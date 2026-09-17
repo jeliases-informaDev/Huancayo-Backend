@@ -1,0 +1,22 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: caja-huancayo-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: caja_huancayo_auditoria
+      MYSQL_USER: caja_huancayo
+      MYSQL_PASSWORD: caja_huancayo_dev
+      MYSQL_ROOT_PASSWORD: root_dev_only
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_dev_only"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_data:

@@ -1,0 +1,237 @@
+// Prisma 7 — La URL de conexión se gestiona desde prisma.config.ts
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum TipoDocumento {
+  DNI
+  CE
+  PASAPORTE
+  RUC
+}
+
+enum TipoCredito {
+  CONSUMO
+  OTROS
+}
+
+/// Tabla física: usuarios (Administrador, Supervisor, Auditor)
+model Usuario {
+  id_usuario        String    @id @default(uuid()) @db.VarChar(36)
+  username          String    @unique @db.VarChar(50)
+  nombres           String?   @db.VarChar(150)
+  apellidos         String?   @db.VarChar(200)
+  email             String?   @db.VarChar(150)
+  sede              String?   @db.VarChar(100)
+  password_hash     String    @db.Text
+  rol               String    @db.VarChar(20) // ADMINISTRADOR, SUPERVISOR, AUDITOR
+  estado            String    @default("ACTIVO") @db.VarChar(20) // ACTIVO, INACTIVO
+  fecha_creacion    DateTime  @default(now())
+  mfa_habilitado    Boolean   @default(false)
+  mfa_requerido     Boolean   @default(false)
+  mfa_exento        Boolean   @default(false)
+  mfa_secreto       String?   @db.Text
+  mfa_ultimo_uso    DateTime?
+  token_version     Int       @default(0)
+  intentos_fallidos Int       @default(0)
+  bloqueado_hasta   DateTime?
+  ultimo_acceso     DateTime?
+  password_cambio   DateTime  @default(now())
+  latitud           Decimal?  @db.Decimal(10, 8) // última ubicación conocida en campo (auditor/supervisor)
+  longitud          Decimal?  @db.Decimal(11, 8)
+
+  asignaciones AsignacionAuditoria[]
+  visitas      VisitaAuditoria[]
+  dispositivos DispositivoAutorizado[]
+
+  @@map("usuarios")
+}
+
+/// Tabla física: dispositivos_autorizados — vincula un usuario a los dispositivos desde los que ha iniciado sesión
+model DispositivoAutorizado {
+  id_dispositivo     String    @id @default(uuid()) @db.VarChar(36)
+  id_usuario         String    @db.VarChar(36)
+  device_id          String    @db.VarChar(150) // identificador estable del dispositivo (installationId)
+  nombre_dispositivo String?   @db.VarChar(150)
+  activo             Boolean   @default(true)
+  primer_uso         DateTime  @default(now())
+  ultimo_uso         DateTime?
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([id_usuario, device_id])
+  @@index([id_usuario])
+  @@map("dispositivos_autorizados")
+}
+
+/// Tabla física: expedientes — ficha de crédito/cliente a auditar, prellenada por importación
+model Expediente {
+  id_expediente     Int         @id @default(autoincrement())
+  codigo_expediente String      @unique @db.VarChar(50) // N° de crédito / clave de importación
+  tipo_credito      TipoCredito @default(CONSUMO)
+  oficina           String?     @db.VarChar(100)
+
+  tipo_documento_cliente   TipoDocumento @default(DNI)
+  numero_documento_cliente String        @db.VarChar(20)
+  nombres_cliente          String        @db.VarChar(200)
+  telefono_cliente         String?       @db.VarChar(20)
+  direccion_domicilio      String?       @db.VarChar(255)
+  distrito                 String?       @db.VarChar(100)
+  provincia                String?       @db.VarChar(100)
+  latitud                  Decimal?      @db.Decimal(10, 8) // domicilio del cliente — base para el chequeo de geocerca
+  longitud                 Decimal?      @db.Decimal(11, 8)
+
+  asesor_responsable String   @db.VarChar(150)
+  monto_desembolso   Decimal? @db.Decimal(12, 2)
+  moneda             String?  @db.VarChar(5)
+
+  // Bloques variables de la ficha (ver PLANTILLAS FICHAS DE VISITA): se guardan como JSON
+  // para no sobre-normalizar ~80 campos que la app solo muestra de referencia al auditor.
+  datos_cliente         Json? // identidad/domicilio adicionales (fuente, fecha nac., edad, estado civil, vivienda...)
+  datos_negocio         Json? // actividad, antigüedad, empleador/negocio, tipo de cliente...
+  datos_credito         Json? // historial crediticio + datos del crédito y participantes
+  evaluacion_financiera Json? // ingresos / balance general / estado de resultados (variante Otros)
+  endeudamiento         Json? // tabla de endeudamiento del cliente y cónyuge
+
+  estado           String   @default("PENDIENTE") @db.VarChar(20) // PENDIENTE, ASIGNADO, VISITADO, CERRADO
+  fecha_creacion   DateTime @default(now())
+  fecha_actualizar DateTime @updatedAt
+
+  asignaciones AsignacionAuditoria[]
+  visitas      VisitaAuditoria[]
+
+  @@index([latitud, longitud])
+  @@index([distrito])
+  @@index([asesor_responsable])
+  @@map("expedientes")
+}
+
+/// Tabla física: asignaciones_auditoria — auditor ↔ expediente (muestra a visitar)
+model AsignacionAuditoria {
+  id_asignacion      Int       @id @default(autoincrement())
+  id_expediente      Int
+  id_usuario_auditor String    @db.VarChar(36)
+  fecha_asignacion   DateTime  @default(now())
+  fecha_fin          DateTime?
+  estado             String    @default("ACTIVA") @db.VarChar(20) // ACTIVA, FINALIZADA, CANCELADA
+  prioridad          String    @default("MEDIA") @db.VarChar(20) // ALTA, MEDIA, BAJA
+
+  expediente Expediente @relation(fields: [id_expediente], references: [id_expediente], onDelete: Restrict, onUpdate: Cascade)
+  auditor    Usuario    @relation(fields: [id_usuario_auditor], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([id_usuario_auditor])
+  @@index([id_expediente])
+  @@map("asignaciones_auditoria")
+}
+
+/// Tabla física: visitas_auditoria — ejecución real de la ficha de entrevista en campo
+model VisitaAuditoria {
+  id_visita          Int       @id @default(autoincrement())
+  client_sync_id     String?   @unique @db.VarChar(100) // idempotencia para visitas creadas sin conexión
+  id_asignacion      Int?
+  id_expediente      Int
+  id_usuario_auditor String    @db.VarChar(36)
+
+  fecha_hora_checkin  DateTime
+  fecha_hora_checkout DateTime?
+  latitud             Decimal   @db.Decimal(10, 8)
+  longitud            Decimal   @db.Decimal(11, 8)
+  precision_metros    Decimal?  @db.Decimal(8, 2) // precisión GPS reportada por el dispositivo
+
+  // Señales anti-fraude calculadas/recibidas al momento de la visita
+  distancia_domicilio_m Decimal? @db.Decimal(10, 2) // distancia Haversine vs expediente.latitud/longitud
+  mock_location         Boolean  @default(false) // ubicación simulada detectada (Fake GPS)
+  device_integrity_ok   Boolean  @default(true) // sin indicios de root/jailbreak/emulador
+  device_id             String?  @db.VarChar(150)
+  server_received_at    DateTime @default(now()) // hora del servidor, no confiar solo en la del dispositivo
+
+  resultado                String  @db.VarChar(30) // CONFORME, OBSERVADO, NO_UBICADO, RECHAZADO
+  respuestas_cuestionario Json // preguntas SI/NO de la ficha (cuestionario al cliente)
+  comentario_negocio      String? @db.Text
+  comentario_auditor      String? @db.Text
+  otros_clientes_domicilio Json?
+  otros_ingresos           Json?
+  firma_evidencia          String? @db.Text // firma PNG en data URL
+
+  estado           String   @default("ABIERTA") @db.VarChar(20) // ABIERTA, CERRADA
+  fecha_creacion   DateTime @default(now())
+  fecha_actualizar DateTime @updatedAt
+
+  expediente Expediente  @relation(fields: [id_expediente], references: [id_expediente], onDelete: Restrict, onUpdate: Cascade)
+  auditor    Usuario     @relation(fields: [id_usuario_auditor], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
+  evidencias Evidencia[]
+
+  @@index([id_expediente])
+  @@index([id_usuario_auditor, fecha_hora_checkin])
+  @@map("visitas_auditoria")
+}
+
+/// Tabla física: evidencias — fotografías/documentos de una visita
+model Evidencia {
+  id_evidencia     String   @id @default(uuid()) @db.VarChar(36)
+  id_visita        Int
+  tipo             String   @db.VarChar(20) // FOTO_PRINCIPAL, FOTO_ADICIONAL
+  object_key       String   @db.VarChar(255)
+  hash_sha256      String   @unique @db.VarChar(64) // detecta reuso de la misma foto entre visitas/clientes
+  latitud_captura  Decimal? @db.Decimal(10, 8)
+  longitud_captura Decimal? @db.Decimal(11, 8)
+  capturado_en     DateTime
+  fecha_creacion   DateTime @default(now())
+
+  visita VisitaAuditoria @relation(fields: [id_visita], references: [id_visita], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([id_visita])
+  @@map("evidencias")
+}
+
+/// Registro inmutable de auditoría de seguridad (acceso y operaciones)
+model AuditoriaSeguridad {
+  id_auditoria  String   @id @default(uuid()) @db.VarChar(36)
+  fecha         DateTime @default(now())
+  request_id    String?  @db.VarChar(100)
+  actor_id      String?  @db.VarChar(36)
+  actor         String?  @db.VarChar(50)
+  rol           String?  @db.VarChar(30)
+  metodo        String   @db.VarChar(10)
+  ruta          String   @db.VarChar(255)
+  estado_http   Int
+  ip_address    String?  @db.VarChar(45)
+  ip_hash       String?  @db.VarChar(64)
+  user_agent    String?  @db.VarChar(255)
+  device_id     String?  @db.VarChar(150)
+  mock_location Boolean?
+
+  @@index([fecha])
+  @@index([actor_id, fecha])
+  @@map("auditoria_seguridad")
+}
+
+/// Importación masiva de expedientes por Excel (no hay integración en vivo con Caja Huancayo todavía)
+model ImportacionMasiva {
+  id_importacion String    @id @default(uuid()) @db.VarChar(36)
+  tipo           String    @db.VarChar(30)
+  estado         String    @default("PENDIENTE") @db.VarChar(20)
+  archivo        String    @db.VarChar(255)
+  ruta_temporal  String    @db.Text
+  actor_id       String?   @db.VarChar(36)
+  total_filas    Int       @default(0)
+  procesadas     Int       @default(0)
+  insertadas     Int       @default(0)
+  actualizadas   Int       @default(0)
+  omitidas       Int       @default(0)
+  errores        Int       @default(0)
+  detalle_error  Json?
+  fecha_creacion DateTime  @default(now())
+  fecha_inicio   DateTime?
+  fecha_fin      DateTime?
+
+  @@index([estado, fecha_creacion])
+  @@index([actor_id, fecha_creacion])
+  @@map("importaciones_masivas")
+}

@@ -1,0 +1,54 @@
+{
+  "name": "caja-huancayo-auditoria-backend",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "API de auditoria de visitas de campo para Caja Huancayo",
+  "main": "index.js",
+  "engines": {
+    "node": "24.19.x"
+  },
+  "imports": {
+    "#core/*": "./src/core/*",
+    "#modules/*": "./src/modules/*"
+  },
+  "scripts": {
+    "build": "prisma generate",
+    "postinstall": "prisma generate",
+    "db:deploy": "prisma migrate deploy",
+    "admin:bootstrap": "node scripts/bootstrap-admin.js",
+    "seed:test-data": "node scripts/seed-test-data.js",
+    "deploy:prepare": "npm run db:deploy && npm run admin:bootstrap",
+    "dev": "node src/server.js",
+    "start": "npm run deploy:prepare && node src/server.js",
+    "test": "node --test tests/*.test.js",
+    "security:audit": "npm audit --omit=dev",
+    "check": "node --check src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "docx": "^9.5.1",
+    "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
+    "otplib": "^13.4.1",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
+    "prisma": "^7.8.0",
+    "socket.io": "^4.8.3",
+    "xlsx": "^0.18.5",
+    "zod": "^4.4.3"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  }
+}
