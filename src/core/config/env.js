@@ -25,6 +25,9 @@ const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().min(1).max(65535).default(4100),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL es obligatorio'),
+  // Certificado CA del proveedor MySQL administrado (p. ej. Aiven) para TLS con
+  // verificación de identidad del servidor. Vacío en desarrollo local (Docker sin TLS).
+  DATABASE_SSL_CA: z.string().optional(),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET debe tener al menos 32 caracteres'),
   MFA_ENCRYPTION_KEY: z.string().min(32, 'MFA_ENCRYPTION_KEY debe tener al menos 32 caracteres'),
   INITIAL_ADMIN_USERNAME: z.string().trim().min(3).max(50).default('CajaHuancayo'),
@@ -43,7 +46,9 @@ const schema = z.object({
   ACCOUNT_LOCK_MINUTES: z.coerce.number().int().min(5).max(1440).default(15),
   // Almacenamiento local de evidencias (fase 1 — sin credenciales cloud todavía).
   EVIDENCIAS_DIR: z.string().default('./storage/evidencias'),
-  EVIDENCIAS_BASE_URL: z.string().default('http://localhost:4100'),
+  // Render inyecta RENDER_EXTERNAL_URL con la URL pública del propio servicio; se usa
+  // como valor por defecto para no tener que configurarlo a mano tras cada deploy.
+  EVIDENCIAS_BASE_URL: z.string().default(process.env.RENDER_EXTERNAL_URL || 'http://localhost:4100'),
   // Anti-fraude: radio máximo (metros) entre el domicilio del expediente y el punto de la visita.
   GEOFENCE_RADIO_METROS: z.coerce.number().int().min(10).max(50000).default(300),
   GEOFENCE_PRECISION_MAXIMA_METROS: z.coerce.number().int().min(5).max(5000).default(100),

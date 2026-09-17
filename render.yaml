@@ -1,0 +1,66 @@
+# Blueprint de Render para el backend de Auditoría de Visitas - Caja Huancayo.
+# Uso: Render Dashboard -> New -> Blueprint -> seleccionar este repositorio.
+# La base de datos MySQL NO se provisiona aquí (Render no ofrece MySQL administrado):
+# se crea aparte en Aiven (u otro proveedor) y su DATABASE_URL se pega a mano abajo,
+# igual que INITIAL_ADMIN_PASSWORD y DATABASE_SSL_CA (marcados con sync: false).
+services:
+  - type: web
+    name: caja-huancayo-backend
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm run start
+    healthCheckPath: /health/live
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_SSL_CA
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MFA_ENCRYPTION_KEY
+        generateValue: true
+      - key: INITIAL_ADMIN_USERNAME
+        value: CajaHuancayo
+      - key: INITIAL_ADMIN_PASSWORD
+        sync: false
+      - key: RESET_INITIAL_ADMIN
+        value: "false"
+      - key: REQUIRE_MFA
+        value: "true"
+      - key: MFA_EXEMPT_USERNAMES
+        value: CajaHuancayo
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: JWT_FIELD_EXPIRES_IN
+        value: 15m
+      - key: JWT_ISSUER
+        value: caja-huancayo-auditoria-api
+      - key: JWT_AUDIENCE
+        value: caja-huancayo-auditoria-clients
+      - key: FRONTEND_URL
+        value: https://caja-huancayo-web.onrender.com
+      - key: CORS_ALLOW_ALL
+        value: "false"
+      - key: TRUST_PROXY
+        value: "true"
+      - key: LOG_LEVEL
+        value: info
+      - key: MAX_LOGIN_FAILURES
+        value: "5"
+      - key: ACCOUNT_LOCK_MINUTES
+        value: "15"
+      - key: EVIDENCIAS_DIR
+        value: /var/data/evidencias
+      - key: GEOFENCE_RADIO_METROS
+        value: "300"
+      - key: GEOFENCE_PRECISION_MAXIMA_METROS
+        value: "100"
+    disk:
+      name: evidencias
+      mountPath: /var/data
+      sizeGB: 1

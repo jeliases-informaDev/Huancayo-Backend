@@ -1,6 +1,6 @@
 import prisma from '#core/config/prisma.js';
 import bcrypt from 'bcryptjs';
-import { ALL_ROLES, normalizeRole } from '#core/security/roles.js';
+import { ALL_ROLES, FIELD_ROLES, normalizeRole } from '#core/security/roles.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
 
 function mapUsuario(usuario) {
@@ -108,4 +108,36 @@ async function resetDevice(id) {
   await prisma.usuario.update({ where: { id_usuario: id }, data: { token_version: { increment: 1 } } });
 }
 
-export default { listar, crear, actualizar, eliminar, resetMfa, resetDevice };
+// Última posición conocida de cada supervisor/auditor activo, para el mapa en vivo
+// del panel web (Fase 2/Fase 6: "el Auditor de Agencia observa... en tiempo real").
+async function ubicacionesActivas() {
+  const usuarios = await prisma.usuario.findMany({
+    where: { estado: 'ACTIVO', rol: { in: FIELD_ROLES }, latitud: { not: null }, longitud: { not: null } },
+    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, latitud: true, longitud: true },
+  });
+  return usuarios.map(u => ({
+    id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '',
+    rol: normalizeRole(u.rol),
+    latitud: u.latitud != null ? Number(u.latitud) : null,
+    longitud: u.longitud != null ? Number(u.longitud) : null,
+  }));
+}
+
+// Ruta recorrida por un usuario en un día dado (por defecto, hoy) — reconstruye la
+// visita a partir de los puntos guardados en tracking_ubicacion.
+async function trackingDeUsuario(id, fecha) {
+  const inicio = fecha ? new Date(`${fecha}T00:00:00`) : new Date(new Date().toDateString());
+  const fin = new Date(inicio.getTime() + 24 * 60 * 60 * 1000);
+  const puntos = await prisma.trackingUbicacion.findMany({
+    where: { id_usuario: id, registrado_en: { gte: inicio, lt: fin } },
+    orderBy: { registrado_en: 'asc' },
+    select: { latitud: true, longitud: true, precision_metros: true, registrado_en: true },
+  });
+  return puntos.map(p => ({
+    latitud: Number(p.latitud), longitud: Number(p.longitud),
+    precision: p.precision_metros != null ? Number(p.precision_metros) : null,
+    fecha: p.registrado_en,
+  }));
+}
+
+export default { listar, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, trackingDeUsuario };

@@ -49,8 +49,25 @@ model Usuario {
   asignaciones AsignacionAuditoria[]
   visitas      VisitaAuditoria[]
   dispositivos DispositivoAutorizado[]
+  trackings    TrackingUbicacion[]
 
   @@map("usuarios")
+}
+
+/// Historial de posiciones GPS del personal de campo (Supervisor/Auditor) — permite
+/// reconstruir la ruta recorrida en el mapa de supervisión (Fase 2/Fase 6 del flujo).
+model TrackingUbicacion {
+  id_tracking      BigInt   @id @default(autoincrement())
+  id_usuario       String   @db.VarChar(36)
+  latitud          Decimal  @db.Decimal(10, 8)
+  longitud         Decimal  @db.Decimal(11, 8)
+  precision_metros Decimal? @db.Decimal(8, 2)
+  registrado_en    DateTime @default(now())
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([id_usuario, registrado_en])
+  @@map("tracking_ubicacion")
 }
 
 /// Tabla física: dispositivos_autorizados — vincula un usuario a los dispositivos desde los que ha iniciado sesión

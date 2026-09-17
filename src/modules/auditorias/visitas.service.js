@@ -156,8 +156,14 @@ async function actualizarUbicacionEnVivo(usuarioId, payload) {
   if (!Number.isFinite(latitud) || !Number.isFinite(longitud) || Math.abs(latitud) > 90 || Math.abs(longitud) > 180) {
     throw Object.assign(new Error('Las coordenadas recibidas no son válidas.'), { statusCode: 400 });
   }
-  const usuario = await prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } });
-  return serialize({ ...usuario, precision: payload.precision ?? null, fecha: new Date() });
+  const precision = payload.precision != null ? Number(payload.precision) : null;
+  const [usuario] = await prisma.$transaction([
+    prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } }),
+    // Se conserva cada punto (no solo el último) para poder reconstruir la ruta recorrida
+    // en el mapa de supervisión, tal como pide el flujo (Fase 2/Fase 6).
+    prisma.trackingUbicacion.create({ data: { id_usuario: usuarioId, latitud, longitud, precision_metros: precision } }),
+  ]);
+  return serialize({ ...usuario, precision, fecha: new Date() });
 }
 
 export default { presignEvidencia, recibirEvidencia, crearVisita, listar, obtener, obtenerArchivoEvidencia, actualizarUbicacionEnVivo };

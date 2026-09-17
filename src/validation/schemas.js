@@ -93,6 +93,10 @@ export const ubicacionBody = z.object({
   precision: z.coerce.number().nonnegative().optional(),
 }).strict();
 
+export const trackingQuery = z.object({
+  fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+}).strict();
+
 export const evidenciaPresignBody = z.object({
   id_expediente: z.coerce.number().int().positive(),
   tipo: z.enum(['FOTO_PRINCIPAL', 'FOTO_ADICIONAL']),

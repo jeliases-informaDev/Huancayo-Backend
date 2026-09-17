@@ -19,6 +19,12 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type Usuario = $Result.DefaultSelection<Prisma.$UsuarioPayload>
 /**
+ * Model TrackingUbicacion
+ * Historial de posiciones GPS del personal de campo (Supervisor/Auditor) — permite
+ * reconstruir la ruta recorrida en el mapa de supervisión (Fase 2/Fase 6 del flujo).
+ */
+export type TrackingUbicacion = $Result.DefaultSelection<Prisma.$TrackingUbicacionPayload>
+/**
  * Model DispositivoAutorizado
  * Tabla física: dispositivos_autorizados — vincula un usuario a los dispositivos desde los que ha iniciado sesión
  */
@@ -215,6 +221,16 @@ export class PrismaClient<
     * ```
     */
   get usuario(): Prisma.UsuarioDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.trackingUbicacion`: Exposes CRUD operations for the **TrackingUbicacion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TrackingUbicacions
+    * const trackingUbicacions = await prisma.trackingUbicacion.findMany()
+    * ```
+    */
+  get trackingUbicacion(): Prisma.TrackingUbicacionDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.dispositivoAutorizado`: Exposes CRUD operations for the **DispositivoAutorizado** model.
@@ -733,6 +749,7 @@ export namespace Prisma {
 
   export const ModelName: {
     Usuario: 'Usuario',
+    TrackingUbicacion: 'TrackingUbicacion',
     DispositivoAutorizado: 'DispositivoAutorizado',
     Expediente: 'Expediente',
     AsignacionAuditoria: 'AsignacionAuditoria',
@@ -755,7 +772,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "usuario" | "dispositivoAutorizado" | "expediente" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva"
+      modelProps: "usuario" | "trackingUbicacion" | "dispositivoAutorizado" | "expediente" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -822,6 +839,72 @@ export namespace Prisma {
           count: {
             args: Prisma.UsuarioCountArgs<ExtArgs>
             result: $Utils.Optional<UsuarioCountAggregateOutputType> | number
+          }
+        }
+      }
+      TrackingUbicacion: {
+        payload: Prisma.$TrackingUbicacionPayload<ExtArgs>
+        fields: Prisma.TrackingUbicacionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TrackingUbicacionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackingUbicacionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TrackingUbicacionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackingUbicacionPayload>
+          }
+          findFirst: {
+            args: Prisma.TrackingUbicacionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackingUbicacionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TrackingUbicacionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackingUbicacionPayload>
+          }
+          findMany: {
+            args: Prisma.TrackingUbicacionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackingUbicacionPayload>[]
+          }
+          create: {
+            args: Prisma.TrackingUbicacionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackingUbicacionPayload>
+          }
+          createMany: {
+            args: Prisma.TrackingUbicacionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.TrackingUbicacionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackingUbicacionPayload>
+          }
+          update: {
+            args: Prisma.TrackingUbicacionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackingUbicacionPayload>
+          }
+          deleteMany: {
+            args: Prisma.TrackingUbicacionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TrackingUbicacionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.TrackingUbicacionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TrackingUbicacionPayload>
+          }
+          aggregate: {
+            args: Prisma.TrackingUbicacionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTrackingUbicacion>
+          }
+          groupBy: {
+            args: Prisma.TrackingUbicacionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TrackingUbicacionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TrackingUbicacionCountArgs<ExtArgs>
+            result: $Utils.Optional<TrackingUbicacionCountAggregateOutputType> | number
           }
         }
       }
@@ -1411,6 +1494,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     usuario?: UsuarioOmit
+    trackingUbicacion?: TrackingUbicacionOmit
     dispositivoAutorizado?: DispositivoAutorizadoOmit
     expediente?: ExpedienteOmit
     asignacionAuditoria?: AsignacionAuditoriaOmit
@@ -1501,12 +1585,14 @@ export namespace Prisma {
     asignaciones: number
     visitas: number
     dispositivos: number
+    trackings: number
   }
 
   export type UsuarioCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | UsuarioCountOutputTypeCountAsignacionesArgs
     visitas?: boolean | UsuarioCountOutputTypeCountVisitasArgs
     dispositivos?: boolean | UsuarioCountOutputTypeCountDispositivosArgs
+    trackings?: boolean | UsuarioCountOutputTypeCountTrackingsArgs
   }
 
   // Custom InputTypes
@@ -1539,6 +1625,13 @@ export namespace Prisma {
    */
   export type UsuarioCountOutputTypeCountDispositivosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DispositivoAutorizadoWhereInput
+  }
+
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeCountTrackingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TrackingUbicacionWhereInput
   }
 
 
@@ -1966,6 +2059,7 @@ export namespace Prisma {
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
     dispositivos?: boolean | Usuario$dispositivosArgs<ExtArgs>
+    trackings?: boolean | Usuario$trackingsArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["usuario"]>
 
@@ -2001,6 +2095,7 @@ export namespace Prisma {
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
     dispositivos?: boolean | Usuario$dispositivosArgs<ExtArgs>
+    trackings?: boolean | Usuario$trackingsArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -2010,6 +2105,7 @@ export namespace Prisma {
       asignaciones: Prisma.$AsignacionAuditoriaPayload<ExtArgs>[]
       visitas: Prisma.$VisitaAuditoriaPayload<ExtArgs>[]
       dispositivos: Prisma.$DispositivoAutorizadoPayload<ExtArgs>[]
+      trackings: Prisma.$TrackingUbicacionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id_usuario: string
@@ -2377,6 +2473,7 @@ export namespace Prisma {
     asignaciones<T extends Usuario$asignacionesArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$asignacionesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AsignacionAuditoriaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     visitas<T extends Usuario$visitasArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$visitasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VisitaAuditoriaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dispositivos<T extends Usuario$dispositivosArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$dispositivosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DispositivoAutorizadoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    trackings<T extends Usuario$trackingsArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$trackingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2848,6 +2945,30 @@ export namespace Prisma {
   }
 
   /**
+   * Usuario.trackings
+   */
+  export type Usuario$trackingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    where?: TrackingUbicacionWhereInput
+    orderBy?: TrackingUbicacionOrderByWithRelationInput | TrackingUbicacionOrderByWithRelationInput[]
+    cursor?: TrackingUbicacionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TrackingUbicacionScalarFieldEnum | TrackingUbicacionScalarFieldEnum[]
+  }
+
+  /**
    * Usuario without action
    */
   export type UsuarioDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2863,6 +2984,997 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UsuarioInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TrackingUbicacion
+   */
+
+  export type AggregateTrackingUbicacion = {
+    _count: TrackingUbicacionCountAggregateOutputType | null
+    _avg: TrackingUbicacionAvgAggregateOutputType | null
+    _sum: TrackingUbicacionSumAggregateOutputType | null
+    _min: TrackingUbicacionMinAggregateOutputType | null
+    _max: TrackingUbicacionMaxAggregateOutputType | null
+  }
+
+  export type TrackingUbicacionAvgAggregateOutputType = {
+    id_tracking: number | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    precision_metros: Decimal | null
+  }
+
+  export type TrackingUbicacionSumAggregateOutputType = {
+    id_tracking: bigint | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    precision_metros: Decimal | null
+  }
+
+  export type TrackingUbicacionMinAggregateOutputType = {
+    id_tracking: bigint | null
+    id_usuario: string | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    precision_metros: Decimal | null
+    registrado_en: Date | null
+  }
+
+  export type TrackingUbicacionMaxAggregateOutputType = {
+    id_tracking: bigint | null
+    id_usuario: string | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    precision_metros: Decimal | null
+    registrado_en: Date | null
+  }
+
+  export type TrackingUbicacionCountAggregateOutputType = {
+    id_tracking: number
+    id_usuario: number
+    latitud: number
+    longitud: number
+    precision_metros: number
+    registrado_en: number
+    _all: number
+  }
+
+
+  export type TrackingUbicacionAvgAggregateInputType = {
+    id_tracking?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+  }
+
+  export type TrackingUbicacionSumAggregateInputType = {
+    id_tracking?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+  }
+
+  export type TrackingUbicacionMinAggregateInputType = {
+    id_tracking?: true
+    id_usuario?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+    registrado_en?: true
+  }
+
+  export type TrackingUbicacionMaxAggregateInputType = {
+    id_tracking?: true
+    id_usuario?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+    registrado_en?: true
+  }
+
+  export type TrackingUbicacionCountAggregateInputType = {
+    id_tracking?: true
+    id_usuario?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+    registrado_en?: true
+    _all?: true
+  }
+
+  export type TrackingUbicacionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TrackingUbicacion to aggregate.
+     */
+    where?: TrackingUbicacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrackingUbicacions to fetch.
+     */
+    orderBy?: TrackingUbicacionOrderByWithRelationInput | TrackingUbicacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TrackingUbicacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrackingUbicacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrackingUbicacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TrackingUbicacions
+    **/
+    _count?: true | TrackingUbicacionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: TrackingUbicacionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: TrackingUbicacionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TrackingUbicacionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TrackingUbicacionMaxAggregateInputType
+  }
+
+  export type GetTrackingUbicacionAggregateType<T extends TrackingUbicacionAggregateArgs> = {
+        [P in keyof T & keyof AggregateTrackingUbicacion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTrackingUbicacion[P]>
+      : GetScalarType<T[P], AggregateTrackingUbicacion[P]>
+  }
+
+
+
+
+  export type TrackingUbicacionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TrackingUbicacionWhereInput
+    orderBy?: TrackingUbicacionOrderByWithAggregationInput | TrackingUbicacionOrderByWithAggregationInput[]
+    by: TrackingUbicacionScalarFieldEnum[] | TrackingUbicacionScalarFieldEnum
+    having?: TrackingUbicacionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TrackingUbicacionCountAggregateInputType | true
+    _avg?: TrackingUbicacionAvgAggregateInputType
+    _sum?: TrackingUbicacionSumAggregateInputType
+    _min?: TrackingUbicacionMinAggregateInputType
+    _max?: TrackingUbicacionMaxAggregateInputType
+  }
+
+  export type TrackingUbicacionGroupByOutputType = {
+    id_tracking: bigint
+    id_usuario: string
+    latitud: Decimal
+    longitud: Decimal
+    precision_metros: Decimal | null
+    registrado_en: Date
+    _count: TrackingUbicacionCountAggregateOutputType | null
+    _avg: TrackingUbicacionAvgAggregateOutputType | null
+    _sum: TrackingUbicacionSumAggregateOutputType | null
+    _min: TrackingUbicacionMinAggregateOutputType | null
+    _max: TrackingUbicacionMaxAggregateOutputType | null
+  }
+
+  type GetTrackingUbicacionGroupByPayload<T extends TrackingUbicacionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TrackingUbicacionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TrackingUbicacionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TrackingUbicacionGroupByOutputType[P]>
+            : GetScalarType<T[P], TrackingUbicacionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TrackingUbicacionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id_tracking?: boolean
+    id_usuario?: boolean
+    latitud?: boolean
+    longitud?: boolean
+    precision_metros?: boolean
+    registrado_en?: boolean
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["trackingUbicacion"]>
+
+
+
+  export type TrackingUbicacionSelectScalar = {
+    id_tracking?: boolean
+    id_usuario?: boolean
+    latitud?: boolean
+    longitud?: boolean
+    precision_metros?: boolean
+    registrado_en?: boolean
+  }
+
+  export type TrackingUbicacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_tracking" | "id_usuario" | "latitud" | "longitud" | "precision_metros" | "registrado_en", ExtArgs["result"]["trackingUbicacion"]>
+  export type TrackingUbicacionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }
+
+  export type $TrackingUbicacionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TrackingUbicacion"
+    objects: {
+      usuario: Prisma.$UsuarioPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id_tracking: bigint
+      id_usuario: string
+      latitud: Prisma.Decimal
+      longitud: Prisma.Decimal
+      precision_metros: Prisma.Decimal | null
+      registrado_en: Date
+    }, ExtArgs["result"]["trackingUbicacion"]>
+    composites: {}
+  }
+
+  type TrackingUbicacionGetPayload<S extends boolean | null | undefined | TrackingUbicacionDefaultArgs> = $Result.GetResult<Prisma.$TrackingUbicacionPayload, S>
+
+  type TrackingUbicacionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TrackingUbicacionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TrackingUbicacionCountAggregateInputType | true
+    }
+
+  export interface TrackingUbicacionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TrackingUbicacion'], meta: { name: 'TrackingUbicacion' } }
+    /**
+     * Find zero or one TrackingUbicacion that matches the filter.
+     * @param {TrackingUbicacionFindUniqueArgs} args - Arguments to find a TrackingUbicacion
+     * @example
+     * // Get one TrackingUbicacion
+     * const trackingUbicacion = await prisma.trackingUbicacion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TrackingUbicacionFindUniqueArgs>(args: SelectSubset<T, TrackingUbicacionFindUniqueArgs<ExtArgs>>): Prisma__TrackingUbicacionClient<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TrackingUbicacion that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TrackingUbicacionFindUniqueOrThrowArgs} args - Arguments to find a TrackingUbicacion
+     * @example
+     * // Get one TrackingUbicacion
+     * const trackingUbicacion = await prisma.trackingUbicacion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TrackingUbicacionFindUniqueOrThrowArgs>(args: SelectSubset<T, TrackingUbicacionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TrackingUbicacionClient<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TrackingUbicacion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackingUbicacionFindFirstArgs} args - Arguments to find a TrackingUbicacion
+     * @example
+     * // Get one TrackingUbicacion
+     * const trackingUbicacion = await prisma.trackingUbicacion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TrackingUbicacionFindFirstArgs>(args?: SelectSubset<T, TrackingUbicacionFindFirstArgs<ExtArgs>>): Prisma__TrackingUbicacionClient<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TrackingUbicacion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackingUbicacionFindFirstOrThrowArgs} args - Arguments to find a TrackingUbicacion
+     * @example
+     * // Get one TrackingUbicacion
+     * const trackingUbicacion = await prisma.trackingUbicacion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TrackingUbicacionFindFirstOrThrowArgs>(args?: SelectSubset<T, TrackingUbicacionFindFirstOrThrowArgs<ExtArgs>>): Prisma__TrackingUbicacionClient<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TrackingUbicacions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackingUbicacionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TrackingUbicacions
+     * const trackingUbicacions = await prisma.trackingUbicacion.findMany()
+     * 
+     * // Get first 10 TrackingUbicacions
+     * const trackingUbicacions = await prisma.trackingUbicacion.findMany({ take: 10 })
+     * 
+     * // Only select the `id_tracking`
+     * const trackingUbicacionWithId_trackingOnly = await prisma.trackingUbicacion.findMany({ select: { id_tracking: true } })
+     * 
+     */
+    findMany<T extends TrackingUbicacionFindManyArgs>(args?: SelectSubset<T, TrackingUbicacionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TrackingUbicacion.
+     * @param {TrackingUbicacionCreateArgs} args - Arguments to create a TrackingUbicacion.
+     * @example
+     * // Create one TrackingUbicacion
+     * const TrackingUbicacion = await prisma.trackingUbicacion.create({
+     *   data: {
+     *     // ... data to create a TrackingUbicacion
+     *   }
+     * })
+     * 
+     */
+    create<T extends TrackingUbicacionCreateArgs>(args: SelectSubset<T, TrackingUbicacionCreateArgs<ExtArgs>>): Prisma__TrackingUbicacionClient<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TrackingUbicacions.
+     * @param {TrackingUbicacionCreateManyArgs} args - Arguments to create many TrackingUbicacions.
+     * @example
+     * // Create many TrackingUbicacions
+     * const trackingUbicacion = await prisma.trackingUbicacion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TrackingUbicacionCreateManyArgs>(args?: SelectSubset<T, TrackingUbicacionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a TrackingUbicacion.
+     * @param {TrackingUbicacionDeleteArgs} args - Arguments to delete one TrackingUbicacion.
+     * @example
+     * // Delete one TrackingUbicacion
+     * const TrackingUbicacion = await prisma.trackingUbicacion.delete({
+     *   where: {
+     *     // ... filter to delete one TrackingUbicacion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TrackingUbicacionDeleteArgs>(args: SelectSubset<T, TrackingUbicacionDeleteArgs<ExtArgs>>): Prisma__TrackingUbicacionClient<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TrackingUbicacion.
+     * @param {TrackingUbicacionUpdateArgs} args - Arguments to update one TrackingUbicacion.
+     * @example
+     * // Update one TrackingUbicacion
+     * const trackingUbicacion = await prisma.trackingUbicacion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TrackingUbicacionUpdateArgs>(args: SelectSubset<T, TrackingUbicacionUpdateArgs<ExtArgs>>): Prisma__TrackingUbicacionClient<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TrackingUbicacions.
+     * @param {TrackingUbicacionDeleteManyArgs} args - Arguments to filter TrackingUbicacions to delete.
+     * @example
+     * // Delete a few TrackingUbicacions
+     * const { count } = await prisma.trackingUbicacion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TrackingUbicacionDeleteManyArgs>(args?: SelectSubset<T, TrackingUbicacionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TrackingUbicacions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackingUbicacionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TrackingUbicacions
+     * const trackingUbicacion = await prisma.trackingUbicacion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TrackingUbicacionUpdateManyArgs>(args: SelectSubset<T, TrackingUbicacionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one TrackingUbicacion.
+     * @param {TrackingUbicacionUpsertArgs} args - Arguments to update or create a TrackingUbicacion.
+     * @example
+     * // Update or create a TrackingUbicacion
+     * const trackingUbicacion = await prisma.trackingUbicacion.upsert({
+     *   create: {
+     *     // ... data to create a TrackingUbicacion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TrackingUbicacion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TrackingUbicacionUpsertArgs>(args: SelectSubset<T, TrackingUbicacionUpsertArgs<ExtArgs>>): Prisma__TrackingUbicacionClient<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TrackingUbicacions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackingUbicacionCountArgs} args - Arguments to filter TrackingUbicacions to count.
+     * @example
+     * // Count the number of TrackingUbicacions
+     * const count = await prisma.trackingUbicacion.count({
+     *   where: {
+     *     // ... the filter for the TrackingUbicacions we want to count
+     *   }
+     * })
+    **/
+    count<T extends TrackingUbicacionCountArgs>(
+      args?: Subset<T, TrackingUbicacionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TrackingUbicacionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TrackingUbicacion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackingUbicacionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TrackingUbicacionAggregateArgs>(args: Subset<T, TrackingUbicacionAggregateArgs>): Prisma.PrismaPromise<GetTrackingUbicacionAggregateType<T>>
+
+    /**
+     * Group by TrackingUbicacion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackingUbicacionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TrackingUbicacionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TrackingUbicacionGroupByArgs['orderBy'] }
+        : { orderBy?: TrackingUbicacionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TrackingUbicacionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTrackingUbicacionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TrackingUbicacion model
+   */
+  readonly fields: TrackingUbicacionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TrackingUbicacion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TrackingUbicacionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TrackingUbicacion model
+   */
+  interface TrackingUbicacionFieldRefs {
+    readonly id_tracking: FieldRef<"TrackingUbicacion", 'BigInt'>
+    readonly id_usuario: FieldRef<"TrackingUbicacion", 'String'>
+    readonly latitud: FieldRef<"TrackingUbicacion", 'Decimal'>
+    readonly longitud: FieldRef<"TrackingUbicacion", 'Decimal'>
+    readonly precision_metros: FieldRef<"TrackingUbicacion", 'Decimal'>
+    readonly registrado_en: FieldRef<"TrackingUbicacion", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TrackingUbicacion findUnique
+   */
+  export type TrackingUbicacionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackingUbicacion to fetch.
+     */
+    where: TrackingUbicacionWhereUniqueInput
+  }
+
+  /**
+   * TrackingUbicacion findUniqueOrThrow
+   */
+  export type TrackingUbicacionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackingUbicacion to fetch.
+     */
+    where: TrackingUbicacionWhereUniqueInput
+  }
+
+  /**
+   * TrackingUbicacion findFirst
+   */
+  export type TrackingUbicacionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackingUbicacion to fetch.
+     */
+    where?: TrackingUbicacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrackingUbicacions to fetch.
+     */
+    orderBy?: TrackingUbicacionOrderByWithRelationInput | TrackingUbicacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TrackingUbicacions.
+     */
+    cursor?: TrackingUbicacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrackingUbicacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrackingUbicacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TrackingUbicacions.
+     */
+    distinct?: TrackingUbicacionScalarFieldEnum | TrackingUbicacionScalarFieldEnum[]
+  }
+
+  /**
+   * TrackingUbicacion findFirstOrThrow
+   */
+  export type TrackingUbicacionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackingUbicacion to fetch.
+     */
+    where?: TrackingUbicacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrackingUbicacions to fetch.
+     */
+    orderBy?: TrackingUbicacionOrderByWithRelationInput | TrackingUbicacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TrackingUbicacions.
+     */
+    cursor?: TrackingUbicacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrackingUbicacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrackingUbicacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TrackingUbicacions.
+     */
+    distinct?: TrackingUbicacionScalarFieldEnum | TrackingUbicacionScalarFieldEnum[]
+  }
+
+  /**
+   * TrackingUbicacion findMany
+   */
+  export type TrackingUbicacionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    /**
+     * Filter, which TrackingUbicacions to fetch.
+     */
+    where?: TrackingUbicacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TrackingUbicacions to fetch.
+     */
+    orderBy?: TrackingUbicacionOrderByWithRelationInput | TrackingUbicacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TrackingUbicacions.
+     */
+    cursor?: TrackingUbicacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TrackingUbicacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TrackingUbicacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TrackingUbicacions.
+     */
+    distinct?: TrackingUbicacionScalarFieldEnum | TrackingUbicacionScalarFieldEnum[]
+  }
+
+  /**
+   * TrackingUbicacion create
+   */
+  export type TrackingUbicacionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TrackingUbicacion.
+     */
+    data: XOR<TrackingUbicacionCreateInput, TrackingUbicacionUncheckedCreateInput>
+  }
+
+  /**
+   * TrackingUbicacion createMany
+   */
+  export type TrackingUbicacionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TrackingUbicacions.
+     */
+    data: TrackingUbicacionCreateManyInput | TrackingUbicacionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TrackingUbicacion update
+   */
+  export type TrackingUbicacionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TrackingUbicacion.
+     */
+    data: XOR<TrackingUbicacionUpdateInput, TrackingUbicacionUncheckedUpdateInput>
+    /**
+     * Choose, which TrackingUbicacion to update.
+     */
+    where: TrackingUbicacionWhereUniqueInput
+  }
+
+  /**
+   * TrackingUbicacion updateMany
+   */
+  export type TrackingUbicacionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TrackingUbicacions.
+     */
+    data: XOR<TrackingUbicacionUpdateManyMutationInput, TrackingUbicacionUncheckedUpdateManyInput>
+    /**
+     * Filter which TrackingUbicacions to update
+     */
+    where?: TrackingUbicacionWhereInput
+    /**
+     * Limit how many TrackingUbicacions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TrackingUbicacion upsert
+   */
+  export type TrackingUbicacionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TrackingUbicacion to update in case it exists.
+     */
+    where: TrackingUbicacionWhereUniqueInput
+    /**
+     * In case the TrackingUbicacion found by the `where` argument doesn't exist, create a new TrackingUbicacion with this data.
+     */
+    create: XOR<TrackingUbicacionCreateInput, TrackingUbicacionUncheckedCreateInput>
+    /**
+     * In case the TrackingUbicacion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TrackingUbicacionUpdateInput, TrackingUbicacionUncheckedUpdateInput>
+  }
+
+  /**
+   * TrackingUbicacion delete
+   */
+  export type TrackingUbicacionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
+    /**
+     * Filter which TrackingUbicacion to delete.
+     */
+    where: TrackingUbicacionWhereUniqueInput
+  }
+
+  /**
+   * TrackingUbicacion deleteMany
+   */
+  export type TrackingUbicacionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TrackingUbicacions to delete
+     */
+    where?: TrackingUbicacionWhereInput
+    /**
+     * Limit how many TrackingUbicacions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TrackingUbicacion without action
+   */
+  export type TrackingUbicacionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackingUbicacion
+     */
+    select?: TrackingUbicacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TrackingUbicacion
+     */
+    omit?: TrackingUbicacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackingUbicacionInclude<ExtArgs> | null
   }
 
 
@@ -10417,6 +11529,18 @@ export namespace Prisma {
   export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
 
 
+  export const TrackingUbicacionScalarFieldEnum: {
+    id_tracking: 'id_tracking',
+    id_usuario: 'id_usuario',
+    latitud: 'latitud',
+    longitud: 'longitud',
+    precision_metros: 'precision_metros',
+    registrado_en: 'registrado_en'
+  };
+
+  export type TrackingUbicacionScalarFieldEnum = (typeof TrackingUbicacionScalarFieldEnum)[keyof typeof TrackingUbicacionScalarFieldEnum]
+
+
   export const DispositivoAutorizadoScalarFieldEnum: {
     id_dispositivo: 'id_dispositivo',
     id_usuario: 'id_usuario',
@@ -10608,6 +11732,13 @@ export namespace Prisma {
   export type UsuarioOrderByRelevanceFieldEnum = (typeof UsuarioOrderByRelevanceFieldEnum)[keyof typeof UsuarioOrderByRelevanceFieldEnum]
 
 
+  export const TrackingUbicacionOrderByRelevanceFieldEnum: {
+    id_usuario: 'id_usuario'
+  };
+
+  export type TrackingUbicacionOrderByRelevanceFieldEnum = (typeof TrackingUbicacionOrderByRelevanceFieldEnum)[keyof typeof TrackingUbicacionOrderByRelevanceFieldEnum]
+
+
   export const DispositivoAutorizadoOrderByRelevanceFieldEnum: {
     id_dispositivo: 'id_dispositivo',
     id_usuario: 'id_usuario',
@@ -10755,6 +11886,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'BigInt'
+   */
+  export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+  /**
    * Reference to a field of type 'TipoCredito'
    */
   export type EnumTipoCreditoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TipoCredito'>
@@ -10821,6 +11959,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     dispositivos?: DispositivoAutorizadoListRelationFilter
+    trackings?: TrackingUbicacionListRelationFilter
   }
 
   export type UsuarioOrderByWithRelationInput = {
@@ -10849,6 +11988,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaOrderByRelationAggregateInput
     visitas?: VisitaAuditoriaOrderByRelationAggregateInput
     dispositivos?: DispositivoAutorizadoOrderByRelationAggregateInput
+    trackings?: TrackingUbicacionOrderByRelationAggregateInput
     _relevance?: UsuarioOrderByRelevanceInput
   }
 
@@ -10881,6 +12021,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     dispositivos?: DispositivoAutorizadoListRelationFilter
+    trackings?: TrackingUbicacionListRelationFilter
   }, "id_usuario" | "username">
 
   export type UsuarioOrderByWithAggregationInput = {
@@ -10939,6 +12080,69 @@ export namespace Prisma {
     password_cambio?: DateTimeWithAggregatesFilter<"Usuario"> | Date | string
     latitud?: DecimalNullableWithAggregatesFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableWithAggregatesFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type TrackingUbicacionWhereInput = {
+    AND?: TrackingUbicacionWhereInput | TrackingUbicacionWhereInput[]
+    OR?: TrackingUbicacionWhereInput[]
+    NOT?: TrackingUbicacionWhereInput | TrackingUbicacionWhereInput[]
+    id_tracking?: BigIntFilter<"TrackingUbicacion"> | bigint | number
+    id_usuario?: StringFilter<"TrackingUbicacion"> | string
+    latitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
+    precision_metros?: DecimalNullableFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }
+
+  export type TrackingUbicacionOrderByWithRelationInput = {
+    id_tracking?: SortOrder
+    id_usuario?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrderInput | SortOrder
+    registrado_en?: SortOrder
+    usuario?: UsuarioOrderByWithRelationInput
+    _relevance?: TrackingUbicacionOrderByRelevanceInput
+  }
+
+  export type TrackingUbicacionWhereUniqueInput = Prisma.AtLeast<{
+    id_tracking?: bigint | number
+    AND?: TrackingUbicacionWhereInput | TrackingUbicacionWhereInput[]
+    OR?: TrackingUbicacionWhereInput[]
+    NOT?: TrackingUbicacionWhereInput | TrackingUbicacionWhereInput[]
+    id_usuario?: StringFilter<"TrackingUbicacion"> | string
+    latitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
+    precision_metros?: DecimalNullableFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }, "id_tracking">
+
+  export type TrackingUbicacionOrderByWithAggregationInput = {
+    id_tracking?: SortOrder
+    id_usuario?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrderInput | SortOrder
+    registrado_en?: SortOrder
+    _count?: TrackingUbicacionCountOrderByAggregateInput
+    _avg?: TrackingUbicacionAvgOrderByAggregateInput
+    _max?: TrackingUbicacionMaxOrderByAggregateInput
+    _min?: TrackingUbicacionMinOrderByAggregateInput
+    _sum?: TrackingUbicacionSumOrderByAggregateInput
+  }
+
+  export type TrackingUbicacionScalarWhereWithAggregatesInput = {
+    AND?: TrackingUbicacionScalarWhereWithAggregatesInput | TrackingUbicacionScalarWhereWithAggregatesInput[]
+    OR?: TrackingUbicacionScalarWhereWithAggregatesInput[]
+    NOT?: TrackingUbicacionScalarWhereWithAggregatesInput | TrackingUbicacionScalarWhereWithAggregatesInput[]
+    id_tracking?: BigIntWithAggregatesFilter<"TrackingUbicacion"> | bigint | number
+    id_usuario?: StringWithAggregatesFilter<"TrackingUbicacion"> | string
+    latitud?: DecimalWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
+    precision_metros?: DecimalNullableWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeWithAggregatesFilter<"TrackingUbicacion"> | Date | string
   }
 
   export type DispositivoAutorizadoWhereInput = {
@@ -11713,6 +12917,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateInput = {
@@ -11741,6 +12946,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUpdateInput = {
@@ -11769,6 +12975,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateInput = {
@@ -11797,6 +13004,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateManyInput = {
@@ -11872,6 +13080,68 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type TrackingUbicacionCreateInput = {
+    id_tracking?: bigint | number
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    registrado_en?: Date | string
+    usuario: UsuarioCreateNestedOneWithoutTrackingsInput
+  }
+
+  export type TrackingUbicacionUncheckedCreateInput = {
+    id_tracking?: bigint | number
+    id_usuario: string
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    registrado_en?: Date | string
+  }
+
+  export type TrackingUbicacionUpdateInput = {
+    id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    usuario?: UsuarioUpdateOneRequiredWithoutTrackingsNestedInput
+  }
+
+  export type TrackingUbicacionUncheckedUpdateInput = {
+    id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackingUbicacionCreateManyInput = {
+    id_tracking?: bigint | number
+    id_usuario: string
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    registrado_en?: Date | string
+  }
+
+  export type TrackingUbicacionUpdateManyMutationInput = {
+    id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackingUbicacionUncheckedUpdateManyInput = {
+    id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DispositivoAutorizadoCreateInput = {
@@ -12829,6 +14099,12 @@ export namespace Prisma {
     none?: DispositivoAutorizadoWhereInput
   }
 
+  export type TrackingUbicacionListRelationFilter = {
+    every?: TrackingUbicacionWhereInput
+    some?: TrackingUbicacionWhereInput
+    none?: TrackingUbicacionWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -12843,6 +14119,10 @@ export namespace Prisma {
   }
 
   export type DispositivoAutorizadoOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TrackingUbicacionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -13045,9 +14325,110 @@ export namespace Prisma {
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
+  export type BigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[]
+    notIn?: bigint[] | number[]
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
+  export type DecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
   export type UsuarioScalarRelationFilter = {
     is?: UsuarioWhereInput
     isNot?: UsuarioWhereInput
+  }
+
+  export type TrackingUbicacionOrderByRelevanceInput = {
+    fields: TrackingUbicacionOrderByRelevanceFieldEnum | TrackingUbicacionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type TrackingUbicacionCountOrderByAggregateInput = {
+    id_tracking?: SortOrder
+    id_usuario?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+    registrado_en?: SortOrder
+  }
+
+  export type TrackingUbicacionAvgOrderByAggregateInput = {
+    id_tracking?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+  }
+
+  export type TrackingUbicacionMaxOrderByAggregateInput = {
+    id_tracking?: SortOrder
+    id_usuario?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+    registrado_en?: SortOrder
+  }
+
+  export type TrackingUbicacionMinOrderByAggregateInput = {
+    id_tracking?: SortOrder
+    id_usuario?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+    registrado_en?: SortOrder
+  }
+
+  export type TrackingUbicacionSumOrderByAggregateInput = {
+    id_tracking?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+  }
+
+  export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[]
+    notIn?: bigint[] | number[]
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
+  }
+
+  export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
   }
 
   export type DispositivoAutorizadoOrderByRelevanceInput = {
@@ -13326,17 +14707,6 @@ export namespace Prisma {
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
-
-  export type DecimalFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -13489,22 +14859,6 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedDecimalFilter<$PrismaModel>
-    _sum?: NestedDecimalFilter<$PrismaModel>
-    _min?: NestedDecimalFilter<$PrismaModel>
-    _max?: NestedDecimalFilter<$PrismaModel>
   }
   export type JsonWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -13770,6 +15124,13 @@ export namespace Prisma {
     connect?: DispositivoAutorizadoWhereUniqueInput | DispositivoAutorizadoWhereUniqueInput[]
   }
 
+  export type TrackingUbicacionCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<TrackingUbicacionCreateWithoutUsuarioInput, TrackingUbicacionUncheckedCreateWithoutUsuarioInput> | TrackingUbicacionCreateWithoutUsuarioInput[] | TrackingUbicacionUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: TrackingUbicacionCreateOrConnectWithoutUsuarioInput | TrackingUbicacionCreateOrConnectWithoutUsuarioInput[]
+    createMany?: TrackingUbicacionCreateManyUsuarioInputEnvelope
+    connect?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutAuditorInput, AsignacionAuditoriaUncheckedCreateWithoutAuditorInput> | AsignacionAuditoriaCreateWithoutAuditorInput[] | AsignacionAuditoriaUncheckedCreateWithoutAuditorInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutAuditorInput | AsignacionAuditoriaCreateOrConnectWithoutAuditorInput[]
@@ -13789,6 +15150,13 @@ export namespace Prisma {
     connectOrCreate?: DispositivoAutorizadoCreateOrConnectWithoutUsuarioInput | DispositivoAutorizadoCreateOrConnectWithoutUsuarioInput[]
     createMany?: DispositivoAutorizadoCreateManyUsuarioInputEnvelope
     connect?: DispositivoAutorizadoWhereUniqueInput | DispositivoAutorizadoWhereUniqueInput[]
+  }
+
+  export type TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<TrackingUbicacionCreateWithoutUsuarioInput, TrackingUbicacionUncheckedCreateWithoutUsuarioInput> | TrackingUbicacionCreateWithoutUsuarioInput[] | TrackingUbicacionUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: TrackingUbicacionCreateOrConnectWithoutUsuarioInput | TrackingUbicacionCreateOrConnectWithoutUsuarioInput[]
+    createMany?: TrackingUbicacionCreateManyUsuarioInputEnvelope
+    connect?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -13869,6 +15237,20 @@ export namespace Prisma {
     deleteMany?: DispositivoAutorizadoScalarWhereInput | DispositivoAutorizadoScalarWhereInput[]
   }
 
+  export type TrackingUbicacionUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<TrackingUbicacionCreateWithoutUsuarioInput, TrackingUbicacionUncheckedCreateWithoutUsuarioInput> | TrackingUbicacionCreateWithoutUsuarioInput[] | TrackingUbicacionUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: TrackingUbicacionCreateOrConnectWithoutUsuarioInput | TrackingUbicacionCreateOrConnectWithoutUsuarioInput[]
+    upsert?: TrackingUbicacionUpsertWithWhereUniqueWithoutUsuarioInput | TrackingUbicacionUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: TrackingUbicacionCreateManyUsuarioInputEnvelope
+    set?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+    disconnect?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+    delete?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+    connect?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+    update?: TrackingUbicacionUpdateWithWhereUniqueWithoutUsuarioInput | TrackingUbicacionUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: TrackingUbicacionUpdateManyWithWhereWithoutUsuarioInput | TrackingUbicacionUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: TrackingUbicacionScalarWhereInput | TrackingUbicacionScalarWhereInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutAuditorInput, AsignacionAuditoriaUncheckedCreateWithoutAuditorInput> | AsignacionAuditoriaCreateWithoutAuditorInput[] | AsignacionAuditoriaUncheckedCreateWithoutAuditorInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutAuditorInput | AsignacionAuditoriaCreateOrConnectWithoutAuditorInput[]
@@ -13909,6 +15291,50 @@ export namespace Prisma {
     update?: DispositivoAutorizadoUpdateWithWhereUniqueWithoutUsuarioInput | DispositivoAutorizadoUpdateWithWhereUniqueWithoutUsuarioInput[]
     updateMany?: DispositivoAutorizadoUpdateManyWithWhereWithoutUsuarioInput | DispositivoAutorizadoUpdateManyWithWhereWithoutUsuarioInput[]
     deleteMany?: DispositivoAutorizadoScalarWhereInput | DispositivoAutorizadoScalarWhereInput[]
+  }
+
+  export type TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<TrackingUbicacionCreateWithoutUsuarioInput, TrackingUbicacionUncheckedCreateWithoutUsuarioInput> | TrackingUbicacionCreateWithoutUsuarioInput[] | TrackingUbicacionUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: TrackingUbicacionCreateOrConnectWithoutUsuarioInput | TrackingUbicacionCreateOrConnectWithoutUsuarioInput[]
+    upsert?: TrackingUbicacionUpsertWithWhereUniqueWithoutUsuarioInput | TrackingUbicacionUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: TrackingUbicacionCreateManyUsuarioInputEnvelope
+    set?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+    disconnect?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+    delete?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+    connect?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+    update?: TrackingUbicacionUpdateWithWhereUniqueWithoutUsuarioInput | TrackingUbicacionUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: TrackingUbicacionUpdateManyWithWhereWithoutUsuarioInput | TrackingUbicacionUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: TrackingUbicacionScalarWhereInput | TrackingUbicacionScalarWhereInput[]
+  }
+
+  export type UsuarioCreateNestedOneWithoutTrackingsInput = {
+    create?: XOR<UsuarioCreateWithoutTrackingsInput, UsuarioUncheckedCreateWithoutTrackingsInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutTrackingsInput
+    connect?: UsuarioWhereUniqueInput
+  }
+
+  export type BigIntFieldUpdateOperationsInput = {
+    set?: bigint | number
+    increment?: bigint | number
+    decrement?: bigint | number
+    multiply?: bigint | number
+    divide?: bigint | number
+  }
+
+  export type DecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type UsuarioUpdateOneRequiredWithoutTrackingsNestedInput = {
+    create?: XOR<UsuarioCreateWithoutTrackingsInput, UsuarioUncheckedCreateWithoutTrackingsInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutTrackingsInput
+    upsert?: UsuarioUpsertWithoutTrackingsInput
+    connect?: UsuarioWhereUniqueInput
+    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutTrackingsInput, UsuarioUpdateWithoutTrackingsInput>, UsuarioUncheckedUpdateWithoutTrackingsInput>
   }
 
   export type UsuarioCreateNestedOneWithoutDispositivosInput = {
@@ -14077,14 +15503,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type DecimalFieldUpdateOperationsInput = {
-    set?: Decimal | DecimalJsLike | number | string
-    increment?: Decimal | DecimalJsLike | number | string
-    decrement?: Decimal | DecimalJsLike | number | string
-    multiply?: Decimal | DecimalJsLike | number | string
-    divide?: Decimal | DecimalJsLike | number | string
   }
 
   export type ExpedienteUpdateOneRequiredWithoutVisitasNestedInput = {
@@ -14354,6 +15772,60 @@ export namespace Prisma {
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
+  export type NestedBigIntFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[]
+    notIn?: bigint[] | number[]
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntFilter<$PrismaModel> | bigint | number
+  }
+
+  export type NestedDecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    in?: bigint[] | number[]
+    notIn?: bigint[] | number[]
+    lt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    lte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gt?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    gte?: bigint | number | BigIntFieldRefInput<$PrismaModel>
+    not?: NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedBigIntFilter<$PrismaModel>
+    _min?: NestedBigIntFilter<$PrismaModel>
+    _max?: NestedBigIntFilter<$PrismaModel>
+  }
+
+  export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
   export type NestedEnumTipoCreditoFilter<$PrismaModel = never> = {
     equals?: $Enums.TipoCredito | EnumTipoCreditoFieldRefInput<$PrismaModel>
     in?: $Enums.TipoCredito[]
@@ -14411,17 +15883,6 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type NestedDecimalFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
     in?: number[] | null
@@ -14447,22 +15908,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[]
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedDecimalFilter<$PrismaModel>
-    _sum?: NestedDecimalFilter<$PrismaModel>
-    _min?: NestedDecimalFilter<$PrismaModel>
-    _max?: NestedDecimalFilter<$PrismaModel>
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -14621,6 +16066,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TrackingUbicacionCreateWithoutUsuarioInput = {
+    id_tracking?: bigint | number
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    registrado_en?: Date | string
+  }
+
+  export type TrackingUbicacionUncheckedCreateWithoutUsuarioInput = {
+    id_tracking?: bigint | number
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    registrado_en?: Date | string
+  }
+
+  export type TrackingUbicacionCreateOrConnectWithoutUsuarioInput = {
+    where: TrackingUbicacionWhereUniqueInput
+    create: XOR<TrackingUbicacionCreateWithoutUsuarioInput, TrackingUbicacionUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type TrackingUbicacionCreateManyUsuarioInputEnvelope = {
+    data: TrackingUbicacionCreateManyUsuarioInput | TrackingUbicacionCreateManyUsuarioInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AsignacionAuditoriaUpsertWithWhereUniqueWithoutAuditorInput = {
     where: AsignacionAuditoriaWhereUniqueInput
     update: XOR<AsignacionAuditoriaUpdateWithoutAuditorInput, AsignacionAuditoriaUncheckedUpdateWithoutAuditorInput>
@@ -14726,6 +16197,162 @@ export namespace Prisma {
     ultimo_uso?: DateTimeNullableFilter<"DispositivoAutorizado"> | Date | string | null
   }
 
+  export type TrackingUbicacionUpsertWithWhereUniqueWithoutUsuarioInput = {
+    where: TrackingUbicacionWhereUniqueInput
+    update: XOR<TrackingUbicacionUpdateWithoutUsuarioInput, TrackingUbicacionUncheckedUpdateWithoutUsuarioInput>
+    create: XOR<TrackingUbicacionCreateWithoutUsuarioInput, TrackingUbicacionUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type TrackingUbicacionUpdateWithWhereUniqueWithoutUsuarioInput = {
+    where: TrackingUbicacionWhereUniqueInput
+    data: XOR<TrackingUbicacionUpdateWithoutUsuarioInput, TrackingUbicacionUncheckedUpdateWithoutUsuarioInput>
+  }
+
+  export type TrackingUbicacionUpdateManyWithWhereWithoutUsuarioInput = {
+    where: TrackingUbicacionScalarWhereInput
+    data: XOR<TrackingUbicacionUpdateManyMutationInput, TrackingUbicacionUncheckedUpdateManyWithoutUsuarioInput>
+  }
+
+  export type TrackingUbicacionScalarWhereInput = {
+    AND?: TrackingUbicacionScalarWhereInput | TrackingUbicacionScalarWhereInput[]
+    OR?: TrackingUbicacionScalarWhereInput[]
+    NOT?: TrackingUbicacionScalarWhereInput | TrackingUbicacionScalarWhereInput[]
+    id_tracking?: BigIntFilter<"TrackingUbicacion"> | bigint | number
+    id_usuario?: StringFilter<"TrackingUbicacion"> | string
+    latitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
+    precision_metros?: DecimalNullableFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
+  }
+
+  export type UsuarioCreateWithoutTrackingsInput = {
+    id_usuario?: string
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
+    visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
+    dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioUncheckedCreateWithoutTrackingsInput = {
+    id_usuario?: string
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
+    visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
+    dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioCreateOrConnectWithoutTrackingsInput = {
+    where: UsuarioWhereUniqueInput
+    create: XOR<UsuarioCreateWithoutTrackingsInput, UsuarioUncheckedCreateWithoutTrackingsInput>
+  }
+
+  export type UsuarioUpsertWithoutTrackingsInput = {
+    update: XOR<UsuarioUpdateWithoutTrackingsInput, UsuarioUncheckedUpdateWithoutTrackingsInput>
+    create: XOR<UsuarioCreateWithoutTrackingsInput, UsuarioUncheckedCreateWithoutTrackingsInput>
+    where?: UsuarioWhereInput
+  }
+
+  export type UsuarioUpdateToOneWithWhereWithoutTrackingsInput = {
+    where?: UsuarioWhereInput
+    data: XOR<UsuarioUpdateWithoutTrackingsInput, UsuarioUncheckedUpdateWithoutTrackingsInput>
+  }
+
+  export type UsuarioUpdateWithoutTrackingsInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
+    visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
+    dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
+  }
+
+  export type UsuarioUncheckedUpdateWithoutTrackingsInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
+    visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
+    dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
+  }
+
   export type UsuarioCreateWithoutDispositivosInput = {
     id_usuario?: string
     username: string
@@ -14751,6 +16378,7 @@ export namespace Prisma {
     longitud?: Decimal | DecimalJsLike | number | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
+    trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutDispositivosInput = {
@@ -14778,6 +16406,7 @@ export namespace Prisma {
     longitud?: Decimal | DecimalJsLike | number | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
+    trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutDispositivosInput = {
@@ -14821,6 +16450,7 @@ export namespace Prisma {
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
+    trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutDispositivosInput = {
@@ -14848,6 +16478,7 @@ export namespace Prisma {
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
+    trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type AsignacionAuditoriaCreateWithoutExpedienteInput = {
@@ -15059,6 +16690,7 @@ export namespace Prisma {
     longitud?: Decimal | DecimalJsLike | number | string | null
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutAsignacionesInput = {
@@ -15086,6 +16718,7 @@ export namespace Prisma {
     longitud?: Decimal | DecimalJsLike | number | string | null
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutAsignacionesInput = {
@@ -15195,6 +16828,7 @@ export namespace Prisma {
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutAsignacionesInput = {
@@ -15222,6 +16856,7 @@ export namespace Prisma {
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type ExpedienteCreateWithoutVisitasInput = {
@@ -15309,6 +16944,7 @@ export namespace Prisma {
     longitud?: Decimal | DecimalJsLike | number | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutVisitasInput = {
@@ -15336,6 +16972,7 @@ export namespace Prisma {
     longitud?: Decimal | DecimalJsLike | number | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutVisitasInput = {
@@ -15477,6 +17114,7 @@ export namespace Prisma {
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutVisitasInput = {
@@ -15504,6 +17142,7 @@ export namespace Prisma {
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type EvidenciaUpsertWithWhereUniqueWithoutVisitaInput = {
@@ -15708,6 +17347,14 @@ export namespace Prisma {
     ultimo_uso?: Date | string | null
   }
 
+  export type TrackingUbicacionCreateManyUsuarioInput = {
+    id_tracking?: bigint | number
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    registrado_en?: Date | string
+  }
+
   export type AsignacionAuditoriaUpdateWithoutAuditorInput = {
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -15841,6 +17488,30 @@ export namespace Prisma {
     activo?: BoolFieldUpdateOperationsInput | boolean
     primer_uso?: DateTimeFieldUpdateOperationsInput | Date | string
     ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type TrackingUbicacionUpdateWithoutUsuarioInput = {
+    id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackingUbicacionUncheckedUpdateWithoutUsuarioInput = {
+    id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TrackingUbicacionUncheckedUpdateManyWithoutUsuarioInput = {
+    id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AsignacionAuditoriaCreateManyExpedienteInput = {

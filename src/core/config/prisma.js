@@ -10,6 +10,15 @@ import { PrismaClient } from '../../generated/prisma/index.js';
 // por defecto el plugin de autenticación caching_sha2_password, que en una
 // conexión sin TLS necesita recuperar la llave pública RSA del servidor; sin
 // allowPublicKeyRetrieval la conexión se queda colgada en el primer intento.
+// En producción (Aiven u otro MySQL administrado), DATABASE_SSL_CA trae el certificado
+// CA para TLS con verificación de identidad del servidor (rejectUnauthorized: true).
+// Sin ese certificado (desarrollo local con Docker) no se fuerza TLS.
+function buildSsl() {
+  if (!env.DATABASE_SSL_CA) return undefined;
+  const ca = env.DATABASE_SSL_CA.includes('\\n') ? env.DATABASE_SSL_CA.replace(/\\n/g, '\n') : env.DATABASE_SSL_CA;
+  return { ca, rejectUnauthorized: true };
+}
+
 function parseDatabaseUrl(url) {
   const parsed = new URL(url);
   return {
@@ -19,6 +28,7 @@ function parseDatabaseUrl(url) {
     password: decodeURIComponent(parsed.password),
     database: parsed.pathname.replace(/^\//, ''),
     allowPublicKeyRetrieval: true,
+    ssl: buildSsl(),
   };
 }
 

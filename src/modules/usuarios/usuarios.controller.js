@@ -19,4 +19,10 @@ async function resetMfa(req, res, next) {
 async function resetDevice(req, res, next) {
   try { await usuariosService.resetDevice(req.params.id); res.json({ message: 'Dispositivo liberado; el próximo inicio de sesión autorizará el nuevo equipo' }); } catch (error) { next(error); }
 }
-export default { listar, crear, actualizar, eliminar, resetMfa, resetDevice };
+async function ubicacionesActivas(_req, res, next) {
+  try { res.json({ data: await usuariosService.ubicacionesActivas() }); } catch (error) { next(error); }
+}
+async function tracking(req, res, next) {
+  try { res.json({ data: await usuariosService.trackingDeUsuario(req.validated.params.id, req.validated.query.fecha) }); } catch (error) { next(error); }
+}
+export default { listar, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking };
