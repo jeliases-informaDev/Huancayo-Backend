@@ -3,11 +3,17 @@
 # La base de datos MySQL NO se provisiona aquí (Render no ofrece MySQL administrado):
 # se crea aparte en Aiven (u otro proveedor) y su DATABASE_URL se pega a mano abajo,
 # igual que INITIAL_ADMIN_PASSWORD y DATABASE_SSL_CA (marcados con sync: false).
+#
+# Plan "free": sin tarjeta, pero el servicio se suspende tras 15 min sin tráfico (la
+# siguiente petición tarda ~30-60s en "despertarlo") y no admite disco persistente, así
+# que las evidencias (fotos) NO sobreviven a un redeploy o reinicio. Sirve para demos;
+# para producción real, subir a "starter" y volver a agregar un "disk" persistente
+# (o migrar storage.service.js a Backblaze B2, como ya hace Afacop).
 services:
   - type: web
     name: caja-huancayo-backend
     runtime: node
-    plan: starter
+    plan: free
     region: ohio
     buildCommand: npm install
     startCommand: npm run start
@@ -54,13 +60,7 @@ services:
         value: "5"
       - key: ACCOUNT_LOCK_MINUTES
         value: "15"
-      - key: EVIDENCIAS_DIR
-        value: /var/data/evidencias
       - key: GEOFENCE_RADIO_METROS
         value: "300"
       - key: GEOFENCE_PRECISION_MAXIMA_METROS
         value: "100"
-    disk:
-      name: evidencias
-      mountPath: /var/data
-      sizeGB: 1
