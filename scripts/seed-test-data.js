@@ -6,11 +6,14 @@ import prisma from '#core/config/prisma.js';
 
 const TEST_PASSWORD = 'CajaHuancayo2026!';
 
+// Nombres de usuario ligados a la persona (no numerados) para no confundir roles
+// durante la demo: cada uno deja claro a simple vista si es Auditor de Agencia
+// (supervisor.*) o Auditor de Campo (auditor.<apellido>).
 const usuarios = [
-  { username: 'supervisor.test', nombres: 'Rosa', apellidos: 'Quispe Mendoza', rol: 'SUPERVISOR' },
-  { username: 'auditor1.test', nombres: 'Luis', apellidos: 'Ramos Torres', rol: 'AUDITOR' },
-  { username: 'auditor2.test', nombres: 'Milagros', apellidos: 'Cuba Espinoza', rol: 'AUDITOR' },
-  { username: 'auditor3.test', nombres: 'Jhon', apellidos: 'Huaman Rojas', rol: 'AUDITOR' },
+  { username: 'supervisor.agencia', nombres: 'Rosa', apellidos: 'Quispe Mendoza', rol: 'SUPERVISOR' },
+  { username: 'auditor.ramos', nombres: 'Luis', apellidos: 'Ramos Torres', rol: 'AUDITOR' },
+  { username: 'auditor.cuba', nombres: 'Milagros', apellidos: 'Cuba Espinoza', rol: 'AUDITOR' },
+  { username: 'auditor.huaman', nombres: 'Jhon', apellidos: 'Huaman Rojas', rol: 'AUDITOR' },
 ];
 
 // Coordenadas de referencia en Huancayo, Junín, con variación pequeña entre expedientes.

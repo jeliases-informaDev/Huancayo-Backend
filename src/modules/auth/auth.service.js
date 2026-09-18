@@ -75,8 +75,11 @@ async function login(username, password, clientPlatform, deviceId) {
     if (role === ROLES.ADMINISTRADOR && platform === 'mobile') {
       return { success: false, code: 'WEB_ACCESS_DENIED', error: 'Los administradores ingresan exclusivamente desde el backoffice.' };
     }
-    if (isFieldRole(role) && platform !== 'mobile') {
-      return { success: false, code: 'WEB_ACCESS_DENIED', error: 'Supervisores y auditores ingresan exclusivamente desde el aplicativo móvil.' };
+    // El Supervisor (Auditor de Agencia) opera tanto en la web (mapa en vivo, banco de
+    // clientes, evidencias, fichas) como en campo desde la app — solo el Auditor de
+    // Campo queda restringido exclusivamente al aplicativo móvil.
+    if (role === ROLES.AUDITOR && platform !== 'mobile') {
+      return { success: false, code: 'WEB_ACCESS_DENIED', error: 'Los auditores de campo ingresan exclusivamente desde el aplicativo móvil.' };
     }
     if (isFieldRole(role)) {
       try {
