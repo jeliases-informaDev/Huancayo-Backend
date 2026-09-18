@@ -28,6 +28,17 @@ async function listar() {
   return usuarios.map(mapUsuario);
 }
 
+// Lista acotada para que el Auditor de Oficina arme asignaciones y filtre visitas,
+// sin exponerle el resto de la gestion de cuentas (exclusiva del Administrador).
+async function listarAuditores() {
+  const usuarios = await prisma.usuario.findMany({
+    where: { rol: { in: FIELD_ROLES }, estado: 'ACTIVO' },
+    orderBy: { nombres: 'asc' },
+    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true },
+  });
+  return usuarios.map(u => ({ id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '', rol: normalizeRole(u.rol) }));
+}
+
 async function crear(datos) {
   assertRole(datos.rol);
   const usuario = await prisma.usuario.create({
@@ -140,4 +151,4 @@ async function trackingDeUsuario(id, fecha) {
   }));
 }
 
-export default { listar, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, trackingDeUsuario };
+export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, trackingDeUsuario };

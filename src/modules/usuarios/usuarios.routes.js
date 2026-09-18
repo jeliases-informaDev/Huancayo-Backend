@@ -13,6 +13,10 @@ router.use(authMiddleware);
 // Seguimiento en vivo: visible para Administrador y Supervisor (Auditor de Agencia).
 router.get("/ubicaciones", roleMiddleware(OPERATIONAL_MANAGERS), usuariosController.ubicacionesActivas);
 router.get("/:id/tracking", roleMiddleware(OPERATIONAL_MANAGERS), validate({ params: uuidParams, query: trackingQuery }), usuariosController.tracking);
+// Lista minima de auditores de campo activos (para el selector de "Asignar a" y los
+// filtros de Visitas). No expone estado de cuenta, MFA ni el resto de campos de
+// gestion de usuarios, que siguen siendo exclusivos del Administrador.
+router.get("/auditores", roleMiddleware(OPERATIONAL_MANAGERS), usuariosController.listarAuditores);
 
 router.use(roleMiddleware(ADMIN_ROLES));
 router.get("/", usuariosController.listar);

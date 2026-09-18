@@ -3,6 +3,9 @@ import usuariosService from './usuarios.service.js';
 async function listar(_req, res, next) {
   try { res.json({ data: await usuariosService.listar() }); } catch (error) { next(error); }
 }
+async function listarAuditores(_req, res, next) {
+  try { res.json({ data: await usuariosService.listarAuditores() }); } catch (error) { next(error); }
+}
 async function crear(req, res, next) {
   try { res.status(201).json({ data: await usuariosService.crear(req.body) }); } catch (error) { next(error); }
 }
@@ -25,4 +28,4 @@ async function ubicacionesActivas(_req, res, next) {
 async function tracking(req, res, next) {
   try { res.json({ data: await usuariosService.trackingDeUsuario(req.validated.params.id, req.validated.query.fecha) }); } catch (error) { next(error); }
 }
-export default { listar, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking };
+export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking };
