@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '#core/config/prisma.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
-import { normalizeRole, ROLES, FIELD_ROLES } from '#core/security/roles.js';
+import { normalizeRole, FIELD_ROLES } from '#core/security/roles.js';
 import * as mfaService from './mfa.service.js';
 
 function mapearUsuario(usuario) {
@@ -42,6 +42,7 @@ const DEVICE_DENIED_ERROR = () => Object.assign(
 );
 
 async function enforceDeviceBinding(usuario, deviceId) {
+  if (env.ENFORCE_DEVICE_BINDING === 'false') return;
   if (!deviceId) return;
   const existing = await prisma.dispositivoAutorizado.findFirst({ where: { id_usuario: usuario.id_usuario, activo: true } });
   if (!existing) {
@@ -90,14 +91,14 @@ async function login(username, password, clientPlatform, deviceId) {
     if (usuario.estado !== 'ACTIVO') return { success: false, code: 'USER_INACTIVE', error: 'Cuenta inactiva. Contacte al administrador.' };
     const role = normalizeRole(usuario.rol);
     const platform = normalizeClientPlatform(clientPlatform);
-    if (role === ROLES.ADMINISTRADOR && platform === 'mobile') {
-      return { success: false, code: 'WEB_ACCESS_DENIED', error: 'Los administradores ingresan exclusivamente desde el backoffice.' };
-    }
-    // El Supervisor (Auditor de Agencia) opera tanto en la web (mapa en vivo, banco de
-    // clientes, evidencias, fichas) como en campo desde la app — solo el Auditor de
-    // Campo queda restringido exclusivamente al aplicativo móvil.
-    if (role === ROLES.AUDITOR && platform !== 'mobile') {
+    // Único que usa el celular es el Auditor de Campo (hace la entrevista en la calle).
+    // Administrador y Auditor de Oficina (SUPERVISOR) nunca salen a campo: operan
+    // exclusivamente desde el backoffice web.
+    if (isFieldRole(role) && platform !== 'mobile') {
       return { success: false, code: 'WEB_ACCESS_DENIED', error: 'Los auditores de campo ingresan exclusivamente desde el aplicativo móvil.' };
+    }
+    if (!isFieldRole(role) && platform === 'mobile') {
+      return { success: false, code: 'WEB_ACCESS_DENIED', error: 'Los administradores y auditores de oficina ingresan exclusivamente desde el backoffice.' };
     }
     if (isFieldRole(role)) {
       try {

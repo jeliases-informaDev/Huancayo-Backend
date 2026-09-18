@@ -43,6 +43,10 @@ const schema = z.object({
   TRUST_PROXY: z.enum(['true', 'false']).default('false'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   MAX_LOGIN_FAILURES: z.coerce.number().int().min(3).max(20).default(5),
+  // Un dispositivo activo por cuenta de campo. Activo por defecto (incluida
+  // producción); solo se apaga explícitamente en entornos de prueba locales donde
+  // el mismo usuario se loguea seguido desde dispositivos/navegadores distintos.
+  ENFORCE_DEVICE_BINDING: z.enum(['true', 'false']).default('true'),
   ACCOUNT_LOCK_MINUTES: z.coerce.number().int().min(5).max(1440).default(15),
   // Almacenamiento local de evidencias (fase 1 — sin credenciales cloud todavía).
   EVIDENCIAS_DIR: z.string().default('./storage/evidencias'),
@@ -64,6 +68,9 @@ if (result.data.NODE_ENV === 'production' && !process.env.FRONTEND_URL?.trim()) 
 }
 if (result.data.NODE_ENV === 'production' && result.data.CORS_ALLOW_ALL === 'true') {
   throw new Error('Configuración de entorno inválida: CORS_ALLOW_ALL no puede habilitarse en producción');
+}
+if (result.data.NODE_ENV === 'production' && result.data.ENFORCE_DEVICE_BINDING === 'false') {
+  throw new Error('Configuración de entorno inválida: ENFORCE_DEVICE_BINDING no puede desactivarse en producción');
 }
 
 export const env = Object.freeze(result.data);

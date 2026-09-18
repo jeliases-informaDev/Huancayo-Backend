@@ -36,8 +36,15 @@ export async function authMiddleware(req, res, next) {
     }
     const role = normalizeRole(usuario.rol);
     const requestPlatform = req.get('x-client-platform') === 'mobile' ? 'mobile' : 'web';
+    // FIELD_ROLES (solo Auditor de Campo) debe usar siempre la app móvil; todo lo
+    // demás (Administrador, Auditor de Oficina) debe usar siempre el backoffice web.
+    // Se revalida en cada petición, no solo en el login, por si el token se reutiliza
+    // fuera de su canal previsto.
     if (FIELD_ROLES.includes(role) && (decoded.channel !== 'mobile' || requestPlatform !== 'mobile')) {
-      return res.status(403).json({ error: 'El acceso de supervisores y auditores está permitido únicamente desde el aplicativo móvil', code: 'MOBILE_APP_REQUIRED', requestId: req.id });
+      return res.status(403).json({ error: 'El acceso de auditores de campo está permitido únicamente desde el aplicativo móvil', code: 'MOBILE_APP_REQUIRED', requestId: req.id });
+    }
+    if (!FIELD_ROLES.includes(role) && (decoded.channel === 'mobile' || requestPlatform === 'mobile')) {
+      return res.status(403).json({ error: 'El acceso de administradores y auditores de oficina está permitido únicamente desde el backoffice web', code: 'WEB_APP_REQUIRED', requestId: req.id });
     }
     req.user = { id: usuario.id_usuario, username: usuario.username, rol: role };
     next();
