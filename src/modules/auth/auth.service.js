@@ -36,17 +36,35 @@ function issueAccessToken(usuario, clientPlatform = 'web') {
 // Vincula la cuenta a un único dispositivo activo por vez (evita sesiones simultáneas
 // desde dos teléfonos). El primer inicio de sesión desde el móvil autoriza ese
 // dispositivo; para cambiarlo, un administrador debe liberarlo (ver usuarios.service.js).
+const DEVICE_DENIED_ERROR = () => Object.assign(
+  new Error('Esta cuenta ya está vinculada a otro dispositivo. Pida a un administrador que lo libere.'),
+  { statusCode: 409, code: 'DEVICE_NOT_AUTHORIZED' },
+);
+
 async function enforceDeviceBinding(usuario, deviceId) {
   if (!deviceId) return;
   const existing = await prisma.dispositivoAutorizado.findFirst({ where: { id_usuario: usuario.id_usuario, activo: true } });
   if (!existing) {
-    await prisma.dispositivoAutorizado.create({
-      data: { id_usuario: usuario.id_usuario, device_id: deviceId, primer_uso: new Date(), ultimo_uso: new Date() },
-    });
+    try {
+      await prisma.dispositivoAutorizado.create({
+        data: { id_usuario: usuario.id_usuario, device_id: deviceId, primer_uso: new Date(), ultimo_uso: new Date() },
+      });
+    } catch (error) {
+      // Dos logins casi simultáneos (doble tap, reintento de red) pueden pasar ambos
+      // el chequeo "no existe" antes de que el primero termine de crear la fila; el
+      // índice único (id_usuario, device_id) evita el duplicado pero lanza P2002 en
+      // el segundo. Si el dispositivo coincide, no es un ataque: es la misma persona.
+      if (error.code === 'P2002') {
+        const recheck = await prisma.dispositivoAutorizado.findFirst({ where: { id_usuario: usuario.id_usuario, activo: true } });
+        if (recheck?.device_id === deviceId) return;
+        throw DEVICE_DENIED_ERROR();
+      }
+      throw error;
+    }
     return;
   }
   if (existing.device_id !== deviceId) {
-    throw Object.assign(new Error('Esta cuenta ya está vinculada a otro dispositivo. Pida a un administrador que lo libere.'), { statusCode: 409, code: 'DEVICE_NOT_AUTHORIZED' });
+    throw DEVICE_DENIED_ERROR();
   }
   await prisma.dispositivoAutorizado.update({ where: { id_dispositivo: existing.id_dispositivo }, data: { ultimo_uso: new Date() } });
 }
