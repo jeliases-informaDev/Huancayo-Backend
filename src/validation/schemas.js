@@ -34,6 +34,17 @@ export const listQuery = z.object({
   tipo_credito: z.enum(['CONSUMO', 'OTROS']).optional(),
 }).strict();
 
+// Filtros del modulo de evidencias/fichas (panel de Administrador/Supervisor).
+export const visitasListQuery = z.object({
+  page: z.coerce.number().int().min(1).max(100000).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  estado: z.string().trim().max(30).optional(),
+  id_usuario_auditor: z.string().uuid().optional(),
+  resultado: z.enum(['CONFORME', 'OBSERVADO', 'NO_UBICADO', 'RECHAZADO']).optional(),
+  tipo_credito: z.enum(['CONSUMO', 'OTROS']).optional(),
+  con_alertas: z.enum(['true', 'false']).optional(),
+}).strict();
+
 // --- Expedientes ---
 export const expedienteCreateBody = z.object({
   codigo_expediente: cleanString(50),

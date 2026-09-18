@@ -124,8 +124,14 @@ async function crearVisita(auditorId, payload) {
   return { ...serialize(visita), _alertas: alertas };
 }
 
-async function listar({ page = 1, limit = 25, estado } = {}) {
-  const where = estado ? { estado } : {};
+async function listar({ page = 1, limit = 25, estado, id_usuario_auditor, resultado, tipo_credito, con_alertas } = {}) {
+  const where = {
+    ...(estado ? { estado } : {}),
+    ...(id_usuario_auditor ? { id_usuario_auditor } : {}),
+    ...(resultado ? { resultado } : {}),
+    ...(tipo_credito ? { expediente: { tipo_credito } } : {}),
+    ...(con_alertas === 'true' ? { OR: [{ mock_location: true }, { device_integrity_ok: false }, { resultado: { in: ['OBSERVADO', 'RECHAZADO'] } }] } : {}),
+  };
   const [data, total] = await Promise.all([
     prisma.visitaAuditoria.findMany({
       where, orderBy: { fecha_creacion: 'desc' }, skip: (page - 1) * limit, take: limit,
