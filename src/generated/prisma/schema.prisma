@@ -29,6 +29,10 @@ model Usuario {
   apellidos         String?   @db.VarChar(200)
   email             String?   @db.VarChar(150)
   sede              String?   @db.VarChar(100)
+  // Departamento donde opera el auditor de campo (ej. "Junín", "Lima"): se compara
+  // contra expediente.departamento al asignar, para no mandarlo a visitar a otra
+  // ciudad. Nulo = sin restricción geográfica configurada todavía.
+  departamento      String?   @db.VarChar(100)
   password_hash     String    @db.Text
   rol               String    @db.VarChar(20) // ADMINISTRADOR, SUPERVISOR, AUDITOR
   estado            String    @default("ACTIVO") @db.VarChar(20) // ACTIVO, INACTIVO
@@ -101,6 +105,7 @@ model Expediente {
   direccion_domicilio      String?       @db.VarChar(255)
   distrito                 String?       @db.VarChar(100)
   provincia                String?       @db.VarChar(100)
+  departamento             String?       @db.VarChar(100)
   latitud                  Decimal?      @db.Decimal(10, 8) // domicilio del cliente — base para el chequeo de geocerca
   longitud                 Decimal?      @db.Decimal(11, 8)
 
@@ -125,6 +130,7 @@ model Expediente {
 
   @@index([latitud, longitud])
   @@index([distrito])
+  @@index([departamento])
   @@index([asesor_responsable])
   @@map("expedientes")
 }

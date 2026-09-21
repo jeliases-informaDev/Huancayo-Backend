@@ -351,8 +351,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.9.1
-   * Query Engine version: e922089b7d7502aff4249d5da3420f6fa55fc6ad
+   * Prisma Client JS version: 7.10.0
+   * Query Engine version: 0edf323efd1d98336f3f0a68684b56f689b900d3
    */
   export type PrismaVersion = {
     client: string
@@ -1743,6 +1743,7 @@ export namespace Prisma {
     apellidos: string | null
     email: string | null
     sede: string | null
+    departamento: string | null
     password_hash: string | null
     rol: string | null
     estado: string | null
@@ -1768,6 +1769,7 @@ export namespace Prisma {
     apellidos: string | null
     email: string | null
     sede: string | null
+    departamento: string | null
     password_hash: string | null
     rol: string | null
     estado: string | null
@@ -1793,6 +1795,7 @@ export namespace Prisma {
     apellidos: number
     email: number
     sede: number
+    departamento: number
     password_hash: number
     rol: number
     estado: number
@@ -1834,6 +1837,7 @@ export namespace Prisma {
     apellidos?: true
     email?: true
     sede?: true
+    departamento?: true
     password_hash?: true
     rol?: true
     estado?: true
@@ -1859,6 +1863,7 @@ export namespace Prisma {
     apellidos?: true
     email?: true
     sede?: true
+    departamento?: true
     password_hash?: true
     rol?: true
     estado?: true
@@ -1884,6 +1889,7 @@ export namespace Prisma {
     apellidos?: true
     email?: true
     sede?: true
+    departamento?: true
     password_hash?: true
     rol?: true
     estado?: true
@@ -1996,6 +2002,7 @@ export namespace Prisma {
     apellidos: string | null
     email: string | null
     sede: string | null
+    departamento: string | null
     password_hash: string
     rol: string
     estado: string
@@ -2040,6 +2047,7 @@ export namespace Prisma {
     apellidos?: boolean
     email?: boolean
     sede?: boolean
+    departamento?: boolean
     password_hash?: boolean
     rol?: boolean
     estado?: boolean
@@ -2072,6 +2080,7 @@ export namespace Prisma {
     apellidos?: boolean
     email?: boolean
     sede?: boolean
+    departamento?: boolean
     password_hash?: boolean
     rol?: boolean
     estado?: boolean
@@ -2090,7 +2099,7 @@ export namespace Prisma {
     longitud?: boolean
   }
 
-  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud", ExtArgs["result"]["usuario"]>
+  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud", ExtArgs["result"]["usuario"]>
   export type UsuarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
@@ -2114,6 +2123,7 @@ export namespace Prisma {
       apellidos: string | null
       email: string | null
       sede: string | null
+      departamento: string | null
       password_hash: string
       rol: string
       estado: string
@@ -2509,6 +2519,7 @@ export namespace Prisma {
     readonly apellidos: FieldRef<"Usuario", 'String'>
     readonly email: FieldRef<"Usuario", 'String'>
     readonly sede: FieldRef<"Usuario", 'String'>
+    readonly departamento: FieldRef<"Usuario", 'String'>
     readonly password_hash: FieldRef<"Usuario", 'String'>
     readonly rol: FieldRef<"Usuario", 'String'>
     readonly estado: FieldRef<"Usuario", 'String'>
@@ -4972,6 +4983,7 @@ export namespace Prisma {
     direccion_domicilio: string | null
     distrito: string | null
     provincia: string | null
+    departamento: string | null
     latitud: Decimal | null
     longitud: Decimal | null
     asesor_responsable: string | null
@@ -4994,6 +5006,7 @@ export namespace Prisma {
     direccion_domicilio: string | null
     distrito: string | null
     provincia: string | null
+    departamento: string | null
     latitud: Decimal | null
     longitud: Decimal | null
     asesor_responsable: string | null
@@ -5016,6 +5029,7 @@ export namespace Prisma {
     direccion_domicilio: number
     distrito: number
     provincia: number
+    departamento: number
     latitud: number
     longitud: number
     asesor_responsable: number
@@ -5059,6 +5073,7 @@ export namespace Prisma {
     direccion_domicilio?: true
     distrito?: true
     provincia?: true
+    departamento?: true
     latitud?: true
     longitud?: true
     asesor_responsable?: true
@@ -5081,6 +5096,7 @@ export namespace Prisma {
     direccion_domicilio?: true
     distrito?: true
     provincia?: true
+    departamento?: true
     latitud?: true
     longitud?: true
     asesor_responsable?: true
@@ -5103,6 +5119,7 @@ export namespace Prisma {
     direccion_domicilio?: true
     distrito?: true
     provincia?: true
+    departamento?: true
     latitud?: true
     longitud?: true
     asesor_responsable?: true
@@ -5217,6 +5234,7 @@ export namespace Prisma {
     direccion_domicilio: string | null
     distrito: string | null
     provincia: string | null
+    departamento: string | null
     latitud: Decimal | null
     longitud: Decimal | null
     asesor_responsable: string
@@ -5263,6 +5281,7 @@ export namespace Prisma {
     direccion_domicilio?: boolean
     distrito?: boolean
     provincia?: boolean
+    departamento?: boolean
     latitud?: boolean
     longitud?: boolean
     asesor_responsable?: boolean
@@ -5295,6 +5314,7 @@ export namespace Prisma {
     direccion_domicilio?: boolean
     distrito?: boolean
     provincia?: boolean
+    departamento?: boolean
     latitud?: boolean
     longitud?: boolean
     asesor_responsable?: boolean
@@ -5310,7 +5330,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
+  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
   export type ExpedienteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Expediente$asignacionesArgs<ExtArgs>
     visitas?: boolean | Expediente$visitasArgs<ExtArgs>
@@ -5335,6 +5355,7 @@ export namespace Prisma {
       direccion_domicilio: string | null
       distrito: string | null
       provincia: string | null
+      departamento: string | null
       latitud: Prisma.Decimal | null
       longitud: Prisma.Decimal | null
       asesor_responsable: string
@@ -5730,6 +5751,7 @@ export namespace Prisma {
     readonly direccion_domicilio: FieldRef<"Expediente", 'String'>
     readonly distrito: FieldRef<"Expediente", 'String'>
     readonly provincia: FieldRef<"Expediente", 'String'>
+    readonly departamento: FieldRef<"Expediente", 'String'>
     readonly latitud: FieldRef<"Expediente", 'Decimal'>
     readonly longitud: FieldRef<"Expediente", 'Decimal'>
     readonly asesor_responsable: FieldRef<"Expediente", 'String'>
@@ -11508,6 +11530,7 @@ export namespace Prisma {
     apellidos: 'apellidos',
     email: 'email',
     sede: 'sede',
+    departamento: 'departamento',
     password_hash: 'password_hash',
     rol: 'rol',
     estado: 'estado',
@@ -11566,6 +11589,7 @@ export namespace Prisma {
     direccion_domicilio: 'direccion_domicilio',
     distrito: 'distrito',
     provincia: 'provincia',
+    departamento: 'departamento',
     latitud: 'latitud',
     longitud: 'longitud',
     asesor_responsable: 'asesor_responsable',
@@ -11723,6 +11747,7 @@ export namespace Prisma {
     apellidos: 'apellidos',
     email: 'email',
     sede: 'sede',
+    departamento: 'departamento',
     password_hash: 'password_hash',
     rol: 'rol',
     estado: 'estado',
@@ -11775,6 +11800,7 @@ export namespace Prisma {
     direccion_domicilio: 'direccion_domicilio',
     distrito: 'distrito',
     provincia: 'provincia',
+    departamento: 'departamento',
     asesor_responsable: 'asesor_responsable',
     moneda: 'moneda',
     estado: 'estado'
@@ -11940,6 +11966,7 @@ export namespace Prisma {
     apellidos?: StringNullableFilter<"Usuario"> | string | null
     email?: StringNullableFilter<"Usuario"> | string | null
     sede?: StringNullableFilter<"Usuario"> | string | null
+    departamento?: StringNullableFilter<"Usuario"> | string | null
     password_hash?: StringFilter<"Usuario"> | string
     rol?: StringFilter<"Usuario"> | string
     estado?: StringFilter<"Usuario"> | string
@@ -11969,6 +11996,7 @@ export namespace Prisma {
     apellidos?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
     sede?: SortOrderInput | SortOrder
+    departamento?: SortOrderInput | SortOrder
     password_hash?: SortOrder
     rol?: SortOrder
     estado?: SortOrder
@@ -12002,6 +12030,7 @@ export namespace Prisma {
     apellidos?: StringNullableFilter<"Usuario"> | string | null
     email?: StringNullableFilter<"Usuario"> | string | null
     sede?: StringNullableFilter<"Usuario"> | string | null
+    departamento?: StringNullableFilter<"Usuario"> | string | null
     password_hash?: StringFilter<"Usuario"> | string
     rol?: StringFilter<"Usuario"> | string
     estado?: StringFilter<"Usuario"> | string
@@ -12031,6 +12060,7 @@ export namespace Prisma {
     apellidos?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
     sede?: SortOrderInput | SortOrder
+    departamento?: SortOrderInput | SortOrder
     password_hash?: SortOrder
     rol?: SortOrder
     estado?: SortOrder
@@ -12064,6 +12094,7 @@ export namespace Prisma {
     apellidos?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
     email?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
     sede?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
+    departamento?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
     password_hash?: StringWithAggregatesFilter<"Usuario"> | string
     rol?: StringWithAggregatesFilter<"Usuario"> | string
     estado?: StringWithAggregatesFilter<"Usuario"> | string
@@ -12227,6 +12258,7 @@ export namespace Prisma {
     direccion_domicilio?: StringNullableFilter<"Expediente"> | string | null
     distrito?: StringNullableFilter<"Expediente"> | string | null
     provincia?: StringNullableFilter<"Expediente"> | string | null
+    departamento?: StringNullableFilter<"Expediente"> | string | null
     latitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFilter<"Expediente"> | string
@@ -12256,6 +12288,7 @@ export namespace Prisma {
     direccion_domicilio?: SortOrderInput | SortOrder
     distrito?: SortOrderInput | SortOrder
     provincia?: SortOrderInput | SortOrder
+    departamento?: SortOrderInput | SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
     asesor_responsable?: SortOrder
@@ -12289,6 +12322,7 @@ export namespace Prisma {
     direccion_domicilio?: StringNullableFilter<"Expediente"> | string | null
     distrito?: StringNullableFilter<"Expediente"> | string | null
     provincia?: StringNullableFilter<"Expediente"> | string | null
+    departamento?: StringNullableFilter<"Expediente"> | string | null
     latitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFilter<"Expediente"> | string
@@ -12318,6 +12352,7 @@ export namespace Prisma {
     direccion_domicilio?: SortOrderInput | SortOrder
     distrito?: SortOrderInput | SortOrder
     provincia?: SortOrderInput | SortOrder
+    departamento?: SortOrderInput | SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
     asesor_responsable?: SortOrder
@@ -12353,6 +12388,7 @@ export namespace Prisma {
     direccion_domicilio?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     distrito?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     provincia?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
+    departamento?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     latitud?: DecimalNullableWithAggregatesFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableWithAggregatesFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringWithAggregatesFilter<"Expediente"> | string
@@ -12898,6 +12934,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -12927,6 +12964,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -12956,6 +12994,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -12985,6 +13024,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -13014,6 +13054,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -13039,6 +13080,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -13064,6 +13106,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -13224,6 +13267,7 @@ export namespace Prisma {
     direccion_domicilio?: string | null
     distrito?: string | null
     provincia?: string | null
+    departamento?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
     asesor_responsable: string
@@ -13253,6 +13297,7 @@ export namespace Prisma {
     direccion_domicilio?: string | null
     distrito?: string | null
     provincia?: string | null
+    departamento?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
     asesor_responsable: string
@@ -13281,6 +13326,7 @@ export namespace Prisma {
     direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFieldUpdateOperationsInput | string
@@ -13310,6 +13356,7 @@ export namespace Prisma {
     direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFieldUpdateOperationsInput | string
@@ -13339,6 +13386,7 @@ export namespace Prisma {
     direccion_domicilio?: string | null
     distrito?: string | null
     provincia?: string | null
+    departamento?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
     asesor_responsable: string
@@ -13365,6 +13413,7 @@ export namespace Prisma {
     direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFieldUpdateOperationsInput | string
@@ -13392,6 +13441,7 @@ export namespace Prisma {
     direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFieldUpdateOperationsInput | string
@@ -14139,6 +14189,7 @@ export namespace Prisma {
     apellidos?: SortOrder
     email?: SortOrder
     sede?: SortOrder
+    departamento?: SortOrder
     password_hash?: SortOrder
     rol?: SortOrder
     estado?: SortOrder
@@ -14171,6 +14222,7 @@ export namespace Prisma {
     apellidos?: SortOrder
     email?: SortOrder
     sede?: SortOrder
+    departamento?: SortOrder
     password_hash?: SortOrder
     rol?: SortOrder
     estado?: SortOrder
@@ -14196,6 +14248,7 @@ export namespace Prisma {
     apellidos?: SortOrder
     email?: SortOrder
     sede?: SortOrder
+    departamento?: SortOrder
     password_hash?: SortOrder
     rol?: SortOrder
     estado?: SortOrder
@@ -14527,6 +14580,7 @@ export namespace Prisma {
     direccion_domicilio?: SortOrder
     distrito?: SortOrder
     provincia?: SortOrder
+    departamento?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
     asesor_responsable?: SortOrder
@@ -14561,6 +14615,7 @@ export namespace Prisma {
     direccion_domicilio?: SortOrder
     distrito?: SortOrder
     provincia?: SortOrder
+    departamento?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
     asesor_responsable?: SortOrder
@@ -14583,6 +14638,7 @@ export namespace Prisma {
     direccion_domicilio?: SortOrder
     distrito?: SortOrder
     provincia?: SortOrder
+    departamento?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
     asesor_responsable?: SortOrder
@@ -16232,6 +16288,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -16260,6 +16317,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -16304,6 +16362,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -16332,6 +16391,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -16360,6 +16420,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -16388,6 +16449,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -16432,6 +16494,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -16460,6 +16523,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -16616,6 +16680,7 @@ export namespace Prisma {
     direccion_domicilio?: string | null
     distrito?: string | null
     provincia?: string | null
+    departamento?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
     asesor_responsable: string
@@ -16644,6 +16709,7 @@ export namespace Prisma {
     direccion_domicilio?: string | null
     distrito?: string | null
     provincia?: string | null
+    departamento?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
     asesor_responsable: string
@@ -16672,6 +16738,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -16700,6 +16767,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -16748,6 +16816,7 @@ export namespace Prisma {
     direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFieldUpdateOperationsInput | string
@@ -16776,6 +16845,7 @@ export namespace Prisma {
     direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFieldUpdateOperationsInput | string
@@ -16810,6 +16880,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -16838,6 +16909,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -16870,6 +16942,7 @@ export namespace Prisma {
     direccion_domicilio?: string | null
     distrito?: string | null
     provincia?: string | null
+    departamento?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
     asesor_responsable: string
@@ -16898,6 +16971,7 @@ export namespace Prisma {
     direccion_domicilio?: string | null
     distrito?: string | null
     provincia?: string | null
+    departamento?: string | null
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
     asesor_responsable: string
@@ -16926,6 +17000,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -16954,6 +17029,7 @@ export namespace Prisma {
     apellidos?: string | null
     email?: string | null
     sede?: string | null
+    departamento?: string | null
     password_hash: string
     rol: string
     estado?: string
@@ -17034,6 +17110,7 @@ export namespace Prisma {
     direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFieldUpdateOperationsInput | string
@@ -17062,6 +17139,7 @@ export namespace Prisma {
     direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
     distrito?: NullableStringFieldUpdateOperationsInput | string | null
     provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asesor_responsable?: StringFieldUpdateOperationsInput | string
@@ -17096,6 +17174,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
@@ -17124,6 +17203,7 @@ export namespace Prisma {
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
     password_hash?: StringFieldUpdateOperationsInput | string
     rol?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string

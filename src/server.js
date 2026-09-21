@@ -80,11 +80,18 @@ app.use(cors({
   exposedHeaders: ['X-Request-Id'], maxAge: 600,
 }));
 
+// Solo se exime del límite global lo que ya tiene su propio límite más estricto
+// (login/MFA) o su propio contrato de tamaño (subida de evidencias). El resto de
+// /api/auth (logout, /me, mfa/setup, mfa/confirm, mfa/disable) SÍ debe pasar por el
+// límite global — antes quedaban sin ningún límite por el prefijo compartido.
+const AUTH_PATHS_WITH_OWN_LIMITER = ['/api/auth/login', '/api/auth/mfa/verify', '/api/auth/mfa/enroll'];
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: env.NODE_ENV === 'development' ? 5000 : 1200,
   standardHeaders: 'draft-8', legacyHeaders: false,
-  skip: req => req.path.startsWith('/api/auth/') || req.path.startsWith('/health/') || req.path.startsWith('/api/visitas/evidencias/upload/'),
+  skip: req => AUTH_PATHS_WITH_OWN_LIMITER.some(path => req.path.startsWith(path))
+    || req.path.startsWith('/health/')
+    || req.path.startsWith('/api/visitas/evidencias/upload/'),
   message: { error: 'Demasiadas solicitudes. Intente nuevamente más tarde.', code: 'RATE_LIMITED' },
 });
 

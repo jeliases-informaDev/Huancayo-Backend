@@ -2,6 +2,7 @@ import prisma from '#core/config/prisma.js';
 import bcrypt from 'bcryptjs';
 import { ALL_ROLES, FIELD_ROLES, normalizeRole } from '#core/security/roles.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
+import asignacionesService from '#modules/auditorias/asignaciones.service.js';
 
 function mapUsuario(usuario) {
   const globallyRequired = env.REQUIRE_MFA === 'true'
@@ -13,7 +14,7 @@ function mapUsuario(usuario) {
     mfa_habilitado: usuario.mfa_habilitado || usuario.mfa_requerido || globallyRequired,
     mfa_confirmado: usuario.mfa_habilitado,
     nombres: usuario.nombres || '', apellidos: usuario.apellidos || '',
-    email: usuario.email || '', sede: usuario.sede || '',
+    email: usuario.email || '', sede: usuario.sede || '', departamento: usuario.departamento || '',
   };
 }
 
@@ -24,7 +25,9 @@ function assertRole(role) {
 }
 
 async function listar() {
-  const usuarios = await prisma.usuario.findMany({ orderBy: { fecha_creacion: 'asc' } });
+  // Tope defensivo: hoy son unas pocas decenas de cuentas de personal, pero la
+  // consulta no debe quedar sin límite si la planilla de usuarios crece.
+  const usuarios = await prisma.usuario.findMany({ orderBy: { fecha_creacion: 'asc' }, take: 1000 });
   return usuarios.map(mapUsuario);
 }
 
@@ -48,6 +51,7 @@ async function crear(datos) {
       apellidos: datos.apellidos?.trim() || null,
       email: datos.email?.trim().toLowerCase() || null,
       sede: datos.sede?.trim() || null,
+      departamento: datos.departamento?.trim() || null,
       rol: normalizeRole(datos.rol), estado: datos.estado || 'ACTIVO',
       mfa_requerido: datos.mfa_habilitado === true,
       mfa_exento: datos.mfa_habilitado !== true,
@@ -71,6 +75,7 @@ async function actualizar(id, datos, actorId) {
     ...(datos.apellidos !== undefined ? { apellidos: datos.apellidos.trim() || null } : {}),
     ...(datos.email !== undefined ? { email: datos.email.trim().toLowerCase() || null } : {}),
     ...(datos.sede !== undefined ? { sede: datos.sede.trim() || null } : {}),
+    ...(datos.departamento !== undefined ? { departamento: datos.departamento.trim() || null } : {}),
     ...(datos.rol ? { rol: normalizeRole(datos.rol) } : {}),
     ...(datos.estado ? { estado: datos.estado } : {}),
   };
@@ -95,6 +100,12 @@ async function actualizar(id, datos, actorId) {
     }
   }
   const usuario = await prisma.usuario.update({ where: { id_usuario: id }, data });
+  // Si se desactiva a un auditor de campo, sus clientes en curso no deben quedar
+  // "asignados" a alguien que ya no puede iniciar sesión ni visitarlos: se liberan
+  // para que el Auditor de Oficina los reasigne a otra persona.
+  if (datos.estado === 'INACTIVO' && actual.estado !== 'INACTIVO') {
+    await asignacionesService.cancelarTodasDeAuditor(id);
+  }
   return mapUsuario(usuario);
 }
 

@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import multer from 'multer';
 
-const uploadDir = path.join(os.tmpdir(), 'radar360-imports');
+const uploadDir = path.join(os.tmpdir(), 'caja-huancayo-imports');
 fs.mkdirSync(uploadDir, { recursive: true, mode: 0o700 });
 
 const storage = multer.diskStorage({

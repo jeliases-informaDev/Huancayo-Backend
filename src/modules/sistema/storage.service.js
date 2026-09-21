@@ -68,12 +68,20 @@ function createUpload({ auditorId, expedienteId, tipo, contentType, size }) {
   };
 }
 
+// Firma JPEG (JFIF/Exif): los primeros 3 bytes son siempre FF D8 FF. El Content-Type
+// que declara el cliente al pedir la URL firmada no prueba nada del archivo real que
+// llega en el PUT — esta comprobación evita guardar como "evidencia" un archivo que
+// en realidad no es una fotografía.
+function isJpegSignature(buffer) {
+  return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+}
+
 // Recibe los bytes crudos (PUT) y los escribe en disco. La clave ya trae la firma
 // de propiedad; validarla aquí evita que un auditor suba evidencia con la clave de otro.
 async function receiveUpload({ key, buffer, auditorId, expedienteId, tipo }) {
   const ownedKey = validateOwnedKey(key, auditorId, expedienteId, tipo);
   const config = TYPES[tipo];
-  if (!buffer || buffer.length < 1 || buffer.length > config.maxBytes) {
+  if (!buffer || buffer.length < 1 || buffer.length > config.maxBytes || !isJpegSignature(buffer)) {
     throw Object.assign(new Error('El archivo recibido no es válido.'), { statusCode: 400, code: 'INVALID_EVIDENCE_FILE' });
   }
   const hash = crypto.createHash('sha256').update(buffer).digest('hex');

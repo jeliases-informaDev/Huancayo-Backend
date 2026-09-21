@@ -35,7 +35,14 @@ const schema = z.object({
   // Exenciones por cuenta, nunca por rol, para no desactivar MFA a todos los administradores.
   MFA_EXEMPT_USERNAMES: z.string().default(''),
   JWT_EXPIRES_IN: z.string().default('8h'),
-  JWT_FIELD_EXPIRES_IN: z.string().default('15m'), // auditores/supervisores en campo (app móvil)
+  // El auditor de campo no tiene forma de renovar la sesión sin volver a loguearse
+  // (no existe token de refresco): si esto fuera corto, la sesión podría vencer a
+  // mitad de una visita real (trasladarse, entrevistar, fotos, firma) y el auditor
+  // se quedaría bloqueado con la ficha a medio llenar. Se cubre un turno completo;
+  // la protección real ante un celular perdido es el vínculo a un solo dispositivo
+  // y que el administrador pueda desactivar la cuenta o liberar el dispositivo al
+  // instante (invalida la sesión vigente vía token_version), no un vencimiento corto.
+  JWT_FIELD_EXPIRES_IN: z.string().default('12h'),
   JWT_ISSUER: z.string().default('caja-huancayo-auditoria-api'),
   JWT_AUDIENCE: z.string().default('caja-huancayo-auditoria-clients'),
   FRONTEND_URL: corsOrigins.default('http://localhost:5173'),

@@ -22,6 +22,7 @@ export const userCreateBody = z.object({
   estado: z.enum(['ACTIVO', 'INACTIVO']).optional(), nombres: z.string().max(150).optional(),
   apellidos: z.string().max(200).optional(), email: z.string().email().max(150).optional().or(z.literal('')),
   sede: z.string().max(100).optional(), mfa_habilitado: z.boolean().optional(),
+  departamento: z.string().max(100).optional(),
 }).strict();
 export const userUpdateBody = userCreateBody.partial().refine(data => Object.keys(data).length > 0, 'Debe enviar al menos un campo');
 
@@ -31,6 +32,7 @@ export const listQuery = z.object({
   limit: z.coerce.number().int().min(1).max(1000).optional(),
   search: z.string().trim().max(150).optional(), estado: z.string().trim().max(30).optional(),
   distrito: z.string().trim().max(100).optional(),
+  departamento: z.string().trim().max(100).optional(),
   tipo_credito: z.enum(['CONSUMO', 'OTROS']).optional(),
 }).strict();
 
@@ -57,6 +59,7 @@ export const expedienteCreateBody = z.object({
   direccion_domicilio: optionalString(255),
   distrito: optionalString(100),
   provincia: optionalString(100),
+  departamento: optionalString(100),
   latitud: z.coerce.number().min(-90).max(90).optional(),
   longitud: z.coerce.number().min(-180).max(180).optional(),
   asesor_responsable: cleanString(150),

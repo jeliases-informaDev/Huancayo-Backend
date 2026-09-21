@@ -43,7 +43,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: 8h
       - key: JWT_FIELD_EXPIRES_IN
-        value: 15m
+        value: 12h
       - key: JWT_ISSUER
         value: caja-huancayo-auditoria-api
       - key: JWT_AUDIENCE

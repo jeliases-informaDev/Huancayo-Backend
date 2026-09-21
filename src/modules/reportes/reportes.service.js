@@ -88,7 +88,7 @@ function seccionClienteYNegocio(expediente) {
       [`Nombres y apellidos: ${texto(expediente.nombres_cliente)}`, `Estado del negocio: ${texto(n.estado_negocio)}`],
       [`Estado Civil: ${texto(c.estado_civil)}   ${expediente.tipo_documento_cliente}: ${texto(expediente.numero_documento_cliente)}`, `Antigüedad del negocio: ${texto(n.antiguedad_negocio)}`],
       [`Dirección del domicilio: ${texto(expediente.direccion_domicilio)}`, `Dirección del negocio/empleador: ${texto(n.direccion_negocio || n.empleador)}`],
-      [`Distrito: ${texto(expediente.distrito)}   Provincia: ${texto(expediente.provincia)}`, `Referencia del negocio/empleador: ${texto(n.referencia)}`],
+      [`Distrito: ${texto(expediente.distrito)}   Provincia: ${texto(expediente.provincia)}   Departamento: ${texto(expediente.departamento)}`, `Referencia del negocio/empleador: ${texto(n.referencia)}`],
       [`Referencia del domicilio: ${texto(c.referencia_domicilio)}`, `Tipo de vivienda: ${texto(c.tipo_vivienda)}`],
       [`Teléfono y/o celular: ${texto(expediente.telefono_cliente)}`, `N° de suministro: ${texto(c.numero_suministro)}`],
     ]),

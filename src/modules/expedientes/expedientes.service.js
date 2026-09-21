@@ -4,15 +4,16 @@ function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item)
 
 const listSelect = {
   id_expediente: true, codigo_expediente: true, tipo_credito: true, oficina: true,
-  numero_documento_cliente: true, nombres_cliente: true, distrito: true, provincia: true,
+  numero_documento_cliente: true, nombres_cliente: true, distrito: true, provincia: true, departamento: true,
   latitud: true, longitud: true, asesor_responsable: true, monto_desembolso: true, moneda: true,
   estado: true, fecha_creacion: true,
 };
 
-async function listar({ page = 1, limit = 25, search, estado, distrito, tipo_credito } = {}) {
+async function listar({ page = 1, limit = 25, search, estado, distrito, departamento, tipo_credito } = {}) {
   const where = {
     ...(estado ? { estado } : {}),
     ...(distrito ? { distrito: { contains: distrito } } : {}),
+    ...(departamento ? { departamento: { contains: departamento } } : {}),
     ...(tipo_credito ? { tipo_credito } : {}),
     ...(search ? {
       OR: [
@@ -75,6 +76,7 @@ async function importarExcel(rows, actorId, archivo) {
         direccion_domicilio: row.direccion_domicilio ? String(row.direccion_domicilio).trim() : null,
         distrito: row.distrito ? String(row.distrito).trim() : null,
         provincia: row.provincia ? String(row.provincia).trim() : null,
+        departamento: row.departamento ? String(row.departamento).trim() : null,
         latitud: row.latitud !== undefined && row.latitud !== '' ? Number(row.latitud) : null,
         longitud: row.longitud !== undefined && row.longitud !== '' ? Number(row.longitud) : null,
         asesor_responsable: String(row.asesor_responsable).trim(),
