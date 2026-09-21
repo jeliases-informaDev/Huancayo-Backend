@@ -49,7 +49,9 @@ services:
       - key: JWT_AUDIENCE
         value: caja-huancayo-auditoria-clients
       - key: FRONTEND_URL
-        value: https://caja-huancayo-web.onrender.com
+        # http://localhost:8081 es el preview local de la app (Expo Web) que se
+        # usa durante el desarrollo/demo — quitarlo antes de la entrega final.
+        value: https://caja-huancayo-web.onrender.com,http://localhost:8081
       - key: CORS_ALLOW_ALL
         value: "false"
       - key: TRUST_PROXY
