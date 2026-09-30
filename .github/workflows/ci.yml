@@ -17,6 +17,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+        env:
+          # Las pruebas son unitarias (no tocan una base de datos real), pero
+          # env.js valida el formato de estas variables al importarse — con
+          # valores dummy de formato válido alcanza, nunca se conectan de verdad.
+          DATABASE_URL: mysql://user:pass@localhost:3306/ci
+          JWT_SECRET: ci-only-dummy-secret-not-used-in-prod-32ch
+          MFA_ENCRYPTION_KEY: ci-only-dummy-secret-not-used-in-prod32
       # Informativo por ahora (no bloquea el build): hoy hay 4 vulnerabilidades
       # "high" heredadas de mysql2 a traves de Prisma, cuyo fix rompe compatibilidad
       # (bajaria Prisma de 7.x a 6.19.3). Pasar a bloqueante en cuanto se resuelva
