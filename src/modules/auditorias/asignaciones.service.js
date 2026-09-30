@@ -49,6 +49,63 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }) {
   return serialize(asignacion);
 }
 
+// Expedientes PENDIENTE que un auditor podría tomar por su cuenta: solo los de su
+// propio departamento (misma regla geográfica que crear()). Sin departamento
+// configurado, no ve ninguno — evita que se autoasigne fuera de su zona por defecto.
+async function disponiblesParaAuditor(auditorId) {
+  const auditor = await prisma.usuario.findFirst({ where: { id_usuario: auditorId, rol: 'AUDITOR', estado: 'ACTIVO' } });
+  if (!auditor) { const error = new Error('El auditor indicado no existe o está inactivo'); error.statusCode = 400; throw error; }
+  if (!auditor.departamento) return [];
+
+  const departamentos = await prisma.expediente.findMany({ where: { estado: 'PENDIENTE' }, select: { departamento: true } });
+  const propios = departamentos.filter(d => normalizarTexto(d.departamento) === normalizarTexto(auditor.departamento));
+  if (!propios.length) return [];
+
+  const expedientes = await prisma.expediente.findMany({
+    where: { estado: 'PENDIENTE', departamento: { in: [...new Set(propios.map(d => d.departamento))] } },
+    select: expedienteSelect,
+    orderBy: { fecha_creacion: 'asc' },
+    take: 200,
+  });
+  return serialize(expedientes);
+}
+
+// Auto-asignación: el propio auditor "toma" un expediente pendiente de su muestra,
+// en vez de que un supervisor se lo asigne. El punto crítico es que dos auditores
+// no pueden tomar el mismo cliente si presionan "tomar" casi al mismo tiempo — se
+// resuelve con un UPDATE condicionado (WHERE estado = 'PENDIENTE') dentro de una
+// transacción: MySQL/InnoDB toma un lock de fila exclusivo al ejecutar ese UPDATE y
+// evalúa el WHERE contra el valor ya comprometido más reciente (no contra la foto
+// de la transacción), así que si dos auditores lo intentan a la vez, el segundo
+// UPDATE simplemente afecta 0 filas (el estado ya cambió) y falla limpio con
+// ALREADY_CLAIMED — sin necesidad de locks manuales ni de un semáforo aparte.
+async function autoAsignar(auditorId, idExpediente) {
+  const auditor = await prisma.usuario.findFirst({ where: { id_usuario: auditorId, rol: 'AUDITOR', estado: 'ACTIVO' } });
+  if (!auditor) { const error = new Error('El auditor indicado no existe o está inactivo'); error.statusCode = 400; throw error; }
+
+  const expediente = await prisma.expediente.findUnique({ where: { id_expediente: idExpediente } });
+  if (!expediente) { const error = new Error('Expediente no encontrado'); error.statusCode = 404; throw error; }
+
+  if (auditor.departamento && expediente.departamento && normalizarTexto(auditor.departamento) !== normalizarTexto(expediente.departamento)) {
+    const error = new Error(`Este expediente está en ${expediente.departamento} y tú operas en ${auditor.departamento}. Solo puedes tomar expedientes de tu propia zona.`);
+    error.statusCode = 422; error.code = 'GEOGRAPHIC_MISMATCH'; throw error;
+  }
+
+  const asignacion = await prisma.$transaction(async tx => {
+    const reclamo = await tx.expediente.updateMany({
+      where: { id_expediente: idExpediente, estado: 'PENDIENTE' },
+      data: { estado: 'ASIGNADO' },
+    });
+    if (reclamo.count === 0) {
+      const error = new Error('Este expediente ya no está disponible: otro auditor lo tomó primero.');
+      error.statusCode = 409; error.code = 'ALREADY_CLAIMED';
+      throw error;
+    }
+    return tx.asignacionAuditoria.create({ data: { id_expediente: idExpediente, id_usuario_auditor: auditorId, prioridad: 'MEDIA' } });
+  });
+  return serialize(asignacion);
+}
+
 async function crearMasivo({ id_usuario_auditor, id_expedientes, prioridad }) {
   const resultados = [];
   for (const id_expediente of id_expedientes) {
@@ -109,4 +166,4 @@ async function cancelarTodasDeAuditor(auditorId) {
   return activas.length;
 }
 
-export default { crear, crearMasivo, misAsignaciones, listar, cancelar, cancelarTodasDeAuditor };
+export default { crear, crearMasivo, misAsignaciones, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar };

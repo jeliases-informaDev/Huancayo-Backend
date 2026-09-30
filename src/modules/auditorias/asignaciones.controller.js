@@ -24,6 +24,16 @@ async function crearMasivo(req, res, next) {
 async function misAsignaciones(req, res, next) {
   try { res.json({ data: await asignacionesService.misAsignaciones(req.user.id) }); } catch (error) { next(error); }
 }
+async function disponibles(req, res, next) {
+  try { res.json({ data: await asignacionesService.disponiblesParaAuditor(req.user.id) }); } catch (error) { next(error); }
+}
+async function autoAsignar(req, res, next) {
+  try {
+    const data = await asignacionesService.autoAsignar(req.user.id, req.validated.params.id);
+    notifyRoles(req, 'muestra_actualizada', data);
+    res.status(201).json({ data });
+  } catch (error) { next(error); }
+}
 async function listar(req, res, next) {
   try { res.json(await asignacionesService.listar(req.validated.query)); } catch (error) { next(error); }
 }
@@ -31,4 +41,4 @@ async function cancelar(req, res, next) {
   try { res.json({ data: await asignacionesService.cancelar(req.validated.params.id) }); } catch (error) { next(error); }
 }
 
-export default { crear, crearMasivo, misAsignaciones, listar, cancelar };
+export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar };
