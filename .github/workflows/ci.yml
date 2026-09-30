@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      # Informativo por ahora (no bloquea el build): hoy hay 4 vulnerabilidades
+      # "high" heredadas de mysql2 a traves de Prisma, cuyo fix rompe compatibilidad
+      # (bajaria Prisma de 7.x a 6.19.3). Pasar a bloqueante en cuanto se resuelva
+      # esa dependencia — ver la nota en el cuestionario tecnico de seguridad.
+      - run: npm audit --omit=dev
+        continue-on-error: true
