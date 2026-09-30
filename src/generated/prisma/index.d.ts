@@ -9466,6 +9466,8 @@ export namespace Prisma {
     user_agent: string | null
     device_id: string | null
     mock_location: boolean | null
+    entidad: string | null
+    entidad_id: string | null
   }
 
   export type AuditoriaSeguridadMaxAggregateOutputType = {
@@ -9483,6 +9485,8 @@ export namespace Prisma {
     user_agent: string | null
     device_id: string | null
     mock_location: boolean | null
+    entidad: string | null
+    entidad_id: string | null
   }
 
   export type AuditoriaSeguridadCountAggregateOutputType = {
@@ -9500,6 +9504,10 @@ export namespace Prisma {
     user_agent: number
     device_id: number
     mock_location: number
+    entidad: number
+    entidad_id: number
+    valor_anterior: number
+    valor_nuevo: number
     _all: number
   }
 
@@ -9527,6 +9535,8 @@ export namespace Prisma {
     user_agent?: true
     device_id?: true
     mock_location?: true
+    entidad?: true
+    entidad_id?: true
   }
 
   export type AuditoriaSeguridadMaxAggregateInputType = {
@@ -9544,6 +9554,8 @@ export namespace Prisma {
     user_agent?: true
     device_id?: true
     mock_location?: true
+    entidad?: true
+    entidad_id?: true
   }
 
   export type AuditoriaSeguridadCountAggregateInputType = {
@@ -9561,6 +9573,10 @@ export namespace Prisma {
     user_agent?: true
     device_id?: true
     mock_location?: true
+    entidad?: true
+    entidad_id?: true
+    valor_anterior?: true
+    valor_nuevo?: true
     _all?: true
   }
 
@@ -9665,6 +9681,10 @@ export namespace Prisma {
     user_agent: string | null
     device_id: string | null
     mock_location: boolean | null
+    entidad: string | null
+    entidad_id: string | null
+    valor_anterior: JsonValue | null
+    valor_nuevo: JsonValue | null
     _count: AuditoriaSeguridadCountAggregateOutputType | null
     _avg: AuditoriaSeguridadAvgAggregateOutputType | null
     _sum: AuditoriaSeguridadSumAggregateOutputType | null
@@ -9701,6 +9721,10 @@ export namespace Prisma {
     user_agent?: boolean
     device_id?: boolean
     mock_location?: boolean
+    entidad?: boolean
+    entidad_id?: boolean
+    valor_anterior?: boolean
+    valor_nuevo?: boolean
   }, ExtArgs["result"]["auditoriaSeguridad"]>
 
 
@@ -9720,9 +9744,13 @@ export namespace Prisma {
     user_agent?: boolean
     device_id?: boolean
     mock_location?: boolean
+    entidad?: boolean
+    entidad_id?: boolean
+    valor_anterior?: boolean
+    valor_nuevo?: boolean
   }
 
-  export type AuditoriaSeguridadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_auditoria" | "fecha" | "request_id" | "actor_id" | "actor" | "rol" | "metodo" | "ruta" | "estado_http" | "ip_address" | "ip_hash" | "user_agent" | "device_id" | "mock_location", ExtArgs["result"]["auditoriaSeguridad"]>
+  export type AuditoriaSeguridadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_auditoria" | "fecha" | "request_id" | "actor_id" | "actor" | "rol" | "metodo" | "ruta" | "estado_http" | "ip_address" | "ip_hash" | "user_agent" | "device_id" | "mock_location" | "entidad" | "entidad_id" | "valor_anterior" | "valor_nuevo", ExtArgs["result"]["auditoriaSeguridad"]>
 
   export type $AuditoriaSeguridadPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AuditoriaSeguridad"
@@ -9742,6 +9770,10 @@ export namespace Prisma {
       user_agent: string | null
       device_id: string | null
       mock_location: boolean | null
+      entidad: string | null
+      entidad_id: string | null
+      valor_anterior: Prisma.JsonValue | null
+      valor_nuevo: Prisma.JsonValue | null
     }, ExtArgs["result"]["auditoriaSeguridad"]>
     composites: {}
   }
@@ -10125,6 +10157,10 @@ export namespace Prisma {
     readonly user_agent: FieldRef<"AuditoriaSeguridad", 'String'>
     readonly device_id: FieldRef<"AuditoriaSeguridad", 'String'>
     readonly mock_location: FieldRef<"AuditoriaSeguridad", 'Boolean'>
+    readonly entidad: FieldRef<"AuditoriaSeguridad", 'String'>
+    readonly entidad_id: FieldRef<"AuditoriaSeguridad", 'String'>
+    readonly valor_anterior: FieldRef<"AuditoriaSeguridad", 'Json'>
+    readonly valor_nuevo: FieldRef<"AuditoriaSeguridad", 'Json'>
   }
     
 
@@ -11681,7 +11717,11 @@ export namespace Prisma {
     ip_hash: 'ip_hash',
     user_agent: 'user_agent',
     device_id: 'device_id',
-    mock_location: 'mock_location'
+    mock_location: 'mock_location',
+    entidad: 'entidad',
+    entidad_id: 'entidad_id',
+    valor_anterior: 'valor_anterior',
+    valor_nuevo: 'valor_nuevo'
   };
 
   export type AuditoriaSeguridadScalarFieldEnum = (typeof AuditoriaSeguridadScalarFieldEnum)[keyof typeof AuditoriaSeguridadScalarFieldEnum]
@@ -11853,7 +11893,9 @@ export namespace Prisma {
     ip_address: 'ip_address',
     ip_hash: 'ip_hash',
     user_agent: 'user_agent',
-    device_id: 'device_id'
+    device_id: 'device_id',
+    entidad: 'entidad',
+    entidad_id: 'entidad_id'
   };
 
   export type AuditoriaSeguridadOrderByRelevanceFieldEnum = (typeof AuditoriaSeguridadOrderByRelevanceFieldEnum)[keyof typeof AuditoriaSeguridadOrderByRelevanceFieldEnum]
@@ -12735,6 +12777,10 @@ export namespace Prisma {
     user_agent?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     device_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     mock_location?: BoolNullableFilter<"AuditoriaSeguridad"> | boolean | null
+    entidad?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    entidad_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    valor_anterior?: JsonNullableFilter<"AuditoriaSeguridad">
+    valor_nuevo?: JsonNullableFilter<"AuditoriaSeguridad">
   }
 
   export type AuditoriaSeguridadOrderByWithRelationInput = {
@@ -12752,6 +12798,10 @@ export namespace Prisma {
     user_agent?: SortOrderInput | SortOrder
     device_id?: SortOrderInput | SortOrder
     mock_location?: SortOrderInput | SortOrder
+    entidad?: SortOrderInput | SortOrder
+    entidad_id?: SortOrderInput | SortOrder
+    valor_anterior?: SortOrderInput | SortOrder
+    valor_nuevo?: SortOrderInput | SortOrder
     _relevance?: AuditoriaSeguridadOrderByRelevanceInput
   }
 
@@ -12773,6 +12823,10 @@ export namespace Prisma {
     user_agent?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     device_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     mock_location?: BoolNullableFilter<"AuditoriaSeguridad"> | boolean | null
+    entidad?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    entidad_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    valor_anterior?: JsonNullableFilter<"AuditoriaSeguridad">
+    valor_nuevo?: JsonNullableFilter<"AuditoriaSeguridad">
   }, "id_auditoria">
 
   export type AuditoriaSeguridadOrderByWithAggregationInput = {
@@ -12790,6 +12844,10 @@ export namespace Prisma {
     user_agent?: SortOrderInput | SortOrder
     device_id?: SortOrderInput | SortOrder
     mock_location?: SortOrderInput | SortOrder
+    entidad?: SortOrderInput | SortOrder
+    entidad_id?: SortOrderInput | SortOrder
+    valor_anterior?: SortOrderInput | SortOrder
+    valor_nuevo?: SortOrderInput | SortOrder
     _count?: AuditoriaSeguridadCountOrderByAggregateInput
     _avg?: AuditoriaSeguridadAvgOrderByAggregateInput
     _max?: AuditoriaSeguridadMaxOrderByAggregateInput
@@ -12815,6 +12873,10 @@ export namespace Prisma {
     user_agent?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
     device_id?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
     mock_location?: BoolNullableWithAggregatesFilter<"AuditoriaSeguridad"> | boolean | null
+    entidad?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
+    entidad_id?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
+    valor_anterior?: JsonNullableWithAggregatesFilter<"AuditoriaSeguridad">
+    valor_nuevo?: JsonNullableWithAggregatesFilter<"AuditoriaSeguridad">
   }
 
   export type ImportacionMasivaWhereInput = {
@@ -13815,6 +13877,10 @@ export namespace Prisma {
     user_agent?: string | null
     device_id?: string | null
     mock_location?: boolean | null
+    entidad?: string | null
+    entidad_id?: string | null
+    valor_anterior?: NullableJsonNullValueInput | InputJsonValue
+    valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AuditoriaSeguridadUncheckedCreateInput = {
@@ -13832,6 +13898,10 @@ export namespace Prisma {
     user_agent?: string | null
     device_id?: string | null
     mock_location?: boolean | null
+    entidad?: string | null
+    entidad_id?: string | null
+    valor_anterior?: NullableJsonNullValueInput | InputJsonValue
+    valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AuditoriaSeguridadUpdateInput = {
@@ -13849,6 +13919,10 @@ export namespace Prisma {
     user_agent?: NullableStringFieldUpdateOperationsInput | string | null
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    entidad?: NullableStringFieldUpdateOperationsInput | string | null
+    entidad_id?: NullableStringFieldUpdateOperationsInput | string | null
+    valor_anterior?: NullableJsonNullValueInput | InputJsonValue
+    valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AuditoriaSeguridadUncheckedUpdateInput = {
@@ -13866,6 +13940,10 @@ export namespace Prisma {
     user_agent?: NullableStringFieldUpdateOperationsInput | string | null
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    entidad?: NullableStringFieldUpdateOperationsInput | string | null
+    entidad_id?: NullableStringFieldUpdateOperationsInput | string | null
+    valor_anterior?: NullableJsonNullValueInput | InputJsonValue
+    valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AuditoriaSeguridadCreateManyInput = {
@@ -13883,6 +13961,10 @@ export namespace Prisma {
     user_agent?: string | null
     device_id?: string | null
     mock_location?: boolean | null
+    entidad?: string | null
+    entidad_id?: string | null
+    valor_anterior?: NullableJsonNullValueInput | InputJsonValue
+    valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AuditoriaSeguridadUpdateManyMutationInput = {
@@ -13900,6 +13982,10 @@ export namespace Prisma {
     user_agent?: NullableStringFieldUpdateOperationsInput | string | null
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    entidad?: NullableStringFieldUpdateOperationsInput | string | null
+    entidad_id?: NullableStringFieldUpdateOperationsInput | string | null
+    valor_anterior?: NullableJsonNullValueInput | InputJsonValue
+    valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AuditoriaSeguridadUncheckedUpdateManyInput = {
@@ -13917,6 +14003,10 @@ export namespace Prisma {
     user_agent?: NullableStringFieldUpdateOperationsInput | string | null
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: NullableBoolFieldUpdateOperationsInput | boolean | null
+    entidad?: NullableStringFieldUpdateOperationsInput | string | null
+    entidad_id?: NullableStringFieldUpdateOperationsInput | string | null
+    valor_anterior?: NullableJsonNullValueInput | InputJsonValue
+    valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type ImportacionMasivaCreateInput = {
@@ -15028,6 +15118,10 @@ export namespace Prisma {
     user_agent?: SortOrder
     device_id?: SortOrder
     mock_location?: SortOrder
+    entidad?: SortOrder
+    entidad_id?: SortOrder
+    valor_anterior?: SortOrder
+    valor_nuevo?: SortOrder
   }
 
   export type AuditoriaSeguridadAvgOrderByAggregateInput = {
@@ -15049,6 +15143,8 @@ export namespace Prisma {
     user_agent?: SortOrder
     device_id?: SortOrder
     mock_location?: SortOrder
+    entidad?: SortOrder
+    entidad_id?: SortOrder
   }
 
   export type AuditoriaSeguridadMinOrderByAggregateInput = {
@@ -15066,6 +15162,8 @@ export namespace Prisma {
     user_agent?: SortOrder
     device_id?: SortOrder
     mock_location?: SortOrder
+    entidad?: SortOrder
+    entidad_id?: SortOrder
   }
 
   export type AuditoriaSeguridadSumOrderByAggregateInput = {

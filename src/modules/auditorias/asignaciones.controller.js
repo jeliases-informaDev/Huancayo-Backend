@@ -38,7 +38,11 @@ async function listar(req, res, next) {
   try { res.json(await asignacionesService.listar(req.validated.query)); } catch (error) { next(error); }
 }
 async function cancelar(req, res, next) {
-  try { res.json({ data: await asignacionesService.cancelar(req.validated.params.id) }); } catch (error) { next(error); }
+  try {
+    const { _auditDiff, ...data } = await asignacionesService.cancelar(req.validated.params.id);
+    req.auditContext = _auditDiff;
+    res.json({ data });
+  } catch (error) { next(error); }
 }
 
 export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar };

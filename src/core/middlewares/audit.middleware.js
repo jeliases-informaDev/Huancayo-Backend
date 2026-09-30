@@ -18,11 +18,17 @@ export function auditMiddleware(req, res, next) {
     };
     logger.info(event, 'auditable_operation');
     const ipHash = crypto.createHash('sha256').update(clientIp || '').digest('hex');
+    // req.auditContext: lo llena opcionalmente el controlador cuando la operación
+    // cambia una entidad de negocio (ver #core/security/auditContext.js). No todas
+    // las escrituras lo usan — solo las instrumentadas explícitamente.
+    const diff = req.auditContext || {};
     prisma.auditoriaSeguridad.create({ data: {
       request_id: req.id, actor_id: req.user?.id || null, actor: req.user?.username || loginActor || 'anonymous',
       rol: req.user?.rol || null, metodo: req.method, ruta: req.originalUrl.split('?')[0].slice(0, 255),
       estado_http: res.statusCode, ip_address: clientIp, ip_hash: ipHash,
       user_agent: (req.get('user-agent') || '').slice(0, 255) || null,
+      entidad: diff.entidad || null, entidad_id: diff.entidad_id ? String(diff.entidad_id) : null,
+      valor_anterior: diff.valor_anterior ?? undefined, valor_nuevo: diff.valor_nuevo ?? undefined,
     } }).catch(error => logger.error({ err: error, requestId: req.id }, 'security_audit_persistence_failed'));
   });
   next();

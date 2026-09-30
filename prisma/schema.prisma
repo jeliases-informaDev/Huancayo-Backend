@@ -230,6 +230,15 @@ model AuditoriaSeguridad {
   device_id     String?  @db.VarChar(150)
   mock_location Boolean?
 
+  // Diff de negocio (opcional): qué entidad cambió y su estado antes/después. Lo
+  // llena el controlador vía req.auditContext cuando la operación lo amerita (no
+  // todas: un GET o un login no tienen "entidad" que diffear). Nunca debe contener
+  // secretos (password_hash, mfa_secreto) — cada servicio arma un snapshot sin eso.
+  entidad        String? @db.VarChar(50)
+  entidad_id     String? @db.VarChar(64)
+  valor_anterior Json?
+  valor_nuevo    Json?
+
   @@index([fecha])
   @@index([actor_id, fecha])
   @@map("auditoria_seguridad")

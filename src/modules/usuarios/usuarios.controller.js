@@ -7,13 +7,25 @@ async function listarAuditores(_req, res, next) {
   try { res.json({ data: await usuariosService.listarAuditores() }); } catch (error) { next(error); }
 }
 async function crear(req, res, next) {
-  try { res.status(201).json({ data: await usuariosService.crear(req.body) }); } catch (error) { next(error); }
+  try {
+    const { _auditDiff, ...data } = await usuariosService.crear(req.body);
+    req.auditContext = _auditDiff;
+    res.status(201).json({ data });
+  } catch (error) { next(error); }
 }
 async function actualizar(req, res, next) {
-  try { res.json({ data: await usuariosService.actualizar(req.params.id, req.body, req.user.id) }); } catch (error) { next(error); }
+  try {
+    const { _auditDiff, ...data } = await usuariosService.actualizar(req.params.id, req.body, req.user.id);
+    req.auditContext = _auditDiff;
+    res.json({ data });
+  } catch (error) { next(error); }
 }
 async function eliminar(req, res, next) {
-  try { await usuariosService.eliminar(req.params.id, req.user.id); res.status(204).send(); } catch (error) { next(error); }
+  try {
+    const { _auditDiff } = await usuariosService.eliminar(req.params.id, req.user.id);
+    req.auditContext = _auditDiff;
+    res.status(204).send();
+  } catch (error) { next(error); }
 }
 
 async function resetMfa(req, res, next) {

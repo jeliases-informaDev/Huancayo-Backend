@@ -44,10 +44,18 @@ async function crear(req, res, next) {
   try { res.status(201).json({ data: await expedientesService.crear(req.body) }); } catch (error) { next(error); }
 }
 async function actualizar(req, res, next) {
-  try { res.json({ data: await expedientesService.actualizar(req.validated.params.id, req.body) }); } catch (error) { next(error); }
+  try {
+    const { _auditDiff, ...data } = await expedientesService.actualizar(req.validated.params.id, req.body);
+    req.auditContext = _auditDiff;
+    res.json({ data });
+  } catch (error) { next(error); }
 }
 async function eliminar(req, res, next) {
-  try { await expedientesService.eliminar(req.validated.params.id); res.status(204).send(); } catch (error) { next(error); }
+  try {
+    const { _auditDiff } = await expedientesService.eliminar(req.validated.params.id);
+    req.auditContext = _auditDiff;
+    res.status(204).send();
+  } catch (error) { next(error); }
 }
 async function importar(req, res, next) {
   try {

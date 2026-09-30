@@ -18,6 +18,16 @@ function mapUsuario(usuario) {
   };
 }
 
+// Snapshot para el registro de auditoría: nunca incluye password_hash ni mfa_secreto.
+function auditSnapshot(usuario) {
+  return {
+    username: usuario.username, nombres: usuario.nombres, apellidos: usuario.apellidos,
+    email: usuario.email, sede: usuario.sede, departamento: usuario.departamento,
+    rol: normalizeRole(usuario.rol), estado: usuario.estado,
+    mfa_requerido: usuario.mfa_requerido, mfa_exento: usuario.mfa_exento,
+  };
+}
+
 function assertRole(role) {
   if (!ALL_ROLES.includes(normalizeRole(role))) {
     const error = new Error('El rol indicado no está permitido'); error.statusCode = 400; throw error;
@@ -57,7 +67,7 @@ async function crear(datos) {
       mfa_exento: datos.mfa_habilitado !== true,
     },
   });
-  return mapUsuario(usuario);
+  return { ...mapUsuario(usuario), _auditDiff: { entidad: 'Usuario', entidad_id: usuario.id_usuario, valor_anterior: null, valor_nuevo: auditSnapshot(usuario) } };
 }
 
 async function actualizar(id, datos, actorId) {
@@ -106,14 +116,19 @@ async function actualizar(id, datos, actorId) {
   if (datos.estado === 'INACTIVO' && actual.estado !== 'INACTIVO') {
     await asignacionesService.cancelarTodasDeAuditor(id);
   }
-  return mapUsuario(usuario);
+  return {
+    ...mapUsuario(usuario),
+    _auditDiff: { entidad: 'Usuario', entidad_id: id, valor_anterior: auditSnapshot(actual), valor_nuevo: auditSnapshot(usuario) },
+  };
 }
 
 async function eliminar(id, actorId) {
   if (id === actorId) {
     const error = new Error('No puede eliminar su propia cuenta activa'); error.statusCode = 409; throw error;
   }
+  const actual = await prisma.usuario.findUnique({ where: { id_usuario: id } });
   await prisma.usuario.delete({ where: { id_usuario: id } });
+  return { _auditDiff: { entidad: 'Usuario', entidad_id: id, valor_anterior: actual ? auditSnapshot(actual) : null, valor_nuevo: null } };
 }
 
 async function resetMfa(id) {

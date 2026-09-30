@@ -42,13 +42,33 @@ async function crear(datos) {
   return serialize(expediente);
 }
 
+// Snapshot para auditoría: solo los campos de referencia del expediente, no los
+// bloques JSON variables (evaluacion_financiera, endeudamiento, etc.) que pueden
+// pesar mucho y no aportan valor al diff de negocio.
+function auditSnapshotExpediente(e) {
+  return {
+    codigo_expediente: e.codigo_expediente, tipo_credito: e.tipo_credito, oficina: e.oficina,
+    numero_documento_cliente: e.numero_documento_cliente, nombres_cliente: e.nombres_cliente,
+    distrito: e.distrito, provincia: e.provincia, departamento: e.departamento,
+    asesor_responsable: e.asesor_responsable, monto_desembolso: e.monto_desembolso ? Number(e.monto_desembolso) : null,
+    estado: e.estado,
+  };
+}
+
 async function actualizar(id, datos) {
+  const actual = await prisma.expediente.findUnique({ where: { id_expediente: id } });
+  if (!actual) { const error = new Error('Expediente no encontrado'); error.statusCode = 404; throw error; }
   const expediente = await prisma.expediente.update({ where: { id_expediente: id }, data: datos });
-  return serialize(expediente);
+  return {
+    ...serialize(expediente),
+    _auditDiff: { entidad: 'Expediente', entidad_id: id, valor_anterior: auditSnapshotExpediente(actual), valor_nuevo: auditSnapshotExpediente(expediente) },
+  };
 }
 
 async function eliminar(id) {
+  const actual = await prisma.expediente.findUnique({ where: { id_expediente: id } });
   await prisma.expediente.delete({ where: { id_expediente: id } });
+  return { _auditDiff: { entidad: 'Expediente', entidad_id: id, valor_anterior: actual ? auditSnapshotExpediente(actual) : null, valor_nuevo: null } };
 }
 
 // Importación por Excel: procesamiento síncrono (lotes moderados). Se registra en

@@ -137,6 +137,10 @@ async function listar({ page = 1, limit = 25, estado } = {}) {
   return { data: serialize(data), pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
 }
 
+function auditSnapshotAsignacion(a) {
+  return { id_expediente: a.id_expediente, id_usuario_auditor: a.id_usuario_auditor, estado: a.estado, prioridad: a.prioridad };
+}
+
 async function cancelar(id) {
   const actual = await prisma.asignacionAuditoria.findUnique({ where: { id_asignacion: id } });
   if (!actual) { const error = new Error('Asignación no encontrada'); error.statusCode = 404; throw error; }
@@ -155,7 +159,10 @@ async function cancelar(id) {
     }
   }
 
-  return serialize(asignacion);
+  return {
+    ...serialize(asignacion),
+    _auditDiff: { entidad: 'AsignacionAuditoria', entidad_id: id, valor_anterior: auditSnapshotAsignacion(actual), valor_nuevo: auditSnapshotAsignacion(asignacion) },
+  };
 }
 
 // Usado al desactivar una cuenta de auditor: sus clientes en curso no deben quedar

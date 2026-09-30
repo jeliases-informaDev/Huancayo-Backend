@@ -257,7 +257,11 @@ exports.Prisma.AuditoriaSeguridadScalarFieldEnum = {
   ip_hash: 'ip_hash',
   user_agent: 'user_agent',
   device_id: 'device_id',
-  mock_location: 'mock_location'
+  mock_location: 'mock_location',
+  entidad: 'entidad',
+  entidad_id: 'entidad_id',
+  valor_anterior: 'valor_anterior',
+  valor_nuevo: 'valor_nuevo'
 };
 
 exports.Prisma.ImportacionMasivaScalarFieldEnum = {
@@ -384,7 +388,9 @@ exports.Prisma.AuditoriaSeguridadOrderByRelevanceFieldEnum = {
   ip_address: 'ip_address',
   ip_hash: 'ip_hash',
   user_agent: 'user_agent',
-  device_id: 'device_id'
+  device_id: 'device_id',
+  entidad: 'entidad',
+  entidad_id: 'entidad_id'
 };
 
 exports.Prisma.ImportacionMasivaOrderByRelevanceFieldEnum = {
