@@ -1,4 +1,5 @@
 import visitasService from './visitas.service.js';
+import { env } from '#core/config/env.js';
 
 function notifyRoles(req, event, data) {
   const io = req.app.get('io');
@@ -59,4 +60,8 @@ async function ubicacion(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { presignEvidencia, subirEvidencia, crear, listar, obtener, archivoEvidencia, ubicacion };
+function config(_req, res) {
+  res.json({ data: { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS } });
+}
+
+export default { presignEvidencia, subirEvidencia, crear, listar, obtener, archivoEvidencia, ubicacion, config };

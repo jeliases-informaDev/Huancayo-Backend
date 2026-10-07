@@ -10,6 +10,10 @@ import { idParams, evidenciaParams, visitasListQuery, evidenciaPresignBody, visi
 const router = Router();
 router.use(authMiddleware);
 
+// Umbrales anti-fraude vigentes (geocerca/precisión): la app los usa para avisar al
+// auditor ANTES de guardar la ficha. Va antes de '/:id' para que no la capture.
+router.get('/config', roleMiddleware(FIELD_ROLES), controller.config);
+
 // Backoffice (revisión) — se declaran antes de los prefijos de campo para que
 // no queden atrapadas por el roleMiddleware(FIELD_ROLES) de '/evidencias'.
 router.get('/evidencias/:idEvidencia/archivo', roleMiddleware(OPERATIONAL_MANAGERS), validate({ params: evidenciaParams }), controller.archivoEvidencia);
