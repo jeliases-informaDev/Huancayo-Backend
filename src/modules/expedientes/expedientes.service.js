@@ -1,4 +1,5 @@
 import prisma from '#core/config/prisma.js';
+import importador from './importador/importador.service.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -6,11 +7,12 @@ const listSelect = {
   id_expediente: true, codigo_expediente: true, tipo_credito: true, oficina: true,
   numero_documento_cliente: true, nombres_cliente: true, distrito: true, provincia: true, departamento: true,
   latitud: true, longitud: true, asesor_responsable: true, monto_desembolso: true, moneda: true,
-  estado: true, fecha_creacion: true,
+  estado: true, fecha_creacion: true, ubicacion_origen: true, advertencias_origen: true, id_importacion: true,
 };
 
-async function listar({ page = 1, limit = 25, search, estado, distrito, departamento, tipo_credito } = {}) {
+async function listar({ page = 1, limit = 25, search, estado, distrito, departamento, tipo_credito, sin_ubicacion } = {}) {
   const where = {
+    ...(sin_ubicacion === 'true' ? { OR: [{ latitud: null }, { longitud: null }] } : {}),
     ...(estado ? { estado } : {}),
     ...(distrito ? { distrito: { contains: distrito } } : {}),
     ...(departamento ? { departamento: { contains: departamento } } : {}),
@@ -32,9 +34,33 @@ async function listar({ page = 1, limit = 25, search, estado, distrito, departam
 }
 
 async function obtener(id) {
-  const expediente = await prisma.expediente.findUnique({ where: { id_expediente: id } });
+  const expediente = await prisma.expediente.findUnique({
+    where: { id_expediente: id },
+    include: {
+      cambios: { orderBy: { fecha: 'desc' }, take: 30 },
+      asignaciones: { orderBy: { fecha_asignacion: 'desc' }, take: 10, include: { auditor: { select: { username: true, nombres: true, apellidos: true } } } },
+      visitas: { orderBy: { fecha_creacion: 'desc' }, take: 10, select: { id_visita: true, resultado: true, plantilla: true, fecha_hora_checkin: true, distancia_domicilio_m: true, id_usuario_auditor: true } },
+    },
+  });
   if (!expediente) { const error = new Error('Expediente no encontrado'); error.statusCode = 404; throw error; }
-  return serialize(expediente);
+  // Trazabilidad del dato: de qué importación/archivo viene y quién la ejecutó.
+  let importacion = null;
+  if (expediente.id_importacion) {
+    const imp = await prisma.importacionMasiva.findUnique({
+      where: { id_importacion: expediente.id_importacion },
+      select: { id_importacion: true, archivo: true, formato: true, archivo_sha256: true, fecha_creacion: true, actor_id: true },
+    });
+    if (imp) {
+      const actor = imp.actor_id ? await prisma.usuario.findUnique({ where: { id_usuario: imp.actor_id }, select: { username: true } }) : null;
+      importacion = { ...imp, actor: actor?.username || null };
+    }
+  }
+  // Nombre de quien hizo cada cambio (en la tabla solo se guarda el id).
+  const actorIds = [...new Set(expediente.cambios.map((c) => c.actor_id).filter(Boolean))];
+  const actores = actorIds.length ? await prisma.usuario.findMany({ where: { id_usuario: { in: actorIds } }, select: { id_usuario: true, username: true } }) : [];
+  const nombrePorId = new Map(actores.map((u) => [u.id_usuario, u.username]));
+  const cambios = expediente.cambios.map((c) => ({ ...c, id_cambio: String(c.id_cambio), actor: nombrePorId.get(c.actor_id) || null }));
+  return serialize({ ...expediente, cambios, importacion });
 }
 
 async function crear(datos) {
@@ -52,13 +78,26 @@ function auditSnapshotExpediente(e) {
     distrito: e.distrito, provincia: e.provincia, departamento: e.departamento,
     asesor_responsable: e.asesor_responsable, monto_desembolso: e.monto_desembolso ? Number(e.monto_desembolso) : null,
     estado: e.estado,
+    latitud: e.latitud == null ? null : Number(e.latitud), longitud: e.longitud == null ? null : Number(e.longitud), ubicacion_origen: e.ubicacion_origen,
   };
 }
 
-async function actualizar(id, datos) {
+async function actualizar(id, datos, actorId) {
   const actual = await prisma.expediente.findUnique({ where: { id_expediente: id } });
   if (!actual) { const error = new Error('Expediente no encontrado'); error.statusCode = 404; throw error; }
-  const expediente = await prisma.expediente.update({ where: { id_expediente: id }, data: datos });
+  const data = { ...datos };
+  const cambioUbicacion = (datos.latitud !== undefined || datos.longitud !== undefined)
+    && (Number(datos.latitud ?? actual.latitud) !== Number(actual.latitud) || Number(datos.longitud ?? actual.longitud) !== Number(actual.longitud));
+  if (cambioUbicacion) data.ubicacion_origen = 'MANUAL';
+  const expediente = await prisma.expediente.update({ where: { id_expediente: id }, data });
+  if (cambioUbicacion) {
+    await prisma.expedienteCambio.create({
+      data: {
+        id_expediente: id, actor_id: actorId || null, tipo: 'UBICACION',
+        cambios: { latitud: { antes: actual.latitud == null ? null : Number(actual.latitud), despues: Number(expediente.latitud) }, longitud: { antes: actual.longitud == null ? null : Number(actual.longitud), despues: Number(expediente.longitud) }, ubicacion_origen: { antes: actual.ubicacion_origen, despues: 'MANUAL' } },
+      },
+    });
+  }
   return {
     ...serialize(expediente),
     _auditDiff: { entidad: 'Expediente', entidad_id: id, valor_anterior: auditSnapshotExpediente(actual), valor_nuevo: auditSnapshotExpediente(expediente) },
@@ -71,50 +110,5 @@ async function eliminar(id) {
   return { _auditDiff: { entidad: 'Expediente', entidad_id: id, valor_anterior: actual ? auditSnapshotExpediente(actual) : null, valor_nuevo: null } };
 }
 
-// Importación por Excel: procesamiento síncrono (lotes moderados). Se registra en
-// ImportacionMasiva para trazabilidad, aunque no corre en background en esta fase.
-const REQUIRED_COLUMNS = ['codigo_expediente', 'tipo_credito', 'numero_documento_cliente', 'nombres_cliente', 'asesor_responsable'];
 
-async function importarExcel(rows, actorId, archivo) {
-  const importacion = await prisma.importacionMasiva.create({
-    data: { tipo: 'EXPEDIENTES', estado: 'PROCESANDO', archivo, ruta_temporal: '', actor_id: actorId, total_filas: rows.length, fecha_inicio: new Date() },
-  });
-  let insertadas = 0, actualizadas = 0, omitidas = 0, errores = 0;
-  const detalleError = [];
-  for (const [index, row] of rows.entries()) {
-    try {
-      const faltantes = REQUIRED_COLUMNS.filter(column => !row[column]);
-      if (faltantes.length) { omitidas++; detalleError.push({ fila: index + 2, error: `Faltan columnas: ${faltantes.join(', ')}` }); continue; }
-      const data = {
-        codigo_expediente: String(row.codigo_expediente).trim(),
-        tipo_credito: String(row.tipo_credito).trim().toUpperCase() === 'OTROS' ? 'OTROS' : 'CONSUMO',
-        oficina: row.oficina ? String(row.oficina).trim() : null,
-        tipo_documento_cliente: ['DNI', 'CE', 'PASAPORTE', 'RUC'].includes(String(row.tipo_documento_cliente).toUpperCase()) ? String(row.tipo_documento_cliente).toUpperCase() : 'DNI',
-        numero_documento_cliente: String(row.numero_documento_cliente).trim(),
-        nombres_cliente: String(row.nombres_cliente).trim(),
-        telefono_cliente: row.telefono_cliente ? String(row.telefono_cliente).trim() : null,
-        direccion_domicilio: row.direccion_domicilio ? String(row.direccion_domicilio).trim() : null,
-        distrito: row.distrito ? String(row.distrito).trim() : null,
-        provincia: row.provincia ? String(row.provincia).trim() : null,
-        departamento: row.departamento ? String(row.departamento).trim() : null,
-        latitud: row.latitud !== undefined && row.latitud !== '' ? Number(row.latitud) : null,
-        longitud: row.longitud !== undefined && row.longitud !== '' ? Number(row.longitud) : null,
-        asesor_responsable: String(row.asesor_responsable).trim(),
-        monto_desembolso: row.monto_desembolso !== undefined && row.monto_desembolso !== '' ? Number(row.monto_desembolso) : null,
-        moneda: row.moneda ? String(row.moneda).trim() : 'PEN',
-      };
-      const existing = await prisma.expediente.findUnique({ where: { codigo_expediente: data.codigo_expediente } });
-      if (existing) { await prisma.expediente.update({ where: { id_expediente: existing.id_expediente }, data }); actualizadas++; }
-      else { await prisma.expediente.create({ data }); insertadas++; }
-    } catch (error) {
-      errores++; detalleError.push({ fila: index + 2, error: error.message?.slice(0, 200) });
-    }
-  }
-  await prisma.importacionMasiva.update({
-    where: { id_importacion: importacion.id_importacion },
-    data: { estado: 'COMPLETADO', procesadas: rows.length, insertadas, actualizadas, omitidas, errores, detalle_error: detalleError.slice(0, 100), fecha_fin: new Date() },
-  });
-  return { id_importacion: importacion.id_importacion, total_filas: rows.length, insertadas, actualizadas, omitidas, errores, detalle_error: detalleError.slice(0, 20) };
-}
-
-export default { listar, obtener, crear, actualizar, eliminar, importarExcel };
+export default { listar, obtener, crear, actualizar, eliminar, importador };

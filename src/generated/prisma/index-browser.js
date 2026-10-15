@@ -188,9 +188,24 @@ exports.Prisma.ExpedienteScalarFieldEnum = {
   datos_credito: 'datos_credito',
   evaluacion_financiera: 'evaluacion_financiera',
   endeudamiento: 'endeudamiento',
+  ubicacion_origen: 'ubicacion_origen',
+  id_importacion: 'id_importacion',
+  fila_origen: 'fila_origen',
+  hash_origen: 'hash_origen',
+  advertencias_origen: 'advertencias_origen',
   estado: 'estado',
   fecha_creacion: 'fecha_creacion',
   fecha_actualizar: 'fecha_actualizar'
+};
+
+exports.Prisma.ExpedienteCambioScalarFieldEnum = {
+  id_cambio: 'id_cambio',
+  id_expediente: 'id_expediente',
+  id_importacion: 'id_importacion',
+  actor_id: 'actor_id',
+  tipo: 'tipo',
+  cambios: 'cambios',
+  fecha: 'fecha'
 };
 
 exports.Prisma.AsignacionAuditoriaScalarFieldEnum = {
@@ -200,7 +215,9 @@ exports.Prisma.AsignacionAuditoriaScalarFieldEnum = {
   fecha_asignacion: 'fecha_asignacion',
   fecha_fin: 'fecha_fin',
   estado: 'estado',
-  prioridad: 'prioridad'
+  prioridad: 'prioridad',
+  origen: 'origen',
+  asignado_por: 'asignado_por'
 };
 
 exports.Prisma.VisitaAuditoriaScalarFieldEnum = {
@@ -226,6 +243,13 @@ exports.Prisma.VisitaAuditoriaScalarFieldEnum = {
   otros_clientes_domicilio: 'otros_clientes_domicilio',
   otros_ingresos: 'otros_ingresos',
   firma_evidencia: 'firma_evidencia',
+  plantilla: 'plantilla',
+  expediente_snapshot: 'expediente_snapshot',
+  estado_negocio: 'estado_negocio',
+  propiedad_local: 'propiedad_local',
+  otros_pasivos: 'otros_pasivos',
+  conformidad_financiera: 'conformidad_financiera',
+  firmante_documento: 'firmante_documento',
   estado: 'estado',
   fecha_creacion: 'fecha_creacion',
   fecha_actualizar: 'fecha_actualizar'
@@ -278,6 +302,9 @@ exports.Prisma.ImportacionMasivaScalarFieldEnum = {
   omitidas: 'omitidas',
   errores: 'errores',
   detalle_error: 'detalle_error',
+  archivo_sha256: 'archivo_sha256',
+  formato: 'formato',
+  advertencias: 'advertencias',
   fecha_creacion: 'fecha_creacion',
   fecha_inicio: 'fecha_inicio',
   fecha_fin: 'fecha_fin'
@@ -350,13 +377,24 @@ exports.Prisma.ExpedienteOrderByRelevanceFieldEnum = {
   departamento: 'departamento',
   asesor_responsable: 'asesor_responsable',
   moneda: 'moneda',
+  ubicacion_origen: 'ubicacion_origen',
+  id_importacion: 'id_importacion',
+  hash_origen: 'hash_origen',
   estado: 'estado'
+};
+
+exports.Prisma.ExpedienteCambioOrderByRelevanceFieldEnum = {
+  id_importacion: 'id_importacion',
+  actor_id: 'actor_id',
+  tipo: 'tipo'
 };
 
 exports.Prisma.AsignacionAuditoriaOrderByRelevanceFieldEnum = {
   id_usuario_auditor: 'id_usuario_auditor',
   estado: 'estado',
-  prioridad: 'prioridad'
+  prioridad: 'prioridad',
+  origen: 'origen',
+  asignado_por: 'asignado_por'
 };
 
 exports.Prisma.VisitaAuditoriaOrderByRelevanceFieldEnum = {
@@ -367,6 +405,11 @@ exports.Prisma.VisitaAuditoriaOrderByRelevanceFieldEnum = {
   comentario_negocio: 'comentario_negocio',
   comentario_auditor: 'comentario_auditor',
   firma_evidencia: 'firma_evidencia',
+  plantilla: 'plantilla',
+  estado_negocio: 'estado_negocio',
+  propiedad_local: 'propiedad_local',
+  otros_pasivos: 'otros_pasivos',
+  firmante_documento: 'firmante_documento',
   estado: 'estado'
 };
 
@@ -399,7 +442,9 @@ exports.Prisma.ImportacionMasivaOrderByRelevanceFieldEnum = {
   estado: 'estado',
   archivo: 'archivo',
   ruta_temporal: 'ruta_temporal',
-  actor_id: 'actor_id'
+  actor_id: 'actor_id',
+  archivo_sha256: 'archivo_sha256',
+  formato: 'formato'
 };
 exports.TipoCredito = exports.$Enums.TipoCredito = {
   CONSUMO: 'CONSUMO',
@@ -418,6 +463,7 @@ exports.Prisma.ModelName = {
   TrackingUbicacion: 'TrackingUbicacion',
   DispositivoAutorizado: 'DispositivoAutorizado',
   Expediente: 'Expediente',
+  ExpedienteCambio: 'ExpedienteCambio',
   AsignacionAuditoria: 'AsignacionAuditoria',
   VisitaAuditoria: 'VisitaAuditoria',
   Evidencia: 'Evidencia',

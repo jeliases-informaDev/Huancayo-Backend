@@ -27,6 +27,64 @@ async function recibirEvidencia({ key, buffer, auditorId, id_expediente, tipo })
 }
 
 // --- Visitas ---
+const EXPEDIENTE_RESUMEN = {
+  id_expediente: true, codigo_expediente: true, tipo_credito: true, tipo_documento_cliente: true, numero_documento_cliente: true,
+  nombres_cliente: true, direccion_domicilio: true, distrito: true, oficina: true, asesor_responsable: true,
+};
+
+const SNAPSHOT_CAMPOS = [
+  'id_expediente', 'codigo_expediente', 'tipo_credito', 'oficina', 'tipo_documento_cliente', 'numero_documento_cliente',
+  'nombres_cliente', 'telefono_cliente', 'direccion_domicilio', 'distrito', 'provincia', 'departamento', 'latitud', 'longitud',
+  'ubicacion_origen', 'asesor_responsable', 'monto_desembolso', 'moneda', 'datos_cliente', 'datos_negocio', 'datos_credito',
+  'evaluacion_financiera', 'endeudamiento', 'id_importacion', 'fila_origen', 'hash_origen', 'advertencias_origen',
+];
+
+// Congela los datos de la base tal como los vio el auditor. Si el expediente se reimporta o
+// se corrige después, la ficha ya cerrada (y su Word) sigue mostrando lo que se auditó.
+function snapshotExpediente(expediente) {
+  return serialize(Object.fromEntries(SNAPSHOT_CAMPOS.map((campo) => [campo, expediente[campo] ?? null])));
+}
+
+const plantillaDe = (expediente) => (expediente.tipo_credito === 'OTROS' ? 'MYPE_V1' : 'CONSUMO_V1');
+
+// Reglas propias de la ficha MYPE. Solo se exigen si la app declara plantilla MYPE_V1: las
+// apps anteriores (sin estos campos) siguen pudiendo enviar visitas.
+// Si el auditor llegó al cliente (CONFORME/OBSERVADO) deben estar las 3 preguntas anti-fraude y la
+// firma; en NO_UBICADO / RECHAZADO el cliente no está o no quiere, y eso no se puede exigir.
+function validarFichaBasica(payload) {
+  if (!['CONFORME', 'OBSERVADO'].includes(payload.resultado)) return;
+  const r = payload.respuestas_cuestionario || {};
+  if ([r.entrego_dinero_asesor, r.pago_comision_adicional, r.recibio_monto_total].some((v) => typeof v !== 'boolean')) {
+    throw Object.assign(new Error('Responde las 3 preguntas obligatorias del cuestionario.'), { statusCode: 422, code: 'CUESTIONARIO_INCOMPLETO' });
+  }
+  if (!payload.firma_evidencia) {
+    throw Object.assign(new Error('Falta la firma del cliente.'), { statusCode: 422, code: 'FIRMA_REQUIRED' });
+  }
+}
+
+function validarFichaMype(payload) {
+  if (payload.plantilla !== 'MYPE_V1') return;
+  if (!['CONFORME', 'OBSERVADO'].includes(payload.resultado)) return;
+  if (!payload.estado_negocio) throw Object.assign(new Error('Indica el estado del negocio (en funcionamiento, inoperativo o de terceros).'), { statusCode: 422, code: 'ESTADO_NEGOCIO_REQUIRED' });
+  if (!payload.propiedad_local) throw Object.assign(new Error('Indica la propiedad del local.'), { statusCode: 422, code: 'PROPIEDAD_LOCAL_REQUIRED' });
+  const conformidad = payload.conformidad_financiera;
+  if (!conformidad) throw Object.assign(new Error('Registra el análisis y conformidad de la evaluación financiera (ingresos, balance y resultados).'), { statusCode: 422, code: 'CONFORMIDAD_REQUIRED' });
+  const observados = Object.entries(conformidad).filter(([, bloque]) => bloque.conforme === false);
+  for (const [nombre, bloque] of observados) {
+    if (!bloque.comentario || bloque.comentario.trim().length < 5) {
+      throw Object.assign(new Error(`Explica la observación en "${nombre}" de la evaluación financiera.`), { statusCode: 422, code: 'CONFORMIDAD_COMMENT_REQUIRED' });
+    }
+  }
+  if (payload.resultado === 'CONFORME') {
+    if (payload.estado_negocio !== 'EN_FUNCIONAMIENTO') {
+      throw Object.assign(new Error('Un negocio inoperativo o de terceros no puede registrarse como CONFORME. Usa OBSERVADO y explica el motivo.'), { statusCode: 422, code: 'NEGOCIO_NO_CONFORME' });
+    }
+    if (observados.length) {
+      throw Object.assign(new Error('Hay observaciones en la evaluación financiera: la visita no puede registrarse como CONFORME.'), { statusCode: 422, code: 'CONFORMIDAD_OBSERVADA' });
+    }
+  }
+}
+
 function evaluarSenales({ expediente, payload, serverNow }) {
   const alertas = [];
   let distancia = null;
@@ -63,6 +121,12 @@ async function crearVisita(auditorId, payload) {
   const asignacion = await requireActiveAssignment(auditorId, payload.id_expediente);
   const expediente = await prisma.expediente.findUnique({ where: { id_expediente: payload.id_expediente } });
   if (!expediente) throw Object.assign(new Error('Expediente no encontrado'), { statusCode: 404 });
+  const plantillaEsperada = plantillaDe(expediente);
+  if (payload.plantilla && payload.plantilla !== plantillaEsperada) {
+    throw Object.assign(new Error(`Este expediente es de crédito ${expediente.tipo_credito}: corresponde la ficha ${plantillaEsperada}, no ${payload.plantilla}.`), { statusCode: 422, code: 'TEMPLATE_MISMATCH' });
+  }
+  validarFichaBasica(payload);
+  validarFichaMype(payload);
 
   const serverNow = new Date();
   const { alertas, distancia } = evaluarSenales({ expediente, payload, serverNow });
@@ -109,15 +173,34 @@ async function crearVisita(auditorId, payload) {
         respuestas_cuestionario: payload.respuestas_cuestionario,
         comentario_negocio: payload.comentario_negocio || null,
         comentario_auditor: payload.comentario_auditor || null,
-        otros_clientes_domicilio: payload.otros_clientes_domicilio || null,
-        otros_ingresos: payload.otros_ingresos || null,
-        firma_evidencia: payload.firma_evidencia,
+        otros_clientes_domicilio: payload.otros_clientes_domicilio || undefined,
+        otros_ingresos: payload.otros_ingresos || undefined,
+        firma_evidencia: payload.firma_evidencia || null,
+        plantilla: plantillaEsperada,
+        expediente_snapshot: snapshotExpediente(expediente),
+        estado_negocio: payload.estado_negocio || null,
+        propiedad_local: payload.propiedad_local || null,
+        otros_pasivos: payload.otros_pasivos || null,
+        conformidad_financiera: payload.conformidad_financiera || undefined,
+        firmante_documento: payload.firmante_documento || null,
         estado: 'CERRADA',
       },
     });
     await tx.evidencia.create({ data: { id_visita: created.id_visita, tipo: 'FOTO_PRINCIPAL', object_key: principal.key, hash_sha256: principal.hash, latitud_captura: payload.latitud, longitud_captura: payload.longitud, capturado_en: new Date(payload.fecha_hora_checkin) } });
     if (adicional) await tx.evidencia.create({ data: { id_visita: created.id_visita, tipo: 'FOTO_ADICIONAL', object_key: adicional.key, hash_sha256: adicional.hash, latitud_captura: payload.latitud, longitud_captura: payload.longitud, capturado_en: new Date(payload.fecha_hora_checkin) } });
-    await tx.expediente.update({ where: { id_expediente: payload.id_expediente }, data: { estado: 'VISITADO' } });
+    // Sin coordenadas en la base, la primera visita limpia (sin alertas y con resultado que
+    // implique haber llegado al domicilio) fija la ubicación de referencia. Queda marcada
+    // PRIMERA_VISITA y en el historial del expediente para que se pueda revisar.
+    const fijaUbicacion = expediente.latitud == null && !alertas.length && ['CONFORME', 'OBSERVADO'].includes(payload.resultado);
+    await tx.expediente.update({
+      where: { id_expediente: payload.id_expediente },
+      data: { estado: 'VISITADO', ...(fijaUbicacion ? { latitud: payload.latitud, longitud: payload.longitud, ubicacion_origen: 'PRIMERA_VISITA' } : {}) },
+    });
+    if (fijaUbicacion) {
+      await tx.expedienteCambio.create({
+        data: { id_expediente: payload.id_expediente, actor_id: auditorId, tipo: 'UBICACION', cambios: { latitud: { antes: null, despues: payload.latitud }, longitud: { antes: null, despues: payload.longitud }, ubicacion_origen: { antes: null, despues: 'PRIMERA_VISITA' }, id_visita: created.id_visita } },
+      });
+    }
     await tx.asignacionAuditoria.update({ where: { id_asignacion: asignacion.id_asignacion }, data: { estado: 'FINALIZADA', fecha_fin: serverNow } });
     return created;
   });
@@ -135,7 +218,9 @@ async function listar({ page = 1, limit = 25, estado, id_usuario_auditor, result
   const [data, total] = await Promise.all([
     prisma.visitaAuditoria.findMany({
       where, orderBy: { fecha_creacion: 'desc' }, skip: (page - 1) * limit, take: limit,
-      include: { expediente: true, auditor: { select: { id_usuario: true, username: true, nombres: true, apellidos: true } }, evidencias: true },
+      // Listado liviano: sin los bloques JSON del expediente, el snapshot ni la firma.
+      omit: { expediente_snapshot: true, firma_evidencia: true, conformidad_financiera: true },
+      include: { expediente: { select: EXPEDIENTE_RESUMEN }, auditor: { select: { id_usuario: true, username: true, nombres: true, apellidos: true } }, evidencias: true },
     }),
     prisma.visitaAuditoria.count({ where }),
   ]);
@@ -148,7 +233,27 @@ async function obtener(id) {
     include: { expediente: true, auditor: { select: { id_usuario: true, username: true, nombres: true, apellidos: true } }, evidencias: true },
   });
   if (!visita) throw Object.assign(new Error('Visita no encontrada'), { statusCode: 404 });
-  return serialize(visita);
+
+  // Trazabilidad: quién asignó la muestra, cuándo, y de qué archivo salieron los datos que vio el auditor.
+  const asignacion = visita.id_asignacion ? await prisma.asignacionAuditoria.findUnique({ where: { id_asignacion: visita.id_asignacion } }) : null;
+  const asignador = asignacion?.asignado_por
+    ? await prisma.usuario.findUnique({ where: { id_usuario: asignacion.asignado_por }, select: { username: true, nombres: true, apellidos: true } })
+    : null;
+  const idImportacion = visita.expediente_snapshot?.id_importacion || visita.expediente.id_importacion;
+  const importacion = idImportacion
+    ? await prisma.importacionMasiva.findUnique({ where: { id_importacion: idImportacion }, select: { id_importacion: true, archivo: true, formato: true, archivo_sha256: true, fecha_creacion: true } })
+    : null;
+  const cambiosUbicacion = await prisma.expedienteCambio.findMany({
+    where: { id_expediente: visita.id_expediente, tipo: 'UBICACION' }, orderBy: { fecha: 'desc' }, take: 5,
+  });
+  return serialize({
+    ...visita,
+    trazabilidad: {
+      asignacion: asignacion ? { id_asignacion: asignacion.id_asignacion, fecha_asignacion: asignacion.fecha_asignacion, fecha_fin: asignacion.fecha_fin, origen: asignacion.origen, prioridad: asignacion.prioridad, asignado_por: asignador } : null,
+      importacion,
+      cambios_ubicacion: cambiosUbicacion.map((c) => ({ ...c, id_cambio: String(c.id_cambio) })),
+    },
+  });
 }
 
 async function obtenerArchivoEvidencia(idEvidencia) {

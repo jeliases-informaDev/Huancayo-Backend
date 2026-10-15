@@ -15,7 +15,16 @@ const expedienteSelect = {
   asesor_responsable: true, monto_desembolso: true, moneda: true, estado: true,
 };
 
-async function crear({ id_expediente, id_usuario_auditor, prioridad }) {
+// El auditor recibe, solo de SUS expedientes asignados, los bloques de la ficha (cliente,
+// negocio, crédito, evaluación y deuda): los necesita en campo, incluso sin señal. La lista
+// de "disponibles" y el catálogo general NO los incluyen (mínimo privilegio).
+const expedienteMuestraSelect = {
+  ...expedienteSelect,
+  telefono_cliente: true, tipo_documento_cliente: true, ubicacion_origen: true,
+  datos_cliente: true, datos_negocio: true, datos_credito: true, evaluacion_financiera: true, endeudamiento: true,
+};
+
+async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId = null) {
   const expediente = await prisma.expediente.findUnique({ where: { id_expediente } });
   if (!expediente) { const error = new Error('Expediente no encontrado'); error.statusCode = 404; throw error; }
   const auditor = await prisma.usuario.findFirst({ where: { id_usuario: id_usuario_auditor, rol: 'AUDITOR', estado: 'ACTIVO' } });
@@ -43,7 +52,7 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }) {
   }
 
   const [asignacion] = await prisma.$transaction([
-    prisma.asignacionAuditoria.create({ data: { id_expediente, id_usuario_auditor, prioridad: prioridad || 'MEDIA' } }),
+    prisma.asignacionAuditoria.create({ data: { id_expediente, id_usuario_auditor, prioridad: prioridad || 'MEDIA', origen: 'SUPERVISOR', asignado_por: actorId } }),
     prisma.expediente.update({ where: { id_expediente }, data: { estado: 'ASIGNADO' } }),
   ]);
   return serialize(asignacion);
@@ -101,15 +110,15 @@ async function autoAsignar(auditorId, idExpediente) {
       error.statusCode = 409; error.code = 'ALREADY_CLAIMED';
       throw error;
     }
-    return tx.asignacionAuditoria.create({ data: { id_expediente: idExpediente, id_usuario_auditor: auditorId, prioridad: 'MEDIA' } });
+    return tx.asignacionAuditoria.create({ data: { id_expediente: idExpediente, id_usuario_auditor: auditorId, prioridad: 'MEDIA', origen: 'AUTOASIGNADA', asignado_por: auditorId } });
   });
   return serialize(asignacion);
 }
 
-async function crearMasivo({ id_usuario_auditor, id_expedientes, prioridad }) {
+async function crearMasivo({ id_usuario_auditor, id_expedientes, prioridad }, actorId = null) {
   const resultados = [];
   for (const id_expediente of id_expedientes) {
-    try { resultados.push({ id_expediente, ok: true, asignacion: await crear({ id_expediente, id_usuario_auditor, prioridad }) }); }
+    try { resultados.push({ id_expediente, ok: true, asignacion: await crear({ id_expediente, id_usuario_auditor, prioridad }, actorId) }); }
     catch (error) { resultados.push({ id_expediente, ok: false, error: error.message }); }
   }
   return resultados;
@@ -119,8 +128,8 @@ async function misAsignaciones(auditorId) {
   const asignaciones = await prisma.asignacionAuditoria.findMany({
     where: { id_usuario_auditor: auditorId, estado: 'ACTIVA' },
     orderBy: [{ prioridad: 'asc' }, { fecha_asignacion: 'asc' }],
-    include: { expediente: { select: expedienteSelect } },
-    take: 500,
+    include: { expediente: { select: expedienteMuestraSelect } },
+    take: 150,
   });
   return serialize(asignaciones);
 }

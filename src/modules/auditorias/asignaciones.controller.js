@@ -9,14 +9,14 @@ function notifyRoles(req, event, data) {
 
 async function crear(req, res, next) {
   try {
-    const data = await asignacionesService.crear(req.body);
+    const data = await asignacionesService.crear(req.body, req.user.id);
     notifyRoles(req, 'muestra_actualizada', data);
     res.status(201).json({ data });
   } catch (error) { next(error); }
 }
 async function crearMasivo(req, res, next) {
   try {
-    const data = await asignacionesService.crearMasivo(req.body);
+    const data = await asignacionesService.crearMasivo(req.body, req.user.id);
     notifyRoles(req, 'muestra_actualizada', { id_usuario_auditor: req.body.id_usuario_auditor });
     res.status(201).json({ data });
   } catch (error) { next(error); }

@@ -34,6 +34,11 @@ export const listQuery = z.object({
   distrito: z.string().trim().max(100).optional(),
   departamento: z.string().trim().max(100).optional(),
   tipo_credito: z.enum(['CONSUMO', 'OTROS']).optional(),
+  sin_ubicacion: z.enum(['true', 'false']).optional(),
+}).strict();
+export const importacionesQuery = z.object({
+  page: z.coerce.number().int().min(1).max(100000).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
 }).strict();
 
 // Filtros del modulo de evidencias/fichas (panel de Administrador/Supervisor).
@@ -89,10 +94,11 @@ export const asignacionBulkBody = z.object({
 export const cuestionarioSchema = z.object({
   donde_realiza_pagos: optionalString(200),
   conyuge_conoce_prestamo: z.boolean().optional(),
-  entrego_dinero_asesor: z.boolean(),
+  // Obligatorias solo si el auditor llegó al cliente (CONFORME/OBSERVADO): lo valida el servicio.
+  entrego_dinero_asesor: z.boolean().optional(),
   creditos_paralelos: z.boolean().optional(),
-  pago_comision_adicional: z.boolean(),
-  recibio_monto_total: z.boolean(),
+  pago_comision_adicional: z.boolean().optional(),
+  recibio_monto_total: z.boolean().optional(),
   comparte_dinero_credito: z.boolean().optional(),
   titular_administra_negocio: z.boolean().optional(),
   tiene_microseguro: z.boolean().optional(),
@@ -118,6 +124,11 @@ export const evidenciaPresignBody = z.object({
   size: z.coerce.number().int().positive(),
 }).strict();
 
+const bloqueConformidad = z.object({ conforme: z.boolean(), comentario: optionalString(500) }).strict();
+export const conformidadFinancieraSchema = z.object({
+  ingresos: bloqueConformidad, balance: bloqueConformidad, resultados: bloqueConformidad,
+}).strict();
+
 export const visitaCreateBody = z.object({
   client_sync_id: z.string().regex(/^[A-Za-z0-9._:-]{16,100}$/).optional(),
   id_asignacion: z.coerce.number().int().positive().optional(),
@@ -137,8 +148,16 @@ export const visitaCreateBody = z.object({
     nombre: optionalString(200), parentesco: optionalString(100),
     actividad: optionalString(150), antiguedad_negocio: optionalString(100),
   }).strict()).max(10).optional(),
-  otros_ingresos: z.array(z.object({ origen: optionalString(150), monto_mensual: z.coerce.number().nonnegative().optional() }).strict()).max(5).optional(),
-  firma_evidencia: z.string().regex(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/).max(700000),
+  otros_ingresos: z.array(z.object({ origen: optionalString(150), monto_mensual: z.coerce.number().nonnegative().optional() }).strict()).max(3).optional(),
+  // Ficha por tipo de crédito (MYPE_V1 / CONSUMO_V1). Las apps anteriores no la envían: el
+  // servidor la deduce del expediente y no exige los campos propios de MYPE.
+  plantilla: z.enum(['CONSUMO_V1', 'MYPE_V1']).optional(),
+  estado_negocio: z.enum(['EN_FUNCIONAMIENTO', 'INOPERATIVO', 'DE_TERCEROS']).optional(),
+  propiedad_local: z.enum(['PROPIO', 'ALQUILADO', 'FAMILIAR', 'OTRO']).optional(),
+  otros_pasivos: optionalString(500),
+  conformidad_financiera: conformidadFinancieraSchema.optional(),
+  firmante_documento: z.string().trim().regex(/^[A-Za-z0-9]{6,20}$/).optional(),
+  firma_evidencia: z.string().regex(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/).max(700000).optional(),
   evidencia_principal_key: cleanString(255),
   evidencia_adicional_key: cleanString(255).optional(),
 }).strict();

@@ -5,7 +5,7 @@ import { roleMiddleware } from '#core/middlewares/role.middleware.js';
 import { OPERATIONAL_MANAGERS } from '#core/security/roles.js';
 import { validate } from '#core/middlewares/validate.middleware.js';
 import upload from '#core/middlewares/upload.middleware.js';
-import { idParams, listQuery, expedienteCreateBody, expedienteUpdateBody } from '../../validation/schemas.js';
+import { idParams, uuidParams, listQuery, importacionesQuery, expedienteCreateBody, expedienteUpdateBody } from '../../validation/schemas.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -15,6 +15,9 @@ router.use(authMiddleware);
 // /api/asignaciones/mias (asignados) y /api/asignaciones/disponibles (su zona).
 router.use(roleMiddleware(OPERATIONAL_MANAGERS));
 router.get('/', validate({ query: listQuery }), controller.listar);
+// Historial de importaciones (trazabilidad del dato). Va antes de '/:id'.
+router.get('/importaciones', validate({ query: importacionesQuery }), controller.listarImportaciones);
+router.get('/importaciones/:id', validate({ params: uuidParams }), controller.obtenerImportacion);
 router.get('/:id', validate({ params: idParams }), controller.obtener);
 router.post('/', validate({ body: expedienteCreateBody }), controller.crear);
 router.put('/:id', validate({ params: idParams, body: expedienteUpdateBody }), controller.actualizar);

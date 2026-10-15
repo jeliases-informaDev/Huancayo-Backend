@@ -121,9 +121,12 @@ describe('cuestionarioSchema — preguntas obligatorias de la ficha', () => {
   test('acepta las 3 preguntas obligatorias sin las opcionales', () => {
     assert.equal(cuestionarioSchema.safeParse(completo).success, true);
   });
-  test('rechaza si falta una pregunta obligatoria (recibio_monto_total)', () => {
-    const { recibio_monto_total, ...incompleto } = completo;
-    assert.equal(cuestionarioSchema.safeParse(incompleto).success, false);
+  test('acepta un cuestionario parcial: las 3 son obligatorias solo si se llegó al cliente (lo valida el servicio)', () => {
+    const { recibio_monto_total, ...parcial } = completo;
+    assert.equal(cuestionarioSchema.safeParse(parcial).success, true);
+  });
+  test('rechaza respuestas con tipo incorrecto', () => {
+    assert.equal(cuestionarioSchema.safeParse({ ...completo, recibio_monto_total: 'si' }).success, false);
   });
 });
 

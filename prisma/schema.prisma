@@ -121,18 +121,51 @@ model Expediente {
   evaluacion_financiera Json? // ingresos / balance general / estado de resultados (variante Otros)
   endeudamiento         Json? // tabla de endeudamiento del cliente y cónyuge
 
+  // --- Trazabilidad del dato ---
+  // De dónde salió la ubicación del domicilio: REFERENCIA (coordenadas escritas en la
+  // referencia de la base), MANUAL (la fijó un supervisor/admin en el panel) o
+  // PRIMERA_VISITA (la tomó el auditor al visitar). Nulo = sin ubicación todavía.
+  ubicacion_origen String? @db.VarChar(20)
+  // Importación que creó/actualizó por última vez este expediente, fila del archivo y
+  // huella (SHA-256) de la fila normalizada: permite detectar "sin cambios" al reimportar.
+  id_importacion String? @db.VarChar(36)
+  fila_origen    Int?
+  hash_origen    String? @db.VarChar(64)
+  // Avisos de calidad del dato detectados al importar (texto dañado, sin coordenadas...).
+  advertencias_origen Json?
+
   estado           String   @default("PENDIENTE") @db.VarChar(20) // PENDIENTE, ASIGNADO, VISITADO, CERRADO
   fecha_creacion   DateTime @default(now())
   fecha_actualizar DateTime @updatedAt
 
   asignaciones AsignacionAuditoria[]
   visitas      VisitaAuditoria[]
+  cambios      ExpedienteCambio[]
 
   @@index([latitud, longitud])
   @@index([distrito])
   @@index([departamento])
   @@index([asesor_responsable])
+  @@index([id_importacion])
   @@map("expedientes")
+}
+
+/// Historial de cambios de datos de un expediente (reimportaciones y ediciones de ubicación):
+/// qué campo cambió, de qué valor a cuál, cuándo y por qué importación/usuario.
+model ExpedienteCambio {
+  id_cambio      BigInt   @id @default(autoincrement())
+  id_expediente  Int
+  id_importacion String?  @db.VarChar(36)
+  actor_id       String?  @db.VarChar(36)
+  tipo           String   @db.VarChar(20) // CREADO, ACTUALIZADO, UBICACION
+  cambios        Json
+  fecha          DateTime @default(now())
+
+  expediente Expediente @relation(fields: [id_expediente], references: [id_expediente], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([id_expediente, fecha])
+  @@index([id_importacion])
+  @@map("expediente_cambios")
 }
 
 /// Tabla física: asignaciones_auditoria — auditor ↔ expediente (muestra a visitar)
@@ -144,6 +177,10 @@ model AsignacionAuditoria {
   fecha_fin          DateTime?
   estado             String    @default("ACTIVA") @db.VarChar(20) // ACTIVA, FINALIZADA, CANCELADA
   prioridad          String    @default("MEDIA") @db.VarChar(20) // ALTA, MEDIA, BAJA
+  // Quién y cómo se creó: SUPERVISOR (asignada por un supervisor/admin, asignado_por = su id)
+  // o AUTOASIGNADA (el propio auditor la tomó).
+  origen             String    @default("SUPERVISOR") @db.VarChar(20)
+  asignado_por       String?   @db.VarChar(36)
 
   expediente Expediente @relation(fields: [id_expediente], references: [id_expediente], onDelete: Restrict, onUpdate: Cascade)
   auditor    Usuario    @relation(fields: [id_usuario_auditor], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
@@ -181,6 +218,17 @@ model VisitaAuditoria {
   otros_clientes_domicilio Json?
   otros_ingresos           Json?
   firma_evidencia          String? @db.Text // firma PNG en data URL
+
+  // Ficha por tipo de crédito. "plantilla" identifica con qué formulario se tomó la visita
+  // (CONSUMO_V1 / MYPE_V1) y "expediente_snapshot" congela los datos de la base tal como los
+  // vio el auditor: si el expediente se reimporta después, la ficha ya cerrada no cambia.
+  plantilla              String? @db.VarChar(20)
+  expediente_snapshot    Json?
+  estado_negocio         String? @db.VarChar(30) // EN_FUNCIONAMIENTO, INOPERATIVO, DE_TERCEROS (solo MYPE)
+  propiedad_local        String? @db.VarChar(30) // PROPIO, ALQUILADO, FAMILIAR, OTRO (solo MYPE)
+  otros_pasivos          String? @db.VarChar(500)
+  conformidad_financiera Json? // análisis/conformidad del auditor por bloque (ingresos, balance, resultados)
+  firmante_documento     String? @db.VarChar(20) // N° de documento de quien firmó
 
   estado           String   @default("ABIERTA") @db.VarChar(20) // ABIERTA, CERRADA
   fecha_creacion   DateTime @default(now())
@@ -259,6 +307,11 @@ model ImportacionMasiva {
   omitidas       Int       @default(0)
   errores        Int       @default(0)
   detalle_error  Json?
+  // Trazabilidad del archivo: huella SHA-256 (el mismo archivo no se procesa dos veces sin
+  // que se note), formato detectado y resumen de avisos de calidad del dato.
+  archivo_sha256 String?   @db.VarChar(64)
+  formato        String?   @db.VarChar(20)
+  advertencias   Json?
   fecha_creacion DateTime  @default(now())
   fecha_inicio   DateTime?
   fecha_fin      DateTime?
