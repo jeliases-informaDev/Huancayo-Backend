@@ -10,10 +10,12 @@ import { idParams, listQuery, expedienteCreateBody, expedienteUpdateBody } from 
 const router = Router();
 router.use(authMiddleware);
 
+// Mínimo privilegio: el catálogo completo de expedientes (datos de clientes de todas
+// las zonas) es solo del backoffice. El auditor de campo recibe únicamente lo suyo por
+// /api/asignaciones/mias (asignados) y /api/asignaciones/disponibles (su zona).
+router.use(roleMiddleware(OPERATIONAL_MANAGERS));
 router.get('/', validate({ query: listQuery }), controller.listar);
 router.get('/:id', validate({ params: idParams }), controller.obtener);
-
-router.use(roleMiddleware(OPERATIONAL_MANAGERS));
 router.post('/', validate({ body: expedienteCreateBody }), controller.crear);
 router.put('/:id', validate({ params: idParams, body: expedienteUpdateBody }), controller.actualizar);
 router.delete('/:id', validate({ params: idParams }), controller.eliminar);
