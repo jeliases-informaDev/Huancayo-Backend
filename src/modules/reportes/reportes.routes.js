@@ -8,6 +8,7 @@ import { idParams } from '../../validation/schemas.js';
 
 const router = Router();
 router.use(authMiddleware, roleMiddleware(OPERATIONAL_MANAGERS));
+router.get('/resumen', controller.resumen);
 router.get('/visita/:id/word', validate({ params: idParams }), controller.wordVisita);
 
 export default router;

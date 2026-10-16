@@ -251,6 +251,7 @@ async function obtener(id) {
     trazabilidad: {
       asignacion: asignacion ? { id_asignacion: asignacion.id_asignacion, fecha_asignacion: asignacion.fecha_asignacion, fecha_fin: asignacion.fecha_fin, origen: asignacion.origen, prioridad: asignacion.prioridad, asignado_por: asignador } : null,
       importacion,
+      geocerca_m: env.GEOFENCE_RADIO_METROS,
       cambios_ubicacion: cambiosUbicacion.map((c) => ({ ...c, id_cambio: String(c.id_cambio) })),
     },
   });

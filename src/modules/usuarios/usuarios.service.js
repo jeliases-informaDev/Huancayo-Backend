@@ -47,9 +47,9 @@ async function listarAuditores() {
   const usuarios = await prisma.usuario.findMany({
     where: { rol: { in: FIELD_ROLES }, estado: 'ACTIVO' },
     orderBy: { nombres: 'asc' },
-    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true },
+    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, departamento: true },
   });
-  return usuarios.map(u => ({ id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '', rol: normalizeRole(u.rol) }));
+  return usuarios.map(u => ({ id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '', rol: normalizeRole(u.rol), departamento: u.departamento || null }));
 }
 
 async function crear(datos) {

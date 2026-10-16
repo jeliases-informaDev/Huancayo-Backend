@@ -1,4 +1,5 @@
 import reportesService from './reportes.service.js';
+import resumenService from './resumen.service.js';
 
 async function wordVisita(req, res, next) {
   try {
@@ -9,4 +10,8 @@ async function wordVisita(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { wordVisita };
+async function resumen(_req, res, next) {
+  try { res.json({ data: await resumenService.obtenerResumen() }); } catch (error) { next(error); }
+}
+
+export default { wordVisita, resumen };
