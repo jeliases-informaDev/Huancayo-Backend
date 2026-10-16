@@ -23,6 +23,7 @@ import { normalizeRole } from '#core/security/roles.js';
 import authRoutes from '#modules/auth/auth.routes.js';
 import usuariosRoutes from '#modules/usuarios/usuarios.routes.js';
 import expedientesRoutes from '#modules/expedientes/expedientes.routes.js';
+import importador from '#modules/expedientes/importador/importador.service.js';
 import asignacionesRoutes from '#modules/auditorias/asignaciones.routes.js';
 import visitasRoutes from '#modules/auditorias/visitas.routes.js';
 import reportesRoutes from '#modules/reportes/reportes.routes.js';
@@ -163,6 +164,8 @@ app.use(errorHandler);
 // 5. INICIALIZACIÓN DE SERVIDOR Y WEBSOCKETS
 // ============================================================================
 const server = app.listen(env.PORT, () => {
+  // Una carga que quedó "procesando" por un reinicio del servidor no va a terminar nunca: se marca.
+  importador.marcarInterrumpidas().catch(() => {});
   if (env.NODE_ENV === 'development') process.stdout.write(`http://localhost:${env.PORT}\n`);
   else logger.info({ port: env.PORT }, 'server_started');
 });

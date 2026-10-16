@@ -36,6 +36,10 @@ export const listQuery = z.object({
   tipo_credito: z.enum(['CONSUMO', 'OTROS']).optional(),
   sin_ubicacion: z.enum(['true', 'false']).optional(),
 }).strict();
+export const importarQuery = z.object({
+  simular: z.enum(['true', 'false']).optional(),
+  autoasignable: z.enum(['true', 'false']).optional(),
+}).strict();
 export const importacionesQuery = z.object({
   page: z.coerce.number().int().min(1).max(100000).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
@@ -70,6 +74,7 @@ export const expedienteCreateBody = z.object({
   asesor_responsable: cleanString(150),
   monto_desembolso: z.coerce.number().nonnegative().optional(),
   moneda: optionalString(5),
+  autoasignable: z.boolean().optional(),
   datos_cliente: z.record(z.string(), z.unknown()).optional(),
   datos_negocio: z.record(z.string(), z.unknown()).optional(),
   datos_credito: z.record(z.string(), z.unknown()).optional(),

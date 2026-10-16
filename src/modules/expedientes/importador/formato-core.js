@@ -32,6 +32,7 @@ const BALANCE = [
   ['proveedores', 'nMonPROVEEDORES1', 'nMonPROVEEDORES2'],
   ['otras_cuentas_por_pagar', 'nMonCTASXPAGAR1', 'nMonCTASXPAGAR2'],
   ['prestamos_corto_plazo', 'nMonPRESTAMOCP1', 'nMonPRESTAMOCP2'],
+  ['prestamos_largo_plazo', 'nMonPRESTAMOLP1', 'nMonPRESTAMOLP2'],
   ['pasivo_no_corriente', 'PASIVONOCORRIENTE', 'PASIVONOCORRIENTE2'],
   ['total_pasivo', 'TOTALPASIVO', 'TOTALPASIVO2'],
   ['patrimonio', 'PATRIMONIO', 'PATROMINIO2'], // sic: así se llama la columna en la base
@@ -80,6 +81,7 @@ function ingresos(v) {
       total_mercaderias: numero(v(`nTotMerFin${n}`)),
       total_compras: numero(v(`nTotComPro${n}`)),
       total_ventas: numero(v(`nTotVenFin${n}`)),
+      cantidad_estandar_fin: numero(v(`nCanEstFin${n}`)),
     };
     // Las 5 líneas siempre vienen; solo se guardan las que tienen contenido real.
     if (linea.descripcion || linea.total_ventas || linea.total_compras || linea.total_mercaderias) lineas.push(linea);
@@ -92,13 +94,10 @@ function entidades(v, prefijo) {
   for (let n = 1; n <= 5; n += 1) {
     const entidad = texto(v(`cnomifi${prefijo}${n}`));
     const saldo = numero(v(`nsaldo${prefijo}${n}`));
+    const calificacion = texto(v(`ccalempdes${prefijo}${n}`));
+    const tipoCredito = texto(v(`cdestipcre${prefijo}${n}`));
     if (!entidad && !saldo) continue;
-    lista.push({
-      entidad,
-      saldo,
-      calificacion: texto(v(`ccalempdes${prefijo}${n}`)),
-      tipo_credito: texto(v(`cdestipcre${prefijo}${n}`)),
-    });
+    lista.push({ entidad, saldo, calificacion, tipo_credito: tipoCredito });
   }
   return lista;
 }
@@ -138,9 +137,9 @@ function telefono(...valores) {
 }
 
 // Acceso a una fila sin distinguir mayúsculas en el nombre de la columna.
-function accesoFila(fila) {
+function accesoFila(fila, usadas) {
   const porClave = new Map(Object.entries(fila).map(([k, val]) => [k.trim().toLowerCase(), val]));
-  return (nombre) => porClave.get(nombre.toLowerCase());
+  return (nombre) => { usadas.add(nombre.toLowerCase()); return porClave.get(nombre.toLowerCase()); };
 }
 
 const huella = (objeto) => crypto.createHash('sha256').update(JSON.stringify(objeto)).digest('hex');
@@ -149,7 +148,8 @@ const huella = (objeto) => crypto.createHash('sha256').update(JSON.stringify(obj
  * @returns {{ expediente?: object, advertencias: string[], error?: string }}
  */
 export function mapearFilaCore(fila, { hoja }) {
-  const v = accesoFila(fila);
+  const usadas = new Set();
+  const v = accesoFila(fila, usadas);
   const advertencias = [];
 
   const codigo = texto(v('ccodctacre'), 50);
@@ -209,6 +209,7 @@ export function mapearFilaCore(fila, { hoja }) {
     tipo_cliente: texto(v('tipodecliente')),
     codigo_cliente: texto(v('cCodCliente')),
     codigo_expediente_core: texto(v('ccodexpcli')),
+    codigos: { sexo: texto(v('cCodSexo')), estado_civil: texto(v('cCodEstCiv')) },
     telefono_fijo: fijo,
     telefono_celular: celular,
   };
@@ -259,7 +260,7 @@ export function mapearFilaCore(fila, { hoja }) {
     codigos: {
       moneda: texto(v('cCodTipMon')), tipo_credito: texto(v('cCodTipCre')), producto: texto(v('cCodProduc')),
       subproducto: texto(v('cCodSubPro')), pagare: texto(v('cCodPagare')), normal_refinanciado: texto(v('cCreNorRef')),
-      estado_contable: texto(v('cestcrecon')), modalidad: texto(v('cCodModCre')), plazo: texto(v('cCodPlazo')),
+      estado_contable: texto(v('cestcrecon')), modalidad: texto(v('cCodModCre')), plazo: texto(v('cCodPlazo')), oficina: texto(v('cCodOficin')),
     },
   };
   // La base trae solo el crédito vigente; el historial se modela como lista para poder
@@ -313,6 +314,18 @@ export function mapearFilaCore(fila, { hoja }) {
     endeudamiento,
   };
 
+  // Ninguna columna de la base queda sin destino: lo que el mapeo no consume (columnas nuevas o
+  // sin uso conocido) se conserva tal cual en datos_credito.campos_adicionales.
+  usadas.add('nro'); usadas.add('ubidom');
+  const adicionales = {};
+  for (const [clave, valor] of Object.entries(fila)) {
+    if (usadas.has(clave.trim().toLowerCase())) continue;
+    const limpio = typeof valor === 'string' || typeof valor === 'number' ? texto(valor) : null;
+    if (limpio !== null) adicionales[clave.trim()] = limpio;
+  }
+  // Descartadas a propósito: correlativo de la muestra y ubicación redundante (depto-provincia-distrito).
+  datosCredito.campos_adicionales = adicionales;
+
   // Texto dañado: el archivo perdió Ñ/acentos al exportarse (aparece U+FFFD). Se importa igual,
   // pero se avisa para pedir un archivo nuevo en UTF-8 en lugar de corregir a mano.
   const dañados = [];
@@ -324,5 +337,5 @@ export function mapearFilaCore(fila, { hoja }) {
   revisar('', expediente);
   if (dañados.length) advertencias.push('TEXTO_DANADO');
 
-  return { expediente, advertencias, camposDanados: dañados.slice(0, 8), huella: huella(expediente) };
+  return { expediente, advertencias, camposDanados: dañados.slice(0, 8), huella: huella(expediente), columnasUsadas: usadas };
 }

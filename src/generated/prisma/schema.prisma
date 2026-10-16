@@ -126,6 +126,9 @@ model Expediente {
   // referencia de la base), MANUAL (la fijó un supervisor/admin en el panel) o
   // PRIMERA_VISITA (la tomó el auditor al visitar). Nulo = sin ubicación todavía.
   ubicacion_origen    String? @db.VarChar(20)
+  // false = solo un supervisor/admin puede asignarlo; true = además los auditores de su zona pueden
+  // tomarlo por su cuenta ("Disponibles en tu zona"). Las cargas masivas lo dejan en false por defecto.
+  autoasignable       Boolean @default(true)
   // Importación que creó/actualizó por última vez este expediente, fila del archivo y
   // huella (SHA-256) de la fila normalizada: permite detectar "sin cambios" al reimportar.
   id_importacion      String? @db.VarChar(36)

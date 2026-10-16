@@ -5,7 +5,7 @@ import { roleMiddleware } from '#core/middlewares/role.middleware.js';
 import { OPERATIONAL_MANAGERS } from '#core/security/roles.js';
 import { validate } from '#core/middlewares/validate.middleware.js';
 import upload from '#core/middlewares/upload.middleware.js';
-import { idParams, uuidParams, listQuery, importacionesQuery, expedienteCreateBody, expedienteUpdateBody } from '../../validation/schemas.js';
+import { idParams, uuidParams, listQuery, importacionesQuery, importarQuery, expedienteCreateBody, expedienteUpdateBody } from '../../validation/schemas.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -18,10 +18,11 @@ router.get('/', validate({ query: listQuery }), controller.listar);
 // Historial de importaciones (trazabilidad del dato). Va antes de '/:id'.
 router.get('/importaciones', validate({ query: importacionesQuery }), controller.listarImportaciones);
 router.get('/importaciones/:id', validate({ params: uuidParams }), controller.obtenerImportacion);
+router.post('/importaciones/:id/liberar', validate({ params: uuidParams }), controller.liberarImportacion);
 router.get('/:id', validate({ params: idParams }), controller.obtener);
 router.post('/', validate({ body: expedienteCreateBody }), controller.crear);
 router.put('/:id', validate({ params: idParams, body: expedienteUpdateBody }), controller.actualizar);
 router.delete('/:id', validate({ params: idParams }), controller.eliminar);
-router.post('/importar', upload.single('archivo'), controller.importar);
+router.post('/importar', upload.single('archivo'), validate({ query: importarQuery }), controller.importar);
 
 export default router;

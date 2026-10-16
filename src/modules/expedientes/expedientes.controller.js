@@ -1,45 +1,13 @@
 import crypto from 'node:crypto';
+import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
-import ExcelJS from 'exceljs';
 import expedientesService from './expedientes.service.js';
 
-// Valor de una celda de ExcelJS: puede ser un primitivo, una fecha, texto enriquecido
-// o el resultado cacheado de una fórmula — se normaliza todo a primitivo simple.
-function cellValue(cell) {
-  if (cell === null || cell === undefined) return '';
-  if (cell instanceof Date) return cell;
-  if (typeof cell === 'object') {
-    if (Array.isArray(cell.richText)) return cell.richText.map(part => part.text).join('');
-    if (cell.text !== undefined) return cell.text;
-    if (cell.result !== undefined) return cell.result;
-  }
-  return cell;
-}
-
-// Lee TODAS las hojas con datos (la base de Caja Huancayo separa por tipo de crédito:
-// la hoja OTROS es MYPE, CONSUMO es consumo). Cada hoja usa su fila 1 como encabezados.
-async function leerHojasExcel(filePath) {
-  const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.readFile(filePath);
-  const hojas = [];
-  for (const worksheet of workbook.worksheets) {
-    const encabezados = worksheet.getRow(1).values.slice(1).map(header => String(cellValue(header)).trim());
-    const filas = [];
-    const numeros = [];
-    worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) return;
-      const values = row.values;
-      const fila = {};
-      encabezados.forEach((header, index) => {
-        if (!header) return;
-        fila[header] = cellValue(values[index + 1]);
-      });
-      filas.push(fila);
-      numeros.push(rowNumber);
-    });
-    if (filas.length) hojas.push({ nombre: worksheet.name, encabezados: encabezados.filter(Boolean), filas, numeros });
-  }
-  return hojas;
+function sha256Archivo(ruta) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    createReadStream(ruta).on('data', (parte) => hash.update(parte)).on('end', () => resolve(hash.digest('hex'))).on('error', reject);
+  });
 }
 
 async function listar(req, res, next) {
@@ -65,25 +33,28 @@ async function eliminar(req, res, next) {
     res.status(204).send();
   } catch (error) { next(error); }
 }
+// Responde de inmediato (202) y procesa en segundo plano; el panel consulta el avance en
+// GET /importaciones/:id. Con ?simular=true solo valida y devuelve el reporte, sin guardar nada.
 async function importar(req, res, next) {
   const ruta = req.file?.path;
+  let delegado = false;
   try {
     if (!req.file) { const error = new Error('Debe adjuntar un archivo XLSX'); error.statusCode = 400; throw error; }
-    const contenido = await fs.readFile(ruta);
-    const archivoSha256 = crypto.createHash('sha256').update(contenido).digest('hex');
-    const hojas = await leerHojasExcel(ruta);
-    if (!hojas.length) { const error = new Error('El archivo no tiene filas de datos.'); error.statusCode = 400; throw error; }
-    const resultado = await expedientesService.importador.importarHojas(hojas, { actorId: req.user.id, archivo: req.file.originalname, archivoSha256 });
+    const archivoSha256 = await sha256Archivo(ruta);
+    const { simular, autoasignable } = req.validated?.query || {};
+    const resultado = await expedientesService.importador.iniciarImportacion({
+      ruta, actorId: req.user.id, archivo: req.file.originalname, archivoSha256, simular: simular === 'true', autoasignable: autoasignable === 'true',
+    });
+    delegado = true; // desde aquí el servicio borra el archivo al terminar
     req.auditContext = {
       entidad: 'ImportacionMasiva', entidad_id: resultado.id_importacion, valor_anterior: null,
-      valor_nuevo: { archivo: resultado.archivo, formato: resultado.formato, total_filas: resultado.total_filas, insertadas: resultado.insertadas, actualizadas: resultado.actualizadas, sin_cambios: resultado.sin_cambios, omitidas: resultado.omitidas, errores: resultado.errores, archivo_sha256: archivoSha256 },
+      valor_nuevo: { archivo: req.file.originalname, archivo_sha256: archivoSha256, simulacion: resultado.simulacion, autoasignable: autoasignable === 'true' },
     };
-    res.status(201).json({ data: resultado });
+    res.status(202).json({ data: resultado });
   } catch (error) {
     next(error);
   } finally {
-    // El archivo trae datos personales de clientes: no debe quedar en el disco del servidor.
-    if (ruta) await fs.rm(ruta, { force: true }).catch(() => {});
+    if (!delegado && ruta) await fs.rm(ruta, { force: true }).catch(() => {});
   }
 }
 async function listarImportaciones(req, res, next) {
@@ -93,4 +64,12 @@ async function obtenerImportacion(req, res, next) {
   try { res.json({ data: await expedientesService.importador.obtenerImportacion(req.validated.params.id) }); } catch (error) { next(error); }
 }
 
-export default { listar, obtener, crear, actualizar, eliminar, importar, listarImportaciones, obtenerImportacion };
+async function liberarImportacion(req, res, next) {
+  try {
+    const data = await expedientesService.importador.liberarImportacion(req.validated.params.id);
+    req.auditContext = { entidad: 'ImportacionMasiva', entidad_id: req.validated.params.id, valor_anterior: null, valor_nuevo: { accion: 'LIBERAR_A_AUDITORES', ...data } };
+    res.json({ data });
+  } catch (error) { next(error); }
+}
+
+export default { listar, obtener, crear, actualizar, eliminar, importar, listarImportaciones, obtenerImportacion, liberarImportacion };

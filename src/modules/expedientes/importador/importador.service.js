@@ -1,8 +1,15 @@
+import fs from 'node:fs/promises';
+import ExcelJS from 'exceljs';
 import prisma from '#core/config/prisma.js';
 import { Prisma } from '../../../generated/prisma/index.js';
 import { esFormatoCore, FORMATO_CORE, mapearFilaCore } from './formato-core.js';
 
-// Importación de expedientes por Excel. Reglas de trazabilidad:
+// Importación de expedientes por Excel, pensada para cargas reales (miles de filas).
+//  · El archivo se lee por flujo (no se carga entero en memoria) y se procesa por lotes.
+//  · Corre en segundo plano: el POST responde de inmediato y el panel consulta el avance.
+//  · "Validar sin guardar" (simular) hace todo el análisis y devuelve el reporte sin escribir nada.
+//  · Solo una importación a la vez (evita dos cargas pisándose).
+// Reglas de trazabilidad:
 //  · cada importación queda registrada (archivo, huella SHA-256, formato, resultados y avisos);
 //  · cada expediente guarda de qué importación y fila viene, y la huella de su fila;
 //  · reimportar la misma fila sin cambios no toca nada ("sin cambios");
@@ -17,9 +24,15 @@ const ESCALARES = [
   'direccion_domicilio', 'distrito', 'provincia', 'departamento', 'latitud', 'longitud', 'ubicacion_origen',
   'asesor_responsable', 'monto_desembolso', 'moneda',
 ];
+const TIPO_REAL = 'EXPEDIENTES';
+const TIPO_SIMULACION = 'EXPEDIENTES_SIM';
+const LOTE = 200;
 const MAX_DETALLE = 500;
 const MAX_CAMBIOS_POR_EXPEDIENTE = 150;
 
+let importacionEnCurso = null;
+
+// ---------- utilidades ----------
 function aplanar(valor, ruta = '', salida = {}) {
   if (Array.isArray(valor)) {
     if (!valor.length) salida[ruta] = '[]';
@@ -58,91 +71,119 @@ function calcularCambios(actual, nuevo) {
   return cambios;
 }
 
-function datosParaGuardar(expediente, meta) {
-  return {
-    ...expediente,
-    id_importacion: meta.idImportacion, fila_origen: meta.fila, hash_origen: meta.huella,
-    advertencias_origen: meta.advertencias.length ? meta.advertencias : Prisma.DbNull,
-  };
+// Valor de una celda de ExcelJS: primitivo, fecha, texto enriquecido o resultado cacheado de una fórmula.
+function valorCelda(cell) {
+  if (cell === null || cell === undefined) return '';
+  if (cell instanceof Date) return cell;
+  if (typeof cell === 'object') {
+    if (Array.isArray(cell.richText)) return cell.richText.map((part) => part.text).join('');
+    if (cell.text !== undefined) return cell.text;
+    if (cell.result !== undefined) return cell.result;
+  }
+  return cell;
 }
+
+const vacia = (fila) => Object.values(fila).every((v) => v === '' || v === null || v === undefined);
 
 async function precargarExistentes(codigos) {
   const mapa = new Map();
   for (let i = 0; i < codigos.length; i += 500) {
-    const lote = codigos.slice(i, i + 500);
-    const filas = await prisma.expediente.findMany({ where: { codigo_expediente: { in: lote } } });
+    const filas = await prisma.expediente.findMany({ where: { codigo_expediente: { in: codigos.slice(i, i + 500) } } });
     filas.forEach((f) => mapa.set(f.codigo_expediente, f));
   }
   return mapa;
 }
 
-async function procesarFilasCore(filas, hoja, contexto, numeros) {
-  const mapeadas = filas.map((fila, i) => ({ numeroFila: numeros?.[i] ?? i + 2, resultado: mapearFilaCore(fila, { hoja }) }));
+function metaDe(ctx, fila, huella, advertencias) {
+  return { id_importacion: ctx.idImportacion, fila_origen: fila, hash_origen: huella, advertencias_origen: advertencias.length ? advertencias : Prisma.DbNull };
+}
+
+// ---------- creación por lote ----------
+async function crearNuevos(nuevos, ctx) {
+  if (!nuevos.length) return;
+  const registrarAvisos = (n) => { if (n.advertencias.length) ctx.registrar({ ...n.base, resultado: 'CREADO', advertencias: n.advertencias, campos_danados: n.camposDanados }); };
+  if (ctx.simular) { nuevos.forEach((n) => { ctx.insertadas += 1; registrarAvisos(n); }); return; }
+
+  const datos = nuevos.map((n) => ({ ...n.data, autoasignable: ctx.autoasignable }));
+  let creadas = nuevos;
+  try {
+    await prisma.expediente.createMany({ data: datos });
+  } catch {
+    // Algún registro del lote es inválido: se insertan uno por uno para aislar el culpable.
+    creadas = [];
+    for (const [i, n] of nuevos.entries()) {
+      try { await prisma.expediente.create({ data: datos[i] }); creadas.push(n); }
+      catch (e) { ctx.errores += 1; ctx.registrar({ ...n.base, resultado: 'ERROR', motivo: String(e.message || e).split('\n').pop().slice(0, 200) }); }
+    }
+  }
+  if (!creadas.length) return;
+  const ids = await prisma.expediente.findMany({ where: { codigo_expediente: { in: creadas.map((n) => n.data.codigo_expediente) } }, select: { id_expediente: true, codigo_expediente: true } });
+  const idPorCodigo = new Map(ids.map((r) => [r.codigo_expediente, r.id_expediente]));
+  await prisma.expedienteCambio.createMany({
+    data: creadas.map((n) => ({ id_expediente: idPorCodigo.get(n.data.codigo_expediente), id_importacion: ctx.idImportacion, actor_id: ctx.actorId, tipo: 'CREADO', cambios: { origen: { archivo: ctx.archivo, hoja: n.base.hoja, fila: n.base.fila } } })).filter((c) => c.id_expediente),
+  });
+  ctx.insertadas += creadas.length;
+  creadas.forEach(registrarAvisos);
+}
+
+// ---------- lote formato core ----------
+async function procesarLoteCore({ hoja, filas, numeros }, ctx) {
+  const mapeadas = filas.map((fila, i) => ({ numeroFila: numeros[i], resultado: mapearFilaCore(fila, { hoja }) }));
   const existentes = await precargarExistentes(mapeadas.map((m) => m.resultado.expediente?.codigo_expediente).filter(Boolean));
-  const vistos = new Set();
+  const nuevos = [];
 
   for (const { numeroFila, resultado } of mapeadas) {
     const { expediente, advertencias, error, huella, camposDanados } = resultado;
     const base = { hoja, fila: numeroFila, codigo: expediente?.codigo_expediente ?? null };
     try {
-      if (error) { contexto.errores += 1; contexto.registrar({ ...base, resultado: 'ERROR', motivo: error }); continue; }
-      if (vistos.has(expediente.codigo_expediente)) {
-        contexto.omitidas += 1; contexto.registrar({ ...base, resultado: 'OMITIDA', motivo: 'DUPLICADO_EN_ARCHIVO' }); continue;
-      }
-      vistos.add(expediente.codigo_expediente);
-      advertencias.forEach((a) => { contexto.advertencias[a] = (contexto.advertencias[a] || 0) + 1; });
+      if (error) { ctx.errores += 1; ctx.registrar({ ...base, resultado: 'ERROR', motivo: error }); continue; }
+      if (ctx.vistos.has(expediente.codigo_expediente)) { ctx.omitidas += 1; ctx.registrar({ ...base, resultado: 'OMITIDA', motivo: 'DUPLICADO_EN_ARCHIVO' }); continue; }
+      ctx.vistos.add(expediente.codigo_expediente);
+      advertencias.forEach((a) => { ctx.advertencias[a] = (ctx.advertencias[a] || 0) + 1; });
 
-      const meta = { idImportacion: contexto.idImportacion, fila: numeroFila, huella, advertencias };
       const existente = existentes.get(expediente.codigo_expediente);
+      const datos = { ...expediente, ...metaDe(ctx, numeroFila, huella, advertencias) };
 
-      if (!existente) {
-        const creado = await prisma.expediente.create({ data: datosParaGuardar(expediente, meta) });
-        await prisma.expedienteCambio.create({
-          data: { id_expediente: creado.id_expediente, id_importacion: contexto.idImportacion, actor_id: contexto.actorId, tipo: 'CREADO', cambios: { origen: { archivo: contexto.archivo, hoja, fila: numeroFila } } },
-        });
-        contexto.insertadas += 1;
-        if (advertencias.length) contexto.registrar({ ...base, resultado: 'CREADO', advertencias, campos_danados: camposDanados });
-        continue;
-      }
+      if (!existente) { nuevos.push({ base, data: datos, advertencias, camposDanados }); continue; }
 
       if (ESTADOS_CONGELADOS.has(existente.estado)) {
-        contexto.omitidas += 1;
-        contexto.registrar({ ...base, resultado: 'OMITIDA', motivo: existente.hash_origen === huella ? 'SIN_CAMBIOS' : 'YA_AUDITADO_NO_SE_MODIFICA' });
+        ctx.omitidas += 1;
+        ctx.registrar({ ...base, resultado: 'OMITIDA', motivo: existente.hash_origen === huella ? 'SIN_CAMBIOS' : 'YA_AUDITADO_NO_SE_MODIFICA' });
         continue;
       }
-      if (existente.hash_origen === huella) { contexto.sinCambios += 1; continue; }
+      if (existente.hash_origen === huella) { ctx.sinCambios += 1; continue; }
 
-      const datos = datosParaGuardar(expediente, meta);
       // Ubicación fijada por una persona (panel o primera visita): la base no la pisa.
       if (['MANUAL', 'PRIMERA_VISITA'].includes(existente.ubicacion_origen) || (existente.latitud != null && expediente.latitud == null)) {
         datos.latitud = existente.latitud; datos.longitud = existente.longitud; datos.ubicacion_origen = existente.ubicacion_origen;
       }
       const cambios = calcularCambios(existente, datos);
-      await prisma.expediente.update({ where: { id_expediente: existente.id_expediente }, data: datos });
-      if (Object.keys(cambios).length) {
-        await prisma.expedienteCambio.create({
-          data: { id_expediente: existente.id_expediente, id_importacion: contexto.idImportacion, actor_id: contexto.actorId, tipo: 'ACTUALIZADO', cambios },
-        });
+      if (!ctx.simular) {
+        await prisma.expediente.update({ where: { id_expediente: existente.id_expediente }, data: datos });
+        if (Object.keys(cambios).length) {
+          await prisma.expedienteCambio.create({ data: { id_expediente: existente.id_expediente, id_importacion: ctx.idImportacion, actor_id: ctx.actorId, tipo: 'ACTUALIZADO', cambios } });
+        }
       }
-      contexto.actualizadas += 1;
-      if (advertencias.length) contexto.registrar({ ...base, resultado: 'ACTUALIZADO', advertencias, campos_danados: camposDanados });
+      ctx.actualizadas += 1;
+      if (advertencias.length) ctx.registrar({ ...base, resultado: 'ACTUALIZADO', advertencias, campos_danados: camposDanados });
     } catch (e) {
-      contexto.errores += 1;
-      contexto.registrar({ ...base, resultado: 'ERROR', motivo: String(e.message || e).slice(0, 200) });
+      ctx.errores += 1;
+      ctx.registrar({ ...base, resultado: 'ERROR', motivo: String(e.message || e).slice(0, 200) });
     }
   }
+  await crearNuevos(nuevos, ctx);
 }
 
-// --- Formato simple (plantilla de demostración con columnas legibles) ---
+// ---------- lote formato simple (plantilla de demostración) ----------
 const REQUIRED_COLUMNS = ['codigo_expediente', 'tipo_credito', 'numero_documento_cliente', 'nombres_cliente', 'asesor_responsable'];
 
-async function procesarFilasSimples(filas, hoja, contexto, numeros) {
+async function procesarLoteSimple({ hoja, filas, numeros }, ctx) {
   for (const [index, row] of filas.entries()) {
-    const numeroFila = numeros?.[index] ?? index + 2;
+    const numeroFila = numeros[index];
     const base = { hoja, fila: numeroFila, codigo: row.codigo_expediente ? String(row.codigo_expediente).trim() : null };
     try {
       const faltantes = REQUIRED_COLUMNS.filter((column) => !row[column]);
-      if (faltantes.length) { contexto.omitidas += 1; contexto.registrar({ ...base, resultado: 'OMITIDA', motivo: `Faltan columnas: ${faltantes.join(', ')}` }); continue; }
+      if (faltantes.length) { ctx.omitidas += 1; ctx.registrar({ ...base, resultado: 'OMITIDA', motivo: `Faltan columnas: ${faltantes.join(', ')}` }); continue; }
       const latitud = row.latitud !== undefined && row.latitud !== '' ? Number(row.latitud) : null;
       const longitud = row.longitud !== undefined && row.longitud !== '' ? Number(row.longitud) : null;
       const data = {
@@ -162,84 +203,138 @@ async function procesarFilasSimples(filas, hoja, contexto, numeros) {
         asesor_responsable: String(row.asesor_responsable).trim(),
         monto_desembolso: row.monto_desembolso !== undefined && row.monto_desembolso !== '' ? Number(row.monto_desembolso) : null,
         moneda: row.moneda ? String(row.moneda).trim() : 'PEN',
-        id_importacion: contexto.idImportacion, fila_origen: numeroFila,
+        id_importacion: ctx.idImportacion, fila_origen: numeroFila,
       };
       const existente = await prisma.expediente.findUnique({ where: { codigo_expediente: data.codigo_expediente } });
       if (existente) {
-        if (ESTADOS_CONGELADOS.has(existente.estado)) { contexto.omitidas += 1; contexto.registrar({ ...base, resultado: 'OMITIDA', motivo: 'YA_AUDITADO_NO_SE_MODIFICA' }); continue; }
+        if (ESTADOS_CONGELADOS.has(existente.estado)) { ctx.omitidas += 1; ctx.registrar({ ...base, resultado: 'OMITIDA', motivo: 'YA_AUDITADO_NO_SE_MODIFICA' }); continue; }
         const cambios = calcularCambios(existente, data);
-        await prisma.expediente.update({ where: { id_expediente: existente.id_expediente }, data });
-        if (Object.keys(cambios).length) await prisma.expedienteCambio.create({ data: { id_expediente: existente.id_expediente, id_importacion: contexto.idImportacion, actor_id: contexto.actorId, tipo: 'ACTUALIZADO', cambios } });
-        contexto.actualizadas += 1;
+        if (!ctx.simular) {
+          await prisma.expediente.update({ where: { id_expediente: existente.id_expediente }, data });
+          if (Object.keys(cambios).length) await prisma.expedienteCambio.create({ data: { id_expediente: existente.id_expediente, id_importacion: ctx.idImportacion, actor_id: ctx.actorId, tipo: 'ACTUALIZADO', cambios } });
+        }
+        ctx.actualizadas += 1;
       } else {
-        const creado = await prisma.expediente.create({ data });
-        await prisma.expedienteCambio.create({ data: { id_expediente: creado.id_expediente, id_importacion: contexto.idImportacion, actor_id: contexto.actorId, tipo: 'CREADO', cambios: { origen: { archivo: contexto.archivo, hoja, fila: numeroFila } } } });
-        contexto.insertadas += 1;
+        if (!ctx.simular) {
+          const creado = await prisma.expediente.create({ data: { ...data, autoasignable: ctx.autoasignable } });
+          await prisma.expedienteCambio.create({ data: { id_expediente: creado.id_expediente, id_importacion: ctx.idImportacion, actor_id: ctx.actorId, tipo: 'CREADO', cambios: { origen: { archivo: ctx.archivo, hoja, fila: numeroFila } } } });
+        }
+        ctx.insertadas += 1;
       }
     } catch (e) {
-      contexto.errores += 1;
-      contexto.registrar({ ...base, resultado: 'ERROR', motivo: String(e.message || e).slice(0, 200) });
+      ctx.errores += 1;
+      ctx.registrar({ ...base, resultado: 'ERROR', motivo: String(e.message || e).slice(0, 200) });
     }
   }
 }
 
-/**
- * @param {{ nombre: string, encabezados: string[], filas: object[] }[]} hojas
- */
-async function importarHojas(hojas, { actorId, archivo, archivoSha256 }) {
-  const totalFilas = hojas.reduce((suma, h) => suma + h.filas.length, 0);
-  const formato = hojas.some((h) => esFormatoCore(h.encabezados)) ? FORMATO_CORE : 'SIMPLE';
-  const importacion = await prisma.importacionMasiva.create({
-    data: { tipo: 'EXPEDIENTES', estado: 'PROCESANDO', archivo, ruta_temporal: '', actor_id: actorId, total_filas: totalFilas, fecha_inicio: new Date(), archivo_sha256: archivoSha256 || null, formato },
-  });
-  const detalle = [];
-  const contexto = {
-    idImportacion: importacion.id_importacion, actorId, archivo,
-    insertadas: 0, actualizadas: 0, sinCambios: 0, omitidas: 0, errores: 0, advertencias: {},
-    registrar(item) { if (detalle.length < MAX_DETALLE) detalle.push(item); },
-  };
-
-  for (const hoja of hojas) {
-    if (!hoja.filas.length) continue;
-    if (esFormatoCore(hoja.encabezados)) await procesarFilasCore(hoja.filas, hoja.nombre, contexto, hoja.numeros);
-    else await procesarFilasSimples(hoja.filas, hoja.nombre, contexto, hoja.numeros);
-  }
-
-  const resumen = {
-    id_importacion: importacion.id_importacion, formato, archivo, total_filas: totalFilas,
-    insertadas: contexto.insertadas, actualizadas: contexto.actualizadas, sin_cambios: contexto.sinCambios,
-    omitidas: contexto.omitidas, errores: contexto.errores, advertencias: contexto.advertencias,
-  };
+// ---------- ejecución en segundo plano ----------
+async function guardarAvance(ctx, extra = {}) {
   await prisma.importacionMasiva.update({
-    where: { id_importacion: importacion.id_importacion },
-    data: {
-      estado: 'COMPLETADO', procesadas: totalFilas, insertadas: contexto.insertadas, actualizadas: contexto.actualizadas,
-      omitidas: contexto.omitidas + contexto.sinCambios, errores: contexto.errores,
-      detalle_error: detalle, advertencias: contexto.advertencias, fecha_fin: new Date(),
-    },
+    where: { id_importacion: ctx.idImportacion },
+    data: { procesadas: ctx.procesadas, total_filas: ctx.procesadas, insertadas: ctx.insertadas, actualizadas: ctx.actualizadas, omitidas: ctx.omitidas + ctx.sinCambios, errores: ctx.errores, ...extra },
   });
-  return { ...resumen, detalle: detalle.slice(0, 60) };
 }
 
+async function ejecutar(ctx, ruta) {
+  try {
+    const lector = new ExcelJS.stream.xlsx.WorkbookReader(ruta, { sharedStrings: 'cache', hyperlinks: 'ignore', styles: 'ignore', worksheets: 'emit' });
+    for await (const hoja of lector) {
+      let encabezados = null;
+      let filas = [];
+      let numeros = [];
+      const vaciarLote = async () => {
+        if (!filas.length) return;
+        const lote = { hoja: hoja.name, filas, numeros };
+        filas = []; numeros = [];
+        if (esFormatoCore(encabezados)) { ctx.formato = FORMATO_CORE; await procesarLoteCore(lote, ctx); } else { ctx.formato ||= 'SIMPLE'; await procesarLoteSimple(lote, ctx); }
+        ctx.procesadas += lote.filas.length;
+        await guardarAvance(ctx);
+      };
+      for await (const fila of hoja) {
+        if (fila.number === 1) { encabezados = fila.values.slice(1).map((h) => String(valorCelda(h)).trim()); continue; }
+        if (!encabezados) continue;
+        const objeto = {};
+        encabezados.forEach((h, i) => { if (h) objeto[h] = valorCelda(fila.values[i + 1]); });
+        if (vacia(objeto)) continue;
+        filas.push(objeto); numeros.push(fila.number);
+        if (filas.length >= LOTE) await vaciarLote();
+      }
+      await vaciarLote();
+    }
+    if (!ctx.procesadas) ctx.registrar({ resultado: 'ERROR', motivo: 'El archivo no tiene filas de datos.' });
+    await guardarAvance(ctx, { estado: ctx.procesadas ? 'COMPLETADO' : 'ERROR', formato: ctx.formato, detalle_error: ctx.detalle, advertencias: ctx.advertencias, fecha_fin: new Date() });
+  } catch (error) {
+    ctx.registrar({ resultado: 'ERROR', motivo: `No se pudo leer el archivo: ${String(error.message || error).slice(0, 200)}` });
+    await guardarAvance(ctx, { estado: 'ERROR', formato: ctx.formato, detalle_error: ctx.detalle, advertencias: ctx.advertencias, fecha_fin: new Date() }).catch(() => {});
+  } finally {
+    // El archivo trae datos personales de clientes: no debe quedar en el disco del servidor.
+    await fs.rm(ruta, { force: true }).catch(() => {});
+    importacionEnCurso = null;
+  }
+}
+
+/**
+ * Registra la importación y la procesa en segundo plano. Responde de inmediato.
+ * El archivo (ruta) pasa a ser responsabilidad de este módulo: se borra al terminar.
+ */
+async function iniciarImportacion({ ruta, actorId, archivo, archivoSha256, simular = false, autoasignable = false }) {
+  if (importacionEnCurso) {
+    throw Object.assign(new Error('Ya hay una importación en curso. Espera a que termine para iniciar otra.'), { statusCode: 409, code: 'IMPORT_IN_PROGRESS' });
+  }
+  const repetido = archivoSha256
+    ? await prisma.importacionMasiva.findFirst({
+        where: { archivo_sha256: archivoSha256, estado: 'COMPLETADO', tipo: TIPO_REAL }, orderBy: { fecha_creacion: 'desc' },
+        select: { id_importacion: true, archivo: true, fecha_creacion: true },
+      })
+    : null;
+  const importacion = await prisma.importacionMasiva.create({
+    data: { tipo: simular ? TIPO_SIMULACION : TIPO_REAL, estado: 'PROCESANDO', archivo, ruta_temporal: '', actor_id: actorId, fecha_inicio: new Date(), archivo_sha256: archivoSha256 || null },
+  });
+  importacionEnCurso = importacion.id_importacion;
+  const detalle = [];
+  const ctx = {
+    idImportacion: importacion.id_importacion, actorId, archivo, simular, autoasignable, formato: null,
+    procesadas: 0, insertadas: 0, actualizadas: 0, sinCambios: 0, omitidas: 0, errores: 0, advertencias: {}, vistos: new Set(), detalle,
+    registrar(item) { if (detalle.length < MAX_DETALLE) detalle.push(item); },
+  };
+  ejecutar(ctx, ruta).catch(() => { importacionEnCurso = null; });
+  return { id_importacion: importacion.id_importacion, estado: 'PROCESANDO', simulacion: simular, archivo_repetido: repetido };
+}
+
+// Al arrancar el servidor: lo que quedó "procesando" por un reinicio no va a terminar nunca.
+async function marcarInterrumpidas() {
+  const r = await prisma.importacionMasiva.updateMany({ where: { estado: 'PROCESANDO' }, data: { estado: 'INTERRUMPIDA', fecha_fin: new Date() } });
+  return r.count;
+}
+
+// ---------- consulta ----------
 async function listarImportaciones({ page = 1, limit = 20 } = {}) {
+  const where = { tipo: { in: [TIPO_REAL, TIPO_SIMULACION] } };
   const [data, total] = await Promise.all([
     prisma.importacionMasiva.findMany({
-      where: { tipo: 'EXPEDIENTES' }, orderBy: { fecha_creacion: 'desc' }, skip: (page - 1) * limit, take: limit,
-      select: { id_importacion: true, archivo: true, formato: true, estado: true, total_filas: true, insertadas: true, actualizadas: true, omitidas: true, errores: true, advertencias: true, actor_id: true, archivo_sha256: true, fecha_creacion: true, fecha_fin: true },
+      where, orderBy: { fecha_creacion: 'desc' }, skip: (page - 1) * limit, take: limit,
+      select: { id_importacion: true, tipo: true, archivo: true, formato: true, estado: true, total_filas: true, insertadas: true, actualizadas: true, omitidas: true, errores: true, advertencias: true, actor_id: true, archivo_sha256: true, fecha_creacion: true, fecha_fin: true },
     }),
-    prisma.importacionMasiva.count({ where: { tipo: 'EXPEDIENTES' } }),
+    prisma.importacionMasiva.count({ where }),
   ]);
   const actores = [...new Set(data.map((d) => d.actor_id).filter(Boolean))];
   const usuarios = actores.length ? await prisma.usuario.findMany({ where: { id_usuario: { in: actores } }, select: { id_usuario: true, username: true } }) : [];
   const nombre = new Map(usuarios.map((u) => [u.id_usuario, u.username]));
-  return { data: data.map((d) => ({ ...d, actor: nombre.get(d.actor_id) || null })), pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
+  return { data: data.map(({ tipo, ...d }) => ({ ...d, simulacion: tipo === TIPO_SIMULACION, actor: nombre.get(d.actor_id) || null })), pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
 }
 
 async function obtenerImportacion(id) {
   const importacion = await prisma.importacionMasiva.findUnique({ where: { id_importacion: id } });
   if (!importacion) throw Object.assign(new Error('Importación no encontrada'), { statusCode: 404 });
-  const { ruta_temporal: _ruta, ...resto } = importacion;
-  return resto;
+  const { ruta_temporal: _ruta, tipo, ...resto } = importacion;
+  return { ...resto, simulacion: tipo === TIPO_SIMULACION };
 }
 
-export default { importarHojas, listarImportaciones, obtenerImportacion, calcularCambios };
+// Libera para autoasignación los expedientes (aún pendientes) de una carga.
+async function liberarImportacion(id) {
+  const r = await prisma.expediente.updateMany({ where: { id_importacion: id, estado: 'PENDIENTE', autoasignable: false }, data: { autoasignable: true } });
+  return { liberados: r.count };
+}
+
+export default { iniciarImportacion, marcarInterrumpidas, listarImportaciones, obtenerImportacion, liberarImportacion, calcularCambios };

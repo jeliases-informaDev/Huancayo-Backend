@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { antiguedadEnMeses, esVacio, fecha, numero, texto, tieneTextoDanado } from '../src/modules/expedientes/importador/limpieza.js';
 import { extraerCoordenadas, sinCoordenadas } from '../src/modules/expedientes/importador/coordenadas.js';
 import { esFormatoCore, mapearFilaCore } from '../src/modules/expedientes/importador/formato-core.js';
+import { COLUMNAS_CORE } from '../src/modules/expedientes/importador/columnas-core.js';
 
 describe('importador — limpieza de valores', () => {
   test('NULL, -.- y vacíos se tratan como sin dato', () => {
@@ -156,5 +157,30 @@ describe('importador — formato core (MYPE, 262 columnas)', () => {
     const c = mapearFilaCore(filaBase({ desembolsado: '30000.00' }), { hoja: 'OTROS' }).huella;
     assert.equal(a, b);
     assert.notEqual(a, c);
+  });
+});
+
+describe('importador — cobertura de las 262 columnas', () => {
+  test('el formato oficial tiene 262 columnas sin repetidas', () => {
+    assert.equal(COLUMNAS_CORE.length, 262);
+    assert.equal(new Set(COLUMNAS_CORE.map((c) => c.toLowerCase())).size, 262);
+  });
+
+  test('ninguna columna queda sin destino: todas las usa el mapeo', () => {
+    const fila = { ...Object.fromEntries(COLUMNAS_CORE.map((c) => [c, 'NULL'])), ...filaBase() };
+    const { columnasUsadas, error } = mapearFilaCore(fila, { hoja: 'OTROS' });
+    assert.equal(error, undefined);
+    assert.deepEqual(COLUMNAS_CORE.filter((c) => !columnasUsadas.has(c.toLowerCase())), []);
+  });
+
+  test('una columna nueva que el mapeo no conoce se conserva en campos_adicionales', () => {
+    const { expediente } = mapearFilaCore(filaBase({ ColumnaNuevaDelCore: 'dato importante' }), { hoja: 'OTROS' });
+    assert.equal(expediente.datos_credito.campos_adicionales.ColumnaNuevaDelCore, 'dato importante');
+  });
+
+  test('con las 262 columnas conocidas no sobra ningún campo adicional', () => {
+    const fila = { ...Object.fromEntries(COLUMNAS_CORE.map((c) => [c, 'NULL'])), ...filaBase() };
+    const { expediente } = mapearFilaCore(fila, { hoja: 'OTROS' });
+    assert.deepEqual(expediente.datos_credito.campos_adicionales, {});
   });
 });

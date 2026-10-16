@@ -5085,6 +5085,7 @@ export namespace Prisma {
     monto_desembolso: Decimal | null
     moneda: string | null
     ubicacion_origen: string | null
+    autoasignable: boolean | null
     id_importacion: string | null
     fila_origen: number | null
     hash_origen: string | null
@@ -5112,6 +5113,7 @@ export namespace Prisma {
     monto_desembolso: Decimal | null
     moneda: string | null
     ubicacion_origen: string | null
+    autoasignable: boolean | null
     id_importacion: string | null
     fila_origen: number | null
     hash_origen: string | null
@@ -5144,6 +5146,7 @@ export namespace Prisma {
     evaluacion_financiera: number
     endeudamiento: number
     ubicacion_origen: number
+    autoasignable: number
     id_importacion: number
     fila_origen: number
     hash_origen: number
@@ -5190,6 +5193,7 @@ export namespace Prisma {
     monto_desembolso?: true
     moneda?: true
     ubicacion_origen?: true
+    autoasignable?: true
     id_importacion?: true
     fila_origen?: true
     hash_origen?: true
@@ -5217,6 +5221,7 @@ export namespace Prisma {
     monto_desembolso?: true
     moneda?: true
     ubicacion_origen?: true
+    autoasignable?: true
     id_importacion?: true
     fila_origen?: true
     hash_origen?: true
@@ -5249,6 +5254,7 @@ export namespace Prisma {
     evaluacion_financiera?: true
     endeudamiento?: true
     ubicacion_origen?: true
+    autoasignable?: true
     id_importacion?: true
     fila_origen?: true
     hash_origen?: true
@@ -5369,6 +5375,7 @@ export namespace Prisma {
     evaluacion_financiera: JsonValue | null
     endeudamiento: JsonValue | null
     ubicacion_origen: string | null
+    autoasignable: boolean
     id_importacion: string | null
     fila_origen: number | null
     hash_origen: string | null
@@ -5421,6 +5428,7 @@ export namespace Prisma {
     evaluacion_financiera?: boolean
     endeudamiento?: boolean
     ubicacion_origen?: boolean
+    autoasignable?: boolean
     id_importacion?: boolean
     fila_origen?: boolean
     hash_origen?: boolean
@@ -5460,6 +5468,7 @@ export namespace Prisma {
     evaluacion_financiera?: boolean
     endeudamiento?: boolean
     ubicacion_origen?: boolean
+    autoasignable?: boolean
     id_importacion?: boolean
     fila_origen?: boolean
     hash_origen?: boolean
@@ -5469,7 +5478,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "ubicacion_origen" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
+  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "ubicacion_origen" | "autoasignable" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
   export type ExpedienteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Expediente$asignacionesArgs<ExtArgs>
     visitas?: boolean | Expediente$visitasArgs<ExtArgs>
@@ -5508,6 +5517,7 @@ export namespace Prisma {
       evaluacion_financiera: Prisma.JsonValue | null
       endeudamiento: Prisma.JsonValue | null
       ubicacion_origen: string | null
+      autoasignable: boolean
       id_importacion: string | null
       fila_origen: number | null
       hash_origen: string | null
@@ -5910,6 +5920,7 @@ export namespace Prisma {
     readonly evaluacion_financiera: FieldRef<"Expediente", 'Json'>
     readonly endeudamiento: FieldRef<"Expediente", 'Json'>
     readonly ubicacion_origen: FieldRef<"Expediente", 'String'>
+    readonly autoasignable: FieldRef<"Expediente", 'Boolean'>
     readonly id_importacion: FieldRef<"Expediente", 'String'>
     readonly fila_origen: FieldRef<"Expediente", 'Int'>
     readonly hash_origen: FieldRef<"Expediente", 'String'>
@@ -12923,6 +12934,7 @@ export namespace Prisma {
     evaluacion_financiera: 'evaluacion_financiera',
     endeudamiento: 'endeudamiento',
     ubicacion_origen: 'ubicacion_origen',
+    autoasignable: 'autoasignable',
     id_importacion: 'id_importacion',
     fila_origen: 'fila_origen',
     hash_origen: 'hash_origen',
@@ -13649,6 +13661,7 @@ export namespace Prisma {
     evaluacion_financiera?: JsonNullableFilter<"Expediente">
     endeudamiento?: JsonNullableFilter<"Expediente">
     ubicacion_origen?: StringNullableFilter<"Expediente"> | string | null
+    autoasignable?: BoolFilter<"Expediente"> | boolean
     id_importacion?: StringNullableFilter<"Expediente"> | string | null
     fila_origen?: IntNullableFilter<"Expediente"> | number | null
     hash_origen?: StringNullableFilter<"Expediente"> | string | null
@@ -13685,6 +13698,7 @@ export namespace Prisma {
     evaluacion_financiera?: SortOrderInput | SortOrder
     endeudamiento?: SortOrderInput | SortOrder
     ubicacion_origen?: SortOrderInput | SortOrder
+    autoasignable?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
     fila_origen?: SortOrderInput | SortOrder
     hash_origen?: SortOrderInput | SortOrder
@@ -13725,6 +13739,7 @@ export namespace Prisma {
     evaluacion_financiera?: JsonNullableFilter<"Expediente">
     endeudamiento?: JsonNullableFilter<"Expediente">
     ubicacion_origen?: StringNullableFilter<"Expediente"> | string | null
+    autoasignable?: BoolFilter<"Expediente"> | boolean
     id_importacion?: StringNullableFilter<"Expediente"> | string | null
     fila_origen?: IntNullableFilter<"Expediente"> | number | null
     hash_origen?: StringNullableFilter<"Expediente"> | string | null
@@ -13761,6 +13776,7 @@ export namespace Prisma {
     evaluacion_financiera?: SortOrderInput | SortOrder
     endeudamiento?: SortOrderInput | SortOrder
     ubicacion_origen?: SortOrderInput | SortOrder
+    autoasignable?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
     fila_origen?: SortOrderInput | SortOrder
     hash_origen?: SortOrderInput | SortOrder
@@ -13802,6 +13818,7 @@ export namespace Prisma {
     evaluacion_financiera?: JsonNullableWithAggregatesFilter<"Expediente">
     endeudamiento?: JsonNullableWithAggregatesFilter<"Expediente">
     ubicacion_origen?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
+    autoasignable?: BoolWithAggregatesFilter<"Expediente"> | boolean
     id_importacion?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     fila_origen?: IntNullableWithAggregatesFilter<"Expediente"> | number | null
     hash_origen?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
@@ -14834,6 +14851,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: string | null
+    autoasignable?: boolean
     id_importacion?: string | null
     fila_origen?: number | null
     hash_origen?: string | null
@@ -14870,6 +14888,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: string | null
+    autoasignable?: boolean
     id_importacion?: string | null
     fila_origen?: number | null
     hash_origen?: string | null
@@ -14905,6 +14924,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14941,6 +14961,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14977,6 +14998,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: string | null
+    autoasignable?: boolean
     id_importacion?: string | null
     fila_origen?: number | null
     hash_origen?: string | null
@@ -15009,6 +15031,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15042,6 +15065,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16388,6 +16412,7 @@ export namespace Prisma {
     evaluacion_financiera?: SortOrder
     endeudamiento?: SortOrder
     ubicacion_origen?: SortOrder
+    autoasignable?: SortOrder
     id_importacion?: SortOrder
     fila_origen?: SortOrder
     hash_origen?: SortOrder
@@ -16424,6 +16449,7 @@ export namespace Prisma {
     monto_desembolso?: SortOrder
     moneda?: SortOrder
     ubicacion_origen?: SortOrder
+    autoasignable?: SortOrder
     id_importacion?: SortOrder
     fila_origen?: SortOrder
     hash_origen?: SortOrder
@@ -16451,6 +16477,7 @@ export namespace Prisma {
     monto_desembolso?: SortOrder
     moneda?: SortOrder
     ubicacion_origen?: SortOrder
+    autoasignable?: SortOrder
     id_importacion?: SortOrder
     fila_origen?: SortOrder
     hash_origen?: SortOrder
@@ -18732,6 +18759,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: string | null
+    autoasignable?: boolean
     id_importacion?: string | null
     fila_origen?: number | null
     hash_origen?: string | null
@@ -18767,6 +18795,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: string | null
+    autoasignable?: boolean
     id_importacion?: string | null
     fila_origen?: number | null
     hash_origen?: string | null
@@ -18817,6 +18846,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18852,6 +18882,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18886,6 +18917,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: string | null
+    autoasignable?: boolean
     id_importacion?: string | null
     fila_origen?: number | null
     hash_origen?: string | null
@@ -18921,6 +18953,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: string | null
+    autoasignable?: boolean
     id_importacion?: string | null
     fila_origen?: number | null
     hash_origen?: string | null
@@ -19034,6 +19067,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19069,6 +19103,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19172,6 +19207,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: string | null
+    autoasignable?: boolean
     id_importacion?: string | null
     fila_origen?: number | null
     hash_origen?: string | null
@@ -19207,6 +19243,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: string | null
+    autoasignable?: boolean
     id_importacion?: string | null
     fila_origen?: number | null
     hash_origen?: string | null
@@ -19352,6 +19389,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19387,6 +19425,7 @@ export namespace Prisma {
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
     hash_origen?: NullableStringFieldUpdateOperationsInput | string | null

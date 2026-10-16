@@ -189,6 +189,7 @@ exports.Prisma.ExpedienteScalarFieldEnum = {
   evaluacion_financiera: 'evaluacion_financiera',
   endeudamiento: 'endeudamiento',
   ubicacion_origen: 'ubicacion_origen',
+  autoasignable: 'autoasignable',
   id_importacion: 'id_importacion',
   fila_origen: 'fila_origen',
   hash_origen: 'hash_origen',

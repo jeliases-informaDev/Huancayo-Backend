@@ -66,12 +66,12 @@ async function disponiblesParaAuditor(auditorId) {
   if (!auditor) { const error = new Error('El auditor indicado no existe o está inactivo'); error.statusCode = 400; throw error; }
   if (!auditor.departamento) return [];
 
-  const departamentos = await prisma.expediente.findMany({ where: { estado: 'PENDIENTE' }, select: { departamento: true } });
+  const departamentos = await prisma.expediente.findMany({ where: { estado: 'PENDIENTE', autoasignable: true }, select: { departamento: true } });
   const propios = departamentos.filter(d => normalizarTexto(d.departamento) === normalizarTexto(auditor.departamento));
   if (!propios.length) return [];
 
   const expedientes = await prisma.expediente.findMany({
-    where: { estado: 'PENDIENTE', departamento: { in: [...new Set(propios.map(d => d.departamento))] } },
+    where: { estado: 'PENDIENTE', autoasignable: true, departamento: { in: [...new Set(propios.map(d => d.departamento))] } },
     select: expedienteSelect,
     orderBy: { fecha_creacion: 'asc' },
     take: 200,
@@ -94,6 +94,11 @@ async function autoAsignar(auditorId, idExpediente) {
 
   const expediente = await prisma.expediente.findUnique({ where: { id_expediente: idExpediente } });
   if (!expediente) { const error = new Error('Expediente no encontrado'); error.statusCode = 404; throw error; }
+
+  if (!expediente.autoasignable) {
+    const error = new Error('Este expediente lo asigna un supervisor: no está disponible para tomarlo por tu cuenta.');
+    error.statusCode = 403; error.code = 'NOT_SELF_ASSIGNABLE'; throw error;
+  }
 
   if (auditor.departamento && expediente.departamento && normalizarTexto(auditor.departamento) !== normalizarTexto(expediente.departamento)) {
     const error = new Error(`Este expediente está en ${expediente.departamento} y tú operas en ${auditor.departamento}. Solo puedes tomar expedientes de tu propia zona.`);
