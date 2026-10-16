@@ -236,32 +236,61 @@ async function guardarAvance(ctx, extra = {}) {
   });
 }
 
-async function ejecutar(ctx, ruta) {
+// Procesa las filas de una hoja (iterable de { number, values }) por lotes.
+async function procesarHoja(nombre, filasHoja, ctx) {
+  let encabezados = null;
+  let ignorar = false;
+  let filas = [];
+  let numeros = [];
+  const vaciarLote = async () => {
+    if (!filas.length) return;
+    const lote = { hoja: nombre, filas, numeros };
+    filas = []; numeros = [];
+    if (esFormatoCore(encabezados)) { ctx.formato = FORMATO_CORE; await procesarLoteCore(lote, ctx); } else { ctx.formato ||= 'SIMPLE'; await procesarLoteSimple(lote, ctx); }
+    ctx.procesadas += lote.filas.length;
+    await guardarAvance(ctx);
+  };
+  for await (const fila of filasHoja) {
+    if (fila.number === 1) {
+      encabezados = fila.values.slice(1).map((h) => String(valorCelda(h)).trim());
+      // Hojas de instrucciones u otras sin columnas de un formato conocido: se ignoran (y se deja constancia).
+      if (!esFormatoCore(encabezados) && !encabezados.includes('codigo_expediente')) {
+        ignorar = true;
+        ctx.registrar({ hoja: nombre, resultado: 'HOJA_IGNORADA', motivo: 'No tiene las columnas de ningún formato conocido' });
+      }
+      continue;
+    }
+    if (!encabezados || ignorar) continue;
+    const objeto = {};
+    encabezados.forEach((h, i) => { if (h) objeto[h] = valorCelda(fila.values[i + 1]); });
+    if (vacia(objeto)) continue;
+    filas.push(objeto); numeros.push(fila.number);
+    if (filas.length >= LOTE) await vaciarLote();
+  }
+  await vaciarLote();
+}
+
+// Lectura por flujo (poca memoria). Algunos .xlsx (los que guardan sus partes en otro orden) no
+// se pueden leer así: en ese caso, y solo si todavía no se procesó nada, se carga el libro completo.
+async function leerArchivo(ctx, ruta) {
   try {
     const lector = new ExcelJS.stream.xlsx.WorkbookReader(ruta, { sharedStrings: 'cache', hyperlinks: 'ignore', styles: 'ignore', worksheets: 'emit' });
-    for await (const hoja of lector) {
-      let encabezados = null;
-      let filas = [];
-      let numeros = [];
-      const vaciarLote = async () => {
-        if (!filas.length) return;
-        const lote = { hoja: hoja.name, filas, numeros };
-        filas = []; numeros = [];
-        if (esFormatoCore(encabezados)) { ctx.formato = FORMATO_CORE; await procesarLoteCore(lote, ctx); } else { ctx.formato ||= 'SIMPLE'; await procesarLoteSimple(lote, ctx); }
-        ctx.procesadas += lote.filas.length;
-        await guardarAvance(ctx);
-      };
-      for await (const fila of hoja) {
-        if (fila.number === 1) { encabezados = fila.values.slice(1).map((h) => String(valorCelda(h)).trim()); continue; }
-        if (!encabezados) continue;
-        const objeto = {};
-        encabezados.forEach((h, i) => { if (h) objeto[h] = valorCelda(fila.values[i + 1]); });
-        if (vacia(objeto)) continue;
-        filas.push(objeto); numeros.push(fila.number);
-        if (filas.length >= LOTE) await vaciarLote();
-      }
-      await vaciarLote();
+    for await (const hoja of lector) await procesarHoja(hoja.name, hoja, ctx);
+  } catch (error) {
+    if (ctx.procesadas > 0) throw error;
+    const libro = new ExcelJS.Workbook();
+    await libro.xlsx.readFile(ruta);
+    for (const hoja of libro.worksheets) {
+      const filas = [];
+      hoja.eachRow((row, number) => filas.push({ number, values: row.values }));
+      await procesarHoja(hoja.name, filas, ctx);
     }
+  }
+}
+
+async function ejecutar(ctx, ruta) {
+  try {
+    await leerArchivo(ctx, ruta);
     if (!ctx.procesadas) ctx.registrar({ resultado: 'ERROR', motivo: 'El archivo no tiene filas de datos.' });
     await guardarAvance(ctx, { estado: ctx.procesadas ? 'COMPLETADO' : 'ERROR', formato: ctx.formato, detalle_error: ctx.detalle, advertencias: ctx.advertencias, fecha_fin: new Date() });
   } catch (error) {
