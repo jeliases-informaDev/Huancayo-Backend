@@ -288,13 +288,22 @@ async function leerArchivo(ctx, ruta) {
   }
 }
 
+// Un archivo que no es un .xlsx real (o está dañado) falla con un texto técnico en inglés; se traduce a algo que el usuario pueda actuar.
+function motivoDeLectura(error) {
+  const texto = String(error?.message || error);
+  if (/zip|central directory|corrupt|not a valid|invalid|unexpected token/i.test(texto)) {
+    return 'El archivo no es un Excel (.xlsx) válido o está dañado. Ábrelo en Excel, guárdalo como «Libro de Excel (.xlsx)» y vuelve a subirlo.';
+  }
+  return `No se pudo leer el archivo: ${texto.slice(0, 200)}`;
+}
+
 async function ejecutar(ctx, ruta) {
   try {
     await leerArchivo(ctx, ruta);
     if (!ctx.procesadas) ctx.registrar({ resultado: 'ERROR', motivo: 'El archivo no tiene filas de datos.' });
     await guardarAvance(ctx, { estado: ctx.procesadas ? 'COMPLETADO' : 'ERROR', formato: ctx.formato, detalle_error: ctx.detalle, advertencias: ctx.advertencias, fecha_fin: new Date() });
   } catch (error) {
-    ctx.registrar({ resultado: 'ERROR', motivo: `No se pudo leer el archivo: ${String(error.message || error).slice(0, 200)}` });
+    ctx.registrar({ resultado: 'ERROR', motivo: motivoDeLectura(error) });
     await guardarAvance(ctx, { estado: 'ERROR', formato: ctx.formato, detalle_error: ctx.detalle, advertencias: ctx.advertencias, fecha_fin: new Date() }).catch(() => {});
   } finally {
     // El archivo trae datos personales de clientes: no debe quedar en el disco del servidor.
