@@ -24,12 +24,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.10.0
- * Query Engine version: 0edf323efd1d98336f3f0a68684b56f689b900d3
+ * Prisma Client JS version: 7.10.1
+ * Query Engine version: d1b3f377ca835d73fd50954a5e22128b9ebdd6b8
  */
 Prisma.prismaVersion = {
-  client: "7.10.0",
-  engine: "0edf323efd1d98336f3f0a68684b56f689b900d3"
+  client: "7.10.1",
+  engine: "d1b3f377ca835d73fd50954a5e22128b9ebdd6b8"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -233,6 +233,8 @@ exports.Prisma.VisitaAuditoriaScalarFieldEnum = {
   longitud: 'longitud',
   precision_metros: 'precision_metros',
   distancia_domicilio_m: 'distancia_domicilio_m',
+  ubicacion_visitada: 'ubicacion_visitada',
+  direccion_visitada: 'direccion_visitada',
   mock_location: 'mock_location',
   device_integrity_ok: 'device_integrity_ok',
   device_id: 'device_id',
@@ -401,6 +403,8 @@ exports.Prisma.AsignacionAuditoriaOrderByRelevanceFieldEnum = {
 exports.Prisma.VisitaAuditoriaOrderByRelevanceFieldEnum = {
   client_sync_id: 'client_sync_id',
   id_usuario_auditor: 'id_usuario_auditor',
+  ubicacion_visitada: 'ubicacion_visitada',
+  direccion_visitada: 'direccion_visitada',
   device_id: 'device_id',
   resultado: 'resultado',
   comentario_negocio: 'comentario_negocio',

@@ -2,6 +2,7 @@ import prisma from '#core/config/prisma.js';
 import storageService from '#modules/sistema/storage.service.js';
 import { env } from '#core/config/env.js';
 import { haversineMeters } from '#core/security/geofence.js';
+import { puntoDeReferencia, conUbicacionNegocio } from '#modules/expedientes/ubicaciones.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -85,11 +86,13 @@ function validarFichaMype(payload) {
   }
 }
 
-function evaluarSenales({ expediente, payload, serverNow }) {
+// La distancia se mide contra el punto que el auditor declaró visitar: el domicilio de la persona o,
+// en MYPE, uno de los negocios. Sin ese dato (apps anteriores) se usa el domicilio, como siempre.
+function evaluarSenales({ punto, payload, serverNow }) {
   const alertas = [];
   let distancia = null;
-  if (expediente.latitud != null && expediente.longitud != null) {
-    distancia = haversineMeters(Number(expediente.latitud), Number(expediente.longitud), payload.latitud, payload.longitud);
+  if (punto.latitud != null && punto.longitud != null) {
+    distancia = haversineMeters(punto.latitud, punto.longitud, payload.latitud, payload.longitud);
     if (distancia > env.GEOFENCE_RADIO_METROS) alertas.push('GEOCERCA_EXCEDIDA');
   }
   if (payload.precision_metros != null && payload.precision_metros > env.GEOFENCE_PRECISION_MAXIMA_METROS) {
@@ -127,9 +130,13 @@ async function crearVisita(auditorId, payload) {
   }
   validarFichaBasica(payload);
   validarFichaMype(payload);
+  const punto = puntoDeReferencia(expediente, payload.ubicacion_visitada || 'DOMICILIO', payload.indice_negocio ?? 0);
+  if (!punto) {
+    throw Object.assign(new Error('Este expediente no tiene ese negocio para visitar. Elige el domicilio o actualiza tu muestra.'), { statusCode: 422, code: 'DESTINO_INVALIDO' });
+  }
 
   const serverNow = new Date();
-  const { alertas, distancia } = evaluarSenales({ expediente, payload, serverNow });
+  const { alertas, distancia } = evaluarSenales({ punto, payload, serverNow });
   // Señales "blandas" (geocerca, precisión, reloj adelantado): no se bloquean, porque
   // pueden tener explicaciones legítimas, pero se obliga a declararlas — el auditor no
   // puede marcar la visita como CONFORME sin dejar constancia del motivo.
@@ -165,7 +172,9 @@ async function crearVisita(auditorId, payload) {
         fecha_hora_checkout: serverNow,
         latitud: payload.latitud, longitud: payload.longitud,
         precision_metros: payload.precision_metros ?? null,
-        distancia_domicilio_m: distancia,
+        distancia_domicilio_m: distancia, // distancia al punto visitado (domicilio o negocio)
+        ubicacion_visitada: punto.destino,
+        direccion_visitada: punto.direccion ? punto.direccion.slice(0, 255) : null,
         mock_location: false, device_integrity_ok: true,
         device_id: payload.device_id || null,
         server_received_at: serverNow,
@@ -191,14 +200,21 @@ async function crearVisita(auditorId, payload) {
     // Sin coordenadas en la base, la primera visita limpia (sin alertas y con resultado que
     // implique haber llegado al domicilio) fija la ubicación de referencia. Queda marcada
     // PRIMERA_VISITA y en el historial del expediente para que se pueda revisar.
-    const fijaUbicacion = expediente.latitud == null && !alertas.length && ['CONFORME', 'OBSERVADO'].includes(payload.resultado);
+    // Lo mismo vale para el negocio: si no tenía ubicación, la primera visita limpia a ese negocio la fija.
+    const fijaUbicacion = punto.latitud == null && !alertas.length && ['CONFORME', 'OBSERVADO'].includes(payload.resultado);
+    const esNegocio = punto.destino === 'NEGOCIO';
     await tx.expediente.update({
       where: { id_expediente: payload.id_expediente },
-      data: { estado: 'VISITADO', ...(fijaUbicacion ? { latitud: payload.latitud, longitud: payload.longitud, ubicacion_origen: 'PRIMERA_VISITA' } : {}) },
+      data: {
+        estado: 'VISITADO',
+        ...(fijaUbicacion && !esNegocio ? { latitud: payload.latitud, longitud: payload.longitud, ubicacion_origen: 'PRIMERA_VISITA' } : {}),
+        ...(fijaUbicacion && esNegocio ? { datos_negocio: conUbicacionNegocio(expediente.datos_negocio, punto.indice, payload.latitud, payload.longitud, 'PRIMERA_VISITA') } : {}),
+      },
     });
     if (fijaUbicacion) {
+      const prefijo = esNegocio ? `negocio_${punto.indice + 1}_` : '';
       await tx.expedienteCambio.create({
-        data: { id_expediente: payload.id_expediente, actor_id: auditorId, tipo: 'UBICACION', cambios: { latitud: { antes: null, despues: payload.latitud }, longitud: { antes: null, despues: payload.longitud }, ubicacion_origen: { antes: null, despues: 'PRIMERA_VISITA' }, id_visita: created.id_visita } },
+        data: { id_expediente: payload.id_expediente, actor_id: auditorId, tipo: 'UBICACION', cambios: { [`${prefijo}latitud`]: { antes: null, despues: payload.latitud }, [`${prefijo}longitud`]: { antes: null, despues: payload.longitud }, [`${prefijo}ubicacion_origen`]: { antes: null, despues: 'PRIMERA_VISITA' }, id_visita: created.id_visita } },
       });
     }
     await tx.asignacionAuditoria.update({ where: { id_asignacion: asignacion.id_asignacion }, data: { estado: 'FINALIZADA', fecha_fin: serverNow } });

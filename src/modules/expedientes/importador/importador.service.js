@@ -3,6 +3,7 @@ import ExcelJS from 'exceljs';
 import prisma from '#core/config/prisma.js';
 import { Prisma } from '../../../generated/prisma/index.js';
 import { esFormatoCore, FORMATO_CORE, mapearFilaCore } from './formato-core.js';
+import { conservarUbicacionesNegocio } from '../ubicaciones.js';
 
 // Importación de expedientes por Excel, pensada para cargas reales (miles de filas).
 //  · El archivo se lee por flujo (no se carga entero en memoria) y se procesa por lotes.
@@ -157,6 +158,8 @@ async function procesarLoteCore({ hoja, filas, numeros }, ctx) {
       if (['MANUAL', 'PRIMERA_VISITA'].includes(existente.ubicacion_origen) || (existente.latitud != null && expediente.latitud == null)) {
         datos.latitud = existente.latitud; datos.longitud = existente.longitud; datos.ubicacion_origen = existente.ubicacion_origen;
       }
+      // Lo mismo con la ubicación de los negocios (MYPE) que fijó una persona.
+      if (datos.datos_negocio) datos.datos_negocio = conservarUbicacionesNegocio(existente.datos_negocio, datos.datos_negocio);
       const cambios = calcularCambios(existente, datos);
       if (!ctx.simular) {
         await prisma.expediente.update({ where: { id_expediente: existente.id_expediente }, data: datos });

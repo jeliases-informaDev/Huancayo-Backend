@@ -1,5 +1,6 @@
 import prisma from '#core/config/prisma.js';
 import importador from './importador/importador.service.js';
+import { negociosDe, conUbicacionNegocio } from './ubicaciones.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -104,6 +105,30 @@ async function actualizar(id, datos, actorId) {
   };
 }
 
+// Fija a mano la ubicación de uno de los negocios de un expediente MYPE (queda MANUAL y en el historial).
+async function fijarUbicacionNegocio(id, indice, { latitud, longitud }, actorId) {
+  const actual = await prisma.expediente.findUnique({ where: { id_expediente: id } });
+  if (!actual) { const error = new Error('Expediente no encontrado'); error.statusCode = 404; throw error; }
+  const negocio = actual.tipo_credito === 'OTROS' ? negociosDe(actual)[indice] : null;
+  if (!negocio) { const error = new Error('Este expediente no tiene ese negocio.'); error.statusCode = 422; error.code = 'NEGOCIO_NO_EXISTE'; throw error; }
+  const antes = { latitud: negocio.latitud ?? null, longitud: negocio.longitud ?? null, ubicacion_origen: negocio.ubicacion_origen ?? null };
+  const expediente = await prisma.expediente.update({
+    where: { id_expediente: id },
+    data: { datos_negocio: conUbicacionNegocio(actual.datos_negocio, indice, latitud, longitud, 'MANUAL') },
+  });
+  const n = indice + 1;
+  await prisma.expedienteCambio.create({
+    data: {
+      id_expediente: id, actor_id: actorId || null, tipo: 'UBICACION',
+      cambios: { [`negocio_${n}_latitud`]: { antes: antes.latitud, despues: latitud }, [`negocio_${n}_longitud`]: { antes: antes.longitud, despues: longitud }, [`negocio_${n}_ubicacion_origen`]: { antes: antes.ubicacion_origen, despues: 'MANUAL' } },
+    },
+  });
+  return {
+    ...serialize(expediente),
+    _auditDiff: { entidad: 'Expediente', entidad_id: id, valor_anterior: { negocio: n, ...antes }, valor_nuevo: { negocio: n, latitud, longitud, ubicacion_origen: 'MANUAL' } },
+  };
+}
+
 async function eliminar(id) {
   const actual = await prisma.expediente.findUnique({ where: { id_expediente: id } });
   await prisma.expediente.delete({ where: { id_expediente: id } });
@@ -111,4 +136,4 @@ async function eliminar(id) {
 }
 
 
-export default { listar, obtener, crear, actualizar, eliminar, importador };
+export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, eliminar, importador };

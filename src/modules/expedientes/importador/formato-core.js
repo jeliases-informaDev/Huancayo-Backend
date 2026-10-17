@@ -185,16 +185,24 @@ export function mapearFilaCore(fila, { hoja }) {
   const celular = telefono(v('TELFCLIENTE'));
   const fijo = telefono(v('TelefijoDom'));
 
+  // Como en el domicilio, algunos asesores escriben las coordenadas del local dentro de la referencia.
   const negocios = [1, 2]
-    .map((n) => ({
-      direccion: texto(v(`DirEmp_${n}`)),
-      distrito: texto(v(`DISTNEG_${n}`)),
-      departamento: texto(v(`DEPNEG_${n}`)),
-      referencia: texto(v(`RefEmp_${n}`)),
-      contacto: texto(v(`NomEmp_${n}`)),
-      telefono: telefono(v(`TelEmp_${n}`)),
-    }))
-    .filter((negocio) => negocio.direccion || negocio.referencia || negocio.telefono);
+    .map((n) => {
+      const referenciaNegocio = texto(v(`RefEmp_${n}`));
+      const coordenadasNegocio = extraerCoordenadas(referenciaNegocio);
+      return {
+        direccion: texto(v(`DirEmp_${n}`)),
+        distrito: texto(v(`DISTNEG_${n}`)),
+        departamento: texto(v(`DEPNEG_${n}`)),
+        referencia: (referenciaNegocio ? sinCoordenadas(referenciaNegocio) : null) || null,
+        contacto: texto(v(`NomEmp_${n}`)),
+        telefono: telefono(v(`TelEmp_${n}`)),
+        latitud: coordenadasNegocio?.latitud ?? null,
+        longitud: coordenadasNegocio?.longitud ?? null,
+        ubicacion_origen: coordenadasNegocio ? 'REFERENCIA' : null,
+      };
+    })
+    .filter((negocio) => negocio.direccion || negocio.referencia || negocio.telefono || negocio.latitud !== null);
 
   const datosCliente = {
     fuente: texto(v('Fuente')),

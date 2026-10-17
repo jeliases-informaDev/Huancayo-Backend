@@ -367,8 +367,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 7.10.0
-   * Query Engine version: 0edf323efd1d98336f3f0a68684b56f689b900d3
+   * Prisma Client JS version: 7.10.1
+   * Query Engine version: d1b3f377ca835d73fd50954a5e22128b9ebdd6b8
    */
   export type PrismaVersion = {
     client: string
@@ -8420,6 +8420,8 @@ export namespace Prisma {
     longitud: Decimal | null
     precision_metros: Decimal | null
     distancia_domicilio_m: Decimal | null
+    ubicacion_visitada: string | null
+    direccion_visitada: string | null
     mock_location: boolean | null
     device_integrity_ok: boolean | null
     device_id: string | null
@@ -8450,6 +8452,8 @@ export namespace Prisma {
     longitud: Decimal | null
     precision_metros: Decimal | null
     distancia_domicilio_m: Decimal | null
+    ubicacion_visitada: string | null
+    direccion_visitada: string | null
     mock_location: boolean | null
     device_integrity_ok: boolean | null
     device_id: string | null
@@ -8480,6 +8484,8 @@ export namespace Prisma {
     longitud: number
     precision_metros: number
     distancia_domicilio_m: number
+    ubicacion_visitada: number
+    direccion_visitada: number
     mock_location: number
     device_integrity_ok: number
     device_id: number
@@ -8537,6 +8543,8 @@ export namespace Prisma {
     longitud?: true
     precision_metros?: true
     distancia_domicilio_m?: true
+    ubicacion_visitada?: true
+    direccion_visitada?: true
     mock_location?: true
     device_integrity_ok?: true
     device_id?: true
@@ -8567,6 +8575,8 @@ export namespace Prisma {
     longitud?: true
     precision_metros?: true
     distancia_domicilio_m?: true
+    ubicacion_visitada?: true
+    direccion_visitada?: true
     mock_location?: true
     device_integrity_ok?: true
     device_id?: true
@@ -8597,6 +8607,8 @@ export namespace Prisma {
     longitud?: true
     precision_metros?: true
     distancia_domicilio_m?: true
+    ubicacion_visitada?: true
+    direccion_visitada?: true
     mock_location?: true
     device_integrity_ok?: true
     device_id?: true
@@ -8719,6 +8731,8 @@ export namespace Prisma {
     longitud: Decimal
     precision_metros: Decimal | null
     distancia_domicilio_m: Decimal | null
+    ubicacion_visitada: string | null
+    direccion_visitada: string | null
     mock_location: boolean
     device_integrity_ok: boolean
     device_id: string | null
@@ -8773,6 +8787,8 @@ export namespace Prisma {
     longitud?: boolean
     precision_metros?: boolean
     distancia_domicilio_m?: boolean
+    ubicacion_visitada?: boolean
+    direccion_visitada?: boolean
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: boolean
@@ -8814,6 +8830,8 @@ export namespace Prisma {
     longitud?: boolean
     precision_metros?: boolean
     distancia_domicilio_m?: boolean
+    ubicacion_visitada?: boolean
+    direccion_visitada?: boolean
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: boolean
@@ -8837,7 +8855,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type VisitaAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_visita" | "client_sync_id" | "id_asignacion" | "id_expediente" | "id_usuario_auditor" | "fecha_hora_checkin" | "fecha_hora_checkout" | "latitud" | "longitud" | "precision_metros" | "distancia_domicilio_m" | "mock_location" | "device_integrity_ok" | "device_id" | "server_received_at" | "resultado" | "respuestas_cuestionario" | "comentario_negocio" | "comentario_auditor" | "otros_clientes_domicilio" | "otros_ingresos" | "firma_evidencia" | "plantilla" | "expediente_snapshot" | "estado_negocio" | "propiedad_local" | "otros_pasivos" | "conformidad_financiera" | "firmante_documento" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["visitaAuditoria"]>
+  export type VisitaAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_visita" | "client_sync_id" | "id_asignacion" | "id_expediente" | "id_usuario_auditor" | "fecha_hora_checkin" | "fecha_hora_checkout" | "latitud" | "longitud" | "precision_metros" | "distancia_domicilio_m" | "ubicacion_visitada" | "direccion_visitada" | "mock_location" | "device_integrity_ok" | "device_id" | "server_received_at" | "resultado" | "respuestas_cuestionario" | "comentario_negocio" | "comentario_auditor" | "otros_clientes_domicilio" | "otros_ingresos" | "firma_evidencia" | "plantilla" | "expediente_snapshot" | "estado_negocio" | "propiedad_local" | "otros_pasivos" | "conformidad_financiera" | "firmante_documento" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["visitaAuditoria"]>
   export type VisitaAuditoriaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
     auditor?: boolean | UsuarioDefaultArgs<ExtArgs>
@@ -8864,6 +8882,8 @@ export namespace Prisma {
       longitud: Prisma.Decimal
       precision_metros: Prisma.Decimal | null
       distancia_domicilio_m: Prisma.Decimal | null
+      ubicacion_visitada: string | null
+      direccion_visitada: string | null
       mock_location: boolean
       device_integrity_ok: boolean
       device_id: string | null
@@ -9268,6 +9288,8 @@ export namespace Prisma {
     readonly longitud: FieldRef<"VisitaAuditoria", 'Decimal'>
     readonly precision_metros: FieldRef<"VisitaAuditoria", 'Decimal'>
     readonly distancia_domicilio_m: FieldRef<"VisitaAuditoria", 'Decimal'>
+    readonly ubicacion_visitada: FieldRef<"VisitaAuditoria", 'String'>
+    readonly direccion_visitada: FieldRef<"VisitaAuditoria", 'String'>
     readonly mock_location: FieldRef<"VisitaAuditoria", 'Boolean'>
     readonly device_integrity_ok: FieldRef<"VisitaAuditoria", 'Boolean'>
     readonly device_id: FieldRef<"VisitaAuditoria", 'String'>
@@ -12987,6 +13009,8 @@ export namespace Prisma {
     longitud: 'longitud',
     precision_metros: 'precision_metros',
     distancia_domicilio_m: 'distancia_domicilio_m',
+    ubicacion_visitada: 'ubicacion_visitada',
+    direccion_visitada: 'direccion_visitada',
     mock_location: 'mock_location',
     device_integrity_ok: 'device_integrity_ok',
     device_id: 'device_id',
@@ -13203,6 +13227,8 @@ export namespace Prisma {
   export const VisitaAuditoriaOrderByRelevanceFieldEnum: {
     client_sync_id: 'client_sync_id',
     id_usuario_auditor: 'id_usuario_auditor',
+    ubicacion_visitada: 'ubicacion_visitada',
+    direccion_visitada: 'direccion_visitada',
     device_id: 'device_id',
     resultado: 'resultado',
     comentario_negocio: 'comentario_negocio',
@@ -13992,6 +14018,8 @@ export namespace Prisma {
     longitud?: DecimalFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string
     precision_metros?: DecimalNullableFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: DecimalNullableFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: StringNullableFilter<"VisitaAuditoria"> | string | null
+    direccion_visitada?: StringNullableFilter<"VisitaAuditoria"> | string | null
     mock_location?: BoolFilter<"VisitaAuditoria"> | boolean
     device_integrity_ok?: BoolFilter<"VisitaAuditoria"> | boolean
     device_id?: StringNullableFilter<"VisitaAuditoria"> | string | null
@@ -14030,6 +14058,8 @@ export namespace Prisma {
     longitud?: SortOrder
     precision_metros?: SortOrderInput | SortOrder
     distancia_domicilio_m?: SortOrderInput | SortOrder
+    ubicacion_visitada?: SortOrderInput | SortOrder
+    direccion_visitada?: SortOrderInput | SortOrder
     mock_location?: SortOrder
     device_integrity_ok?: SortOrder
     device_id?: SortOrderInput | SortOrder
@@ -14072,6 +14102,8 @@ export namespace Prisma {
     longitud?: DecimalFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string
     precision_metros?: DecimalNullableFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: DecimalNullableFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: StringNullableFilter<"VisitaAuditoria"> | string | null
+    direccion_visitada?: StringNullableFilter<"VisitaAuditoria"> | string | null
     mock_location?: BoolFilter<"VisitaAuditoria"> | boolean
     device_integrity_ok?: BoolFilter<"VisitaAuditoria"> | boolean
     device_id?: StringNullableFilter<"VisitaAuditoria"> | string | null
@@ -14110,6 +14142,8 @@ export namespace Prisma {
     longitud?: SortOrder
     precision_metros?: SortOrderInput | SortOrder
     distancia_domicilio_m?: SortOrderInput | SortOrder
+    ubicacion_visitada?: SortOrderInput | SortOrder
+    direccion_visitada?: SortOrderInput | SortOrder
     mock_location?: SortOrder
     device_integrity_ok?: SortOrder
     device_id?: SortOrderInput | SortOrder
@@ -14153,6 +14187,8 @@ export namespace Prisma {
     longitud?: DecimalWithAggregatesFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string
     precision_metros?: DecimalNullableWithAggregatesFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: DecimalNullableWithAggregatesFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: StringNullableWithAggregatesFilter<"VisitaAuditoria"> | string | null
+    direccion_visitada?: StringNullableWithAggregatesFilter<"VisitaAuditoria"> | string | null
     mock_location?: BoolWithAggregatesFilter<"VisitaAuditoria"> | boolean
     device_integrity_ok?: BoolWithAggregatesFilter<"VisitaAuditoria"> | boolean
     device_id?: StringNullableWithAggregatesFilter<"VisitaAuditoria"> | string | null
@@ -15232,6 +15268,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -15270,6 +15308,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -15303,6 +15343,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15341,6 +15383,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15377,6 +15421,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -15409,6 +15455,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15444,6 +15492,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16734,6 +16784,8 @@ export namespace Prisma {
     longitud?: SortOrder
     precision_metros?: SortOrder
     distancia_domicilio_m?: SortOrder
+    ubicacion_visitada?: SortOrder
+    direccion_visitada?: SortOrder
     mock_location?: SortOrder
     device_integrity_ok?: SortOrder
     device_id?: SortOrder
@@ -16779,6 +16831,8 @@ export namespace Prisma {
     longitud?: SortOrder
     precision_metros?: SortOrder
     distancia_domicilio_m?: SortOrder
+    ubicacion_visitada?: SortOrder
+    direccion_visitada?: SortOrder
     mock_location?: SortOrder
     device_integrity_ok?: SortOrder
     device_id?: SortOrder
@@ -16809,6 +16863,8 @@ export namespace Prisma {
     longitud?: SortOrder
     precision_metros?: SortOrder
     distancia_domicilio_m?: SortOrder
+    ubicacion_visitada?: SortOrder
+    direccion_visitada?: SortOrder
     mock_location?: SortOrder
     device_integrity_ok?: SortOrder
     device_id?: SortOrder
@@ -18007,6 +18063,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -18043,6 +18101,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -18193,6 +18253,8 @@ export namespace Prisma {
     longitud?: DecimalFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string
     precision_metros?: DecimalNullableFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: DecimalNullableFilter<"VisitaAuditoria"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: StringNullableFilter<"VisitaAuditoria"> | string | null
+    direccion_visitada?: StringNullableFilter<"VisitaAuditoria"> | string | null
     mock_location?: BoolFilter<"VisitaAuditoria"> | boolean
     device_integrity_ok?: BoolFilter<"VisitaAuditoria"> | boolean
     device_id?: StringNullableFilter<"VisitaAuditoria"> | string | null
@@ -18577,6 +18639,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -18613,6 +18677,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -19546,6 +19612,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -19583,6 +19651,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -19631,6 +19701,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19668,6 +19740,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19713,6 +19787,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -19794,6 +19870,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19830,6 +19908,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19865,6 +19945,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19961,6 +20043,8 @@ export namespace Prisma {
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: string | null
+    direccion_visitada?: string | null
     mock_location?: boolean
     device_integrity_ok?: boolean
     device_id?: string | null
@@ -20034,6 +20118,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20070,6 +20156,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20105,6 +20193,8 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     distancia_domicilio_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_visitada?: NullableStringFieldUpdateOperationsInput | string | null
     mock_location?: BoolFieldUpdateOperationsInput | boolean
     device_integrity_ok?: BoolFieldUpdateOperationsInput | boolean
     device_id?: NullableStringFieldUpdateOperationsInput | string | null

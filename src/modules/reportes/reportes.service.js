@@ -351,14 +351,21 @@ function seccionTrazabilidad(visita, e, importacion, huellaFicha) {
   const origenDatos = importacion
     ? `Datos de la base: archivo "${importacion.archivo}" (importado ${fechaHora(importacion.fecha_creacion)}${importacion.archivo_sha256 ? `, huella ${importacion.archivo_sha256.slice(0, 12)}` : ''}), fila ${val(e.fila_origen)}.`
     : 'Datos de la base: carga manual / sin archivo de origen registrado.';
+  // En MYPE el auditor puede ir al domicilio de la persona o al negocio: la ficha dice a cuál fue.
+  const alNegocio = visita.ubicacion_visitada === 'NEGOCIO';
+  const lugar = alNegocio ? 'negocio' : 'domicilio';
   const ubicacion = visita.distancia_domicilio_m != null
-    ? `Distancia al domicilio de la base: ${Math.round(Number(visita.distancia_domicilio_m))} m (precisión GPS ±${val(visita.precision_metros != null ? Math.round(Number(visita.precision_metros)) : null)} m).`
-    : 'Domicilio sin coordenadas en la base: no se calculó distancia.';
+    ? `Distancia al ${lugar} de la base: ${Math.round(Number(visita.distancia_domicilio_m))} m (precisión GPS ±${val(visita.precision_metros != null ? Math.round(Number(visita.precision_metros)) : null)} m).`
+    : `${alNegocio ? 'Negocio' : 'Domicilio'} sin coordenadas en la base: no se calculó distancia.`;
+  const direccionVisitada = visita.ubicacion_visitada
+    ? `Dirección visitada: ${alNegocio ? 'Negocio' : 'Domicilio'}${visita.direccion_visitada ? ` — ${visita.direccion_visitada}` : ''}.`
+    : null;
   return [
     titulo('TRAZABILIDAD DE LA FICHA'),
     ...[
       `Auditor: ${auditor} (@${visita.auditor.username}) · Plantilla ${val(visita.plantilla)} · Resultado: ${visita.resultado}`,
       `Check-in del dispositivo: ${fechaHora(visita.fecha_hora_checkin)} · Recibida por el servidor: ${fechaHora(visita.server_received_at)}`,
+      ...(direccionVisitada ? [direccionVisitada] : []),
       ubicacion,
       `Ubicación simulada: ${visita.mock_location ? 'SÍ' : 'No detectada'} · Integridad del dispositivo: ${visita.device_integrity_ok ? 'OK' : 'con observaciones'}`,
       origenDatos,

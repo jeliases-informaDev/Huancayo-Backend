@@ -208,7 +208,9 @@ model VisitaAuditoria {
   precision_metros    Decimal?  @db.Decimal(8, 2) // precisión GPS reportada por el dispositivo
 
   // Señales anti-fraude calculadas/recibidas al momento de la visita
-  distancia_domicilio_m Decimal? @db.Decimal(10, 2) // distancia Haversine vs expediente.latitud/longitud
+  distancia_domicilio_m Decimal? @db.Decimal(10, 2) // distancia Haversine al punto visitado (domicilio, o negocio en MYPE)
+  ubicacion_visitada    String?  @db.VarChar(10) // DOMICILIO | NEGOCIO: a qué dirección fue el auditor (MYPE puede ir a cualquiera de las dos)
+  direccion_visitada    String?  @db.VarChar(255) // texto de esa dirección tal como estaba en la base
   mock_location         Boolean  @default(false) // ubicación simulada detectada (Fake GPS)
   device_integrity_ok   Boolean  @default(true) // sin indicios de root/jailbreak/emulador
   device_id             String?  @db.VarChar(150)

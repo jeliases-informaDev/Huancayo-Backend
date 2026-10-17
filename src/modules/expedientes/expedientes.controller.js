@@ -26,6 +26,14 @@ async function actualizar(req, res, next) {
     res.json({ data });
   } catch (error) { next(error); }
 }
+async function fijarUbicacionNegocio(req, res, next) {
+  try {
+    const { id, indice } = req.validated.params;
+    const { _auditDiff, ...data } = await expedientesService.fijarUbicacionNegocio(id, indice, req.body, req.user.id);
+    req.auditContext = _auditDiff;
+    res.json({ data });
+  } catch (error) { next(error); }
+}
 async function eliminar(req, res, next) {
   try {
     const { _auditDiff } = await expedientesService.eliminar(req.validated.params.id);
@@ -72,4 +80,4 @@ async function liberarImportacion(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { listar, obtener, crear, actualizar, eliminar, importar, listarImportaciones, obtenerImportacion, liberarImportacion };
+export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, eliminar, importar, listarImportaciones, obtenerImportacion, liberarImportacion };

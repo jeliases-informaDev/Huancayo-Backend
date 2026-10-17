@@ -82,6 +82,9 @@ export const expedienteCreateBody = z.object({
   endeudamiento: z.record(z.string(), z.unknown()).optional(),
 }).strict();
 export const expedienteUpdateBody = expedienteCreateBody.partial().refine(data => Object.keys(data).length > 0, 'Debe enviar al menos un campo');
+// Ubicación de un negocio (MYPE) fijada a mano desde el panel.
+export const negocioParams = z.object({ id: z.coerce.number().int().positive(), indice: z.coerce.number().int().min(0).max(5) }).strict();
+export const negocioUbicacionBody = z.object({ latitud: z.coerce.number().min(-90).max(90), longitud: z.coerce.number().min(-180).max(180) }).strict();
 
 // --- Asignaciones de auditoría ---
 export const asignacionCreateBody = z.object({
@@ -145,6 +148,9 @@ export const visitaCreateBody = z.object({
   mock_location: z.boolean().default(false),
   device_integrity_ok: z.boolean().default(true),
   device_id: optionalString(150),
+  // A qué dirección fue el auditor: el domicilio de la persona (por defecto) o, en MYPE, uno de los negocios.
+  ubicacion_visitada: z.enum(['DOMICILIO', 'NEGOCIO']).optional(),
+  indice_negocio: z.coerce.number().int().min(0).max(5).optional(),
   resultado: z.enum(['CONFORME', 'OBSERVADO', 'NO_UBICADO', 'RECHAZADO']),
   respuestas_cuestionario: cuestionarioSchema,
   comentario_negocio: optionalString(2000),
