@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { antiguedadEnMeses, entero, fecha, normalizarClave, numero, tieneTextoDanado, texto } from './limpieza.js';
 import { extraerCoordenadas, sinCoordenadas } from './coordenadas.js';
+import { camposDeDireccion } from '../../geocodificacion/direcciones.js';
 
 // Base "FV_..._CRED_EMP" del sistema core de Caja Huancayo: una fila por crédito, 262 columnas
 // con nombres técnicos. Este módulo la convierte al modelo del sistema:
@@ -345,5 +346,10 @@ export function mapearFilaCore(fila, { hoja }) {
   revisar('', expediente);
   if (dañados.length) advertencias.push('TEXTO_DANADO');
 
-  return { expediente, advertencias, camposDanados: dañados.slice(0, 8), huella: huella(expediente), columnasUsadas: usadas };
+  // Nomenclatura de la dirección (tipo de vía, número, manzana/lote…) y su calidad. Se agrega después de calcular la huella para no
+  // alterar la huella de las filas ya importadas.
+  const huellaFila = huella(expediente);
+  const direccionNormalizada = camposDeDireccion({ direccion: expediente.direccion_domicilio, distrito: expediente.distrito, provincia: expediente.provincia, tieneCoordenadas: expediente.latitud != null });
+  advertencias.push(...direccionNormalizada.advertencias);
+  return { expediente: { ...expediente, ...direccionNormalizada.campos }, advertencias, camposDanados: dañados.slice(0, 8), huella: huellaFila, columnasUsadas: usadas };
 }

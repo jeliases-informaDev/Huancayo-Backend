@@ -28,6 +28,7 @@ import asignacionesRoutes from '#modules/auditorias/asignaciones.routes.js';
 import visitasRoutes from '#modules/auditorias/visitas.routes.js';
 import reportesRoutes from '#modules/reportes/reportes.routes.js';
 import seguridadRoutes from '#modules/sistema/seguridad.routes.js';
+import { iniciarGeocodificacion } from '#modules/geocodificacion/geocodificacion.worker.js';
 
 // ============================================================================
 // 3. CONFIGURACIÓN DE EXPRESS Y MIDDLEWARES GLOBALES
@@ -166,6 +167,7 @@ app.use(errorHandler);
 const server = app.listen(env.PORT, () => {
   // Una carga que quedó "procesando" por un reinicio del servidor no va a terminar nunca: se marca.
   importador.marcarInterrumpidas().catch(() => {});
+  iniciarGeocodificacion(); // apagado salvo GEOCODING_WORKER_ENABLED=true (enviar direcciones a un proveedor externo requiere autorización del banco)
   if (env.NODE_ENV === 'development') process.stdout.write(`http://localhost:${env.PORT}\n`);
   else logger.info({ port: env.PORT }, 'server_started');
 });

@@ -34,6 +34,22 @@ async function fijarUbicacionNegocio(req, res, next) {
     res.json({ data });
   } catch (error) { next(error); }
 }
+async function geoResumen(_req, res, next) { try { res.json({ data: await expedientesService.geoResumen() }); } catch (error) { next(error); } }
+async function geoProcesar(req, res, next) {
+  try {
+    if (!(await expedientesService.geoResumen()).activa) { const e = new Error('La búsqueda de direcciones en un proveedor de mapas está desactivada en este servidor (GEOCODING_WORKER_ENABLED).'); e.statusCode = 409; e.code = 'GEOCODING_DISABLED'; throw e; }
+    res.json({ data: await expedientesService.geoProcesar({ limite: req.validated?.query?.limite }) });
+  } catch (error) { next(error); }
+}
+async function geoReencolar(_req, res, next) { try { res.json({ data: await expedientesService.geoReencolar() }); } catch (error) { next(error); } }
+async function geoUno(req, res, next) { try { res.json({ data: await expedientesService.geoUno(req.validated.params.id) }); } catch (error) { next(error); } }
+async function aceptarUbicacionSugerida(req, res, next) {
+  try {
+    const { _auditDiff, ...data } = await expedientesService.aceptarUbicacionSugerida(req.validated.params.id, req.user.id);
+    req.auditContext = _auditDiff;
+    res.json({ data });
+  } catch (error) { next(error); }
+}
 async function eliminar(req, res, next) {
   try {
     const { _auditDiff } = await expedientesService.eliminar(req.validated.params.id);
@@ -80,4 +96,4 @@ async function liberarImportacion(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, eliminar, importar, listarImportaciones, obtenerImportacion, liberarImportacion };
+export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, geoResumen, geoProcesar, geoReencolar, geoUno, aceptarUbicacionSugerida, eliminar, importar, listarImportaciones, obtenerImportacion, liberarImportacion };

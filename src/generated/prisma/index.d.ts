@@ -5125,6 +5125,8 @@ export namespace Prisma {
     latitud: Decimal | null
     longitud: Decimal | null
     monto_desembolso: Decimal | null
+    geo_latitud: Decimal | null
+    geo_longitud: Decimal | null
     fila_origen: number | null
   }
 
@@ -5133,6 +5135,8 @@ export namespace Prisma {
     latitud: Decimal | null
     longitud: Decimal | null
     monto_desembolso: Decimal | null
+    geo_latitud: Decimal | null
+    geo_longitud: Decimal | null
     fila_origen: number | null
   }
 
@@ -5154,6 +5158,15 @@ export namespace Prisma {
     asesor_responsable: string | null
     monto_desembolso: Decimal | null
     moneda: string | null
+    direccion_normalizada: string | null
+    geo_estado: string | null
+    geo_confianza: string | null
+    geo_precision: string | null
+    geo_proveedor: string | null
+    geo_latitud: Decimal | null
+    geo_longitud: Decimal | null
+    geo_direccion_encontrada: string | null
+    geo_fecha: Date | null
     ubicacion_origen: string | null
     autoasignable: boolean | null
     id_importacion: string | null
@@ -5182,6 +5195,15 @@ export namespace Prisma {
     asesor_responsable: string | null
     monto_desembolso: Decimal | null
     moneda: string | null
+    direccion_normalizada: string | null
+    geo_estado: string | null
+    geo_confianza: string | null
+    geo_precision: string | null
+    geo_proveedor: string | null
+    geo_latitud: Decimal | null
+    geo_longitud: Decimal | null
+    geo_direccion_encontrada: string | null
+    geo_fecha: Date | null
     ubicacion_origen: string | null
     autoasignable: boolean | null
     id_importacion: string | null
@@ -5215,6 +5237,16 @@ export namespace Prisma {
     datos_credito: number
     evaluacion_financiera: number
     endeudamiento: number
+    direccion_normalizada: number
+    direccion_componentes: number
+    geo_estado: number
+    geo_confianza: number
+    geo_precision: number
+    geo_proveedor: number
+    geo_latitud: number
+    geo_longitud: number
+    geo_direccion_encontrada: number
+    geo_fecha: number
     ubicacion_origen: number
     autoasignable: number
     id_importacion: number
@@ -5233,6 +5265,8 @@ export namespace Prisma {
     latitud?: true
     longitud?: true
     monto_desembolso?: true
+    geo_latitud?: true
+    geo_longitud?: true
     fila_origen?: true
   }
 
@@ -5241,6 +5275,8 @@ export namespace Prisma {
     latitud?: true
     longitud?: true
     monto_desembolso?: true
+    geo_latitud?: true
+    geo_longitud?: true
     fila_origen?: true
   }
 
@@ -5262,6 +5298,15 @@ export namespace Prisma {
     asesor_responsable?: true
     monto_desembolso?: true
     moneda?: true
+    direccion_normalizada?: true
+    geo_estado?: true
+    geo_confianza?: true
+    geo_precision?: true
+    geo_proveedor?: true
+    geo_latitud?: true
+    geo_longitud?: true
+    geo_direccion_encontrada?: true
+    geo_fecha?: true
     ubicacion_origen?: true
     autoasignable?: true
     id_importacion?: true
@@ -5290,6 +5335,15 @@ export namespace Prisma {
     asesor_responsable?: true
     monto_desembolso?: true
     moneda?: true
+    direccion_normalizada?: true
+    geo_estado?: true
+    geo_confianza?: true
+    geo_precision?: true
+    geo_proveedor?: true
+    geo_latitud?: true
+    geo_longitud?: true
+    geo_direccion_encontrada?: true
+    geo_fecha?: true
     ubicacion_origen?: true
     autoasignable?: true
     id_importacion?: true
@@ -5323,6 +5377,16 @@ export namespace Prisma {
     datos_credito?: true
     evaluacion_financiera?: true
     endeudamiento?: true
+    direccion_normalizada?: true
+    direccion_componentes?: true
+    geo_estado?: true
+    geo_confianza?: true
+    geo_precision?: true
+    geo_proveedor?: true
+    geo_latitud?: true
+    geo_longitud?: true
+    geo_direccion_encontrada?: true
+    geo_fecha?: true
     ubicacion_origen?: true
     autoasignable?: true
     id_importacion?: true
@@ -5444,6 +5508,16 @@ export namespace Prisma {
     datos_credito: JsonValue | null
     evaluacion_financiera: JsonValue | null
     endeudamiento: JsonValue | null
+    direccion_normalizada: string | null
+    direccion_componentes: JsonValue | null
+    geo_estado: string | null
+    geo_confianza: string | null
+    geo_precision: string | null
+    geo_proveedor: string | null
+    geo_latitud: Decimal | null
+    geo_longitud: Decimal | null
+    geo_direccion_encontrada: string | null
+    geo_fecha: Date | null
     ubicacion_origen: string | null
     autoasignable: boolean
     id_importacion: string | null
@@ -5497,6 +5571,16 @@ export namespace Prisma {
     datos_credito?: boolean
     evaluacion_financiera?: boolean
     endeudamiento?: boolean
+    direccion_normalizada?: boolean
+    direccion_componentes?: boolean
+    geo_estado?: boolean
+    geo_confianza?: boolean
+    geo_precision?: boolean
+    geo_proveedor?: boolean
+    geo_latitud?: boolean
+    geo_longitud?: boolean
+    geo_direccion_encontrada?: boolean
+    geo_fecha?: boolean
     ubicacion_origen?: boolean
     autoasignable?: boolean
     id_importacion?: boolean
@@ -5537,6 +5621,16 @@ export namespace Prisma {
     datos_credito?: boolean
     evaluacion_financiera?: boolean
     endeudamiento?: boolean
+    direccion_normalizada?: boolean
+    direccion_componentes?: boolean
+    geo_estado?: boolean
+    geo_confianza?: boolean
+    geo_precision?: boolean
+    geo_proveedor?: boolean
+    geo_latitud?: boolean
+    geo_longitud?: boolean
+    geo_direccion_encontrada?: boolean
+    geo_fecha?: boolean
     ubicacion_origen?: boolean
     autoasignable?: boolean
     id_importacion?: boolean
@@ -5548,7 +5642,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "ubicacion_origen" | "autoasignable" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
+  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "direccion_normalizada" | "direccion_componentes" | "geo_estado" | "geo_confianza" | "geo_precision" | "geo_proveedor" | "geo_latitud" | "geo_longitud" | "geo_direccion_encontrada" | "geo_fecha" | "ubicacion_origen" | "autoasignable" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
   export type ExpedienteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Expediente$asignacionesArgs<ExtArgs>
     visitas?: boolean | Expediente$visitasArgs<ExtArgs>
@@ -5586,6 +5680,16 @@ export namespace Prisma {
       datos_credito: Prisma.JsonValue | null
       evaluacion_financiera: Prisma.JsonValue | null
       endeudamiento: Prisma.JsonValue | null
+      direccion_normalizada: string | null
+      direccion_componentes: Prisma.JsonValue | null
+      geo_estado: string | null
+      geo_confianza: string | null
+      geo_precision: string | null
+      geo_proveedor: string | null
+      geo_latitud: Prisma.Decimal | null
+      geo_longitud: Prisma.Decimal | null
+      geo_direccion_encontrada: string | null
+      geo_fecha: Date | null
       ubicacion_origen: string | null
       autoasignable: boolean
       id_importacion: string | null
@@ -5989,6 +6093,16 @@ export namespace Prisma {
     readonly datos_credito: FieldRef<"Expediente", 'Json'>
     readonly evaluacion_financiera: FieldRef<"Expediente", 'Json'>
     readonly endeudamiento: FieldRef<"Expediente", 'Json'>
+    readonly direccion_normalizada: FieldRef<"Expediente", 'String'>
+    readonly direccion_componentes: FieldRef<"Expediente", 'Json'>
+    readonly geo_estado: FieldRef<"Expediente", 'String'>
+    readonly geo_confianza: FieldRef<"Expediente", 'String'>
+    readonly geo_precision: FieldRef<"Expediente", 'String'>
+    readonly geo_proveedor: FieldRef<"Expediente", 'String'>
+    readonly geo_latitud: FieldRef<"Expediente", 'Decimal'>
+    readonly geo_longitud: FieldRef<"Expediente", 'Decimal'>
+    readonly geo_direccion_encontrada: FieldRef<"Expediente", 'String'>
+    readonly geo_fecha: FieldRef<"Expediente", 'DateTime'>
     readonly ubicacion_origen: FieldRef<"Expediente", 'String'>
     readonly autoasignable: FieldRef<"Expediente", 'Boolean'>
     readonly id_importacion: FieldRef<"Expediente", 'String'>
@@ -13031,6 +13145,16 @@ export namespace Prisma {
     datos_credito: 'datos_credito',
     evaluacion_financiera: 'evaluacion_financiera',
     endeudamiento: 'endeudamiento',
+    direccion_normalizada: 'direccion_normalizada',
+    direccion_componentes: 'direccion_componentes',
+    geo_estado: 'geo_estado',
+    geo_confianza: 'geo_confianza',
+    geo_precision: 'geo_precision',
+    geo_proveedor: 'geo_proveedor',
+    geo_latitud: 'geo_latitud',
+    geo_longitud: 'geo_longitud',
+    geo_direccion_encontrada: 'geo_direccion_encontrada',
+    geo_fecha: 'geo_fecha',
     ubicacion_origen: 'ubicacion_origen',
     autoasignable: 'autoasignable',
     id_importacion: 'id_importacion',
@@ -13271,6 +13395,12 @@ export namespace Prisma {
     departamento: 'departamento',
     asesor_responsable: 'asesor_responsable',
     moneda: 'moneda',
+    direccion_normalizada: 'direccion_normalizada',
+    geo_estado: 'geo_estado',
+    geo_confianza: 'geo_confianza',
+    geo_precision: 'geo_precision',
+    geo_proveedor: 'geo_proveedor',
+    geo_direccion_encontrada: 'geo_direccion_encontrada',
     ubicacion_origen: 'ubicacion_origen',
     id_importacion: 'id_importacion',
     hash_origen: 'hash_origen',
@@ -13792,6 +13922,16 @@ export namespace Prisma {
     datos_credito?: JsonNullableFilter<"Expediente">
     evaluacion_financiera?: JsonNullableFilter<"Expediente">
     endeudamiento?: JsonNullableFilter<"Expediente">
+    direccion_normalizada?: StringNullableFilter<"Expediente"> | string | null
+    direccion_componentes?: JsonNullableFilter<"Expediente">
+    geo_estado?: StringNullableFilter<"Expediente"> | string | null
+    geo_confianza?: StringNullableFilter<"Expediente"> | string | null
+    geo_precision?: StringNullableFilter<"Expediente"> | string | null
+    geo_proveedor?: StringNullableFilter<"Expediente"> | string | null
+    geo_latitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: StringNullableFilter<"Expediente"> | string | null
+    geo_fecha?: DateTimeNullableFilter<"Expediente"> | Date | string | null
     ubicacion_origen?: StringNullableFilter<"Expediente"> | string | null
     autoasignable?: BoolFilter<"Expediente"> | boolean
     id_importacion?: StringNullableFilter<"Expediente"> | string | null
@@ -13829,6 +13969,16 @@ export namespace Prisma {
     datos_credito?: SortOrderInput | SortOrder
     evaluacion_financiera?: SortOrderInput | SortOrder
     endeudamiento?: SortOrderInput | SortOrder
+    direccion_normalizada?: SortOrderInput | SortOrder
+    direccion_componentes?: SortOrderInput | SortOrder
+    geo_estado?: SortOrderInput | SortOrder
+    geo_confianza?: SortOrderInput | SortOrder
+    geo_precision?: SortOrderInput | SortOrder
+    geo_proveedor?: SortOrderInput | SortOrder
+    geo_latitud?: SortOrderInput | SortOrder
+    geo_longitud?: SortOrderInput | SortOrder
+    geo_direccion_encontrada?: SortOrderInput | SortOrder
+    geo_fecha?: SortOrderInput | SortOrder
     ubicacion_origen?: SortOrderInput | SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
@@ -13870,6 +14020,16 @@ export namespace Prisma {
     datos_credito?: JsonNullableFilter<"Expediente">
     evaluacion_financiera?: JsonNullableFilter<"Expediente">
     endeudamiento?: JsonNullableFilter<"Expediente">
+    direccion_normalizada?: StringNullableFilter<"Expediente"> | string | null
+    direccion_componentes?: JsonNullableFilter<"Expediente">
+    geo_estado?: StringNullableFilter<"Expediente"> | string | null
+    geo_confianza?: StringNullableFilter<"Expediente"> | string | null
+    geo_precision?: StringNullableFilter<"Expediente"> | string | null
+    geo_proveedor?: StringNullableFilter<"Expediente"> | string | null
+    geo_latitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: StringNullableFilter<"Expediente"> | string | null
+    geo_fecha?: DateTimeNullableFilter<"Expediente"> | Date | string | null
     ubicacion_origen?: StringNullableFilter<"Expediente"> | string | null
     autoasignable?: BoolFilter<"Expediente"> | boolean
     id_importacion?: StringNullableFilter<"Expediente"> | string | null
@@ -13907,6 +14067,16 @@ export namespace Prisma {
     datos_credito?: SortOrderInput | SortOrder
     evaluacion_financiera?: SortOrderInput | SortOrder
     endeudamiento?: SortOrderInput | SortOrder
+    direccion_normalizada?: SortOrderInput | SortOrder
+    direccion_componentes?: SortOrderInput | SortOrder
+    geo_estado?: SortOrderInput | SortOrder
+    geo_confianza?: SortOrderInput | SortOrder
+    geo_precision?: SortOrderInput | SortOrder
+    geo_proveedor?: SortOrderInput | SortOrder
+    geo_latitud?: SortOrderInput | SortOrder
+    geo_longitud?: SortOrderInput | SortOrder
+    geo_direccion_encontrada?: SortOrderInput | SortOrder
+    geo_fecha?: SortOrderInput | SortOrder
     ubicacion_origen?: SortOrderInput | SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
@@ -13949,6 +14119,16 @@ export namespace Prisma {
     datos_credito?: JsonNullableWithAggregatesFilter<"Expediente">
     evaluacion_financiera?: JsonNullableWithAggregatesFilter<"Expediente">
     endeudamiento?: JsonNullableWithAggregatesFilter<"Expediente">
+    direccion_normalizada?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
+    direccion_componentes?: JsonNullableWithAggregatesFilter<"Expediente">
+    geo_estado?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
+    geo_confianza?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
+    geo_precision?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
+    geo_proveedor?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
+    geo_latitud?: DecimalNullableWithAggregatesFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: DecimalNullableWithAggregatesFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
+    geo_fecha?: DateTimeNullableWithAggregatesFilter<"Expediente"> | Date | string | null
     ubicacion_origen?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     autoasignable?: BoolWithAggregatesFilter<"Expediente"> | boolean
     id_importacion?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
@@ -15034,6 +15214,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -15071,6 +15261,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -15107,6 +15307,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15144,6 +15354,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15181,6 +15401,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -15214,6 +15444,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15248,6 +15488,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16629,6 +16879,16 @@ export namespace Prisma {
     datos_credito?: SortOrder
     evaluacion_financiera?: SortOrder
     endeudamiento?: SortOrder
+    direccion_normalizada?: SortOrder
+    direccion_componentes?: SortOrder
+    geo_estado?: SortOrder
+    geo_confianza?: SortOrder
+    geo_precision?: SortOrder
+    geo_proveedor?: SortOrder
+    geo_latitud?: SortOrder
+    geo_longitud?: SortOrder
+    geo_direccion_encontrada?: SortOrder
+    geo_fecha?: SortOrder
     ubicacion_origen?: SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrder
@@ -16645,6 +16905,8 @@ export namespace Prisma {
     latitud?: SortOrder
     longitud?: SortOrder
     monto_desembolso?: SortOrder
+    geo_latitud?: SortOrder
+    geo_longitud?: SortOrder
     fila_origen?: SortOrder
   }
 
@@ -16666,6 +16928,15 @@ export namespace Prisma {
     asesor_responsable?: SortOrder
     monto_desembolso?: SortOrder
     moneda?: SortOrder
+    direccion_normalizada?: SortOrder
+    geo_estado?: SortOrder
+    geo_confianza?: SortOrder
+    geo_precision?: SortOrder
+    geo_proveedor?: SortOrder
+    geo_latitud?: SortOrder
+    geo_longitud?: SortOrder
+    geo_direccion_encontrada?: SortOrder
+    geo_fecha?: SortOrder
     ubicacion_origen?: SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrder
@@ -16694,6 +16965,15 @@ export namespace Prisma {
     asesor_responsable?: SortOrder
     monto_desembolso?: SortOrder
     moneda?: SortOrder
+    direccion_normalizada?: SortOrder
+    geo_estado?: SortOrder
+    geo_confianza?: SortOrder
+    geo_precision?: SortOrder
+    geo_proveedor?: SortOrder
+    geo_latitud?: SortOrder
+    geo_longitud?: SortOrder
+    geo_direccion_encontrada?: SortOrder
+    geo_fecha?: SortOrder
     ubicacion_origen?: SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrder
@@ -16709,6 +16989,8 @@ export namespace Prisma {
     latitud?: SortOrder
     longitud?: SortOrder
     monto_desembolso?: SortOrder
+    geo_latitud?: SortOrder
+    geo_longitud?: SortOrder
     fila_origen?: SortOrder
   }
 
@@ -19035,6 +19317,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -19071,6 +19363,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -19122,6 +19424,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19158,6 +19470,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19193,6 +19515,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -19229,6 +19561,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -19353,6 +19695,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19389,6 +19741,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19503,6 +19865,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -19539,6 +19911,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -19695,6 +20077,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19731,6 +20123,16 @@ export namespace Prisma {
     datos_credito?: NullableJsonNullValueInput | InputJsonValue
     evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
     endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null

@@ -1,6 +1,8 @@
 import prisma from '#core/config/prisma.js';
 import importador from './importador/importador.service.js';
 import { negociosDe, conUbicacionNegocio } from './ubicaciones.js';
+import { camposDeDireccion, SIN_SUGERENCIA } from '../geocodificacion/direcciones.js';
+import * as geocodificacion from '../geocodificacion/geocodificacion.service.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -9,23 +11,26 @@ const listSelect = {
   numero_documento_cliente: true, nombres_cliente: true, distrito: true, provincia: true, departamento: true,
   latitud: true, longitud: true, asesor_responsable: true, monto_desembolso: true, moneda: true,
   estado: true, fecha_creacion: true, ubicacion_origen: true, advertencias_origen: true, id_importacion: true,
+  direccion_normalizada: true, geo_estado: true, geo_confianza: true,
 };
 
-async function listar({ page = 1, limit = 25, search, estado, distrito, departamento, tipo_credito, sin_ubicacion } = {}) {
+async function listar({ page = 1, limit = 25, search, estado, distrito, departamento, tipo_credito, sin_ubicacion, geo_estado } = {}) {
+  // Cada condición con OR va en su propio elemento de AND: si no, «sin ubicación» y «buscar» se pisaban entre sí.
   const where = {
-    ...(sin_ubicacion === 'true' ? { OR: [{ latitud: null }, { longitud: null }] } : {}),
-    ...(estado ? { estado } : {}),
-    ...(distrito ? { distrito: { contains: distrito } } : {}),
-    ...(departamento ? { departamento: { contains: departamento } } : {}),
-    ...(tipo_credito ? { tipo_credito } : {}),
-    ...(search ? {
-      OR: [
+    AND: [
+      ...(sin_ubicacion === 'true' ? [{ OR: [{ latitud: null }, { longitud: null }] }] : []),
+      ...(search ? [{ OR: [
         { codigo_expediente: { contains: search } },
         { nombres_cliente: { contains: search } },
         { numero_documento_cliente: { contains: search } },
         { asesor_responsable: { contains: search } },
-      ],
-    } : {}),
+      ] }] : []),
+    ],
+    ...(estado ? { estado } : {}),
+    ...(distrito ? { distrito: { contains: distrito } } : {}),
+    ...(departamento ? { departamento: { contains: departamento } } : {}),
+    ...(tipo_credito ? { tipo_credito } : {}),
+    ...(geo_estado ? { geo_estado } : {}),
   };
   const [data, total] = await Promise.all([
     prisma.expediente.findMany({ where, select: listSelect, orderBy: { fecha_creacion: 'desc' }, skip: (page - 1) * limit, take: limit }),
@@ -65,7 +70,8 @@ async function obtener(id) {
 }
 
 async function crear(datos) {
-  const expediente = await prisma.expediente.create({ data: datos });
+  const direccion = camposDeDireccion({ direccion: datos.direccion_domicilio, distrito: datos.distrito, provincia: datos.provincia, tieneCoordenadas: datos.latitud != null && datos.longitud != null });
+  const expediente = await prisma.expediente.create({ data: { ...datos, ...direccion.campos } });
   return serialize(expediente);
 }
 
@@ -90,6 +96,15 @@ async function actualizar(id, datos, actorId) {
   const cambioUbicacion = (datos.latitud !== undefined || datos.longitud !== undefined)
     && (Number(datos.latitud ?? actual.latitud) !== Number(actual.latitud) || Number(datos.longitud ?? actual.longitud) !== Number(actual.longitud));
   if (cambioUbicacion) data.ubicacion_origen = 'MANUAL';
+  // Si cambió la dirección escrita se vuelve a descomponer; la sugerencia del mapa anterior ya no vale y la dirección vuelve a la cola.
+  if (['direccion_domicilio', 'distrito', 'provincia'].some((k) => datos[k] !== undefined)) {
+    const unida = { ...actual, ...datos };
+    const dir = camposDeDireccion({ direccion: unida.direccion_domicilio, distrito: unida.distrito, provincia: unida.provincia, tieneCoordenadas: data.latitud !== undefined ? data.latitud != null : actual.latitud != null });
+    if (dir.campos.direccion_normalizada !== actual.direccion_normalizada) {
+      Object.assign(data, dir.campos, SIN_SUGERENCIA);
+      if (actual.ubicacion_origen === 'GEOCODIFICADA' && !cambioUbicacion) { data.latitud = null; data.longitud = null; data.ubicacion_origen = null; data.geo_estado = dir.campos.direccion_normalizada ? 'PENDIENTE' : null; }
+    }
+  }
   const expediente = await prisma.expediente.update({ where: { id_expediente: id }, data });
   if (cambioUbicacion) {
     await prisma.expedienteCambio.create({
@@ -136,4 +151,14 @@ async function eliminar(id) {
 }
 
 
-export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, eliminar, importador };
+// --- Dirección y geocodificación (panel) ---
+const geoResumen = () => geocodificacion.resumenGeocodificacion();
+const geoProcesar = ({ limite } = {}) => geocodificacion.geocodificarPendientes({ limit: limite }).then((r) => ({ ...r, activa: geocodificacion.geocodificacionActiva() }));
+const geoReencolar = async () => ({ reencoladas: await geocodificacion.reencolarFallidas() });
+async function geoUno(id) { return { resultado: await geocodificacion.geocodificarUno(id), expediente: await obtener(id) }; }
+async function aceptarUbicacionSugerida(id, actorId) {
+  const { antes, despues } = await geocodificacion.aceptarSugerencia(id, actorId);
+  return { ...serialize(despues), _auditDiff: { entidad: 'Expediente', entidad_id: id, valor_anterior: auditSnapshotExpediente(antes), valor_nuevo: auditSnapshotExpediente(despues) } };
+}
+
+export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, eliminar, importador, geoResumen, geoProcesar, geoReencolar, geoUno, aceptarUbicacionSugerida };

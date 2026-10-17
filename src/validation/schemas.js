@@ -35,7 +35,10 @@ export const listQuery = z.object({
   departamento: z.string().trim().max(100).optional(),
   tipo_credito: z.enum(['CONSUMO', 'OTROS']).optional(),
   sin_ubicacion: z.enum(['true', 'false']).optional(),
+  // Situación de la dirección en el mapa: PENDIENTE | LOCALIZADO | REVISAR | NO_ENCONTRADO | ERROR | VERIFICADO.
+  geo_estado: z.enum(['PENDIENTE', 'LOCALIZADO', 'REVISAR', 'NO_ENCONTRADO', 'ERROR', 'VERIFICADO']).optional(),
 }).strict();
+export const geocodificarQuery = z.object({ limite: z.coerce.number().int().min(1).max(20).optional() }).strict();
 export const importarQuery = z.object({
   simular: z.enum(['true', 'false']).optional(),
   autoasignable: z.enum(['true', 'false']).optional(),

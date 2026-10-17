@@ -11,7 +11,7 @@ function normalizarTexto(valor) {
 const expedienteSelect = {
   id_expediente: true, codigo_expediente: true, tipo_credito: true, oficina: true,
   numero_documento_cliente: true, nombres_cliente: true, direccion_domicilio: true,
-  distrito: true, provincia: true, departamento: true, latitud: true, longitud: true,
+  distrito: true, provincia: true, departamento: true, latitud: true, longitud: true, direccion_normalizada: true,
   asesor_responsable: true, monto_desembolso: true, moneda: true, estado: true,
 };
 

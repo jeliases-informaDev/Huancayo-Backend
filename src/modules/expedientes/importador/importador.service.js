@@ -4,6 +4,7 @@ import prisma from '#core/config/prisma.js';
 import { Prisma } from '../../../generated/prisma/index.js';
 import { esFormatoCore, FORMATO_CORE, mapearFilaCore } from './formato-core.js';
 import { conservarUbicacionesNegocio } from '../ubicaciones.js';
+import { camposDeDireccion, SIN_SUGERENCIA } from '../../geocodificacion/direcciones.js';
 
 // Importación de expedientes por Excel, pensada para cargas reales (miles de filas).
 //  · El archivo se lee por flujo (no se carga entero en memoria) y se procesa por lotes.
@@ -154,10 +155,17 @@ async function procesarLoteCore({ hoja, filas, numeros }, ctx) {
       }
       if (existente.hash_origen === huella) { ctx.sinCambios += 1; continue; }
 
-      // Ubicación fijada por una persona (panel o primera visita): la base no la pisa.
-      if (['MANUAL', 'PRIMERA_VISITA'].includes(existente.ubicacion_origen) || (existente.latitud != null && expediente.latitud == null)) {
+      // Ubicación fijada por una persona (panel o primera visita): la base no la pisa. La que puso el mapa (GEOCODIFICADA) solo se conserva
+      // mientras la dirección siga siendo la misma; si cambió, se descarta y la dirección vuelve a la cola.
+      const direccionCambio = existente.direccion_normalizada !== datos.direccion_normalizada;
+      if (existente.ubicacion_origen === 'GEOCODIFICADA' && direccionCambio && expediente.latitud == null) {
+        datos.latitud = null; datos.longitud = null; datos.ubicacion_origen = null;
+      } else if (['MANUAL', 'PRIMERA_VISITA', 'GEOCODIFICADA'].includes(existente.ubicacion_origen) || (existente.latitud != null && expediente.latitud == null)) {
         datos.latitud = existente.latitud; datos.longitud = existente.longitud; datos.ubicacion_origen = existente.ubicacion_origen;
       }
+      if (direccionCambio) Object.assign(datos, SIN_SUGERENCIA);
+      // Misma dirección que antes: se conserva lo que ya se averiguó (sugerencia del mapa, verificación) en vez de volver a la cola.
+      if (existente.direccion_normalizada === datos.direccion_normalizada) delete datos.geo_estado;
       // Lo mismo con la ubicación de los negocios (MYPE) que fijó una persona.
       if (datos.datos_negocio) datos.datos_negocio = conservarUbicacionesNegocio(existente.datos_negocio, datos.datos_negocio);
       const cambios = calcularCambios(existente, datos);
@@ -208,7 +216,11 @@ async function procesarLoteSimple({ hoja, filas, numeros }, ctx) {
         moneda: row.moneda ? String(row.moneda).trim() : 'PEN',
         id_importacion: ctx.idImportacion, fila_origen: numeroFila,
       };
+      Object.assign(data, camposDeDireccion({ direccion: data.direccion_domicilio, distrito: data.distrito, provincia: data.provincia, tieneCoordenadas: latitud != null && longitud != null }).campos);
       const existente = await prisma.expediente.findUnique({ where: { codigo_expediente: data.codigo_expediente } });
+      // Misma dirección que antes: se conserva lo que ya se averiguó (sugerencia del mapa, verificación) en vez de volver a la cola.
+      if (existente && existente.direccion_normalizada === data.direccion_normalizada) delete data.geo_estado;
+      else if (existente) Object.assign(data, SIN_SUGERENCIA); // la dirección cambió: la sugerencia anterior ya no vale
       if (existente) {
         if (ESTADOS_CONGELADOS.has(existente.estado)) { ctx.omitidas += 1; ctx.registrar({ ...base, resultado: 'OMITIDA', motivo: 'YA_AUDITADO_NO_SE_MODIFICA' }); continue; }
         const cambios = calcularCambios(existente, data);

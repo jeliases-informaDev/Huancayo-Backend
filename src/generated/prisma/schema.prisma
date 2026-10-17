@@ -131,10 +131,26 @@ model Expediente {
   evaluacion_financiera Json? // ingresos / balance general / estado de resultados (variante Otros)
   endeudamiento         Json? // tabla de endeudamiento del cliente y cónyuge
 
+  // --- Dirección y geocodificación (ver src/modules/geocodificacion) ---
+  // Dirección del domicilio ya normalizada (Av. → Avenida…) y separada en sus partes (tipo de vía, nombre, número, manzana/lote,
+  // urbanización, interior, referencia) con las señales de calidad que le faltan para ubicarla con precisión.
+  direccion_normalizada    String?   @db.VarChar(300)
+  direccion_componentes    Json?
+  // Ubicación SUGERIDA por un proveedor de mapas (no es la referencia de la geocerca hasta que sea de confianza alta o la acepte una persona):
+  // PENDIENTE | LOCALIZADO | REVISAR | NO_ENCONTRADO | ERROR | VERIFICADO (la aceptó una persona o se confirmó en campo).
+  geo_estado               String?   @db.VarChar(15)
+  geo_confianza            String?   @db.VarChar(10) // ALTA | MEDIA | BAJA
+  geo_precision            String?   @db.VarChar(12) // EXACTA | APROXIMADA | DISTRITO
+  geo_proveedor            String?   @db.VarChar(12)
+  geo_latitud              Decimal?  @db.Decimal(10, 8)
+  geo_longitud             Decimal?  @db.Decimal(11, 8)
+  geo_direccion_encontrada String?   @db.VarChar(400)
+  geo_fecha                DateTime?
+
   // --- Trazabilidad del dato ---
-  // De dónde salió la ubicación del domicilio: REFERENCIA (coordenadas escritas en la
-  // referencia de la base), MANUAL (la fijó un supervisor/admin en el panel) o
-  // PRIMERA_VISITA (la tomó el auditor al visitar). Nulo = sin ubicación todavía.
+  // De dónde salió la ubicación del domicilio: REFERENCIA (coordenadas escritas en la referencia de la base), MANUAL (la fijó un
+  // supervisor/admin en el panel), PRIMERA_VISITA (la tomó el auditor al visitar) o GEOCODIFICADA (un proveedor de mapas con confianza
+  // alta). Nulo = sin ubicación todavía.
   ubicacion_origen    String? @db.VarChar(20)
   // false = solo un supervisor/admin puede asignarlo; true = además los auditores de su zona pueden
   // tomarlo por su cuenta ("Disponibles en tu zona"). Las cargas masivas lo dejan en false por defecto.
@@ -158,6 +174,7 @@ model Expediente {
   @@index([latitud, longitud])
   @@index([distrito])
   @@index([departamento])
+  @@index([geo_estado])
   @@index([asesor_responsable])
   @@index([id_importacion])
   @@map("expedientes")

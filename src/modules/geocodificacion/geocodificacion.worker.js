@@ -1,0 +1,50 @@
+// Trabajador en segundo plano: toma lotes de direcciones pendientes y las ubica. Apagado por defecto (GEOCODING_WORKER_ENABLED=true para
+// encenderlo): enviar direcciones de clientes a un proveedor externo de mapas requiere que el banco lo autorice.
+import { logger } from '#core/config/logger.js';
+import { geocodificacionActiva, geocodificarPendientes } from './geocodificacion.service.js';
+import { tamanoMaximoLote } from './proveedores.js';
+
+const LOTE = Math.min(Math.max(Number(process.env.GEOCODING_BATCH_SIZE) || 5, 1), tamanoMaximoLote());
+const CONTINUAR_MS = 2000; // si el lote salió completo hay más en cola: se sigue casi de inmediato
+const INTERVALO_MS = Math.max(Number(process.env.GEOCODING_INTERVAL_MS) || 30000, 5000);
+
+let iniciado = false;
+let procesando = false;
+let temporizador = null;
+
+function programar(ms = INTERVALO_MS) {
+  if (!iniciado) return;
+  temporizador = setTimeout(ciclo, ms);
+}
+
+async function ciclo() {
+  temporizador = null;
+  if (!iniciado) return;
+  if (procesando) { programar(); return; }
+  procesando = true;
+  let siguiente = INTERVALO_MS;
+  try {
+    const r = await geocodificarPendientes({ limit: LOTE });
+    // Con el servidor público de OpenStreetMap se mantiene siempre el ritmo lento; solo un proveedor con clave avanza rápido.
+    if (tamanoMaximoLote() > 20 && !r.detenido && r.procesados >= LOTE) siguiente = CONTINUAR_MS;
+    if (r.procesados > 0) logger.info(r, 'geocodificacion_lote_listo');
+  } catch (error) {
+    logger.error({ err: error }, 'geocodificacion_worker_fallo');
+  } finally {
+    procesando = false;
+    programar(siguiente);
+  }
+}
+
+export function iniciarGeocodificacion() {
+  if (iniciado) return;
+  if (!geocodificacionActiva()) { logger.info('geocodificacion_worker_desactivado'); return; }
+  iniciado = true;
+  logger.info({ lote: LOTE, intervaloMs: INTERVALO_MS }, 'geocodificacion_worker_iniciado');
+  temporizador = setTimeout(ciclo, 5000);
+}
+
+export function detenerGeocodificacion() {
+  iniciado = false;
+  if (temporizador) { clearTimeout(temporizador); temporizador = null; }
+}
