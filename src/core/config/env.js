@@ -57,6 +57,9 @@ const schema = z.object({
   // producción); solo se apaga explícitamente en entornos de prueba locales donde
   // el mismo usuario se loguea seguido desde dispositivos/navegadores distintos.
   ENFORCE_DEVICE_BINDING: z.enum(['true', 'false']).default('true'),
+  // Interruptor de «Disponibles / Tomar este caso»: con false el auditor ya no puede tomar casos por su cuenta y solo trabaja los que
+  // le asigna un supervisor. Encendido por defecto; además, cada carga de Excel decide si sus casos son tomables (autoasignable).
+  PERMITIR_AUTOASIGNACION: z.enum(['true', 'false']).default('true'),
   ACCOUNT_LOCK_MINUTES: z.coerce.number().int().min(5).max(1440).default(15),
   // Almacenamiento local de evidencias (fase 1 — sin credenciales cloud todavía).
   EVIDENCIAS_DIR: z.string().default('./storage/evidencias'),

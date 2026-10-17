@@ -1,4 +1,5 @@
 import prisma from '#core/config/prisma.js';
+import { env } from '#core/config/env.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -62,6 +63,7 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId =
 // propio departamento (misma regla geográfica que crear()). Sin departamento
 // configurado, no ve ninguno — evita que se autoasigne fuera de su zona por defecto.
 async function disponiblesParaAuditor(auditorId) {
+  if (env.PERMITIR_AUTOASIGNACION !== 'true') return [];
   const auditor = await prisma.usuario.findFirst({ where: { id_usuario: auditorId, rol: 'AUDITOR', estado: 'ACTIVO' } });
   if (!auditor) { const error = new Error('El auditor indicado no existe o está inactivo'); error.statusCode = 400; throw error; }
   if (!auditor.departamento) return [];
@@ -89,6 +91,10 @@ async function disponiblesParaAuditor(auditorId) {
 // UPDATE simplemente afecta 0 filas (el estado ya cambió) y falla limpio con
 // ALREADY_CLAIMED — sin necesidad de locks manuales ni de un semáforo aparte.
 async function autoAsignar(auditorId, idExpediente) {
+  if (env.PERMITIR_AUTOASIGNACION !== 'true') {
+    const error = new Error('Tomar casos por cuenta propia está desactivado: tu supervisor te asigna la muestra.');
+    error.statusCode = 403; error.code = 'SELF_ASSIGN_DISABLED'; throw error;
+  }
   const auditor = await prisma.usuario.findFirst({ where: { id_usuario: auditorId, rol: 'AUDITOR', estado: 'ACTIVO' } });
   if (!auditor) { const error = new Error('El auditor indicado no existe o está inactivo'); error.statusCode = 400; throw error; }
 
@@ -151,6 +157,29 @@ async function listar({ page = 1, limit = 25, estado } = {}) {
   return { data: serialize(data), pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
 }
 
+// Cuántos casos tomó cada auditor por su cuenta frente a los que le asignó un supervisor (sin contar las canceladas).
+async function resumenPorOrigen() {
+  const filas = await prisma.asignacionAuditoria.groupBy({
+    by: ['id_usuario_auditor', 'origen'], where: { estado: { in: ['ACTIVA', 'FINALIZADA'] } }, _count: { _all: true },
+  });
+  const usuarios = await prisma.usuario.findMany({
+    where: { id_usuario: { in: [...new Set(filas.map((f) => f.id_usuario_auditor))] } },
+    select: { id_usuario: true, username: true, nombres: true, apellidos: true },
+  });
+  const porAuditor = new Map();
+  for (const f of filas) {
+    const u = usuarios.find((x) => x.id_usuario === f.id_usuario_auditor);
+    const fila = porAuditor.get(f.id_usuario_auditor) || { id: f.id_usuario_auditor, nombre: [u?.nombres, u?.apellidos].filter(Boolean).join(' ') || u?.username || '', total: 0, autoasignadas: 0 };
+    fila.total += f._count._all;
+    if (f.origen === 'AUTOASIGNADA') fila.autoasignadas += f._count._all;
+    porAuditor.set(f.id_usuario_auditor, fila);
+  }
+  const auditores = [...porAuditor.values()].map((a) => ({ ...a, porcentaje: a.total ? Math.round((a.autoasignadas / a.total) * 100) : 0 })).sort((a, b) => b.autoasignadas - a.autoasignadas || b.total - a.total);
+  const total = auditores.reduce((n, a) => n + a.total, 0);
+  const autoasignadas = auditores.reduce((n, a) => n + a.autoasignadas, 0);
+  return { autoasignacion_activa: env.PERMITIR_AUTOASIGNACION === 'true', total, autoasignadas, porcentaje: total ? Math.round((autoasignadas / total) * 100) : 0, auditores };
+}
+
 function auditSnapshotAsignacion(a) {
   return { id_expediente: a.id_expediente, id_usuario_auditor: a.id_usuario_auditor, estado: a.estado, prioridad: a.prioridad };
 }
@@ -187,4 +216,4 @@ async function cancelarTodasDeAuditor(auditorId) {
   return activas.length;
 }
 
-export default { crear, crearMasivo, misAsignaciones, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar };
+export default { crear, crearMasivo, misAsignaciones, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen };

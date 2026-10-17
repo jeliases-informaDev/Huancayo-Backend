@@ -70,7 +70,7 @@ async function jornada(req, res, next) {
 }
 
 function config(_req, res) {
-  res.json({ data: { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS } });
+  res.json({ data: { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS, autoasignacion: env.PERMITIR_AUTOASIGNACION === 'true' } });
 }
 
 export default { presignEvidencia, subirEvidencia, crear, listar, obtener, archivoEvidencia, ubicacion, jornada, config };

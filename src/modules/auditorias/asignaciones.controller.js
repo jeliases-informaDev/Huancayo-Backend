@@ -37,6 +37,9 @@ async function autoAsignar(req, res, next) {
 async function listar(req, res, next) {
   try { res.json(await asignacionesService.listar(req.validated.query)); } catch (error) { next(error); }
 }
+async function resumenOrigen(_req, res, next) {
+  try { res.json({ data: await asignacionesService.resumenPorOrigen() }); } catch (error) { next(error); }
+}
 async function cancelar(req, res, next) {
   try {
     const { _auditDiff, ...data } = await asignacionesService.cancelar(req.validated.params.id);
@@ -45,4 +48,4 @@ async function cancelar(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar };
+export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, resumenOrigen };

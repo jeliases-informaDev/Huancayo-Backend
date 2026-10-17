@@ -15,6 +15,7 @@ router.post('/auto/:id', roleMiddleware([ROLES.AUDITOR]), validate({ params: idP
 
 router.use(roleMiddleware(OPERATIONAL_MANAGERS));
 router.get('/', validate({ query: listQuery }), controller.listar);
+router.get('/resumen-origen', controller.resumenOrigen);
 router.post('/', validate({ body: asignacionCreateBody }), controller.crear);
 router.post('/masivo', validate({ body: asignacionBulkBody }), controller.crearMasivo);
 router.post('/:id/cancelar', validate({ params: idParams }), controller.cancelar);
