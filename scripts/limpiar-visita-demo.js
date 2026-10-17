@@ -43,7 +43,7 @@ await prisma.$transaction(async (tx) => {
   await tx.visitaAuditoria.delete({ where: { id_visita: visita.id_visita } });
   await tx.expediente.update({ where: { id_expediente: expediente.id_expediente }, data: { estado: 'ASIGNADO' } });
   if (asignacion) await tx.asignacionAuditoria.update({ where: { id_asignacion: asignacion.id_asignacion }, data: { estado: 'ACTIVA', fecha_fin: null } });
-});
+}, { maxWait: 30000, timeout: 120000 }); // desde una PC lejos del servidor cada sentencia tarda más; el límite por defecto (5 s) cancelaba la transacción
 
 let archivos = 0;
 for (const e of visita.evidencias) {
