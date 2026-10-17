@@ -143,7 +143,12 @@ exports.Prisma.UsuarioScalarFieldEnum = {
   ultimo_acceso: 'ultimo_acceso',
   password_cambio: 'password_cambio',
   latitud: 'latitud',
-  longitud: 'longitud'
+  longitud: 'longitud',
+  ubicacion_en: 'ubicacion_en',
+  ubicacion_precision: 'ubicacion_precision',
+  ubicacion_simulada: 'ubicacion_simulada',
+  jornada_inicio: 'jornada_inicio',
+  jornada_fin: 'jornada_fin'
 };
 
 exports.Prisma.TrackingUbicacionScalarFieldEnum = {
@@ -152,6 +157,7 @@ exports.Prisma.TrackingUbicacionScalarFieldEnum = {
   latitud: 'latitud',
   longitud: 'longitud',
   precision_metros: 'precision_metros',
+  simulada: 'simulada',
   registrado_en: 'registrado_en'
 };
 

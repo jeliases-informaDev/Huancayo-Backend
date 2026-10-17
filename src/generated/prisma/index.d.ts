@@ -1820,6 +1820,7 @@ export namespace Prisma {
     intentos_fallidos: number | null
     latitud: Decimal | null
     longitud: Decimal | null
+    ubicacion_precision: Decimal | null
   }
 
   export type UsuarioSumAggregateOutputType = {
@@ -1827,6 +1828,7 @@ export namespace Prisma {
     intentos_fallidos: number | null
     latitud: Decimal | null
     longitud: Decimal | null
+    ubicacion_precision: Decimal | null
   }
 
   export type UsuarioMinAggregateOutputType = {
@@ -1853,6 +1855,11 @@ export namespace Prisma {
     password_cambio: Date | null
     latitud: Decimal | null
     longitud: Decimal | null
+    ubicacion_en: Date | null
+    ubicacion_precision: Decimal | null
+    ubicacion_simulada: boolean | null
+    jornada_inicio: Date | null
+    jornada_fin: Date | null
   }
 
   export type UsuarioMaxAggregateOutputType = {
@@ -1879,6 +1886,11 @@ export namespace Prisma {
     password_cambio: Date | null
     latitud: Decimal | null
     longitud: Decimal | null
+    ubicacion_en: Date | null
+    ubicacion_precision: Decimal | null
+    ubicacion_simulada: boolean | null
+    jornada_inicio: Date | null
+    jornada_fin: Date | null
   }
 
   export type UsuarioCountAggregateOutputType = {
@@ -1905,6 +1917,11 @@ export namespace Prisma {
     password_cambio: number
     latitud: number
     longitud: number
+    ubicacion_en: number
+    ubicacion_precision: number
+    ubicacion_simulada: number
+    jornada_inicio: number
+    jornada_fin: number
     _all: number
   }
 
@@ -1914,6 +1931,7 @@ export namespace Prisma {
     intentos_fallidos?: true
     latitud?: true
     longitud?: true
+    ubicacion_precision?: true
   }
 
   export type UsuarioSumAggregateInputType = {
@@ -1921,6 +1939,7 @@ export namespace Prisma {
     intentos_fallidos?: true
     latitud?: true
     longitud?: true
+    ubicacion_precision?: true
   }
 
   export type UsuarioMinAggregateInputType = {
@@ -1947,6 +1966,11 @@ export namespace Prisma {
     password_cambio?: true
     latitud?: true
     longitud?: true
+    ubicacion_en?: true
+    ubicacion_precision?: true
+    ubicacion_simulada?: true
+    jornada_inicio?: true
+    jornada_fin?: true
   }
 
   export type UsuarioMaxAggregateInputType = {
@@ -1973,6 +1997,11 @@ export namespace Prisma {
     password_cambio?: true
     latitud?: true
     longitud?: true
+    ubicacion_en?: true
+    ubicacion_precision?: true
+    ubicacion_simulada?: true
+    jornada_inicio?: true
+    jornada_fin?: true
   }
 
   export type UsuarioCountAggregateInputType = {
@@ -1999,6 +2028,11 @@ export namespace Prisma {
     password_cambio?: true
     latitud?: true
     longitud?: true
+    ubicacion_en?: true
+    ubicacion_precision?: true
+    ubicacion_simulada?: true
+    jornada_inicio?: true
+    jornada_fin?: true
     _all?: true
   }
 
@@ -2112,6 +2146,11 @@ export namespace Prisma {
     password_cambio: Date
     latitud: Decimal | null
     longitud: Decimal | null
+    ubicacion_en: Date | null
+    ubicacion_precision: Decimal | null
+    ubicacion_simulada: boolean
+    jornada_inicio: Date | null
+    jornada_fin: Date | null
     _count: UsuarioCountAggregateOutputType | null
     _avg: UsuarioAvgAggregateOutputType | null
     _sum: UsuarioSumAggregateOutputType | null
@@ -2157,6 +2196,11 @@ export namespace Prisma {
     password_cambio?: boolean
     latitud?: boolean
     longitud?: boolean
+    ubicacion_en?: boolean
+    ubicacion_precision?: boolean
+    ubicacion_simulada?: boolean
+    jornada_inicio?: boolean
+    jornada_fin?: boolean
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
     dispositivos?: boolean | Usuario$dispositivosArgs<ExtArgs>
@@ -2190,9 +2234,14 @@ export namespace Prisma {
     password_cambio?: boolean
     latitud?: boolean
     longitud?: boolean
+    ubicacion_en?: boolean
+    ubicacion_precision?: boolean
+    ubicacion_simulada?: boolean
+    jornada_inicio?: boolean
+    jornada_fin?: boolean
   }
 
-  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud", ExtArgs["result"]["usuario"]>
+  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud" | "ubicacion_en" | "ubicacion_precision" | "ubicacion_simulada" | "jornada_inicio" | "jornada_fin", ExtArgs["result"]["usuario"]>
   export type UsuarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
@@ -2233,6 +2282,11 @@ export namespace Prisma {
       password_cambio: Date
       latitud: Prisma.Decimal | null
       longitud: Prisma.Decimal | null
+      ubicacion_en: Date | null
+      ubicacion_precision: Prisma.Decimal | null
+      ubicacion_simulada: boolean
+      jornada_inicio: Date | null
+      jornada_fin: Date | null
     }, ExtArgs["result"]["usuario"]>
     composites: {}
   }
@@ -2629,6 +2683,11 @@ export namespace Prisma {
     readonly password_cambio: FieldRef<"Usuario", 'DateTime'>
     readonly latitud: FieldRef<"Usuario", 'Decimal'>
     readonly longitud: FieldRef<"Usuario", 'Decimal'>
+    readonly ubicacion_en: FieldRef<"Usuario", 'DateTime'>
+    readonly ubicacion_precision: FieldRef<"Usuario", 'Decimal'>
+    readonly ubicacion_simulada: FieldRef<"Usuario", 'Boolean'>
+    readonly jornada_inicio: FieldRef<"Usuario", 'DateTime'>
+    readonly jornada_fin: FieldRef<"Usuario", 'DateTime'>
   }
     
 
@@ -3123,6 +3182,7 @@ export namespace Prisma {
     latitud: Decimal | null
     longitud: Decimal | null
     precision_metros: Decimal | null
+    simulada: boolean | null
     registrado_en: Date | null
   }
 
@@ -3132,6 +3192,7 @@ export namespace Prisma {
     latitud: Decimal | null
     longitud: Decimal | null
     precision_metros: Decimal | null
+    simulada: boolean | null
     registrado_en: Date | null
   }
 
@@ -3141,6 +3202,7 @@ export namespace Prisma {
     latitud: number
     longitud: number
     precision_metros: number
+    simulada: number
     registrado_en: number
     _all: number
   }
@@ -3166,6 +3228,7 @@ export namespace Prisma {
     latitud?: true
     longitud?: true
     precision_metros?: true
+    simulada?: true
     registrado_en?: true
   }
 
@@ -3175,6 +3238,7 @@ export namespace Prisma {
     latitud?: true
     longitud?: true
     precision_metros?: true
+    simulada?: true
     registrado_en?: true
   }
 
@@ -3184,6 +3248,7 @@ export namespace Prisma {
     latitud?: true
     longitud?: true
     precision_metros?: true
+    simulada?: true
     registrado_en?: true
     _all?: true
   }
@@ -3280,6 +3345,7 @@ export namespace Prisma {
     latitud: Decimal
     longitud: Decimal
     precision_metros: Decimal | null
+    simulada: boolean
     registrado_en: Date
     _count: TrackingUbicacionCountAggregateOutputType | null
     _avg: TrackingUbicacionAvgAggregateOutputType | null
@@ -3308,6 +3374,7 @@ export namespace Prisma {
     latitud?: boolean
     longitud?: boolean
     precision_metros?: boolean
+    simulada?: boolean
     registrado_en?: boolean
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["trackingUbicacion"]>
@@ -3320,10 +3387,11 @@ export namespace Prisma {
     latitud?: boolean
     longitud?: boolean
     precision_metros?: boolean
+    simulada?: boolean
     registrado_en?: boolean
   }
 
-  export type TrackingUbicacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_tracking" | "id_usuario" | "latitud" | "longitud" | "precision_metros" | "registrado_en", ExtArgs["result"]["trackingUbicacion"]>
+  export type TrackingUbicacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_tracking" | "id_usuario" | "latitud" | "longitud" | "precision_metros" | "simulada" | "registrado_en", ExtArgs["result"]["trackingUbicacion"]>
   export type TrackingUbicacionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }
@@ -3339,6 +3407,7 @@ export namespace Prisma {
       latitud: Prisma.Decimal
       longitud: Prisma.Decimal
       precision_metros: Prisma.Decimal | null
+      simulada: boolean
       registrado_en: Date
     }, ExtArgs["result"]["trackingUbicacion"]>
     composites: {}
@@ -3715,6 +3784,7 @@ export namespace Prisma {
     readonly latitud: FieldRef<"TrackingUbicacion", 'Decimal'>
     readonly longitud: FieldRef<"TrackingUbicacion", 'Decimal'>
     readonly precision_metros: FieldRef<"TrackingUbicacion", 'Decimal'>
+    readonly simulada: FieldRef<"TrackingUbicacion", 'Boolean'>
     readonly registrado_en: FieldRef<"TrackingUbicacion", 'DateTime'>
   }
     
@@ -12901,7 +12971,12 @@ export namespace Prisma {
     ultimo_acceso: 'ultimo_acceso',
     password_cambio: 'password_cambio',
     latitud: 'latitud',
-    longitud: 'longitud'
+    longitud: 'longitud',
+    ubicacion_en: 'ubicacion_en',
+    ubicacion_precision: 'ubicacion_precision',
+    ubicacion_simulada: 'ubicacion_simulada',
+    jornada_inicio: 'jornada_inicio',
+    jornada_fin: 'jornada_fin'
   };
 
   export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
@@ -12913,6 +12988,7 @@ export namespace Prisma {
     latitud: 'latitud',
     longitud: 'longitud',
     precision_metros: 'precision_metros',
+    simulada: 'simulada',
     registrado_en: 'registrado_en'
   };
 
@@ -13400,6 +13476,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFilter<"Usuario"> | Date | string
     latitud?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: DateTimeNullableFilter<"Usuario"> | Date | string | null
+    ubicacion_precision?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFilter<"Usuario"> | boolean
+    jornada_inicio?: DateTimeNullableFilter<"Usuario"> | Date | string | null
+    jornada_fin?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     dispositivos?: DispositivoAutorizadoListRelationFilter
@@ -13430,6 +13511,11 @@ export namespace Prisma {
     password_cambio?: SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
+    ubicacion_en?: SortOrderInput | SortOrder
+    ubicacion_precision?: SortOrderInput | SortOrder
+    ubicacion_simulada?: SortOrder
+    jornada_inicio?: SortOrderInput | SortOrder
+    jornada_fin?: SortOrderInput | SortOrder
     asignaciones?: AsignacionAuditoriaOrderByRelationAggregateInput
     visitas?: VisitaAuditoriaOrderByRelationAggregateInput
     dispositivos?: DispositivoAutorizadoOrderByRelationAggregateInput
@@ -13464,6 +13550,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFilter<"Usuario"> | Date | string
     latitud?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: DateTimeNullableFilter<"Usuario"> | Date | string | null
+    ubicacion_precision?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFilter<"Usuario"> | boolean
+    jornada_inicio?: DateTimeNullableFilter<"Usuario"> | Date | string | null
+    jornada_fin?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     dispositivos?: DispositivoAutorizadoListRelationFilter
@@ -13494,6 +13585,11 @@ export namespace Prisma {
     password_cambio?: SortOrder
     latitud?: SortOrderInput | SortOrder
     longitud?: SortOrderInput | SortOrder
+    ubicacion_en?: SortOrderInput | SortOrder
+    ubicacion_precision?: SortOrderInput | SortOrder
+    ubicacion_simulada?: SortOrder
+    jornada_inicio?: SortOrderInput | SortOrder
+    jornada_fin?: SortOrderInput | SortOrder
     _count?: UsuarioCountOrderByAggregateInput
     _avg?: UsuarioAvgOrderByAggregateInput
     _max?: UsuarioMaxOrderByAggregateInput
@@ -13528,6 +13624,11 @@ export namespace Prisma {
     password_cambio?: DateTimeWithAggregatesFilter<"Usuario"> | Date | string
     latitud?: DecimalNullableWithAggregatesFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
     longitud?: DecimalNullableWithAggregatesFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
+    ubicacion_precision?: DecimalNullableWithAggregatesFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolWithAggregatesFilter<"Usuario"> | boolean
+    jornada_inicio?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
+    jornada_fin?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
   }
 
   export type TrackingUbicacionWhereInput = {
@@ -13539,6 +13640,7 @@ export namespace Prisma {
     latitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     precision_metros?: DecimalNullableFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFilter<"TrackingUbicacion"> | boolean
     registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
   }
@@ -13549,6 +13651,7 @@ export namespace Prisma {
     latitud?: SortOrder
     longitud?: SortOrder
     precision_metros?: SortOrderInput | SortOrder
+    simulada?: SortOrder
     registrado_en?: SortOrder
     usuario?: UsuarioOrderByWithRelationInput
     _relevance?: TrackingUbicacionOrderByRelevanceInput
@@ -13563,6 +13666,7 @@ export namespace Prisma {
     latitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     precision_metros?: DecimalNullableFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFilter<"TrackingUbicacion"> | boolean
     registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
   }, "id_tracking">
@@ -13573,6 +13677,7 @@ export namespace Prisma {
     latitud?: SortOrder
     longitud?: SortOrder
     precision_metros?: SortOrderInput | SortOrder
+    simulada?: SortOrder
     registrado_en?: SortOrder
     _count?: TrackingUbicacionCountOrderByAggregateInput
     _avg?: TrackingUbicacionAvgOrderByAggregateInput
@@ -13590,6 +13695,7 @@ export namespace Prisma {
     latitud?: DecimalWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     longitud?: DecimalWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     precision_metros?: DecimalNullableWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolWithAggregatesFilter<"TrackingUbicacion"> | boolean
     registrado_en?: DateTimeWithAggregatesFilter<"TrackingUbicacion"> | Date | string
   }
 
@@ -14559,6 +14665,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
@@ -14589,6 +14700,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
@@ -14619,6 +14735,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
@@ -14649,6 +14770,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -14679,6 +14805,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
   }
 
   export type UsuarioUpdateManyMutationInput = {
@@ -14705,6 +14836,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UsuarioUncheckedUpdateManyInput = {
@@ -14731,6 +14867,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type TrackingUbicacionCreateInput = {
@@ -14738,6 +14879,7 @@ export namespace Prisma {
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
     registrado_en?: Date | string
     usuario: UsuarioCreateNestedOneWithoutTrackingsInput
   }
@@ -14748,6 +14890,7 @@ export namespace Prisma {
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
     registrado_en?: Date | string
   }
 
@@ -14756,6 +14899,7 @@ export namespace Prisma {
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
     usuario?: UsuarioUpdateOneRequiredWithoutTrackingsNestedInput
   }
@@ -14766,6 +14910,7 @@ export namespace Prisma {
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14775,6 +14920,7 @@ export namespace Prisma {
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
     registrado_en?: Date | string
   }
 
@@ -14783,6 +14929,7 @@ export namespace Prisma {
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14792,6 +14939,7 @@ export namespace Prisma {
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -16055,6 +16203,11 @@ export namespace Prisma {
     password_cambio?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    ubicacion_en?: SortOrder
+    ubicacion_precision?: SortOrder
+    ubicacion_simulada?: SortOrder
+    jornada_inicio?: SortOrder
+    jornada_fin?: SortOrder
   }
 
   export type UsuarioAvgOrderByAggregateInput = {
@@ -16062,6 +16215,7 @@ export namespace Prisma {
     intentos_fallidos?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    ubicacion_precision?: SortOrder
   }
 
   export type UsuarioMaxOrderByAggregateInput = {
@@ -16088,6 +16242,11 @@ export namespace Prisma {
     password_cambio?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    ubicacion_en?: SortOrder
+    ubicacion_precision?: SortOrder
+    ubicacion_simulada?: SortOrder
+    jornada_inicio?: SortOrder
+    jornada_fin?: SortOrder
   }
 
   export type UsuarioMinOrderByAggregateInput = {
@@ -16114,6 +16273,11 @@ export namespace Prisma {
     password_cambio?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    ubicacion_en?: SortOrder
+    ubicacion_precision?: SortOrder
+    ubicacion_simulada?: SortOrder
+    jornada_inicio?: SortOrder
+    jornada_fin?: SortOrder
   }
 
   export type UsuarioSumOrderByAggregateInput = {
@@ -16121,6 +16285,7 @@ export namespace Prisma {
     intentos_fallidos?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+    ubicacion_precision?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -16266,6 +16431,7 @@ export namespace Prisma {
     latitud?: SortOrder
     longitud?: SortOrder
     precision_metros?: SortOrder
+    simulada?: SortOrder
     registrado_en?: SortOrder
   }
 
@@ -16282,6 +16448,7 @@ export namespace Prisma {
     latitud?: SortOrder
     longitud?: SortOrder
     precision_metros?: SortOrder
+    simulada?: SortOrder
     registrado_en?: SortOrder
   }
 
@@ -16291,6 +16458,7 @@ export namespace Prisma {
     latitud?: SortOrder
     longitud?: SortOrder
     precision_metros?: SortOrder
+    simulada?: SortOrder
     registrado_en?: SortOrder
   }
 
@@ -18170,6 +18338,7 @@ export namespace Prisma {
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
     registrado_en?: Date | string
   }
 
@@ -18178,6 +18347,7 @@ export namespace Prisma {
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
     registrado_en?: Date | string
   }
 
@@ -18332,6 +18502,7 @@ export namespace Prisma {
     latitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     precision_metros?: DecimalNullableFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFilter<"TrackingUbicacion"> | boolean
     registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
   }
 
@@ -18359,6 +18530,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
@@ -18388,6 +18564,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
@@ -18433,6 +18614,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
@@ -18462,6 +18648,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -18491,6 +18682,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
@@ -18520,6 +18716,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
@@ -18565,6 +18766,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
@@ -18594,6 +18800,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -19060,6 +19271,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
@@ -19089,6 +19305,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
@@ -19216,6 +19437,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
@@ -19245,6 +19471,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -19350,6 +19581,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
@@ -19379,6 +19615,11 @@ export namespace Prisma {
     password_cambio?: Date | string
     latitud?: Decimal | DecimalJsLike | number | string | null
     longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
@@ -19538,6 +19779,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
@@ -19567,6 +19813,11 @@ export namespace Prisma {
     password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
     latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -19826,6 +20077,7 @@ export namespace Prisma {
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
     registrado_en?: Date | string
   }
 
@@ -20002,6 +20254,7 @@ export namespace Prisma {
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -20010,6 +20263,7 @@ export namespace Prisma {
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -20018,6 +20272,7 @@ export namespace Prisma {
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

@@ -285,13 +285,24 @@ async function actualizarUbicacionEnVivo(usuarioId, payload) {
     throw Object.assign(new Error('Las coordenadas recibidas no son válidas.'), { statusCode: 400 });
   }
   const precision = payload.precision != null ? Number(payload.precision) : null;
+  const simulada = payload.simulada === true;
+  const ahora = new Date();
   const [usuario] = await prisma.$transaction([
-    prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } }),
+    prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud, ubicacion_en: ahora, ubicacion_precision: precision, ubicacion_simulada: simulada }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } }),
     // Se conserva cada punto (no solo el último) para poder reconstruir la ruta recorrida
     // en el mapa de supervisión, tal como pide el flujo (Fase 2/Fase 6).
-    prisma.trackingUbicacion.create({ data: { id_usuario: usuarioId, latitud, longitud, precision_metros: precision } }),
+    prisma.trackingUbicacion.create({ data: { id_usuario: usuarioId, latitud, longitud, precision_metros: precision, simulada, registrado_en: ahora } }),
   ]);
-  return serialize({ ...usuario, precision, fecha: new Date() });
+  return serialize({ ...usuario, precision, simulada, actualizado_en: ahora, fecha: ahora });
 }
 
-export default { presignEvidencia, recibirEvidencia, crearVisita, listar, obtener, obtenerArchivoEvidencia, actualizarUbicacionEnVivo };
+// Jornada de campo: INICIAR / TERMINAR. Queda en el usuario y en el registro de auditoría (cada llamada a la API se registra).
+async function registrarJornada(usuarioId, accion) {
+  const ahora = new Date();
+  const data = accion === 'INICIAR' ? { jornada_inicio: ahora, jornada_fin: null } : { jornada_fin: ahora };
+  const u = await prisma.usuario.update({ where: { id_usuario: usuarioId }, data, select: { id_usuario: true, username: true, nombres: true, apellidos: true, jornada_inicio: true, jornada_fin: true } });
+  const enJornada = Boolean(u.jornada_inicio) && (!u.jornada_fin || u.jornada_fin < u.jornada_inicio);
+  return serialize({ id_usuario: u.id_usuario, username: u.username, nombres: u.nombres, apellidos: u.apellidos, en_jornada: enJornada, jornada_inicio: u.jornada_inicio, jornada_fin: u.jornada_fin });
+}
+
+export default { presignEvidencia, recibirEvidencia, crearVisita, listar, obtener, obtenerArchivoEvidencia, actualizarUbicacionEnVivo, registrarJornada };

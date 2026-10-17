@@ -49,6 +49,15 @@ model Usuario {
   password_cambio   DateTime  @default(now())
   latitud           Decimal?  @db.Decimal(10, 8) // última ubicación conocida en campo (auditor/supervisor)
   longitud          Decimal?  @db.Decimal(11, 8)
+  // Cuándo llegó esa última posición, con qué precisión y si venía de un GPS simulado: sin la hora no se puede
+  // distinguir una posición de hace 5 segundos de una de hace 3 días.
+  ubicacion_en        DateTime?
+  ubicacion_precision Decimal?  @db.Decimal(8, 2)
+  ubicacion_simulada  Boolean   @default(false)
+  // Jornada de campo: el auditor la inicia y la termina desde la app; solo durante ella la app comparte su ubicación
+  // aunque la pantalla esté apagada. En jornada = jornada_inicio con jornada_fin vacío o anterior al inicio.
+  jornada_inicio      DateTime?
+  jornada_fin         DateTime?
 
   asignaciones AsignacionAuditoria[]
   visitas      VisitaAuditoria[]
@@ -66,6 +75,7 @@ model TrackingUbicacion {
   latitud          Decimal  @db.Decimal(10, 8)
   longitud         Decimal  @db.Decimal(11, 8)
   precision_metros Decimal? @db.Decimal(8, 2)
+  simulada         Boolean  @default(false) // el celular avisó que la posición venía de un GPS simulado
   registrado_en    DateTime @default(now())
 
   usuario Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)

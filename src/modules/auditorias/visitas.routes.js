@@ -5,7 +5,7 @@ import { authMiddleware } from '#modules/auth/auth.middleware.js';
 import { roleMiddleware } from '#core/middlewares/role.middleware.js';
 import { FIELD_ROLES, OPERATIONAL_MANAGERS } from '#core/security/roles.js';
 import { validate } from '#core/middlewares/validate.middleware.js';
-import { idParams, evidenciaParams, visitasListQuery, evidenciaPresignBody, visitaCreateBody, ubicacionBody } from '../../validation/schemas.js';
+import { idParams, evidenciaParams, visitasListQuery, evidenciaPresignBody, visitaCreateBody, ubicacionBody, jornadaBody } from '../../validation/schemas.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -25,5 +25,6 @@ router.post('/evidencias/presign', roleMiddleware(FIELD_ROLES), validate({ body:
 router.put('/evidencias/upload/:key', roleMiddleware(FIELD_ROLES), express.raw({ type: 'image/jpeg', limit: '5mb' }), controller.subirEvidencia);
 router.post('/', roleMiddleware(FIELD_ROLES), validate({ body: visitaCreateBody }), controller.crear);
 router.patch('/ubicacion', roleMiddleware(FIELD_ROLES), validate({ body: ubicacionBody }), controller.ubicacion);
+router.post('/jornada', roleMiddleware(FIELD_ROLES), validate({ body: jornadaBody }), controller.jornada);
 
 export default router;

@@ -34,8 +34,9 @@ async function resetMfa(req, res, next) {
 async function resetDevice(req, res, next) {
   try { await usuariosService.resetDevice(req.params.id); res.json({ message: 'Dispositivo liberado; el próximo inicio de sesión autorizará el nuevo equipo' }); } catch (error) { next(error); }
 }
+// "ahora" es la hora del servidor: el panel mide la antigüedad de cada posición sin depender del reloj de la PC.
 async function ubicacionesActivas(_req, res, next) {
-  try { res.json({ data: await usuariosService.ubicacionesActivas() }); } catch (error) { next(error); }
+  try { res.json({ data: await usuariosService.ubicacionesActivas(), ahora: new Date().toISOString() }); } catch (error) { next(error); }
 }
 async function tracking(req, res, next) {
   try { res.json({ data: await usuariosService.trackingDeUsuario(req.validated.params.id, req.validated.query.fecha) }); } catch (error) { next(error); }

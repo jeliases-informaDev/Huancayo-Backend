@@ -119,7 +119,10 @@ export const ubicacionBody = z.object({
   latitud: z.coerce.number().min(-90).max(90),
   longitud: z.coerce.number().min(-180).max(180),
   precision: z.coerce.number().nonnegative().optional(),
+  simulada: z.boolean().optional(), // la app avisa si el GPS es simulado (Fake GPS); apps anteriores no lo envían
 }).strict();
+
+export const jornadaBody = z.object({ accion: z.enum(['INICIAR', 'TERMINAR']) }).strict();
 
 export const trackingQuery = z.object({
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),

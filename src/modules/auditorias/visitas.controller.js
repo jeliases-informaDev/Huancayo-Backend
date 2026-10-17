@@ -60,8 +60,16 @@ async function ubicacion(req, res, next) {
   } catch (error) { next(error); }
 }
 
+async function jornada(req, res, next) {
+  try {
+    const data = await visitasService.registrarJornada(req.user.id, req.body.accion);
+    notifyRoles(req, 'jornada_actualizada', data);
+    res.json({ data });
+  } catch (error) { next(error); }
+}
+
 function config(_req, res) {
   res.json({ data: { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS } });
 }
 
-export default { presignEvidencia, subirEvidencia, crear, listar, obtener, archivoEvidencia, ubicacion, config };
+export default { presignEvidencia, subirEvidencia, crear, listar, obtener, archivoEvidencia, ubicacion, jornada, config };

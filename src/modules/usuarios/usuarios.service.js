@@ -149,14 +149,22 @@ async function resetDevice(id) {
 // del panel web (Fase 2/Fase 6: "el Auditor de Agencia observa... en tiempo real").
 async function ubicacionesActivas() {
   const usuarios = await prisma.usuario.findMany({
-    where: { estado: 'ACTIVO', rol: { in: FIELD_ROLES }, latitud: { not: null }, longitud: { not: null } },
-    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, latitud: true, longitud: true },
+    where: { estado: 'ACTIVO', rol: { in: FIELD_ROLES }, OR: [{ latitud: { not: null }, longitud: { not: null } }, { jornada_inicio: { not: null } }] },
+    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, latitud: true, longitud: true, ubicacion_en: true, ubicacion_precision: true, ubicacion_simulada: true, jornada_inicio: true, jornada_fin: true },
   });
   return usuarios.map(u => ({
     id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '',
     rol: normalizeRole(u.rol),
     latitud: u.latitud != null ? Number(u.latitud) : null,
     longitud: u.longitud != null ? Number(u.longitud) : null,
+    // Cuándo llegó la posición (null = posiciones anteriores a que se guardara la hora) para que el panel distinga "en vivo" de "sin señal".
+    actualizado_en: u.ubicacion_en ? u.ubicacion_en.toISOString() : null,
+    precision: u.ubicacion_precision != null ? Number(u.ubicacion_precision) : null,
+    simulada: Boolean(u.ubicacion_simulada),
+    // Jornada: el supervisor distingue «terminó su jornada» de «perdió la señal en plena jornada».
+    en_jornada: Boolean(u.jornada_inicio) && (!u.jornada_fin || u.jornada_fin < u.jornada_inicio),
+    jornada_inicio: u.jornada_inicio ? u.jornada_inicio.toISOString() : null,
+    jornada_fin: u.jornada_fin ? u.jornada_fin.toISOString() : null,
   }));
 }
 
@@ -168,11 +176,12 @@ async function trackingDeUsuario(id, fecha) {
   const puntos = await prisma.trackingUbicacion.findMany({
     where: { id_usuario: id, registrado_en: { gte: inicio, lt: fin } },
     orderBy: { registrado_en: 'asc' },
-    select: { latitud: true, longitud: true, precision_metros: true, registrado_en: true },
+    select: { latitud: true, longitud: true, precision_metros: true, simulada: true, registrado_en: true },
   });
   return puntos.map(p => ({
     latitud: Number(p.latitud), longitud: Number(p.longitud),
     precision: p.precision_metros != null ? Number(p.precision_metros) : null,
+    simulada: p.simulada,
     fecha: p.registrado_en,
   }));
 }
