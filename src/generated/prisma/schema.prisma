@@ -109,6 +109,17 @@ model EventoCampo {
   @@map("eventos_campo")
 }
 
+/// Ajustes que un administrador cambia desde el panel (clave/valor). Hoy: autoasignacion (que el auditor pueda tomar casos por su cuenta).
+/// Si una clave no existe se usa el valor por defecto de la configuración del servidor.
+model ConfiguracionSistema {
+  clave           String   @id @db.VarChar(60)
+  valor           String   @db.VarChar(200)
+  actualizado_por String?  @db.VarChar(36)
+  actualizado_en  DateTime @default(now()) @updatedAt
+
+  @@map("configuracion_sistema")
+}
+
 /// Tabla física: dispositivos_autorizados — vincula un usuario a los dispositivos desde los que ha iniciado sesión
 model DispositivoAutorizado {
   id_dispositivo     String    @id @default(uuid()) @db.VarChar(36)

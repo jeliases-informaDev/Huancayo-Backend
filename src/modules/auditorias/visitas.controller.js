@@ -1,5 +1,6 @@
 import visitasService from './visitas.service.js';
 import { env } from '#core/config/env.js';
+import { autoasignacionPermitida } from '#modules/sistema/configuracion.service.js';
 
 function notifyRoles(req, event, data) {
   const io = req.app.get('io');
@@ -69,8 +70,8 @@ async function jornada(req, res, next) {
   } catch (error) { next(error); }
 }
 
-function config(_req, res) {
-  res.json({ data: { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS, autoasignacion: env.PERMITIR_AUTOASIGNACION === 'true' } });
+async function config(_req, res, next) {
+  try { res.json({ data: { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS, autoasignacion: await autoasignacionPermitida() } }); } catch (error) { next(error); }
 }
 
 export default { presignEvidencia, subirEvidencia, crear, listar, obtener, archivoEvidencia, ubicacion, jornada, config };

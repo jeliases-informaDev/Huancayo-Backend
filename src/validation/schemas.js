@@ -129,6 +129,8 @@ export const ubicacionBody = z.object({
 
 export const jornadaBody = z.object({ accion: z.enum(['INICIAR', 'TERMINAR']) }).strict();
 
+export const autoasignacionBody = z.object({ activa: z.boolean() }).strict();
+
 export const trackingQuery = z.object({
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 }).strict();

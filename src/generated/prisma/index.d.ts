@@ -31,6 +31,12 @@ export type TrackingUbicacion = $Result.DefaultSelection<Prisma.$TrackingUbicaci
  */
 export type EventoCampo = $Result.DefaultSelection<Prisma.$EventoCampoPayload>
 /**
+ * Model ConfiguracionSistema
+ * Ajustes que un administrador cambia desde el panel (clave/valor). Hoy: autoasignacion (que el auditor pueda tomar casos por su cuenta).
+ * Si una clave no existe se usa el valor por defecto de la configuración del servidor.
+ */
+export type ConfiguracionSistema = $Result.DefaultSelection<Prisma.$ConfiguracionSistemaPayload>
+/**
  * Model DispositivoAutorizado
  * Tabla física: dispositivos_autorizados — vincula un usuario a los dispositivos desde los que ha iniciado sesión
  */
@@ -253,6 +259,16 @@ export class PrismaClient<
     * ```
     */
   get eventoCampo(): Prisma.EventoCampoDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.configuracionSistema`: Exposes CRUD operations for the **ConfiguracionSistema** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ConfiguracionSistemas
+    * const configuracionSistemas = await prisma.configuracionSistema.findMany()
+    * ```
+    */
+  get configuracionSistema(): Prisma.ConfiguracionSistemaDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.dispositivoAutorizado`: Exposes CRUD operations for the **DispositivoAutorizado** model.
@@ -783,6 +799,7 @@ export namespace Prisma {
     Usuario: 'Usuario',
     TrackingUbicacion: 'TrackingUbicacion',
     EventoCampo: 'EventoCampo',
+    ConfiguracionSistema: 'ConfiguracionSistema',
     DispositivoAutorizado: 'DispositivoAutorizado',
     Expediente: 'Expediente',
     ExpedienteCambio: 'ExpedienteCambio',
@@ -806,7 +823,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "usuario" | "trackingUbicacion" | "eventoCampo" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva"
+      modelProps: "usuario" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1005,6 +1022,72 @@ export namespace Prisma {
           count: {
             args: Prisma.EventoCampoCountArgs<ExtArgs>
             result: $Utils.Optional<EventoCampoCountAggregateOutputType> | number
+          }
+        }
+      }
+      ConfiguracionSistema: {
+        payload: Prisma.$ConfiguracionSistemaPayload<ExtArgs>
+        fields: Prisma.ConfiguracionSistemaFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ConfiguracionSistemaFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionSistemaPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ConfiguracionSistemaFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionSistemaPayload>
+          }
+          findFirst: {
+            args: Prisma.ConfiguracionSistemaFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionSistemaPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ConfiguracionSistemaFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionSistemaPayload>
+          }
+          findMany: {
+            args: Prisma.ConfiguracionSistemaFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionSistemaPayload>[]
+          }
+          create: {
+            args: Prisma.ConfiguracionSistemaCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionSistemaPayload>
+          }
+          createMany: {
+            args: Prisma.ConfiguracionSistemaCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ConfiguracionSistemaDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionSistemaPayload>
+          }
+          update: {
+            args: Prisma.ConfiguracionSistemaUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionSistemaPayload>
+          }
+          deleteMany: {
+            args: Prisma.ConfiguracionSistemaDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ConfiguracionSistemaUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ConfiguracionSistemaUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ConfiguracionSistemaPayload>
+          }
+          aggregate: {
+            args: Prisma.ConfiguracionSistemaAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateConfiguracionSistema>
+          }
+          groupBy: {
+            args: Prisma.ConfiguracionSistemaGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ConfiguracionSistemaGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ConfiguracionSistemaCountArgs<ExtArgs>
+            result: $Utils.Optional<ConfiguracionSistemaCountAggregateOutputType> | number
           }
         }
       }
@@ -1662,6 +1745,7 @@ export namespace Prisma {
     usuario?: UsuarioOmit
     trackingUbicacion?: TrackingUbicacionOmit
     eventoCampo?: EventoCampoOmit
+    configuracionSistema?: ConfiguracionSistemaOmit
     dispositivoAutorizado?: DispositivoAutorizadoOmit
     expediente?: ExpedienteOmit
     expedienteCambio?: ExpedienteCambioOmit
@@ -5337,6 +5421,882 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: EventoCampoInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ConfiguracionSistema
+   */
+
+  export type AggregateConfiguracionSistema = {
+    _count: ConfiguracionSistemaCountAggregateOutputType | null
+    _min: ConfiguracionSistemaMinAggregateOutputType | null
+    _max: ConfiguracionSistemaMaxAggregateOutputType | null
+  }
+
+  export type ConfiguracionSistemaMinAggregateOutputType = {
+    clave: string | null
+    valor: string | null
+    actualizado_por: string | null
+    actualizado_en: Date | null
+  }
+
+  export type ConfiguracionSistemaMaxAggregateOutputType = {
+    clave: string | null
+    valor: string | null
+    actualizado_por: string | null
+    actualizado_en: Date | null
+  }
+
+  export type ConfiguracionSistemaCountAggregateOutputType = {
+    clave: number
+    valor: number
+    actualizado_por: number
+    actualizado_en: number
+    _all: number
+  }
+
+
+  export type ConfiguracionSistemaMinAggregateInputType = {
+    clave?: true
+    valor?: true
+    actualizado_por?: true
+    actualizado_en?: true
+  }
+
+  export type ConfiguracionSistemaMaxAggregateInputType = {
+    clave?: true
+    valor?: true
+    actualizado_por?: true
+    actualizado_en?: true
+  }
+
+  export type ConfiguracionSistemaCountAggregateInputType = {
+    clave?: true
+    valor?: true
+    actualizado_por?: true
+    actualizado_en?: true
+    _all?: true
+  }
+
+  export type ConfiguracionSistemaAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ConfiguracionSistema to aggregate.
+     */
+    where?: ConfiguracionSistemaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfiguracionSistemas to fetch.
+     */
+    orderBy?: ConfiguracionSistemaOrderByWithRelationInput | ConfiguracionSistemaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ConfiguracionSistemaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfiguracionSistemas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfiguracionSistemas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ConfiguracionSistemas
+    **/
+    _count?: true | ConfiguracionSistemaCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ConfiguracionSistemaMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ConfiguracionSistemaMaxAggregateInputType
+  }
+
+  export type GetConfiguracionSistemaAggregateType<T extends ConfiguracionSistemaAggregateArgs> = {
+        [P in keyof T & keyof AggregateConfiguracionSistema]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateConfiguracionSistema[P]>
+      : GetScalarType<T[P], AggregateConfiguracionSistema[P]>
+  }
+
+
+
+
+  export type ConfiguracionSistemaGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ConfiguracionSistemaWhereInput
+    orderBy?: ConfiguracionSistemaOrderByWithAggregationInput | ConfiguracionSistemaOrderByWithAggregationInput[]
+    by: ConfiguracionSistemaScalarFieldEnum[] | ConfiguracionSistemaScalarFieldEnum
+    having?: ConfiguracionSistemaScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ConfiguracionSistemaCountAggregateInputType | true
+    _min?: ConfiguracionSistemaMinAggregateInputType
+    _max?: ConfiguracionSistemaMaxAggregateInputType
+  }
+
+  export type ConfiguracionSistemaGroupByOutputType = {
+    clave: string
+    valor: string
+    actualizado_por: string | null
+    actualizado_en: Date
+    _count: ConfiguracionSistemaCountAggregateOutputType | null
+    _min: ConfiguracionSistemaMinAggregateOutputType | null
+    _max: ConfiguracionSistemaMaxAggregateOutputType | null
+  }
+
+  type GetConfiguracionSistemaGroupByPayload<T extends ConfiguracionSistemaGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ConfiguracionSistemaGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ConfiguracionSistemaGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ConfiguracionSistemaGroupByOutputType[P]>
+            : GetScalarType<T[P], ConfiguracionSistemaGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ConfiguracionSistemaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    clave?: boolean
+    valor?: boolean
+    actualizado_por?: boolean
+    actualizado_en?: boolean
+  }, ExtArgs["result"]["configuracionSistema"]>
+
+
+
+  export type ConfiguracionSistemaSelectScalar = {
+    clave?: boolean
+    valor?: boolean
+    actualizado_por?: boolean
+    actualizado_en?: boolean
+  }
+
+  export type ConfiguracionSistemaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"clave" | "valor" | "actualizado_por" | "actualizado_en", ExtArgs["result"]["configuracionSistema"]>
+
+  export type $ConfiguracionSistemaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ConfiguracionSistema"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      clave: string
+      valor: string
+      actualizado_por: string | null
+      actualizado_en: Date
+    }, ExtArgs["result"]["configuracionSistema"]>
+    composites: {}
+  }
+
+  type ConfiguracionSistemaGetPayload<S extends boolean | null | undefined | ConfiguracionSistemaDefaultArgs> = $Result.GetResult<Prisma.$ConfiguracionSistemaPayload, S>
+
+  type ConfiguracionSistemaCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ConfiguracionSistemaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ConfiguracionSistemaCountAggregateInputType | true
+    }
+
+  export interface ConfiguracionSistemaDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ConfiguracionSistema'], meta: { name: 'ConfiguracionSistema' } }
+    /**
+     * Find zero or one ConfiguracionSistema that matches the filter.
+     * @param {ConfiguracionSistemaFindUniqueArgs} args - Arguments to find a ConfiguracionSistema
+     * @example
+     * // Get one ConfiguracionSistema
+     * const configuracionSistema = await prisma.configuracionSistema.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ConfiguracionSistemaFindUniqueArgs>(args: SelectSubset<T, ConfiguracionSistemaFindUniqueArgs<ExtArgs>>): Prisma__ConfiguracionSistemaClient<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ConfiguracionSistema that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ConfiguracionSistemaFindUniqueOrThrowArgs} args - Arguments to find a ConfiguracionSistema
+     * @example
+     * // Get one ConfiguracionSistema
+     * const configuracionSistema = await prisma.configuracionSistema.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ConfiguracionSistemaFindUniqueOrThrowArgs>(args: SelectSubset<T, ConfiguracionSistemaFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ConfiguracionSistemaClient<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ConfiguracionSistema that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionSistemaFindFirstArgs} args - Arguments to find a ConfiguracionSistema
+     * @example
+     * // Get one ConfiguracionSistema
+     * const configuracionSistema = await prisma.configuracionSistema.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ConfiguracionSistemaFindFirstArgs>(args?: SelectSubset<T, ConfiguracionSistemaFindFirstArgs<ExtArgs>>): Prisma__ConfiguracionSistemaClient<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ConfiguracionSistema that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionSistemaFindFirstOrThrowArgs} args - Arguments to find a ConfiguracionSistema
+     * @example
+     * // Get one ConfiguracionSistema
+     * const configuracionSistema = await prisma.configuracionSistema.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ConfiguracionSistemaFindFirstOrThrowArgs>(args?: SelectSubset<T, ConfiguracionSistemaFindFirstOrThrowArgs<ExtArgs>>): Prisma__ConfiguracionSistemaClient<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ConfiguracionSistemas that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionSistemaFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ConfiguracionSistemas
+     * const configuracionSistemas = await prisma.configuracionSistema.findMany()
+     * 
+     * // Get first 10 ConfiguracionSistemas
+     * const configuracionSistemas = await prisma.configuracionSistema.findMany({ take: 10 })
+     * 
+     * // Only select the `clave`
+     * const configuracionSistemaWithClaveOnly = await prisma.configuracionSistema.findMany({ select: { clave: true } })
+     * 
+     */
+    findMany<T extends ConfiguracionSistemaFindManyArgs>(args?: SelectSubset<T, ConfiguracionSistemaFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ConfiguracionSistema.
+     * @param {ConfiguracionSistemaCreateArgs} args - Arguments to create a ConfiguracionSistema.
+     * @example
+     * // Create one ConfiguracionSistema
+     * const ConfiguracionSistema = await prisma.configuracionSistema.create({
+     *   data: {
+     *     // ... data to create a ConfiguracionSistema
+     *   }
+     * })
+     * 
+     */
+    create<T extends ConfiguracionSistemaCreateArgs>(args: SelectSubset<T, ConfiguracionSistemaCreateArgs<ExtArgs>>): Prisma__ConfiguracionSistemaClient<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ConfiguracionSistemas.
+     * @param {ConfiguracionSistemaCreateManyArgs} args - Arguments to create many ConfiguracionSistemas.
+     * @example
+     * // Create many ConfiguracionSistemas
+     * const configuracionSistema = await prisma.configuracionSistema.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ConfiguracionSistemaCreateManyArgs>(args?: SelectSubset<T, ConfiguracionSistemaCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ConfiguracionSistema.
+     * @param {ConfiguracionSistemaDeleteArgs} args - Arguments to delete one ConfiguracionSistema.
+     * @example
+     * // Delete one ConfiguracionSistema
+     * const ConfiguracionSistema = await prisma.configuracionSistema.delete({
+     *   where: {
+     *     // ... filter to delete one ConfiguracionSistema
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ConfiguracionSistemaDeleteArgs>(args: SelectSubset<T, ConfiguracionSistemaDeleteArgs<ExtArgs>>): Prisma__ConfiguracionSistemaClient<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ConfiguracionSistema.
+     * @param {ConfiguracionSistemaUpdateArgs} args - Arguments to update one ConfiguracionSistema.
+     * @example
+     * // Update one ConfiguracionSistema
+     * const configuracionSistema = await prisma.configuracionSistema.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ConfiguracionSistemaUpdateArgs>(args: SelectSubset<T, ConfiguracionSistemaUpdateArgs<ExtArgs>>): Prisma__ConfiguracionSistemaClient<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ConfiguracionSistemas.
+     * @param {ConfiguracionSistemaDeleteManyArgs} args - Arguments to filter ConfiguracionSistemas to delete.
+     * @example
+     * // Delete a few ConfiguracionSistemas
+     * const { count } = await prisma.configuracionSistema.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ConfiguracionSistemaDeleteManyArgs>(args?: SelectSubset<T, ConfiguracionSistemaDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ConfiguracionSistemas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionSistemaUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ConfiguracionSistemas
+     * const configuracionSistema = await prisma.configuracionSistema.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ConfiguracionSistemaUpdateManyArgs>(args: SelectSubset<T, ConfiguracionSistemaUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ConfiguracionSistema.
+     * @param {ConfiguracionSistemaUpsertArgs} args - Arguments to update or create a ConfiguracionSistema.
+     * @example
+     * // Update or create a ConfiguracionSistema
+     * const configuracionSistema = await prisma.configuracionSistema.upsert({
+     *   create: {
+     *     // ... data to create a ConfiguracionSistema
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ConfiguracionSistema we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ConfiguracionSistemaUpsertArgs>(args: SelectSubset<T, ConfiguracionSistemaUpsertArgs<ExtArgs>>): Prisma__ConfiguracionSistemaClient<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ConfiguracionSistemas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionSistemaCountArgs} args - Arguments to filter ConfiguracionSistemas to count.
+     * @example
+     * // Count the number of ConfiguracionSistemas
+     * const count = await prisma.configuracionSistema.count({
+     *   where: {
+     *     // ... the filter for the ConfiguracionSistemas we want to count
+     *   }
+     * })
+    **/
+    count<T extends ConfiguracionSistemaCountArgs>(
+      args?: Subset<T, ConfiguracionSistemaCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ConfiguracionSistemaCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ConfiguracionSistema.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionSistemaAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ConfiguracionSistemaAggregateArgs>(args: Subset<T, ConfiguracionSistemaAggregateArgs>): Prisma.PrismaPromise<GetConfiguracionSistemaAggregateType<T>>
+
+    /**
+     * Group by ConfiguracionSistema.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ConfiguracionSistemaGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ConfiguracionSistemaGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ConfiguracionSistemaGroupByArgs['orderBy'] }
+        : { orderBy?: ConfiguracionSistemaGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ConfiguracionSistemaGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetConfiguracionSistemaGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ConfiguracionSistema model
+   */
+  readonly fields: ConfiguracionSistemaFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ConfiguracionSistema.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ConfiguracionSistemaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ConfiguracionSistema model
+   */
+  interface ConfiguracionSistemaFieldRefs {
+    readonly clave: FieldRef<"ConfiguracionSistema", 'String'>
+    readonly valor: FieldRef<"ConfiguracionSistema", 'String'>
+    readonly actualizado_por: FieldRef<"ConfiguracionSistema", 'String'>
+    readonly actualizado_en: FieldRef<"ConfiguracionSistema", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ConfiguracionSistema findUnique
+   */
+  export type ConfiguracionSistemaFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracionSistema to fetch.
+     */
+    where: ConfiguracionSistemaWhereUniqueInput
+  }
+
+  /**
+   * ConfiguracionSistema findUniqueOrThrow
+   */
+  export type ConfiguracionSistemaFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracionSistema to fetch.
+     */
+    where: ConfiguracionSistemaWhereUniqueInput
+  }
+
+  /**
+   * ConfiguracionSistema findFirst
+   */
+  export type ConfiguracionSistemaFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracionSistema to fetch.
+     */
+    where?: ConfiguracionSistemaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfiguracionSistemas to fetch.
+     */
+    orderBy?: ConfiguracionSistemaOrderByWithRelationInput | ConfiguracionSistemaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ConfiguracionSistemas.
+     */
+    cursor?: ConfiguracionSistemaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfiguracionSistemas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfiguracionSistemas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConfiguracionSistemas.
+     */
+    distinct?: ConfiguracionSistemaScalarFieldEnum | ConfiguracionSistemaScalarFieldEnum[]
+  }
+
+  /**
+   * ConfiguracionSistema findFirstOrThrow
+   */
+  export type ConfiguracionSistemaFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracionSistema to fetch.
+     */
+    where?: ConfiguracionSistemaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfiguracionSistemas to fetch.
+     */
+    orderBy?: ConfiguracionSistemaOrderByWithRelationInput | ConfiguracionSistemaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ConfiguracionSistemas.
+     */
+    cursor?: ConfiguracionSistemaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfiguracionSistemas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfiguracionSistemas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConfiguracionSistemas.
+     */
+    distinct?: ConfiguracionSistemaScalarFieldEnum | ConfiguracionSistemaScalarFieldEnum[]
+  }
+
+  /**
+   * ConfiguracionSistema findMany
+   */
+  export type ConfiguracionSistemaFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
+    /**
+     * Filter, which ConfiguracionSistemas to fetch.
+     */
+    where?: ConfiguracionSistemaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ConfiguracionSistemas to fetch.
+     */
+    orderBy?: ConfiguracionSistemaOrderByWithRelationInput | ConfiguracionSistemaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ConfiguracionSistemas.
+     */
+    cursor?: ConfiguracionSistemaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ConfiguracionSistemas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ConfiguracionSistemas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ConfiguracionSistemas.
+     */
+    distinct?: ConfiguracionSistemaScalarFieldEnum | ConfiguracionSistemaScalarFieldEnum[]
+  }
+
+  /**
+   * ConfiguracionSistema create
+   */
+  export type ConfiguracionSistemaCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ConfiguracionSistema.
+     */
+    data: XOR<ConfiguracionSistemaCreateInput, ConfiguracionSistemaUncheckedCreateInput>
+  }
+
+  /**
+   * ConfiguracionSistema createMany
+   */
+  export type ConfiguracionSistemaCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ConfiguracionSistemas.
+     */
+    data: ConfiguracionSistemaCreateManyInput | ConfiguracionSistemaCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ConfiguracionSistema update
+   */
+  export type ConfiguracionSistemaUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ConfiguracionSistema.
+     */
+    data: XOR<ConfiguracionSistemaUpdateInput, ConfiguracionSistemaUncheckedUpdateInput>
+    /**
+     * Choose, which ConfiguracionSistema to update.
+     */
+    where: ConfiguracionSistemaWhereUniqueInput
+  }
+
+  /**
+   * ConfiguracionSistema updateMany
+   */
+  export type ConfiguracionSistemaUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ConfiguracionSistemas.
+     */
+    data: XOR<ConfiguracionSistemaUpdateManyMutationInput, ConfiguracionSistemaUncheckedUpdateManyInput>
+    /**
+     * Filter which ConfiguracionSistemas to update
+     */
+    where?: ConfiguracionSistemaWhereInput
+    /**
+     * Limit how many ConfiguracionSistemas to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConfiguracionSistema upsert
+   */
+  export type ConfiguracionSistemaUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ConfiguracionSistema to update in case it exists.
+     */
+    where: ConfiguracionSistemaWhereUniqueInput
+    /**
+     * In case the ConfiguracionSistema found by the `where` argument doesn't exist, create a new ConfiguracionSistema with this data.
+     */
+    create: XOR<ConfiguracionSistemaCreateInput, ConfiguracionSistemaUncheckedCreateInput>
+    /**
+     * In case the ConfiguracionSistema was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ConfiguracionSistemaUpdateInput, ConfiguracionSistemaUncheckedUpdateInput>
+  }
+
+  /**
+   * ConfiguracionSistema delete
+   */
+  export type ConfiguracionSistemaDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
+    /**
+     * Filter which ConfiguracionSistema to delete.
+     */
+    where: ConfiguracionSistemaWhereUniqueInput
+  }
+
+  /**
+   * ConfiguracionSistema deleteMany
+   */
+  export type ConfiguracionSistemaDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ConfiguracionSistemas to delete
+     */
+    where?: ConfiguracionSistemaWhereInput
+    /**
+     * Limit how many ConfiguracionSistemas to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ConfiguracionSistema without action
+   */
+  export type ConfiguracionSistemaDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ConfiguracionSistema
+     */
+    select?: ConfiguracionSistemaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ConfiguracionSistema
+     */
+    omit?: ConfiguracionSistemaOmit<ExtArgs> | null
   }
 
 
@@ -14342,6 +15302,16 @@ export namespace Prisma {
   export type EventoCampoScalarFieldEnum = (typeof EventoCampoScalarFieldEnum)[keyof typeof EventoCampoScalarFieldEnum]
 
 
+  export const ConfiguracionSistemaScalarFieldEnum: {
+    clave: 'clave',
+    valor: 'valor',
+    actualizado_por: 'actualizado_por',
+    actualizado_en: 'actualizado_en'
+  };
+
+  export type ConfiguracionSistemaScalarFieldEnum = (typeof ConfiguracionSistemaScalarFieldEnum)[keyof typeof ConfiguracionSistemaScalarFieldEnum]
+
+
   export const DispositivoAutorizadoScalarFieldEnum: {
     id_dispositivo: 'id_dispositivo',
     id_usuario: 'id_usuario',
@@ -14596,6 +15566,15 @@ export namespace Prisma {
   };
 
   export type EventoCampoOrderByRelevanceFieldEnum = (typeof EventoCampoOrderByRelevanceFieldEnum)[keyof typeof EventoCampoOrderByRelevanceFieldEnum]
+
+
+  export const ConfiguracionSistemaOrderByRelevanceFieldEnum: {
+    clave: 'clave',
+    valor: 'valor',
+    actualizado_por: 'actualizado_por'
+  };
+
+  export type ConfiguracionSistemaOrderByRelevanceFieldEnum = (typeof ConfiguracionSistemaOrderByRelevanceFieldEnum)[keyof typeof ConfiguracionSistemaOrderByRelevanceFieldEnum]
 
 
   export const DispositivoAutorizadoOrderByRelevanceFieldEnum: {
@@ -15163,6 +16142,54 @@ export namespace Prisma {
     latitud?: DecimalWithAggregatesFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
     longitud?: DecimalWithAggregatesFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
     registrado_en?: DateTimeWithAggregatesFilter<"EventoCampo"> | Date | string
+  }
+
+  export type ConfiguracionSistemaWhereInput = {
+    AND?: ConfiguracionSistemaWhereInput | ConfiguracionSistemaWhereInput[]
+    OR?: ConfiguracionSistemaWhereInput[]
+    NOT?: ConfiguracionSistemaWhereInput | ConfiguracionSistemaWhereInput[]
+    clave?: StringFilter<"ConfiguracionSistema"> | string
+    valor?: StringFilter<"ConfiguracionSistema"> | string
+    actualizado_por?: StringNullableFilter<"ConfiguracionSistema"> | string | null
+    actualizado_en?: DateTimeFilter<"ConfiguracionSistema"> | Date | string
+  }
+
+  export type ConfiguracionSistemaOrderByWithRelationInput = {
+    clave?: SortOrder
+    valor?: SortOrder
+    actualizado_por?: SortOrderInput | SortOrder
+    actualizado_en?: SortOrder
+    _relevance?: ConfiguracionSistemaOrderByRelevanceInput
+  }
+
+  export type ConfiguracionSistemaWhereUniqueInput = Prisma.AtLeast<{
+    clave?: string
+    AND?: ConfiguracionSistemaWhereInput | ConfiguracionSistemaWhereInput[]
+    OR?: ConfiguracionSistemaWhereInput[]
+    NOT?: ConfiguracionSistemaWhereInput | ConfiguracionSistemaWhereInput[]
+    valor?: StringFilter<"ConfiguracionSistema"> | string
+    actualizado_por?: StringNullableFilter<"ConfiguracionSistema"> | string | null
+    actualizado_en?: DateTimeFilter<"ConfiguracionSistema"> | Date | string
+  }, "clave">
+
+  export type ConfiguracionSistemaOrderByWithAggregationInput = {
+    clave?: SortOrder
+    valor?: SortOrder
+    actualizado_por?: SortOrderInput | SortOrder
+    actualizado_en?: SortOrder
+    _count?: ConfiguracionSistemaCountOrderByAggregateInput
+    _max?: ConfiguracionSistemaMaxOrderByAggregateInput
+    _min?: ConfiguracionSistemaMinOrderByAggregateInput
+  }
+
+  export type ConfiguracionSistemaScalarWhereWithAggregatesInput = {
+    AND?: ConfiguracionSistemaScalarWhereWithAggregatesInput | ConfiguracionSistemaScalarWhereWithAggregatesInput[]
+    OR?: ConfiguracionSistemaScalarWhereWithAggregatesInput[]
+    NOT?: ConfiguracionSistemaScalarWhereWithAggregatesInput | ConfiguracionSistemaScalarWhereWithAggregatesInput[]
+    clave?: StringWithAggregatesFilter<"ConfiguracionSistema"> | string
+    valor?: StringWithAggregatesFilter<"ConfiguracionSistema"> | string
+    actualizado_por?: StringNullableWithAggregatesFilter<"ConfiguracionSistema"> | string | null
+    actualizado_en?: DateTimeWithAggregatesFilter<"ConfiguracionSistema"> | Date | string
   }
 
   export type DispositivoAutorizadoWhereInput = {
@@ -16560,6 +17587,55 @@ export namespace Prisma {
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfiguracionSistemaCreateInput = {
+    clave: string
+    valor: string
+    actualizado_por?: string | null
+    actualizado_en?: Date | string
+  }
+
+  export type ConfiguracionSistemaUncheckedCreateInput = {
+    clave: string
+    valor: string
+    actualizado_por?: string | null
+    actualizado_en?: Date | string
+  }
+
+  export type ConfiguracionSistemaUpdateInput = {
+    clave?: StringFieldUpdateOperationsInput | string
+    valor?: StringFieldUpdateOperationsInput | string
+    actualizado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    actualizado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfiguracionSistemaUncheckedUpdateInput = {
+    clave?: StringFieldUpdateOperationsInput | string
+    valor?: StringFieldUpdateOperationsInput | string
+    actualizado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    actualizado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfiguracionSistemaCreateManyInput = {
+    clave: string
+    valor: string
+    actualizado_por?: string | null
+    actualizado_en?: Date | string
+  }
+
+  export type ConfiguracionSistemaUpdateManyMutationInput = {
+    clave?: StringFieldUpdateOperationsInput | string
+    valor?: StringFieldUpdateOperationsInput | string
+    actualizado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    actualizado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ConfiguracionSistemaUncheckedUpdateManyInput = {
+    clave?: StringFieldUpdateOperationsInput | string
+    valor?: StringFieldUpdateOperationsInput | string
+    actualizado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    actualizado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DispositivoAutorizadoCreateInput = {
@@ -18300,6 +19376,33 @@ export namespace Prisma {
     distancia_m?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
+  }
+
+  export type ConfiguracionSistemaOrderByRelevanceInput = {
+    fields: ConfiguracionSistemaOrderByRelevanceFieldEnum | ConfiguracionSistemaOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ConfiguracionSistemaCountOrderByAggregateInput = {
+    clave?: SortOrder
+    valor?: SortOrder
+    actualizado_por?: SortOrder
+    actualizado_en?: SortOrder
+  }
+
+  export type ConfiguracionSistemaMaxOrderByAggregateInput = {
+    clave?: SortOrder
+    valor?: SortOrder
+    actualizado_por?: SortOrder
+    actualizado_en?: SortOrder
+  }
+
+  export type ConfiguracionSistemaMinOrderByAggregateInput = {
+    clave?: SortOrder
+    valor?: SortOrder
+    actualizado_por?: SortOrder
+    actualizado_en?: SortOrder
   }
 
   export type DispositivoAutorizadoOrderByRelevanceInput = {

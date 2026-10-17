@@ -1,5 +1,5 @@
 import prisma from '#core/config/prisma.js';
-import { env } from '#core/config/env.js';
+import { autoasignacionPermitida } from '#modules/sistema/configuracion.service.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -63,7 +63,7 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId =
 // propio departamento (misma regla geográfica que crear()). Sin departamento
 // configurado, no ve ninguno — evita que se autoasigne fuera de su zona por defecto.
 async function disponiblesParaAuditor(auditorId) {
-  if (env.PERMITIR_AUTOASIGNACION !== 'true') return [];
+  if (!(await autoasignacionPermitida())) return [];
   const auditor = await prisma.usuario.findFirst({ where: { id_usuario: auditorId, rol: 'AUDITOR', estado: 'ACTIVO' } });
   if (!auditor) { const error = new Error('El auditor indicado no existe o está inactivo'); error.statusCode = 400; throw error; }
   if (!auditor.departamento) return [];
@@ -91,7 +91,7 @@ async function disponiblesParaAuditor(auditorId) {
 // UPDATE simplemente afecta 0 filas (el estado ya cambió) y falla limpio con
 // ALREADY_CLAIMED — sin necesidad de locks manuales ni de un semáforo aparte.
 async function autoAsignar(auditorId, idExpediente) {
-  if (env.PERMITIR_AUTOASIGNACION !== 'true') {
+  if (!(await autoasignacionPermitida())) {
     const error = new Error('Tomar casos por cuenta propia está desactivado: tu supervisor te asigna la muestra.');
     error.statusCode = 403; error.code = 'SELF_ASSIGN_DISABLED'; throw error;
   }
@@ -177,7 +177,7 @@ async function resumenPorOrigen() {
   const auditores = [...porAuditor.values()].map((a) => ({ ...a, porcentaje: a.total ? Math.round((a.autoasignadas / a.total) * 100) : 0 })).sort((a, b) => b.autoasignadas - a.autoasignadas || b.total - a.total);
   const total = auditores.reduce((n, a) => n + a.total, 0);
   const autoasignadas = auditores.reduce((n, a) => n + a.autoasignadas, 0);
-  return { autoasignacion_activa: env.PERMITIR_AUTOASIGNACION === 'true', total, autoasignadas, porcentaje: total ? Math.round((autoasignadas / total) * 100) : 0, auditores };
+  return { autoasignacion_activa: await autoasignacionPermitida(), total, autoasignadas, porcentaje: total ? Math.round((autoasignadas / total) * 100) : 0, auditores };
 }
 
 function auditSnapshotAsignacion(a) {

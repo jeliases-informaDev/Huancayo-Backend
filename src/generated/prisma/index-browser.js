@@ -175,6 +175,13 @@ exports.Prisma.EventoCampoScalarFieldEnum = {
   registrado_en: 'registrado_en'
 };
 
+exports.Prisma.ConfiguracionSistemaScalarFieldEnum = {
+  clave: 'clave',
+  valor: 'valor',
+  actualizado_por: 'actualizado_por',
+  actualizado_en: 'actualizado_en'
+};
+
 exports.Prisma.DispositivoAutorizadoScalarFieldEnum = {
   id_dispositivo: 'id_dispositivo',
   id_usuario: 'id_usuario',
@@ -386,6 +393,12 @@ exports.Prisma.EventoCampoOrderByRelevanceFieldEnum = {
   tipo: 'tipo'
 };
 
+exports.Prisma.ConfiguracionSistemaOrderByRelevanceFieldEnum = {
+  clave: 'clave',
+  valor: 'valor',
+  actualizado_por: 'actualizado_por'
+};
+
 exports.Prisma.DispositivoAutorizadoOrderByRelevanceFieldEnum = {
   id_dispositivo: 'id_dispositivo',
   id_usuario: 'id_usuario',
@@ -509,6 +522,7 @@ exports.Prisma.ModelName = {
   Usuario: 'Usuario',
   TrackingUbicacion: 'TrackingUbicacion',
   EventoCampo: 'EventoCampo',
+  ConfiguracionSistema: 'ConfiguracionSistema',
   DispositivoAutorizado: 'DispositivoAutorizado',
   Expediente: 'Expediente',
   ExpedienteCambio: 'ExpedienteCambio',
