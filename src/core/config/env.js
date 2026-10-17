@@ -61,7 +61,7 @@ const schema = z.object({
   // como valor por defecto para no tener que configurarlo a mano tras cada deploy.
   EVIDENCIAS_BASE_URL: z.string().default(process.env.RENDER_EXTERNAL_URL || 'http://localhost:4100'),
   // Anti-fraude: radio máximo (metros) entre el domicilio del expediente y el punto de la visita.
-  GEOFENCE_RADIO_METROS: z.coerce.number().int().min(10).max(50000).default(300),
+  GEOFENCE_RADIO_METROS: z.coerce.number().int().min(10).max(50000).default(100),
   GEOFENCE_PRECISION_MAXIMA_METROS: z.coerce.number().int().min(5).max(5000).default(100),
 });
 

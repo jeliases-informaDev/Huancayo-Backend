@@ -63,6 +63,6 @@ services:
       - key: ACCOUNT_LOCK_MINUTES
         value: "15"
       - key: GEOFENCE_RADIO_METROS
-        value: "300"
+        value: "100"
       - key: GEOFENCE_PRECISION_MAXIMA_METROS
         value: "100"
