@@ -28,6 +28,9 @@ const schema = z.object({
   // Certificado CA del proveedor MySQL administrado (p. ej. Aiven) para TLS con
   // verificación de identidad del servidor. Vacío en desarrollo local (Docker sin TLS).
   DATABASE_SSL_CA: z.string().optional(),
+  // Espera máxima (ms) para abrir la conexión. Sin definir se usa la de la librería (1 s): desde un servidor en la misma región basta;
+  // desde una PC lejos del proveedor (p. ej. para correr un script de mantenimiento) conviene subirla, p. ej. 15000.
+  DATABASE_CONNECT_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60000).optional(),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET debe tener al menos 32 caracteres'),
   MFA_ENCRYPTION_KEY: z.string().min(32, 'MFA_ENCRYPTION_KEY debe tener al menos 32 caracteres'),
   INITIAL_ADMIN_USERNAME: z.string().trim().min(3).max(50).default('CajaHuancayo'),

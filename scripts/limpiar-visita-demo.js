@@ -1,6 +1,7 @@
 // Deshace UNA visita de prueba en la base a la que apunte DATABASE_URL (pensado para la demo).
 // Uso:   node scripts/limpiar-visita-demo.js --codigo CH-HYO-208            (solo muestra qué haría)
 //        node scripts/limpiar-visita-demo.js --codigo CH-HYO-208 --aplicar  (lo hace)
+// Desde una PC lejos del servidor MySQL conviene esperar más al conectar: $env:DATABASE_CONNECT_TIMEOUT_MS = "15000".
 //
 // Qué hace con --aplicar, todo en una transacción:
 //   · borra las evidencias y la visita del expediente;

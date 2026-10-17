@@ -29,6 +29,7 @@ function parseDatabaseUrl(url) {
     database: parsed.pathname.replace(/^\//, ''),
     allowPublicKeyRetrieval: true,
     ssl: buildSsl(),
+    ...(env.DATABASE_CONNECT_TIMEOUT_MS ? { connectTimeout: env.DATABASE_CONNECT_TIMEOUT_MS, acquireTimeout: env.DATABASE_CONNECT_TIMEOUT_MS + 5000 } : {}),
   };
 }
 
