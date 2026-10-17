@@ -3,6 +3,8 @@ import storageService from '#modules/sistema/storage.service.js';
 import { env } from '#core/config/env.js';
 import { haversineMeters } from '#core/security/geofence.js';
 import { puntoDeReferencia, conUbicacionNegocio } from '#modules/expedientes/ubicaciones.js';
+import { registrarEventosDeCampo } from './eventos-campo.js';
+import { logger } from '#core/config/logger.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -286,14 +288,19 @@ async function actualizarUbicacionEnVivo(usuarioId, payload) {
   }
   const precision = payload.precision != null ? Number(payload.precision) : null;
   const simulada = payload.simulada === true;
+  const bateria = payload.bateria != null ? Math.round(Number(payload.bateria)) : null;
+  const cargando = payload.cargando === true;
   const ahora = new Date();
   const [usuario] = await prisma.$transaction([
-    prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud, ubicacion_en: ahora, ubicacion_precision: precision, ubicacion_simulada: simulada }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } }),
+    prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud, ubicacion_en: ahora, ubicacion_precision: precision, ubicacion_simulada: simulada, bateria_porcentaje: bateria, bateria_cargando: cargando }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } }),
     // Se conserva cada punto (no solo el último) para poder reconstruir la ruta recorrida
     // en el mapa de supervisión, tal como pide el flujo (Fase 2/Fase 6).
     prisma.trackingUbicacion.create({ data: { id_usuario: usuarioId, latitud, longitud, precision_metros: precision, simulada, registrado_en: ahora } }),
   ]);
-  return serialize({ ...usuario, precision, simulada, actualizado_en: ahora, fecha: ahora });
+  // Avisos de llegada/salida: un fallo aquí nunca debe impedir que la posición quede registrada.
+  let eventos = [];
+  try { eventos = await registrarEventosDeCampo(usuarioId, { latitud, longitud, precision, simulada }); } catch (error) { logger.warn({ err: error.message }, 'eventos_campo_fallo'); }
+  return serialize({ ...usuario, precision, simulada, bateria, cargando, actualizado_en: ahora, fecha: ahora, eventos });
 }
 
 // Jornada de campo: INICIAR / TERMINAR. Queda en el usuario y en el registro de auditoría (cada llamada a la API se registra).

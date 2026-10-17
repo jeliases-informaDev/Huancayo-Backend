@@ -54,6 +54,9 @@ model Usuario {
   ubicacion_en        DateTime?
   ubicacion_precision Decimal?  @db.Decimal(8, 2)
   ubicacion_simulada  Boolean   @default(false)
+  // Estado del celular en la última posición: con la batería se distingue «no se mueve» de «se quedó sin batería».
+  bateria_porcentaje  Int?
+  bateria_cargando    Boolean   @default(false)
   // Jornada de campo: el auditor la inicia y la termina desde la app; solo durante ella la app comparte su ubicación
   // aunque la pantalla esté apagada. En jornada = jornada_inicio con jornada_fin vacío o anterior al inicio.
   jornada_inicio      DateTime?
@@ -63,6 +66,7 @@ model Usuario {
   visitas      VisitaAuditoria[]
   dispositivos DispositivoAutorizado[]
   trackings    TrackingUbicacion[]
+  eventosCampo EventoCampo[]
 
   @@map("usuarios")
 }
@@ -82,6 +86,27 @@ model TrackingUbicacion {
 
   @@index([id_usuario, registrado_en])
   @@map("tracking_ubicacion")
+}
+
+/// Avisos de llegada y salida: el auditor entró a la geocerca de un punto de un caso (domicilio o negocio) o se alejó de ella.
+/// Los calcula el servidor con cada posición en vivo; una posición simulada o muy imprecisa no genera avisos.
+model EventoCampo {
+  id_evento     BigInt   @id @default(autoincrement())
+  id_usuario    String   @db.VarChar(36)
+  id_expediente Int
+  punto         String   @db.VarChar(20) // DOMICILIO o NEGOCIO:n
+  tipo          String   @db.VarChar(10) // LLEGADA, SALIDA
+  distancia_m   Decimal? @db.Decimal(8, 2)
+  latitud       Decimal  @db.Decimal(10, 8)
+  longitud      Decimal  @db.Decimal(11, 8)
+  registrado_en DateTime @default(now())
+
+  usuario    Usuario    @relation(fields: [id_usuario], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
+  expediente Expediente @relation(fields: [id_expediente], references: [id_expediente], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([id_usuario, registrado_en])
+  @@index([id_expediente])
+  @@map("eventos_campo")
 }
 
 /// Tabla física: dispositivos_autorizados — vincula un usuario a los dispositivos desde los que ha iniciado sesión
@@ -170,6 +195,7 @@ model Expediente {
   asignaciones AsignacionAuditoria[]
   visitas      VisitaAuditoria[]
   cambios      ExpedienteCambio[]
+  eventosCampo EventoCampo[]
 
   @@index([latitud, longitud])
   @@index([distrito])

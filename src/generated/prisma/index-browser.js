@@ -147,6 +147,8 @@ exports.Prisma.UsuarioScalarFieldEnum = {
   ubicacion_en: 'ubicacion_en',
   ubicacion_precision: 'ubicacion_precision',
   ubicacion_simulada: 'ubicacion_simulada',
+  bateria_porcentaje: 'bateria_porcentaje',
+  bateria_cargando: 'bateria_cargando',
   jornada_inicio: 'jornada_inicio',
   jornada_fin: 'jornada_fin'
 };
@@ -158,6 +160,18 @@ exports.Prisma.TrackingUbicacionScalarFieldEnum = {
   longitud: 'longitud',
   precision_metros: 'precision_metros',
   simulada: 'simulada',
+  registrado_en: 'registrado_en'
+};
+
+exports.Prisma.EventoCampoScalarFieldEnum = {
+  id_evento: 'id_evento',
+  id_usuario: 'id_usuario',
+  id_expediente: 'id_expediente',
+  punto: 'punto',
+  tipo: 'tipo',
+  distancia_m: 'distancia_m',
+  latitud: 'latitud',
+  longitud: 'longitud',
   registrado_en: 'registrado_en'
 };
 
@@ -366,6 +380,12 @@ exports.Prisma.TrackingUbicacionOrderByRelevanceFieldEnum = {
   id_usuario: 'id_usuario'
 };
 
+exports.Prisma.EventoCampoOrderByRelevanceFieldEnum = {
+  id_usuario: 'id_usuario',
+  punto: 'punto',
+  tipo: 'tipo'
+};
+
 exports.Prisma.DispositivoAutorizadoOrderByRelevanceFieldEnum = {
   id_dispositivo: 'id_dispositivo',
   id_usuario: 'id_usuario',
@@ -488,6 +508,7 @@ exports.TipoDocumento = exports.$Enums.TipoDocumento = {
 exports.Prisma.ModelName = {
   Usuario: 'Usuario',
   TrackingUbicacion: 'TrackingUbicacion',
+  EventoCampo: 'EventoCampo',
   DispositivoAutorizado: 'DispositivoAutorizado',
   Expediente: 'Expediente',
   ExpedienteCambio: 'ExpedienteCambio',

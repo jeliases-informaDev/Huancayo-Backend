@@ -54,8 +54,9 @@ async function archivoEvidencia(req, res, next) {
 
 async function ubicacion(req, res, next) {
   try {
-    const data = await visitasService.actualizarUbicacionEnVivo(req.user.id, req.body);
+    const { eventos = [], ...data } = await visitasService.actualizarUbicacionEnVivo(req.user.id, req.body);
     notifyRoles(req, 'ubicacion_actualizada', data);
+    eventos.forEach((evento) => notifyRoles(req, 'evento_campo', evento));
     res.json({ data });
   } catch (error) { next(error); }
 }

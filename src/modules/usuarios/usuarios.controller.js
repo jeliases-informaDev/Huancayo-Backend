@@ -1,4 +1,5 @@
 import usuariosService from './usuarios.service.js';
+import { listarEventos } from '#modules/auditorias/eventos-campo.js';
 
 async function listar(_req, res, next) {
   try { res.json({ data: await usuariosService.listar() }); } catch (error) { next(error); }
@@ -41,4 +42,7 @@ async function ubicacionesActivas(_req, res, next) {
 async function tracking(req, res, next) {
   try { res.json({ data: await usuariosService.trackingDeUsuario(req.validated.params.id, req.validated.query.fecha) }); } catch (error) { next(error); }
 }
-export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking };
+async function eventos(req, res, next) {
+  try { res.json({ data: await listarEventos(req.validated.query.fecha) }); } catch (error) { next(error); }
+}
+export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking, eventos };

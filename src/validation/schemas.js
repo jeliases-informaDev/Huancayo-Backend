@@ -123,6 +123,8 @@ export const ubicacionBody = z.object({
   longitud: z.coerce.number().min(-180).max(180),
   precision: z.coerce.number().nonnegative().optional(),
   simulada: z.boolean().optional(), // la app avisa si el GPS es simulado (Fake GPS); apps anteriores no lo envían
+  bateria: z.coerce.number().int().min(0).max(100).optional(), // % de batería del celular; apps anteriores no lo envían
+  cargando: z.boolean().optional(),
 }).strict();
 
 export const jornadaBody = z.object({ accion: z.enum(['INICIAR', 'TERMINAR']) }).strict();

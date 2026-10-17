@@ -12,6 +12,8 @@ router.use(authMiddleware);
 
 // Seguimiento en vivo: visible para Administrador y Supervisor (Auditor de Agencia).
 router.get("/ubicaciones", roleMiddleware(OPERATIONAL_MANAGERS), usuariosController.ubicacionesActivas);
+// Avisos de llegada y salida del día (?fecha=AAAA-MM-DD, hoy por defecto).
+router.get("/eventos", roleMiddleware(OPERATIONAL_MANAGERS), validate({ query: trackingQuery }), usuariosController.eventos);
 router.get("/:id/tracking", roleMiddleware(OPERATIONAL_MANAGERS), validate({ params: uuidParams, query: trackingQuery }), usuariosController.tracking);
 // Lista minima de auditores de campo activos (para el selector de "Asignar a" y los
 // filtros de Visitas). No expone estado de cuenta, MFA ni el resto de campos de

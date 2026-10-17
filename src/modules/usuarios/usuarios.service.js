@@ -150,7 +150,7 @@ async function resetDevice(id) {
 async function ubicacionesActivas() {
   const usuarios = await prisma.usuario.findMany({
     where: { estado: 'ACTIVO', rol: { in: FIELD_ROLES }, OR: [{ latitud: { not: null }, longitud: { not: null } }, { jornada_inicio: { not: null } }] },
-    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, latitud: true, longitud: true, ubicacion_en: true, ubicacion_precision: true, ubicacion_simulada: true, jornada_inicio: true, jornada_fin: true },
+    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, latitud: true, longitud: true, ubicacion_en: true, ubicacion_precision: true, ubicacion_simulada: true, bateria_porcentaje: true, bateria_cargando: true, jornada_inicio: true, jornada_fin: true },
   });
   return usuarios.map(u => ({
     id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '',
@@ -161,6 +161,9 @@ async function ubicacionesActivas() {
     actualizado_en: u.ubicacion_en ? u.ubicacion_en.toISOString() : null,
     precision: u.ubicacion_precision != null ? Number(u.ubicacion_precision) : null,
     simulada: Boolean(u.ubicacion_simulada),
+    // Estado del celular en esa posición (null = la app no lo informó).
+    bateria: u.bateria_porcentaje ?? null,
+    cargando: Boolean(u.bateria_cargando),
     // Jornada: el supervisor distingue «terminó su jornada» de «perdió la señal en plena jornada».
     en_jornada: Boolean(u.jornada_inicio) && (!u.jornada_fin || u.jornada_fin < u.jornada_inicio),
     jornada_inicio: u.jornada_inicio ? u.jornada_inicio.toISOString() : null,

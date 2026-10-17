@@ -25,6 +25,12 @@ export type Usuario = $Result.DefaultSelection<Prisma.$UsuarioPayload>
  */
 export type TrackingUbicacion = $Result.DefaultSelection<Prisma.$TrackingUbicacionPayload>
 /**
+ * Model EventoCampo
+ * Avisos de llegada y salida: el auditor entró a la geocerca de un punto de un caso (domicilio o negocio) o se alejó de ella.
+ * Los calcula el servidor con cada posición en vivo; una posición simulada o muy imprecisa no genera avisos.
+ */
+export type EventoCampo = $Result.DefaultSelection<Prisma.$EventoCampoPayload>
+/**
  * Model DispositivoAutorizado
  * Tabla física: dispositivos_autorizados — vincula un usuario a los dispositivos desde los que ha iniciado sesión
  */
@@ -237,6 +243,16 @@ export class PrismaClient<
     * ```
     */
   get trackingUbicacion(): Prisma.TrackingUbicacionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventoCampo`: Exposes CRUD operations for the **EventoCampo** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventoCampos
+    * const eventoCampos = await prisma.eventoCampo.findMany()
+    * ```
+    */
+  get eventoCampo(): Prisma.EventoCampoDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.dispositivoAutorizado`: Exposes CRUD operations for the **DispositivoAutorizado** model.
@@ -766,6 +782,7 @@ export namespace Prisma {
   export const ModelName: {
     Usuario: 'Usuario',
     TrackingUbicacion: 'TrackingUbicacion',
+    EventoCampo: 'EventoCampo',
     DispositivoAutorizado: 'DispositivoAutorizado',
     Expediente: 'Expediente',
     ExpedienteCambio: 'ExpedienteCambio',
@@ -789,7 +806,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "usuario" | "trackingUbicacion" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva"
+      modelProps: "usuario" | "trackingUbicacion" | "eventoCampo" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -922,6 +939,72 @@ export namespace Prisma {
           count: {
             args: Prisma.TrackingUbicacionCountArgs<ExtArgs>
             result: $Utils.Optional<TrackingUbicacionCountAggregateOutputType> | number
+          }
+        }
+      }
+      EventoCampo: {
+        payload: Prisma.$EventoCampoPayload<ExtArgs>
+        fields: Prisma.EventoCampoFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventoCampoFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventoCampoPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventoCampoFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventoCampoPayload>
+          }
+          findFirst: {
+            args: Prisma.EventoCampoFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventoCampoPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventoCampoFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventoCampoPayload>
+          }
+          findMany: {
+            args: Prisma.EventoCampoFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventoCampoPayload>[]
+          }
+          create: {
+            args: Prisma.EventoCampoCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventoCampoPayload>
+          }
+          createMany: {
+            args: Prisma.EventoCampoCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.EventoCampoDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventoCampoPayload>
+          }
+          update: {
+            args: Prisma.EventoCampoUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventoCampoPayload>
+          }
+          deleteMany: {
+            args: Prisma.EventoCampoDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventoCampoUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.EventoCampoUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventoCampoPayload>
+          }
+          aggregate: {
+            args: Prisma.EventoCampoAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventoCampo>
+          }
+          groupBy: {
+            args: Prisma.EventoCampoGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventoCampoGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventoCampoCountArgs<ExtArgs>
+            result: $Utils.Optional<EventoCampoCountAggregateOutputType> | number
           }
         }
       }
@@ -1578,6 +1661,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     usuario?: UsuarioOmit
     trackingUbicacion?: TrackingUbicacionOmit
+    eventoCampo?: EventoCampoOmit
     dispositivoAutorizado?: DispositivoAutorizadoOmit
     expediente?: ExpedienteOmit
     expedienteCambio?: ExpedienteCambioOmit
@@ -1670,6 +1754,7 @@ export namespace Prisma {
     visitas: number
     dispositivos: number
     trackings: number
+    eventosCampo: number
   }
 
   export type UsuarioCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1677,6 +1762,7 @@ export namespace Prisma {
     visitas?: boolean | UsuarioCountOutputTypeCountVisitasArgs
     dispositivos?: boolean | UsuarioCountOutputTypeCountDispositivosArgs
     trackings?: boolean | UsuarioCountOutputTypeCountTrackingsArgs
+    eventosCampo?: boolean | UsuarioCountOutputTypeCountEventosCampoArgs
   }
 
   // Custom InputTypes
@@ -1718,6 +1804,13 @@ export namespace Prisma {
     where?: TrackingUbicacionWhereInput
   }
 
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeCountEventosCampoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventoCampoWhereInput
+  }
+
 
   /**
    * Count Type ExpedienteCountOutputType
@@ -1727,12 +1820,14 @@ export namespace Prisma {
     asignaciones: number
     visitas: number
     cambios: number
+    eventosCampo: number
   }
 
   export type ExpedienteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | ExpedienteCountOutputTypeCountAsignacionesArgs
     visitas?: boolean | ExpedienteCountOutputTypeCountVisitasArgs
     cambios?: boolean | ExpedienteCountOutputTypeCountCambiosArgs
+    eventosCampo?: boolean | ExpedienteCountOutputTypeCountEventosCampoArgs
   }
 
   // Custom InputTypes
@@ -1765,6 +1860,13 @@ export namespace Prisma {
    */
   export type ExpedienteCountOutputTypeCountCambiosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ExpedienteCambioWhereInput
+  }
+
+  /**
+   * ExpedienteCountOutputType without action
+   */
+  export type ExpedienteCountOutputTypeCountEventosCampoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventoCampoWhereInput
   }
 
 
@@ -1821,6 +1923,7 @@ export namespace Prisma {
     latitud: Decimal | null
     longitud: Decimal | null
     ubicacion_precision: Decimal | null
+    bateria_porcentaje: number | null
   }
 
   export type UsuarioSumAggregateOutputType = {
@@ -1829,6 +1932,7 @@ export namespace Prisma {
     latitud: Decimal | null
     longitud: Decimal | null
     ubicacion_precision: Decimal | null
+    bateria_porcentaje: number | null
   }
 
   export type UsuarioMinAggregateOutputType = {
@@ -1858,6 +1962,8 @@ export namespace Prisma {
     ubicacion_en: Date | null
     ubicacion_precision: Decimal | null
     ubicacion_simulada: boolean | null
+    bateria_porcentaje: number | null
+    bateria_cargando: boolean | null
     jornada_inicio: Date | null
     jornada_fin: Date | null
   }
@@ -1889,6 +1995,8 @@ export namespace Prisma {
     ubicacion_en: Date | null
     ubicacion_precision: Decimal | null
     ubicacion_simulada: boolean | null
+    bateria_porcentaje: number | null
+    bateria_cargando: boolean | null
     jornada_inicio: Date | null
     jornada_fin: Date | null
   }
@@ -1920,6 +2028,8 @@ export namespace Prisma {
     ubicacion_en: number
     ubicacion_precision: number
     ubicacion_simulada: number
+    bateria_porcentaje: number
+    bateria_cargando: number
     jornada_inicio: number
     jornada_fin: number
     _all: number
@@ -1932,6 +2042,7 @@ export namespace Prisma {
     latitud?: true
     longitud?: true
     ubicacion_precision?: true
+    bateria_porcentaje?: true
   }
 
   export type UsuarioSumAggregateInputType = {
@@ -1940,6 +2051,7 @@ export namespace Prisma {
     latitud?: true
     longitud?: true
     ubicacion_precision?: true
+    bateria_porcentaje?: true
   }
 
   export type UsuarioMinAggregateInputType = {
@@ -1969,6 +2081,8 @@ export namespace Prisma {
     ubicacion_en?: true
     ubicacion_precision?: true
     ubicacion_simulada?: true
+    bateria_porcentaje?: true
+    bateria_cargando?: true
     jornada_inicio?: true
     jornada_fin?: true
   }
@@ -2000,6 +2114,8 @@ export namespace Prisma {
     ubicacion_en?: true
     ubicacion_precision?: true
     ubicacion_simulada?: true
+    bateria_porcentaje?: true
+    bateria_cargando?: true
     jornada_inicio?: true
     jornada_fin?: true
   }
@@ -2031,6 +2147,8 @@ export namespace Prisma {
     ubicacion_en?: true
     ubicacion_precision?: true
     ubicacion_simulada?: true
+    bateria_porcentaje?: true
+    bateria_cargando?: true
     jornada_inicio?: true
     jornada_fin?: true
     _all?: true
@@ -2149,6 +2267,8 @@ export namespace Prisma {
     ubicacion_en: Date | null
     ubicacion_precision: Decimal | null
     ubicacion_simulada: boolean
+    bateria_porcentaje: number | null
+    bateria_cargando: boolean
     jornada_inicio: Date | null
     jornada_fin: Date | null
     _count: UsuarioCountAggregateOutputType | null
@@ -2199,12 +2319,15 @@ export namespace Prisma {
     ubicacion_en?: boolean
     ubicacion_precision?: boolean
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: boolean
+    bateria_cargando?: boolean
     jornada_inicio?: boolean
     jornada_fin?: boolean
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
     dispositivos?: boolean | Usuario$dispositivosArgs<ExtArgs>
     trackings?: boolean | Usuario$trackingsArgs<ExtArgs>
+    eventosCampo?: boolean | Usuario$eventosCampoArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["usuario"]>
 
@@ -2237,16 +2360,19 @@ export namespace Prisma {
     ubicacion_en?: boolean
     ubicacion_precision?: boolean
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: boolean
+    bateria_cargando?: boolean
     jornada_inicio?: boolean
     jornada_fin?: boolean
   }
 
-  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud" | "ubicacion_en" | "ubicacion_precision" | "ubicacion_simulada" | "jornada_inicio" | "jornada_fin", ExtArgs["result"]["usuario"]>
+  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud" | "ubicacion_en" | "ubicacion_precision" | "ubicacion_simulada" | "bateria_porcentaje" | "bateria_cargando" | "jornada_inicio" | "jornada_fin", ExtArgs["result"]["usuario"]>
   export type UsuarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
     dispositivos?: boolean | Usuario$dispositivosArgs<ExtArgs>
     trackings?: boolean | Usuario$trackingsArgs<ExtArgs>
+    eventosCampo?: boolean | Usuario$eventosCampoArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -2257,6 +2383,7 @@ export namespace Prisma {
       visitas: Prisma.$VisitaAuditoriaPayload<ExtArgs>[]
       dispositivos: Prisma.$DispositivoAutorizadoPayload<ExtArgs>[]
       trackings: Prisma.$TrackingUbicacionPayload<ExtArgs>[]
+      eventosCampo: Prisma.$EventoCampoPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id_usuario: string
@@ -2285,6 +2412,8 @@ export namespace Prisma {
       ubicacion_en: Date | null
       ubicacion_precision: Prisma.Decimal | null
       ubicacion_simulada: boolean
+      bateria_porcentaje: number | null
+      bateria_cargando: boolean
       jornada_inicio: Date | null
       jornada_fin: Date | null
     }, ExtArgs["result"]["usuario"]>
@@ -2631,6 +2760,7 @@ export namespace Prisma {
     visitas<T extends Usuario$visitasArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$visitasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VisitaAuditoriaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dispositivos<T extends Usuario$dispositivosArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$dispositivosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DispositivoAutorizadoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     trackings<T extends Usuario$trackingsArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$trackingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eventosCampo<T extends Usuario$eventosCampoArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$eventosCampoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2686,6 +2816,8 @@ export namespace Prisma {
     readonly ubicacion_en: FieldRef<"Usuario", 'DateTime'>
     readonly ubicacion_precision: FieldRef<"Usuario", 'Decimal'>
     readonly ubicacion_simulada: FieldRef<"Usuario", 'Boolean'>
+    readonly bateria_porcentaje: FieldRef<"Usuario", 'Int'>
+    readonly bateria_cargando: FieldRef<"Usuario", 'Boolean'>
     readonly jornada_inicio: FieldRef<"Usuario", 'DateTime'>
     readonly jornada_fin: FieldRef<"Usuario", 'DateTime'>
   }
@@ -3129,6 +3261,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TrackingUbicacionScalarFieldEnum | TrackingUbicacionScalarFieldEnum[]
+  }
+
+  /**
+   * Usuario.eventosCampo
+   */
+  export type Usuario$eventosCampoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    where?: EventoCampoWhereInput
+    orderBy?: EventoCampoOrderByWithRelationInput | EventoCampoOrderByWithRelationInput[]
+    cursor?: EventoCampoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventoCampoScalarFieldEnum | EventoCampoScalarFieldEnum[]
   }
 
   /**
@@ -4149,6 +4305,1038 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: TrackingUbicacionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventoCampo
+   */
+
+  export type AggregateEventoCampo = {
+    _count: EventoCampoCountAggregateOutputType | null
+    _avg: EventoCampoAvgAggregateOutputType | null
+    _sum: EventoCampoSumAggregateOutputType | null
+    _min: EventoCampoMinAggregateOutputType | null
+    _max: EventoCampoMaxAggregateOutputType | null
+  }
+
+  export type EventoCampoAvgAggregateOutputType = {
+    id_evento: number | null
+    id_expediente: number | null
+    distancia_m: Decimal | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+  }
+
+  export type EventoCampoSumAggregateOutputType = {
+    id_evento: bigint | null
+    id_expediente: number | null
+    distancia_m: Decimal | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+  }
+
+  export type EventoCampoMinAggregateOutputType = {
+    id_evento: bigint | null
+    id_usuario: string | null
+    id_expediente: number | null
+    punto: string | null
+    tipo: string | null
+    distancia_m: Decimal | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    registrado_en: Date | null
+  }
+
+  export type EventoCampoMaxAggregateOutputType = {
+    id_evento: bigint | null
+    id_usuario: string | null
+    id_expediente: number | null
+    punto: string | null
+    tipo: string | null
+    distancia_m: Decimal | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    registrado_en: Date | null
+  }
+
+  export type EventoCampoCountAggregateOutputType = {
+    id_evento: number
+    id_usuario: number
+    id_expediente: number
+    punto: number
+    tipo: number
+    distancia_m: number
+    latitud: number
+    longitud: number
+    registrado_en: number
+    _all: number
+  }
+
+
+  export type EventoCampoAvgAggregateInputType = {
+    id_evento?: true
+    id_expediente?: true
+    distancia_m?: true
+    latitud?: true
+    longitud?: true
+  }
+
+  export type EventoCampoSumAggregateInputType = {
+    id_evento?: true
+    id_expediente?: true
+    distancia_m?: true
+    latitud?: true
+    longitud?: true
+  }
+
+  export type EventoCampoMinAggregateInputType = {
+    id_evento?: true
+    id_usuario?: true
+    id_expediente?: true
+    punto?: true
+    tipo?: true
+    distancia_m?: true
+    latitud?: true
+    longitud?: true
+    registrado_en?: true
+  }
+
+  export type EventoCampoMaxAggregateInputType = {
+    id_evento?: true
+    id_usuario?: true
+    id_expediente?: true
+    punto?: true
+    tipo?: true
+    distancia_m?: true
+    latitud?: true
+    longitud?: true
+    registrado_en?: true
+  }
+
+  export type EventoCampoCountAggregateInputType = {
+    id_evento?: true
+    id_usuario?: true
+    id_expediente?: true
+    punto?: true
+    tipo?: true
+    distancia_m?: true
+    latitud?: true
+    longitud?: true
+    registrado_en?: true
+    _all?: true
+  }
+
+  export type EventoCampoAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventoCampo to aggregate.
+     */
+    where?: EventoCampoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventoCampos to fetch.
+     */
+    orderBy?: EventoCampoOrderByWithRelationInput | EventoCampoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventoCampoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventoCampos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventoCampos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventoCampos
+    **/
+    _count?: true | EventoCampoCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EventoCampoAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EventoCampoSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventoCampoMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventoCampoMaxAggregateInputType
+  }
+
+  export type GetEventoCampoAggregateType<T extends EventoCampoAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventoCampo]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventoCampo[P]>
+      : GetScalarType<T[P], AggregateEventoCampo[P]>
+  }
+
+
+
+
+  export type EventoCampoGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventoCampoWhereInput
+    orderBy?: EventoCampoOrderByWithAggregationInput | EventoCampoOrderByWithAggregationInput[]
+    by: EventoCampoScalarFieldEnum[] | EventoCampoScalarFieldEnum
+    having?: EventoCampoScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventoCampoCountAggregateInputType | true
+    _avg?: EventoCampoAvgAggregateInputType
+    _sum?: EventoCampoSumAggregateInputType
+    _min?: EventoCampoMinAggregateInputType
+    _max?: EventoCampoMaxAggregateInputType
+  }
+
+  export type EventoCampoGroupByOutputType = {
+    id_evento: bigint
+    id_usuario: string
+    id_expediente: number
+    punto: string
+    tipo: string
+    distancia_m: Decimal | null
+    latitud: Decimal
+    longitud: Decimal
+    registrado_en: Date
+    _count: EventoCampoCountAggregateOutputType | null
+    _avg: EventoCampoAvgAggregateOutputType | null
+    _sum: EventoCampoSumAggregateOutputType | null
+    _min: EventoCampoMinAggregateOutputType | null
+    _max: EventoCampoMaxAggregateOutputType | null
+  }
+
+  type GetEventoCampoGroupByPayload<T extends EventoCampoGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventoCampoGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventoCampoGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventoCampoGroupByOutputType[P]>
+            : GetScalarType<T[P], EventoCampoGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventoCampoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id_evento?: boolean
+    id_usuario?: boolean
+    id_expediente?: boolean
+    punto?: boolean
+    tipo?: boolean
+    distancia_m?: boolean
+    latitud?: boolean
+    longitud?: boolean
+    registrado_en?: boolean
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+    expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventoCampo"]>
+
+
+
+  export type EventoCampoSelectScalar = {
+    id_evento?: boolean
+    id_usuario?: boolean
+    id_expediente?: boolean
+    punto?: boolean
+    tipo?: boolean
+    distancia_m?: boolean
+    latitud?: boolean
+    longitud?: boolean
+    registrado_en?: boolean
+  }
+
+  export type EventoCampoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_evento" | "id_usuario" | "id_expediente" | "punto" | "tipo" | "distancia_m" | "latitud" | "longitud" | "registrado_en", ExtArgs["result"]["eventoCampo"]>
+  export type EventoCampoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+    expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
+  }
+
+  export type $EventoCampoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventoCampo"
+    objects: {
+      usuario: Prisma.$UsuarioPayload<ExtArgs>
+      expediente: Prisma.$ExpedientePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id_evento: bigint
+      id_usuario: string
+      id_expediente: number
+      punto: string
+      tipo: string
+      distancia_m: Prisma.Decimal | null
+      latitud: Prisma.Decimal
+      longitud: Prisma.Decimal
+      registrado_en: Date
+    }, ExtArgs["result"]["eventoCampo"]>
+    composites: {}
+  }
+
+  type EventoCampoGetPayload<S extends boolean | null | undefined | EventoCampoDefaultArgs> = $Result.GetResult<Prisma.$EventoCampoPayload, S>
+
+  type EventoCampoCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventoCampoFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventoCampoCountAggregateInputType | true
+    }
+
+  export interface EventoCampoDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventoCampo'], meta: { name: 'EventoCampo' } }
+    /**
+     * Find zero or one EventoCampo that matches the filter.
+     * @param {EventoCampoFindUniqueArgs} args - Arguments to find a EventoCampo
+     * @example
+     * // Get one EventoCampo
+     * const eventoCampo = await prisma.eventoCampo.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventoCampoFindUniqueArgs>(args: SelectSubset<T, EventoCampoFindUniqueArgs<ExtArgs>>): Prisma__EventoCampoClient<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventoCampo that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventoCampoFindUniqueOrThrowArgs} args - Arguments to find a EventoCampo
+     * @example
+     * // Get one EventoCampo
+     * const eventoCampo = await prisma.eventoCampo.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventoCampoFindUniqueOrThrowArgs>(args: SelectSubset<T, EventoCampoFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventoCampoClient<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventoCampo that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventoCampoFindFirstArgs} args - Arguments to find a EventoCampo
+     * @example
+     * // Get one EventoCampo
+     * const eventoCampo = await prisma.eventoCampo.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventoCampoFindFirstArgs>(args?: SelectSubset<T, EventoCampoFindFirstArgs<ExtArgs>>): Prisma__EventoCampoClient<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventoCampo that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventoCampoFindFirstOrThrowArgs} args - Arguments to find a EventoCampo
+     * @example
+     * // Get one EventoCampo
+     * const eventoCampo = await prisma.eventoCampo.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventoCampoFindFirstOrThrowArgs>(args?: SelectSubset<T, EventoCampoFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventoCampoClient<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventoCampos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventoCampoFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventoCampos
+     * const eventoCampos = await prisma.eventoCampo.findMany()
+     * 
+     * // Get first 10 EventoCampos
+     * const eventoCampos = await prisma.eventoCampo.findMany({ take: 10 })
+     * 
+     * // Only select the `id_evento`
+     * const eventoCampoWithId_eventoOnly = await prisma.eventoCampo.findMany({ select: { id_evento: true } })
+     * 
+     */
+    findMany<T extends EventoCampoFindManyArgs>(args?: SelectSubset<T, EventoCampoFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventoCampo.
+     * @param {EventoCampoCreateArgs} args - Arguments to create a EventoCampo.
+     * @example
+     * // Create one EventoCampo
+     * const EventoCampo = await prisma.eventoCampo.create({
+     *   data: {
+     *     // ... data to create a EventoCampo
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventoCampoCreateArgs>(args: SelectSubset<T, EventoCampoCreateArgs<ExtArgs>>): Prisma__EventoCampoClient<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventoCampos.
+     * @param {EventoCampoCreateManyArgs} args - Arguments to create many EventoCampos.
+     * @example
+     * // Create many EventoCampos
+     * const eventoCampo = await prisma.eventoCampo.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventoCampoCreateManyArgs>(args?: SelectSubset<T, EventoCampoCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a EventoCampo.
+     * @param {EventoCampoDeleteArgs} args - Arguments to delete one EventoCampo.
+     * @example
+     * // Delete one EventoCampo
+     * const EventoCampo = await prisma.eventoCampo.delete({
+     *   where: {
+     *     // ... filter to delete one EventoCampo
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventoCampoDeleteArgs>(args: SelectSubset<T, EventoCampoDeleteArgs<ExtArgs>>): Prisma__EventoCampoClient<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventoCampo.
+     * @param {EventoCampoUpdateArgs} args - Arguments to update one EventoCampo.
+     * @example
+     * // Update one EventoCampo
+     * const eventoCampo = await prisma.eventoCampo.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventoCampoUpdateArgs>(args: SelectSubset<T, EventoCampoUpdateArgs<ExtArgs>>): Prisma__EventoCampoClient<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventoCampos.
+     * @param {EventoCampoDeleteManyArgs} args - Arguments to filter EventoCampos to delete.
+     * @example
+     * // Delete a few EventoCampos
+     * const { count } = await prisma.eventoCampo.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventoCampoDeleteManyArgs>(args?: SelectSubset<T, EventoCampoDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventoCampos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventoCampoUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventoCampos
+     * const eventoCampo = await prisma.eventoCampo.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventoCampoUpdateManyArgs>(args: SelectSubset<T, EventoCampoUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one EventoCampo.
+     * @param {EventoCampoUpsertArgs} args - Arguments to update or create a EventoCampo.
+     * @example
+     * // Update or create a EventoCampo
+     * const eventoCampo = await prisma.eventoCampo.upsert({
+     *   create: {
+     *     // ... data to create a EventoCampo
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventoCampo we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventoCampoUpsertArgs>(args: SelectSubset<T, EventoCampoUpsertArgs<ExtArgs>>): Prisma__EventoCampoClient<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventoCampos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventoCampoCountArgs} args - Arguments to filter EventoCampos to count.
+     * @example
+     * // Count the number of EventoCampos
+     * const count = await prisma.eventoCampo.count({
+     *   where: {
+     *     // ... the filter for the EventoCampos we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventoCampoCountArgs>(
+      args?: Subset<T, EventoCampoCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventoCampoCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventoCampo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventoCampoAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventoCampoAggregateArgs>(args: Subset<T, EventoCampoAggregateArgs>): Prisma.PrismaPromise<GetEventoCampoAggregateType<T>>
+
+    /**
+     * Group by EventoCampo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventoCampoGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventoCampoGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventoCampoGroupByArgs['orderBy'] }
+        : { orderBy?: EventoCampoGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventoCampoGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventoCampoGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventoCampo model
+   */
+  readonly fields: EventoCampoFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventoCampo.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventoCampoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    expediente<T extends ExpedienteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ExpedienteDefaultArgs<ExtArgs>>): Prisma__ExpedienteClient<$Result.GetResult<Prisma.$ExpedientePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventoCampo model
+   */
+  interface EventoCampoFieldRefs {
+    readonly id_evento: FieldRef<"EventoCampo", 'BigInt'>
+    readonly id_usuario: FieldRef<"EventoCampo", 'String'>
+    readonly id_expediente: FieldRef<"EventoCampo", 'Int'>
+    readonly punto: FieldRef<"EventoCampo", 'String'>
+    readonly tipo: FieldRef<"EventoCampo", 'String'>
+    readonly distancia_m: FieldRef<"EventoCampo", 'Decimal'>
+    readonly latitud: FieldRef<"EventoCampo", 'Decimal'>
+    readonly longitud: FieldRef<"EventoCampo", 'Decimal'>
+    readonly registrado_en: FieldRef<"EventoCampo", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventoCampo findUnique
+   */
+  export type EventoCampoFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventoCampo to fetch.
+     */
+    where: EventoCampoWhereUniqueInput
+  }
+
+  /**
+   * EventoCampo findUniqueOrThrow
+   */
+  export type EventoCampoFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventoCampo to fetch.
+     */
+    where: EventoCampoWhereUniqueInput
+  }
+
+  /**
+   * EventoCampo findFirst
+   */
+  export type EventoCampoFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventoCampo to fetch.
+     */
+    where?: EventoCampoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventoCampos to fetch.
+     */
+    orderBy?: EventoCampoOrderByWithRelationInput | EventoCampoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventoCampos.
+     */
+    cursor?: EventoCampoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventoCampos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventoCampos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventoCampos.
+     */
+    distinct?: EventoCampoScalarFieldEnum | EventoCampoScalarFieldEnum[]
+  }
+
+  /**
+   * EventoCampo findFirstOrThrow
+   */
+  export type EventoCampoFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventoCampo to fetch.
+     */
+    where?: EventoCampoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventoCampos to fetch.
+     */
+    orderBy?: EventoCampoOrderByWithRelationInput | EventoCampoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventoCampos.
+     */
+    cursor?: EventoCampoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventoCampos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventoCampos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventoCampos.
+     */
+    distinct?: EventoCampoScalarFieldEnum | EventoCampoScalarFieldEnum[]
+  }
+
+  /**
+   * EventoCampo findMany
+   */
+  export type EventoCampoFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventoCampos to fetch.
+     */
+    where?: EventoCampoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventoCampos to fetch.
+     */
+    orderBy?: EventoCampoOrderByWithRelationInput | EventoCampoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventoCampos.
+     */
+    cursor?: EventoCampoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventoCampos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventoCampos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventoCampos.
+     */
+    distinct?: EventoCampoScalarFieldEnum | EventoCampoScalarFieldEnum[]
+  }
+
+  /**
+   * EventoCampo create
+   */
+  export type EventoCampoCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventoCampo.
+     */
+    data: XOR<EventoCampoCreateInput, EventoCampoUncheckedCreateInput>
+  }
+
+  /**
+   * EventoCampo createMany
+   */
+  export type EventoCampoCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventoCampos.
+     */
+    data: EventoCampoCreateManyInput | EventoCampoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventoCampo update
+   */
+  export type EventoCampoUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventoCampo.
+     */
+    data: XOR<EventoCampoUpdateInput, EventoCampoUncheckedUpdateInput>
+    /**
+     * Choose, which EventoCampo to update.
+     */
+    where: EventoCampoWhereUniqueInput
+  }
+
+  /**
+   * EventoCampo updateMany
+   */
+  export type EventoCampoUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventoCampos.
+     */
+    data: XOR<EventoCampoUpdateManyMutationInput, EventoCampoUncheckedUpdateManyInput>
+    /**
+     * Filter which EventoCampos to update
+     */
+    where?: EventoCampoWhereInput
+    /**
+     * Limit how many EventoCampos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventoCampo upsert
+   */
+  export type EventoCampoUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventoCampo to update in case it exists.
+     */
+    where: EventoCampoWhereUniqueInput
+    /**
+     * In case the EventoCampo found by the `where` argument doesn't exist, create a new EventoCampo with this data.
+     */
+    create: XOR<EventoCampoCreateInput, EventoCampoUncheckedCreateInput>
+    /**
+     * In case the EventoCampo was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventoCampoUpdateInput, EventoCampoUncheckedUpdateInput>
+  }
+
+  /**
+   * EventoCampo delete
+   */
+  export type EventoCampoDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    /**
+     * Filter which EventoCampo to delete.
+     */
+    where: EventoCampoWhereUniqueInput
+  }
+
+  /**
+   * EventoCampo deleteMany
+   */
+  export type EventoCampoDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventoCampos to delete
+     */
+    where?: EventoCampoWhereInput
+    /**
+     * Limit how many EventoCampos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventoCampo without action
+   */
+  export type EventoCampoDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
   }
 
 
@@ -5593,6 +6781,7 @@ export namespace Prisma {
     asignaciones?: boolean | Expediente$asignacionesArgs<ExtArgs>
     visitas?: boolean | Expediente$visitasArgs<ExtArgs>
     cambios?: boolean | Expediente$cambiosArgs<ExtArgs>
+    eventosCampo?: boolean | Expediente$eventosCampoArgs<ExtArgs>
     _count?: boolean | ExpedienteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["expediente"]>
 
@@ -5647,6 +6836,7 @@ export namespace Prisma {
     asignaciones?: boolean | Expediente$asignacionesArgs<ExtArgs>
     visitas?: boolean | Expediente$visitasArgs<ExtArgs>
     cambios?: boolean | Expediente$cambiosArgs<ExtArgs>
+    eventosCampo?: boolean | Expediente$eventosCampoArgs<ExtArgs>
     _count?: boolean | ExpedienteCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -5656,6 +6846,7 @@ export namespace Prisma {
       asignaciones: Prisma.$AsignacionAuditoriaPayload<ExtArgs>[]
       visitas: Prisma.$VisitaAuditoriaPayload<ExtArgs>[]
       cambios: Prisma.$ExpedienteCambioPayload<ExtArgs>[]
+      eventosCampo: Prisma.$EventoCampoPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id_expediente: number
@@ -6042,6 +7233,7 @@ export namespace Prisma {
     asignaciones<T extends Expediente$asignacionesArgs<ExtArgs> = {}>(args?: Subset<T, Expediente$asignacionesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AsignacionAuditoriaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     visitas<T extends Expediente$visitasArgs<ExtArgs> = {}>(args?: Subset<T, Expediente$visitasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VisitaAuditoriaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     cambios<T extends Expediente$cambiosArgs<ExtArgs> = {}>(args?: Subset<T, Expediente$cambiosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExpedienteCambioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eventosCampo<T extends Expediente$eventosCampoArgs<ExtArgs> = {}>(args?: Subset<T, Expediente$eventosCampoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6529,6 +7721,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ExpedienteCambioScalarFieldEnum | ExpedienteCambioScalarFieldEnum[]
+  }
+
+  /**
+   * Expediente.eventosCampo
+   */
+  export type Expediente$eventosCampoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventoCampo
+     */
+    select?: EventoCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventoCampo
+     */
+    omit?: EventoCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventoCampoInclude<ExtArgs> | null
+    where?: EventoCampoWhereInput
+    orderBy?: EventoCampoOrderByWithRelationInput | EventoCampoOrderByWithRelationInput[]
+    cursor?: EventoCampoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventoCampoScalarFieldEnum | EventoCampoScalarFieldEnum[]
   }
 
   /**
@@ -13089,6 +14305,8 @@ export namespace Prisma {
     ubicacion_en: 'ubicacion_en',
     ubicacion_precision: 'ubicacion_precision',
     ubicacion_simulada: 'ubicacion_simulada',
+    bateria_porcentaje: 'bateria_porcentaje',
+    bateria_cargando: 'bateria_cargando',
     jornada_inicio: 'jornada_inicio',
     jornada_fin: 'jornada_fin'
   };
@@ -13107,6 +14325,21 @@ export namespace Prisma {
   };
 
   export type TrackingUbicacionScalarFieldEnum = (typeof TrackingUbicacionScalarFieldEnum)[keyof typeof TrackingUbicacionScalarFieldEnum]
+
+
+  export const EventoCampoScalarFieldEnum: {
+    id_evento: 'id_evento',
+    id_usuario: 'id_usuario',
+    id_expediente: 'id_expediente',
+    punto: 'punto',
+    tipo: 'tipo',
+    distancia_m: 'distancia_m',
+    latitud: 'latitud',
+    longitud: 'longitud',
+    registrado_en: 'registrado_en'
+  };
+
+  export type EventoCampoScalarFieldEnum = (typeof EventoCampoScalarFieldEnum)[keyof typeof EventoCampoScalarFieldEnum]
 
 
   export const DispositivoAutorizadoScalarFieldEnum: {
@@ -13354,6 +14587,15 @@ export namespace Prisma {
   };
 
   export type TrackingUbicacionOrderByRelevanceFieldEnum = (typeof TrackingUbicacionOrderByRelevanceFieldEnum)[keyof typeof TrackingUbicacionOrderByRelevanceFieldEnum]
+
+
+  export const EventoCampoOrderByRelevanceFieldEnum: {
+    id_usuario: 'id_usuario',
+    punto: 'punto',
+    tipo: 'tipo'
+  };
+
+  export type EventoCampoOrderByRelevanceFieldEnum = (typeof EventoCampoOrderByRelevanceFieldEnum)[keyof typeof EventoCampoOrderByRelevanceFieldEnum]
 
 
   export const DispositivoAutorizadoOrderByRelevanceFieldEnum: {
@@ -13609,12 +14851,15 @@ export namespace Prisma {
     ubicacion_en?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     ubicacion_precision?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFilter<"Usuario"> | boolean
+    bateria_porcentaje?: IntNullableFilter<"Usuario"> | number | null
+    bateria_cargando?: BoolFilter<"Usuario"> | boolean
     jornada_inicio?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     jornada_fin?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     dispositivos?: DispositivoAutorizadoListRelationFilter
     trackings?: TrackingUbicacionListRelationFilter
+    eventosCampo?: EventoCampoListRelationFilter
   }
 
   export type UsuarioOrderByWithRelationInput = {
@@ -13644,12 +14889,15 @@ export namespace Prisma {
     ubicacion_en?: SortOrderInput | SortOrder
     ubicacion_precision?: SortOrderInput | SortOrder
     ubicacion_simulada?: SortOrder
+    bateria_porcentaje?: SortOrderInput | SortOrder
+    bateria_cargando?: SortOrder
     jornada_inicio?: SortOrderInput | SortOrder
     jornada_fin?: SortOrderInput | SortOrder
     asignaciones?: AsignacionAuditoriaOrderByRelationAggregateInput
     visitas?: VisitaAuditoriaOrderByRelationAggregateInput
     dispositivos?: DispositivoAutorizadoOrderByRelationAggregateInput
     trackings?: TrackingUbicacionOrderByRelationAggregateInput
+    eventosCampo?: EventoCampoOrderByRelationAggregateInput
     _relevance?: UsuarioOrderByRelevanceInput
   }
 
@@ -13683,12 +14931,15 @@ export namespace Prisma {
     ubicacion_en?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     ubicacion_precision?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFilter<"Usuario"> | boolean
+    bateria_porcentaje?: IntNullableFilter<"Usuario"> | number | null
+    bateria_cargando?: BoolFilter<"Usuario"> | boolean
     jornada_inicio?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     jornada_fin?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     dispositivos?: DispositivoAutorizadoListRelationFilter
     trackings?: TrackingUbicacionListRelationFilter
+    eventosCampo?: EventoCampoListRelationFilter
   }, "id_usuario" | "username">
 
   export type UsuarioOrderByWithAggregationInput = {
@@ -13718,6 +14969,8 @@ export namespace Prisma {
     ubicacion_en?: SortOrderInput | SortOrder
     ubicacion_precision?: SortOrderInput | SortOrder
     ubicacion_simulada?: SortOrder
+    bateria_porcentaje?: SortOrderInput | SortOrder
+    bateria_cargando?: SortOrder
     jornada_inicio?: SortOrderInput | SortOrder
     jornada_fin?: SortOrderInput | SortOrder
     _count?: UsuarioCountOrderByAggregateInput
@@ -13757,6 +15010,8 @@ export namespace Prisma {
     ubicacion_en?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
     ubicacion_precision?: DecimalNullableWithAggregatesFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolWithAggregatesFilter<"Usuario"> | boolean
+    bateria_porcentaje?: IntNullableWithAggregatesFilter<"Usuario"> | number | null
+    bateria_cargando?: BoolWithAggregatesFilter<"Usuario"> | boolean
     jornada_inicio?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
     jornada_fin?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
   }
@@ -13827,6 +15082,87 @@ export namespace Prisma {
     precision_metros?: DecimalNullableWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolWithAggregatesFilter<"TrackingUbicacion"> | boolean
     registrado_en?: DateTimeWithAggregatesFilter<"TrackingUbicacion"> | Date | string
+  }
+
+  export type EventoCampoWhereInput = {
+    AND?: EventoCampoWhereInput | EventoCampoWhereInput[]
+    OR?: EventoCampoWhereInput[]
+    NOT?: EventoCampoWhereInput | EventoCampoWhereInput[]
+    id_evento?: BigIntFilter<"EventoCampo"> | bigint | number
+    id_usuario?: StringFilter<"EventoCampo"> | string
+    id_expediente?: IntFilter<"EventoCampo"> | number
+    punto?: StringFilter<"EventoCampo"> | string
+    tipo?: StringFilter<"EventoCampo"> | string
+    distancia_m?: DecimalNullableFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFilter<"EventoCampo"> | Date | string
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+    expediente?: XOR<ExpedienteScalarRelationFilter, ExpedienteWhereInput>
+  }
+
+  export type EventoCampoOrderByWithRelationInput = {
+    id_evento?: SortOrder
+    id_usuario?: SortOrder
+    id_expediente?: SortOrder
+    punto?: SortOrder
+    tipo?: SortOrder
+    distancia_m?: SortOrderInput | SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    registrado_en?: SortOrder
+    usuario?: UsuarioOrderByWithRelationInput
+    expediente?: ExpedienteOrderByWithRelationInput
+    _relevance?: EventoCampoOrderByRelevanceInput
+  }
+
+  export type EventoCampoWhereUniqueInput = Prisma.AtLeast<{
+    id_evento?: bigint | number
+    AND?: EventoCampoWhereInput | EventoCampoWhereInput[]
+    OR?: EventoCampoWhereInput[]
+    NOT?: EventoCampoWhereInput | EventoCampoWhereInput[]
+    id_usuario?: StringFilter<"EventoCampo"> | string
+    id_expediente?: IntFilter<"EventoCampo"> | number
+    punto?: StringFilter<"EventoCampo"> | string
+    tipo?: StringFilter<"EventoCampo"> | string
+    distancia_m?: DecimalNullableFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFilter<"EventoCampo"> | Date | string
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+    expediente?: XOR<ExpedienteScalarRelationFilter, ExpedienteWhereInput>
+  }, "id_evento">
+
+  export type EventoCampoOrderByWithAggregationInput = {
+    id_evento?: SortOrder
+    id_usuario?: SortOrder
+    id_expediente?: SortOrder
+    punto?: SortOrder
+    tipo?: SortOrder
+    distancia_m?: SortOrderInput | SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    registrado_en?: SortOrder
+    _count?: EventoCampoCountOrderByAggregateInput
+    _avg?: EventoCampoAvgOrderByAggregateInput
+    _max?: EventoCampoMaxOrderByAggregateInput
+    _min?: EventoCampoMinOrderByAggregateInput
+    _sum?: EventoCampoSumOrderByAggregateInput
+  }
+
+  export type EventoCampoScalarWhereWithAggregatesInput = {
+    AND?: EventoCampoScalarWhereWithAggregatesInput | EventoCampoScalarWhereWithAggregatesInput[]
+    OR?: EventoCampoScalarWhereWithAggregatesInput[]
+    NOT?: EventoCampoScalarWhereWithAggregatesInput | EventoCampoScalarWhereWithAggregatesInput[]
+    id_evento?: BigIntWithAggregatesFilter<"EventoCampo"> | bigint | number
+    id_usuario?: StringWithAggregatesFilter<"EventoCampo"> | string
+    id_expediente?: IntWithAggregatesFilter<"EventoCampo"> | number
+    punto?: StringWithAggregatesFilter<"EventoCampo"> | string
+    tipo?: StringWithAggregatesFilter<"EventoCampo"> | string
+    distancia_m?: DecimalNullableWithAggregatesFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalWithAggregatesFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalWithAggregatesFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeWithAggregatesFilter<"EventoCampo"> | Date | string
   }
 
   export type DispositivoAutorizadoWhereInput = {
@@ -13944,6 +15280,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     cambios?: ExpedienteCambioListRelationFilter
+    eventosCampo?: EventoCampoListRelationFilter
   }
 
   export type ExpedienteOrderByWithRelationInput = {
@@ -13991,6 +15328,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaOrderByRelationAggregateInput
     visitas?: VisitaAuditoriaOrderByRelationAggregateInput
     cambios?: ExpedienteCambioOrderByRelationAggregateInput
+    eventosCampo?: EventoCampoOrderByRelationAggregateInput
     _relevance?: ExpedienteOrderByRelevanceInput
   }
 
@@ -14042,6 +15380,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     cambios?: ExpedienteCambioListRelationFilter
+    eventosCampo?: EventoCampoListRelationFilter
   }, "id_expediente" | "codigo_expediente">
 
   export type ExpedienteOrderByWithAggregationInput = {
@@ -14848,12 +16187,15 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateInput = {
@@ -14883,12 +16225,15 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUpdateInput = {
@@ -14918,12 +16263,15 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateInput = {
@@ -14953,12 +16301,15 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateManyInput = {
@@ -14988,6 +16339,8 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
   }
@@ -15019,6 +16372,8 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -15050,6 +16405,8 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -15120,6 +16477,88 @@ export namespace Prisma {
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFieldUpdateOperationsInput | boolean
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventoCampoCreateInput = {
+    id_evento?: bigint | number
+    punto: string
+    tipo: string
+    distancia_m?: Decimal | DecimalJsLike | number | string | null
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    registrado_en?: Date | string
+    usuario: UsuarioCreateNestedOneWithoutEventosCampoInput
+    expediente: ExpedienteCreateNestedOneWithoutEventosCampoInput
+  }
+
+  export type EventoCampoUncheckedCreateInput = {
+    id_evento?: bigint | number
+    id_usuario: string
+    id_expediente: number
+    punto: string
+    tipo: string
+    distancia_m?: Decimal | DecimalJsLike | number | string | null
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    registrado_en?: Date | string
+  }
+
+  export type EventoCampoUpdateInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    usuario?: UsuarioUpdateOneRequiredWithoutEventosCampoNestedInput
+    expediente?: ExpedienteUpdateOneRequiredWithoutEventosCampoNestedInput
+  }
+
+  export type EventoCampoUncheckedUpdateInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    id_expediente?: IntFieldUpdateOperationsInput | number
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventoCampoCreateManyInput = {
+    id_evento?: bigint | number
+    id_usuario: string
+    id_expediente: number
+    punto: string
+    tipo: string
+    distancia_m?: Decimal | DecimalJsLike | number | string | null
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    registrado_en?: Date | string
+  }
+
+  export type EventoCampoUpdateManyMutationInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventoCampoUncheckedUpdateManyInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    id_expediente?: IntFieldUpdateOperationsInput | number
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -15236,6 +16675,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutExpedienteInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutExpedienteInput
     cambios?: ExpedienteCambioCreateNestedManyWithoutExpedienteInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutExpedienteInput
   }
 
   export type ExpedienteUncheckedCreateInput = {
@@ -15283,6 +16723,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutExpedienteInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutExpedienteInput
     cambios?: ExpedienteCambioUncheckedCreateNestedManyWithoutExpedienteInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutExpedienteInput
   }
 
   export type ExpedienteUpdateInput = {
@@ -15329,6 +16770,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutExpedienteNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutExpedienteNestedInput
     cambios?: ExpedienteCambioUpdateManyWithoutExpedienteNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutExpedienteNestedInput
   }
 
   export type ExpedienteUncheckedUpdateInput = {
@@ -15376,6 +16818,7 @@ export namespace Prisma {
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutExpedienteNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutExpedienteNestedInput
     cambios?: ExpedienteCambioUncheckedUpdateManyWithoutExpedienteNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutExpedienteNestedInput
   }
 
   export type ExpedienteCreateManyInput = {
@@ -16378,6 +17821,17 @@ export namespace Prisma {
     not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type AsignacionAuditoriaListRelationFilter = {
     every?: AsignacionAuditoriaWhereInput
     some?: AsignacionAuditoriaWhereInput
@@ -16402,6 +17856,12 @@ export namespace Prisma {
     none?: TrackingUbicacionWhereInput
   }
 
+  export type EventoCampoListRelationFilter = {
+    every?: EventoCampoWhereInput
+    some?: EventoCampoWhereInput
+    none?: EventoCampoWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -16420,6 +17880,10 @@ export namespace Prisma {
   }
 
   export type TrackingUbicacionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EventoCampoOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -16456,6 +17920,8 @@ export namespace Prisma {
     ubicacion_en?: SortOrder
     ubicacion_precision?: SortOrder
     ubicacion_simulada?: SortOrder
+    bateria_porcentaje?: SortOrder
+    bateria_cargando?: SortOrder
     jornada_inicio?: SortOrder
     jornada_fin?: SortOrder
   }
@@ -16466,6 +17932,7 @@ export namespace Prisma {
     latitud?: SortOrder
     longitud?: SortOrder
     ubicacion_precision?: SortOrder
+    bateria_porcentaje?: SortOrder
   }
 
   export type UsuarioMaxOrderByAggregateInput = {
@@ -16495,6 +17962,8 @@ export namespace Prisma {
     ubicacion_en?: SortOrder
     ubicacion_precision?: SortOrder
     ubicacion_simulada?: SortOrder
+    bateria_porcentaje?: SortOrder
+    bateria_cargando?: SortOrder
     jornada_inicio?: SortOrder
     jornada_fin?: SortOrder
   }
@@ -16526,6 +17995,8 @@ export namespace Prisma {
     ubicacion_en?: SortOrder
     ubicacion_precision?: SortOrder
     ubicacion_simulada?: SortOrder
+    bateria_porcentaje?: SortOrder
+    bateria_cargando?: SortOrder
     jornada_inicio?: SortOrder
     jornada_fin?: SortOrder
   }
@@ -16536,6 +18007,7 @@ export namespace Prisma {
     latitud?: SortOrder
     longitud?: SortOrder
     ubicacion_precision?: SortOrder
+    bateria_porcentaje?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -16640,6 +18112,22 @@ export namespace Prisma {
     _sum?: NestedDecimalNullableFilter<$PrismaModel>
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type BigIntFilter<$PrismaModel = never> = {
@@ -16751,6 +18239,69 @@ export namespace Prisma {
     _max?: NestedDecimalFilter<$PrismaModel>
   }
 
+  export type ExpedienteScalarRelationFilter = {
+    is?: ExpedienteWhereInput
+    isNot?: ExpedienteWhereInput
+  }
+
+  export type EventoCampoOrderByRelevanceInput = {
+    fields: EventoCampoOrderByRelevanceFieldEnum | EventoCampoOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type EventoCampoCountOrderByAggregateInput = {
+    id_evento?: SortOrder
+    id_usuario?: SortOrder
+    id_expediente?: SortOrder
+    punto?: SortOrder
+    tipo?: SortOrder
+    distancia_m?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    registrado_en?: SortOrder
+  }
+
+  export type EventoCampoAvgOrderByAggregateInput = {
+    id_evento?: SortOrder
+    id_expediente?: SortOrder
+    distancia_m?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+  }
+
+  export type EventoCampoMaxOrderByAggregateInput = {
+    id_evento?: SortOrder
+    id_usuario?: SortOrder
+    id_expediente?: SortOrder
+    punto?: SortOrder
+    tipo?: SortOrder
+    distancia_m?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    registrado_en?: SortOrder
+  }
+
+  export type EventoCampoMinOrderByAggregateInput = {
+    id_evento?: SortOrder
+    id_usuario?: SortOrder
+    id_expediente?: SortOrder
+    punto?: SortOrder
+    tipo?: SortOrder
+    distancia_m?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    registrado_en?: SortOrder
+  }
+
+  export type EventoCampoSumOrderByAggregateInput = {
+    id_evento?: SortOrder
+    id_expediente?: SortOrder
+    distancia_m?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+  }
+
   export type DispositivoAutorizadoOrderByRelevanceInput = {
     fields: DispositivoAutorizadoOrderByRelevanceFieldEnum | DispositivoAutorizadoOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -16827,17 +18378,6 @@ export namespace Prisma {
     gt?: InputJsonValue
     gte?: InputJsonValue
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type ExpedienteCambioListRelationFilter = {
@@ -17039,22 +18579,6 @@ export namespace Prisma {
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
-
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -17077,11 +18601,6 @@ export namespace Prisma {
     gt?: InputJsonValue
     gte?: InputJsonValue
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type ExpedienteScalarRelationFilter = {
-    is?: ExpedienteWhereInput
-    isNot?: ExpedienteWhereInput
   }
 
   export type ExpedienteCambioOrderByRelevanceInput = {
@@ -17602,6 +19121,13 @@ export namespace Prisma {
     connect?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
   }
 
+  export type EventoCampoCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<EventoCampoCreateWithoutUsuarioInput, EventoCampoUncheckedCreateWithoutUsuarioInput> | EventoCampoCreateWithoutUsuarioInput[] | EventoCampoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: EventoCampoCreateOrConnectWithoutUsuarioInput | EventoCampoCreateOrConnectWithoutUsuarioInput[]
+    createMany?: EventoCampoCreateManyUsuarioInputEnvelope
+    connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutAuditorInput, AsignacionAuditoriaUncheckedCreateWithoutAuditorInput> | AsignacionAuditoriaCreateWithoutAuditorInput[] | AsignacionAuditoriaUncheckedCreateWithoutAuditorInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutAuditorInput | AsignacionAuditoriaCreateOrConnectWithoutAuditorInput[]
@@ -17628,6 +19154,13 @@ export namespace Prisma {
     connectOrCreate?: TrackingUbicacionCreateOrConnectWithoutUsuarioInput | TrackingUbicacionCreateOrConnectWithoutUsuarioInput[]
     createMany?: TrackingUbicacionCreateManyUsuarioInputEnvelope
     connect?: TrackingUbicacionWhereUniqueInput | TrackingUbicacionWhereUniqueInput[]
+  }
+
+  export type EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<EventoCampoCreateWithoutUsuarioInput, EventoCampoUncheckedCreateWithoutUsuarioInput> | EventoCampoCreateWithoutUsuarioInput[] | EventoCampoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: EventoCampoCreateOrConnectWithoutUsuarioInput | EventoCampoCreateOrConnectWithoutUsuarioInput[]
+    createMany?: EventoCampoCreateManyUsuarioInputEnvelope
+    connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -17664,6 +19197,14 @@ export namespace Prisma {
     decrement?: Decimal | DecimalJsLike | number | string
     multiply?: Decimal | DecimalJsLike | number | string
     divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput = {
@@ -17722,6 +19263,20 @@ export namespace Prisma {
     deleteMany?: TrackingUbicacionScalarWhereInput | TrackingUbicacionScalarWhereInput[]
   }
 
+  export type EventoCampoUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<EventoCampoCreateWithoutUsuarioInput, EventoCampoUncheckedCreateWithoutUsuarioInput> | EventoCampoCreateWithoutUsuarioInput[] | EventoCampoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: EventoCampoCreateOrConnectWithoutUsuarioInput | EventoCampoCreateOrConnectWithoutUsuarioInput[]
+    upsert?: EventoCampoUpsertWithWhereUniqueWithoutUsuarioInput | EventoCampoUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: EventoCampoCreateManyUsuarioInputEnvelope
+    set?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    disconnect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    delete?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    update?: EventoCampoUpdateWithWhereUniqueWithoutUsuarioInput | EventoCampoUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: EventoCampoUpdateManyWithWhereWithoutUsuarioInput | EventoCampoUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: EventoCampoScalarWhereInput | EventoCampoScalarWhereInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutAuditorInput, AsignacionAuditoriaUncheckedCreateWithoutAuditorInput> | AsignacionAuditoriaCreateWithoutAuditorInput[] | AsignacionAuditoriaUncheckedCreateWithoutAuditorInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutAuditorInput | AsignacionAuditoriaCreateOrConnectWithoutAuditorInput[]
@@ -17778,6 +19333,20 @@ export namespace Prisma {
     deleteMany?: TrackingUbicacionScalarWhereInput | TrackingUbicacionScalarWhereInput[]
   }
 
+  export type EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<EventoCampoCreateWithoutUsuarioInput, EventoCampoUncheckedCreateWithoutUsuarioInput> | EventoCampoCreateWithoutUsuarioInput[] | EventoCampoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: EventoCampoCreateOrConnectWithoutUsuarioInput | EventoCampoCreateOrConnectWithoutUsuarioInput[]
+    upsert?: EventoCampoUpsertWithWhereUniqueWithoutUsuarioInput | EventoCampoUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: EventoCampoCreateManyUsuarioInputEnvelope
+    set?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    disconnect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    delete?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    update?: EventoCampoUpdateWithWhereUniqueWithoutUsuarioInput | EventoCampoUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: EventoCampoUpdateManyWithWhereWithoutUsuarioInput | EventoCampoUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: EventoCampoScalarWhereInput | EventoCampoScalarWhereInput[]
+  }
+
   export type UsuarioCreateNestedOneWithoutTrackingsInput = {
     create?: XOR<UsuarioCreateWithoutTrackingsInput, UsuarioUncheckedCreateWithoutTrackingsInput>
     connectOrCreate?: UsuarioCreateOrConnectWithoutTrackingsInput
@@ -17806,6 +19375,34 @@ export namespace Prisma {
     upsert?: UsuarioUpsertWithoutTrackingsInput
     connect?: UsuarioWhereUniqueInput
     update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutTrackingsInput, UsuarioUpdateWithoutTrackingsInput>, UsuarioUncheckedUpdateWithoutTrackingsInput>
+  }
+
+  export type UsuarioCreateNestedOneWithoutEventosCampoInput = {
+    create?: XOR<UsuarioCreateWithoutEventosCampoInput, UsuarioUncheckedCreateWithoutEventosCampoInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutEventosCampoInput
+    connect?: UsuarioWhereUniqueInput
+  }
+
+  export type ExpedienteCreateNestedOneWithoutEventosCampoInput = {
+    create?: XOR<ExpedienteCreateWithoutEventosCampoInput, ExpedienteUncheckedCreateWithoutEventosCampoInput>
+    connectOrCreate?: ExpedienteCreateOrConnectWithoutEventosCampoInput
+    connect?: ExpedienteWhereUniqueInput
+  }
+
+  export type UsuarioUpdateOneRequiredWithoutEventosCampoNestedInput = {
+    create?: XOR<UsuarioCreateWithoutEventosCampoInput, UsuarioUncheckedCreateWithoutEventosCampoInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutEventosCampoInput
+    upsert?: UsuarioUpsertWithoutEventosCampoInput
+    connect?: UsuarioWhereUniqueInput
+    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutEventosCampoInput, UsuarioUpdateWithoutEventosCampoInput>, UsuarioUncheckedUpdateWithoutEventosCampoInput>
+  }
+
+  export type ExpedienteUpdateOneRequiredWithoutEventosCampoNestedInput = {
+    create?: XOR<ExpedienteCreateWithoutEventosCampoInput, ExpedienteUncheckedCreateWithoutEventosCampoInput>
+    connectOrCreate?: ExpedienteCreateOrConnectWithoutEventosCampoInput
+    upsert?: ExpedienteUpsertWithoutEventosCampoInput
+    connect?: ExpedienteWhereUniqueInput
+    update?: XOR<XOR<ExpedienteUpdateToOneWithWhereWithoutEventosCampoInput, ExpedienteUpdateWithoutEventosCampoInput>, ExpedienteUncheckedUpdateWithoutEventosCampoInput>
   }
 
   export type UsuarioCreateNestedOneWithoutDispositivosInput = {
@@ -17843,6 +19440,13 @@ export namespace Prisma {
     connect?: ExpedienteCambioWhereUniqueInput | ExpedienteCambioWhereUniqueInput[]
   }
 
+  export type EventoCampoCreateNestedManyWithoutExpedienteInput = {
+    create?: XOR<EventoCampoCreateWithoutExpedienteInput, EventoCampoUncheckedCreateWithoutExpedienteInput> | EventoCampoCreateWithoutExpedienteInput[] | EventoCampoUncheckedCreateWithoutExpedienteInput[]
+    connectOrCreate?: EventoCampoCreateOrConnectWithoutExpedienteInput | EventoCampoCreateOrConnectWithoutExpedienteInput[]
+    createMany?: EventoCampoCreateManyExpedienteInputEnvelope
+    connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedCreateNestedManyWithoutExpedienteInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutExpedienteInput, AsignacionAuditoriaUncheckedCreateWithoutExpedienteInput> | AsignacionAuditoriaCreateWithoutExpedienteInput[] | AsignacionAuditoriaUncheckedCreateWithoutExpedienteInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutExpedienteInput | AsignacionAuditoriaCreateOrConnectWithoutExpedienteInput[]
@@ -17864,20 +19468,19 @@ export namespace Prisma {
     connect?: ExpedienteCambioWhereUniqueInput | ExpedienteCambioWhereUniqueInput[]
   }
 
+  export type EventoCampoUncheckedCreateNestedManyWithoutExpedienteInput = {
+    create?: XOR<EventoCampoCreateWithoutExpedienteInput, EventoCampoUncheckedCreateWithoutExpedienteInput> | EventoCampoCreateWithoutExpedienteInput[] | EventoCampoUncheckedCreateWithoutExpedienteInput[]
+    connectOrCreate?: EventoCampoCreateOrConnectWithoutExpedienteInput | EventoCampoCreateOrConnectWithoutExpedienteInput[]
+    createMany?: EventoCampoCreateManyExpedienteInputEnvelope
+    connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+  }
+
   export type EnumTipoCreditoFieldUpdateOperationsInput = {
     set?: $Enums.TipoCredito
   }
 
   export type EnumTipoDocumentoFieldUpdateOperationsInput = {
     set?: $Enums.TipoDocumento
-  }
-
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type AsignacionAuditoriaUpdateManyWithoutExpedienteNestedInput = {
@@ -17922,6 +19525,20 @@ export namespace Prisma {
     deleteMany?: ExpedienteCambioScalarWhereInput | ExpedienteCambioScalarWhereInput[]
   }
 
+  export type EventoCampoUpdateManyWithoutExpedienteNestedInput = {
+    create?: XOR<EventoCampoCreateWithoutExpedienteInput, EventoCampoUncheckedCreateWithoutExpedienteInput> | EventoCampoCreateWithoutExpedienteInput[] | EventoCampoUncheckedCreateWithoutExpedienteInput[]
+    connectOrCreate?: EventoCampoCreateOrConnectWithoutExpedienteInput | EventoCampoCreateOrConnectWithoutExpedienteInput[]
+    upsert?: EventoCampoUpsertWithWhereUniqueWithoutExpedienteInput | EventoCampoUpsertWithWhereUniqueWithoutExpedienteInput[]
+    createMany?: EventoCampoCreateManyExpedienteInputEnvelope
+    set?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    disconnect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    delete?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    update?: EventoCampoUpdateWithWhereUniqueWithoutExpedienteInput | EventoCampoUpdateWithWhereUniqueWithoutExpedienteInput[]
+    updateMany?: EventoCampoUpdateManyWithWhereWithoutExpedienteInput | EventoCampoUpdateManyWithWhereWithoutExpedienteInput[]
+    deleteMany?: EventoCampoScalarWhereInput | EventoCampoScalarWhereInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedUpdateManyWithoutExpedienteNestedInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutExpedienteInput, AsignacionAuditoriaUncheckedCreateWithoutExpedienteInput> | AsignacionAuditoriaCreateWithoutExpedienteInput[] | AsignacionAuditoriaUncheckedCreateWithoutExpedienteInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutExpedienteInput | AsignacionAuditoriaCreateOrConnectWithoutExpedienteInput[]
@@ -17962,6 +19579,20 @@ export namespace Prisma {
     update?: ExpedienteCambioUpdateWithWhereUniqueWithoutExpedienteInput | ExpedienteCambioUpdateWithWhereUniqueWithoutExpedienteInput[]
     updateMany?: ExpedienteCambioUpdateManyWithWhereWithoutExpedienteInput | ExpedienteCambioUpdateManyWithWhereWithoutExpedienteInput[]
     deleteMany?: ExpedienteCambioScalarWhereInput | ExpedienteCambioScalarWhereInput[]
+  }
+
+  export type EventoCampoUncheckedUpdateManyWithoutExpedienteNestedInput = {
+    create?: XOR<EventoCampoCreateWithoutExpedienteInput, EventoCampoUncheckedCreateWithoutExpedienteInput> | EventoCampoCreateWithoutExpedienteInput[] | EventoCampoUncheckedCreateWithoutExpedienteInput[]
+    connectOrCreate?: EventoCampoCreateOrConnectWithoutExpedienteInput | EventoCampoCreateOrConnectWithoutExpedienteInput[]
+    upsert?: EventoCampoUpsertWithWhereUniqueWithoutExpedienteInput | EventoCampoUpsertWithWhereUniqueWithoutExpedienteInput[]
+    createMany?: EventoCampoCreateManyExpedienteInputEnvelope
+    set?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    disconnect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    delete?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+    update?: EventoCampoUpdateWithWhereUniqueWithoutExpedienteInput | EventoCampoUpdateWithWhereUniqueWithoutExpedienteInput[]
+    updateMany?: EventoCampoUpdateManyWithWhereWithoutExpedienteInput | EventoCampoUpdateManyWithWhereWithoutExpedienteInput[]
+    deleteMany?: EventoCampoScalarWhereInput | EventoCampoScalarWhereInput[]
   }
 
   export type ExpedienteCreateNestedOneWithoutCambiosInput = {
@@ -18173,6 +19804,17 @@ export namespace Prisma {
     not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
   }
 
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -18207,17 +19849,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -18297,6 +19928,33 @@ export namespace Prisma {
     _sum?: NestedDecimalNullableFilter<$PrismaModel>
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedBigIntFilter<$PrismaModel = never> = {
@@ -18408,33 +20066,6 @@ export namespace Prisma {
     gt?: InputJsonValue
     gte?: InputJsonValue
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -18643,6 +20274,38 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type EventoCampoCreateWithoutUsuarioInput = {
+    id_evento?: bigint | number
+    punto: string
+    tipo: string
+    distancia_m?: Decimal | DecimalJsLike | number | string | null
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    registrado_en?: Date | string
+    expediente: ExpedienteCreateNestedOneWithoutEventosCampoInput
+  }
+
+  export type EventoCampoUncheckedCreateWithoutUsuarioInput = {
+    id_evento?: bigint | number
+    id_expediente: number
+    punto: string
+    tipo: string
+    distancia_m?: Decimal | DecimalJsLike | number | string | null
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    registrado_en?: Date | string
+  }
+
+  export type EventoCampoCreateOrConnectWithoutUsuarioInput = {
+    where: EventoCampoWhereUniqueInput
+    create: XOR<EventoCampoCreateWithoutUsuarioInput, EventoCampoUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type EventoCampoCreateManyUsuarioInputEnvelope = {
+    data: EventoCampoCreateManyUsuarioInput | EventoCampoCreateManyUsuarioInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AsignacionAuditoriaUpsertWithWhereUniqueWithoutAuditorInput = {
     where: AsignacionAuditoriaWhereUniqueInput
     update: XOR<AsignacionAuditoriaUpdateWithoutAuditorInput, AsignacionAuditoriaUncheckedUpdateWithoutAuditorInput>
@@ -18788,6 +20451,37 @@ export namespace Prisma {
     registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
   }
 
+  export type EventoCampoUpsertWithWhereUniqueWithoutUsuarioInput = {
+    where: EventoCampoWhereUniqueInput
+    update: XOR<EventoCampoUpdateWithoutUsuarioInput, EventoCampoUncheckedUpdateWithoutUsuarioInput>
+    create: XOR<EventoCampoCreateWithoutUsuarioInput, EventoCampoUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type EventoCampoUpdateWithWhereUniqueWithoutUsuarioInput = {
+    where: EventoCampoWhereUniqueInput
+    data: XOR<EventoCampoUpdateWithoutUsuarioInput, EventoCampoUncheckedUpdateWithoutUsuarioInput>
+  }
+
+  export type EventoCampoUpdateManyWithWhereWithoutUsuarioInput = {
+    where: EventoCampoScalarWhereInput
+    data: XOR<EventoCampoUpdateManyMutationInput, EventoCampoUncheckedUpdateManyWithoutUsuarioInput>
+  }
+
+  export type EventoCampoScalarWhereInput = {
+    AND?: EventoCampoScalarWhereInput | EventoCampoScalarWhereInput[]
+    OR?: EventoCampoScalarWhereInput[]
+    NOT?: EventoCampoScalarWhereInput | EventoCampoScalarWhereInput[]
+    id_evento?: BigIntFilter<"EventoCampo"> | bigint | number
+    id_usuario?: StringFilter<"EventoCampo"> | string
+    id_expediente?: IntFilter<"EventoCampo"> | number
+    punto?: StringFilter<"EventoCampo"> | string
+    tipo?: StringFilter<"EventoCampo"> | string
+    distancia_m?: DecimalNullableFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFilter<"EventoCampo"> | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFilter<"EventoCampo"> | Date | string
+  }
+
   export type UsuarioCreateWithoutTrackingsInput = {
     id_usuario?: string
     username: string
@@ -18815,11 +20509,14 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutTrackingsInput = {
@@ -18849,11 +20546,14 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutTrackingsInput = {
@@ -18899,11 +20599,14 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutTrackingsInput = {
@@ -18933,11 +20636,380 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
+  }
+
+  export type UsuarioCreateWithoutEventosCampoInput = {
+    id_usuario?: string
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    departamento?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
+    asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
+    visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
+    dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioUncheckedCreateWithoutEventosCampoInput = {
+    id_usuario?: string
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    departamento?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
+    asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
+    visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
+    dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioCreateOrConnectWithoutEventosCampoInput = {
+    where: UsuarioWhereUniqueInput
+    create: XOR<UsuarioCreateWithoutEventosCampoInput, UsuarioUncheckedCreateWithoutEventosCampoInput>
+  }
+
+  export type ExpedienteCreateWithoutEventosCampoInput = {
+    codigo_expediente: string
+    tipo_credito?: $Enums.TipoCredito
+    oficina?: string | null
+    tipo_documento_cliente?: $Enums.TipoDocumento
+    numero_documento_cliente: string
+    nombres_cliente: string
+    telefono_cliente?: string | null
+    direccion_domicilio?: string | null
+    distrito?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    asesor_responsable: string
+    monto_desembolso?: Decimal | DecimalJsLike | number | string | null
+    moneda?: string | null
+    datos_cliente?: NullableJsonNullValueInput | InputJsonValue
+    datos_negocio?: NullableJsonNullValueInput | InputJsonValue
+    datos_credito?: NullableJsonNullValueInput | InputJsonValue
+    evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
+    endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
+    ubicacion_origen?: string | null
+    autoasignable?: boolean
+    id_importacion?: string | null
+    fila_origen?: number | null
+    hash_origen?: string | null
+    advertencias_origen?: NullableJsonNullValueInput | InputJsonValue
+    estado?: string
+    fecha_creacion?: Date | string
+    fecha_actualizar?: Date | string
+    asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutExpedienteInput
+    visitas?: VisitaAuditoriaCreateNestedManyWithoutExpedienteInput
+    cambios?: ExpedienteCambioCreateNestedManyWithoutExpedienteInput
+  }
+
+  export type ExpedienteUncheckedCreateWithoutEventosCampoInput = {
+    id_expediente?: number
+    codigo_expediente: string
+    tipo_credito?: $Enums.TipoCredito
+    oficina?: string | null
+    tipo_documento_cliente?: $Enums.TipoDocumento
+    numero_documento_cliente: string
+    nombres_cliente: string
+    telefono_cliente?: string | null
+    direccion_domicilio?: string | null
+    distrito?: string | null
+    provincia?: string | null
+    departamento?: string | null
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    asesor_responsable: string
+    monto_desembolso?: Decimal | DecimalJsLike | number | string | null
+    moneda?: string | null
+    datos_cliente?: NullableJsonNullValueInput | InputJsonValue
+    datos_negocio?: NullableJsonNullValueInput | InputJsonValue
+    datos_credito?: NullableJsonNullValueInput | InputJsonValue
+    evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
+    endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: string | null
+    geo_confianza?: string | null
+    geo_precision?: string | null
+    geo_proveedor?: string | null
+    geo_latitud?: Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: string | null
+    geo_fecha?: Date | string | null
+    ubicacion_origen?: string | null
+    autoasignable?: boolean
+    id_importacion?: string | null
+    fila_origen?: number | null
+    hash_origen?: string | null
+    advertencias_origen?: NullableJsonNullValueInput | InputJsonValue
+    estado?: string
+    fecha_creacion?: Date | string
+    fecha_actualizar?: Date | string
+    asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutExpedienteInput
+    visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutExpedienteInput
+    cambios?: ExpedienteCambioUncheckedCreateNestedManyWithoutExpedienteInput
+  }
+
+  export type ExpedienteCreateOrConnectWithoutEventosCampoInput = {
+    where: ExpedienteWhereUniqueInput
+    create: XOR<ExpedienteCreateWithoutEventosCampoInput, ExpedienteUncheckedCreateWithoutEventosCampoInput>
+  }
+
+  export type UsuarioUpsertWithoutEventosCampoInput = {
+    update: XOR<UsuarioUpdateWithoutEventosCampoInput, UsuarioUncheckedUpdateWithoutEventosCampoInput>
+    create: XOR<UsuarioCreateWithoutEventosCampoInput, UsuarioUncheckedCreateWithoutEventosCampoInput>
+    where?: UsuarioWhereInput
+  }
+
+  export type UsuarioUpdateToOneWithWhereWithoutEventosCampoInput = {
+    where?: UsuarioWhereInput
+    data: XOR<UsuarioUpdateWithoutEventosCampoInput, UsuarioUncheckedUpdateWithoutEventosCampoInput>
+  }
+
+  export type UsuarioUpdateWithoutEventosCampoInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
+    visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
+    dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
+  }
+
+  export type UsuarioUncheckedUpdateWithoutEventosCampoInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
+    visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
+    dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
+  }
+
+  export type ExpedienteUpsertWithoutEventosCampoInput = {
+    update: XOR<ExpedienteUpdateWithoutEventosCampoInput, ExpedienteUncheckedUpdateWithoutEventosCampoInput>
+    create: XOR<ExpedienteCreateWithoutEventosCampoInput, ExpedienteUncheckedCreateWithoutEventosCampoInput>
+    where?: ExpedienteWhereInput
+  }
+
+  export type ExpedienteUpdateToOneWithWhereWithoutEventosCampoInput = {
+    where?: ExpedienteWhereInput
+    data: XOR<ExpedienteUpdateWithoutEventosCampoInput, ExpedienteUncheckedUpdateWithoutEventosCampoInput>
+  }
+
+  export type ExpedienteUpdateWithoutEventosCampoInput = {
+    codigo_expediente?: StringFieldUpdateOperationsInput | string
+    tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
+    oficina?: NullableStringFieldUpdateOperationsInput | string | null
+    tipo_documento_cliente?: EnumTipoDocumentoFieldUpdateOperationsInput | $Enums.TipoDocumento
+    numero_documento_cliente?: StringFieldUpdateOperationsInput | string
+    nombres_cliente?: StringFieldUpdateOperationsInput | string
+    telefono_cliente?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
+    distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    asesor_responsable?: StringFieldUpdateOperationsInput | string
+    monto_desembolso?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    moneda?: NullableStringFieldUpdateOperationsInput | string | null
+    datos_cliente?: NullableJsonNullValueInput | InputJsonValue
+    datos_negocio?: NullableJsonNullValueInput | InputJsonValue
+    datos_credito?: NullableJsonNullValueInput | InputJsonValue
+    evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
+    endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
+    id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
+    hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    advertencias_origen?: NullableJsonNullValueInput | InputJsonValue
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
+    asignaciones?: AsignacionAuditoriaUpdateManyWithoutExpedienteNestedInput
+    visitas?: VisitaAuditoriaUpdateManyWithoutExpedienteNestedInput
+    cambios?: ExpedienteCambioUpdateManyWithoutExpedienteNestedInput
+  }
+
+  export type ExpedienteUncheckedUpdateWithoutEventosCampoInput = {
+    id_expediente?: IntFieldUpdateOperationsInput | number
+    codigo_expediente?: StringFieldUpdateOperationsInput | string
+    tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
+    oficina?: NullableStringFieldUpdateOperationsInput | string | null
+    tipo_documento_cliente?: EnumTipoDocumentoFieldUpdateOperationsInput | $Enums.TipoDocumento
+    numero_documento_cliente?: StringFieldUpdateOperationsInput | string
+    nombres_cliente?: StringFieldUpdateOperationsInput | string
+    telefono_cliente?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_domicilio?: NullableStringFieldUpdateOperationsInput | string | null
+    distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    asesor_responsable?: StringFieldUpdateOperationsInput | string
+    monto_desembolso?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    moneda?: NullableStringFieldUpdateOperationsInput | string | null
+    datos_cliente?: NullableJsonNullValueInput | InputJsonValue
+    datos_negocio?: NullableJsonNullValueInput | InputJsonValue
+    datos_credito?: NullableJsonNullValueInput | InputJsonValue
+    evaluacion_financiera?: NullableJsonNullValueInput | InputJsonValue
+    endeudamiento?: NullableJsonNullValueInput | InputJsonValue
+    direccion_normalizada?: NullableStringFieldUpdateOperationsInput | string | null
+    direccion_componentes?: NullableJsonNullValueInput | InputJsonValue
+    geo_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_confianza?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_precision?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_proveedor?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    autoasignable?: BoolFieldUpdateOperationsInput | boolean
+    id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fila_origen?: NullableIntFieldUpdateOperationsInput | number | null
+    hash_origen?: NullableStringFieldUpdateOperationsInput | string | null
+    advertencias_origen?: NullableJsonNullValueInput | InputJsonValue
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
+    asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutExpedienteNestedInput
+    visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutExpedienteNestedInput
+    cambios?: ExpedienteCambioUncheckedUpdateManyWithoutExpedienteNestedInput
   }
 
   export type UsuarioCreateWithoutDispositivosInput = {
@@ -18967,11 +21039,14 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutDispositivosInput = {
@@ -19001,11 +21076,14 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutDispositivosInput = {
@@ -19051,11 +21129,14 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutDispositivosInput = {
@@ -19085,11 +21166,14 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type AsignacionAuditoriaCreateWithoutExpedienteInput = {
@@ -19234,6 +21318,38 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type EventoCampoCreateWithoutExpedienteInput = {
+    id_evento?: bigint | number
+    punto: string
+    tipo: string
+    distancia_m?: Decimal | DecimalJsLike | number | string | null
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    registrado_en?: Date | string
+    usuario: UsuarioCreateNestedOneWithoutEventosCampoInput
+  }
+
+  export type EventoCampoUncheckedCreateWithoutExpedienteInput = {
+    id_evento?: bigint | number
+    id_usuario: string
+    punto: string
+    tipo: string
+    distancia_m?: Decimal | DecimalJsLike | number | string | null
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    registrado_en?: Date | string
+  }
+
+  export type EventoCampoCreateOrConnectWithoutExpedienteInput = {
+    where: EventoCampoWhereUniqueInput
+    create: XOR<EventoCampoCreateWithoutExpedienteInput, EventoCampoUncheckedCreateWithoutExpedienteInput>
+  }
+
+  export type EventoCampoCreateManyExpedienteInputEnvelope = {
+    data: EventoCampoCreateManyExpedienteInput | EventoCampoCreateManyExpedienteInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AsignacionAuditoriaUpsertWithWhereUniqueWithoutExpedienteInput = {
     where: AsignacionAuditoriaWhereUniqueInput
     update: XOR<AsignacionAuditoriaUpdateWithoutExpedienteInput, AsignacionAuditoriaUncheckedUpdateWithoutExpedienteInput>
@@ -19295,6 +21411,22 @@ export namespace Prisma {
     fecha?: DateTimeFilter<"ExpedienteCambio"> | Date | string
   }
 
+  export type EventoCampoUpsertWithWhereUniqueWithoutExpedienteInput = {
+    where: EventoCampoWhereUniqueInput
+    update: XOR<EventoCampoUpdateWithoutExpedienteInput, EventoCampoUncheckedUpdateWithoutExpedienteInput>
+    create: XOR<EventoCampoCreateWithoutExpedienteInput, EventoCampoUncheckedCreateWithoutExpedienteInput>
+  }
+
+  export type EventoCampoUpdateWithWhereUniqueWithoutExpedienteInput = {
+    where: EventoCampoWhereUniqueInput
+    data: XOR<EventoCampoUpdateWithoutExpedienteInput, EventoCampoUncheckedUpdateWithoutExpedienteInput>
+  }
+
+  export type EventoCampoUpdateManyWithWhereWithoutExpedienteInput = {
+    where: EventoCampoScalarWhereInput
+    data: XOR<EventoCampoUpdateManyMutationInput, EventoCampoUncheckedUpdateManyWithoutExpedienteInput>
+  }
+
   export type ExpedienteCreateWithoutCambiosInput = {
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
@@ -19338,6 +21470,7 @@ export namespace Prisma {
     fecha_actualizar?: Date | string
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutExpedienteInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutExpedienteInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutExpedienteInput
   }
 
   export type ExpedienteUncheckedCreateWithoutCambiosInput = {
@@ -19384,6 +21517,7 @@ export namespace Prisma {
     fecha_actualizar?: Date | string
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutExpedienteInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutExpedienteInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutExpedienteInput
   }
 
   export type ExpedienteCreateOrConnectWithoutCambiosInput = {
@@ -19445,6 +21579,7 @@ export namespace Prisma {
     fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutExpedienteNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutExpedienteNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutExpedienteNestedInput
   }
 
   export type ExpedienteUncheckedUpdateWithoutCambiosInput = {
@@ -19491,6 +21626,7 @@ export namespace Prisma {
     fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutExpedienteNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutExpedienteNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutExpedienteNestedInput
   }
 
   export type ExpedienteCreateWithoutAsignacionesInput = {
@@ -19536,6 +21672,7 @@ export namespace Prisma {
     fecha_actualizar?: Date | string
     visitas?: VisitaAuditoriaCreateNestedManyWithoutExpedienteInput
     cambios?: ExpedienteCambioCreateNestedManyWithoutExpedienteInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutExpedienteInput
   }
 
   export type ExpedienteUncheckedCreateWithoutAsignacionesInput = {
@@ -19582,6 +21719,7 @@ export namespace Prisma {
     fecha_actualizar?: Date | string
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutExpedienteInput
     cambios?: ExpedienteCambioUncheckedCreateNestedManyWithoutExpedienteInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutExpedienteInput
   }
 
   export type ExpedienteCreateOrConnectWithoutAsignacionesInput = {
@@ -19616,11 +21754,14 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutAsignacionesInput = {
@@ -19650,11 +21791,14 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutAsignacionesInput = {
@@ -19716,6 +21860,7 @@ export namespace Prisma {
     fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
     visitas?: VisitaAuditoriaUpdateManyWithoutExpedienteNestedInput
     cambios?: ExpedienteCambioUpdateManyWithoutExpedienteNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutExpedienteNestedInput
   }
 
   export type ExpedienteUncheckedUpdateWithoutAsignacionesInput = {
@@ -19762,6 +21907,7 @@ export namespace Prisma {
     fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutExpedienteNestedInput
     cambios?: ExpedienteCambioUncheckedUpdateManyWithoutExpedienteNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutExpedienteNestedInput
   }
 
   export type UsuarioUpsertWithoutAsignacionesInput = {
@@ -19802,11 +21948,14 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutAsignacionesInput = {
@@ -19836,11 +21985,14 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type ExpedienteCreateWithoutVisitasInput = {
@@ -19886,6 +22038,7 @@ export namespace Prisma {
     fecha_actualizar?: Date | string
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutExpedienteInput
     cambios?: ExpedienteCambioCreateNestedManyWithoutExpedienteInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutExpedienteInput
   }
 
   export type ExpedienteUncheckedCreateWithoutVisitasInput = {
@@ -19932,6 +22085,7 @@ export namespace Prisma {
     fecha_actualizar?: Date | string
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutExpedienteInput
     cambios?: ExpedienteCambioUncheckedCreateNestedManyWithoutExpedienteInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutExpedienteInput
   }
 
   export type ExpedienteCreateOrConnectWithoutVisitasInput = {
@@ -19966,11 +22120,14 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutVisitasInput = {
@@ -20000,11 +22157,14 @@ export namespace Prisma {
     ubicacion_en?: Date | string | null
     ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutVisitasInput = {
@@ -20098,6 +22258,7 @@ export namespace Prisma {
     fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutExpedienteNestedInput
     cambios?: ExpedienteCambioUpdateManyWithoutExpedienteNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutExpedienteNestedInput
   }
 
   export type ExpedienteUncheckedUpdateWithoutVisitasInput = {
@@ -20144,6 +22305,7 @@ export namespace Prisma {
     fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutExpedienteNestedInput
     cambios?: ExpedienteCambioUncheckedUpdateManyWithoutExpedienteNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutExpedienteNestedInput
   }
 
   export type UsuarioUpsertWithoutVisitasInput = {
@@ -20184,11 +22346,14 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutVisitasInput = {
@@ -20218,11 +22383,14 @@ export namespace Prisma {
     ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type EvidenciaUpsertWithWhereUniqueWithoutVisitaInput = {
@@ -20483,6 +22651,17 @@ export namespace Prisma {
     registrado_en?: Date | string
   }
 
+  export type EventoCampoCreateManyUsuarioInput = {
+    id_evento?: bigint | number
+    id_expediente: number
+    punto: string
+    tipo: string
+    distancia_m?: Decimal | DecimalJsLike | number | string | null
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    registrado_en?: Date | string
+  }
+
   export type AsignacionAuditoriaUpdateWithoutAuditorInput = {
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -20678,6 +22857,39 @@ export namespace Prisma {
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type EventoCampoUpdateWithoutUsuarioInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    expediente?: ExpedienteUpdateOneRequiredWithoutEventosCampoNestedInput
+  }
+
+  export type EventoCampoUncheckedUpdateWithoutUsuarioInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    id_expediente?: IntFieldUpdateOperationsInput | number
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventoCampoUncheckedUpdateManyWithoutUsuarioInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    id_expediente?: IntFieldUpdateOperationsInput | number
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AsignacionAuditoriaCreateManyExpedienteInput = {
     id_asignacion?: number
     id_usuario_auditor: string
@@ -20732,6 +22944,17 @@ export namespace Prisma {
     tipo: string
     cambios: JsonNullValueInput | InputJsonValue
     fecha?: Date | string
+  }
+
+  export type EventoCampoCreateManyExpedienteInput = {
+    id_evento?: bigint | number
+    id_usuario: string
+    punto: string
+    tipo: string
+    distancia_m?: Decimal | DecimalJsLike | number | string | null
+    latitud: Decimal | DecimalJsLike | number | string
+    longitud: Decimal | DecimalJsLike | number | string
+    registrado_en?: Date | string
   }
 
   export type AsignacionAuditoriaUpdateWithoutExpedienteInput = {
@@ -20900,6 +23123,39 @@ export namespace Prisma {
     tipo?: StringFieldUpdateOperationsInput | string
     cambios?: JsonNullValueInput | InputJsonValue
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventoCampoUpdateWithoutExpedienteInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    usuario?: UsuarioUpdateOneRequiredWithoutEventosCampoNestedInput
+  }
+
+  export type EventoCampoUncheckedUpdateWithoutExpedienteInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventoCampoUncheckedUpdateManyWithoutExpedienteInput = {
+    id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    punto?: StringFieldUpdateOperationsInput | string
+    tipo?: StringFieldUpdateOperationsInput | string
+    distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type EvidenciaCreateManyVisitaInput = {
