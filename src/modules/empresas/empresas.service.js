@@ -11,7 +11,8 @@ export const slugDe = (texto) => String(texto || '').normalize('NFD').replace(/[
 
 // Abreviatura de la empresa: prefijo fijo de sus nombres de usuario (arq + jorge = arq.jorge). Así un usuario nunca choca con el de otra
 // empresa y el inicio de sesión sigue identificando a la empresa sin preguntar nada. Se sugiere desde la palabra distintiva del nombre;
-// el administrador universal la puede cambiar. Las cuentas ya existentes no se renombran.
+// el administrador universal la puede cambiar, pero toda empresa debe tener una (si dos empresas no la tuvieran, "supervisor1" chocaría).
+// Las cuentas ya existentes no se renombran.
 const PALABRAS_GENERICAS = new Set(['caja', 'municipal', 'rural', 'de', 'del', 'la', 'el', 'y', 'e', 'los', 'las', 'ahorro', 'ahorros', 'credito', 'creditos', 'cmac', 'crac', 'edpyme', 'financiera', 'cooperativa', 'coop', 'banco', 'sa', 'sac', 'srl', 'eirl', 'empresa', 'grupo']);
 export const prefijoDe = (texto) => {
   const slug = slugDe(texto);
@@ -22,7 +23,7 @@ export const prefijoDe = (texto) => {
 export function limpiarPrefijo(valor) {
   if (valor === undefined) return undefined;
   const v = String(valor ?? '').trim().toLowerCase();
-  if (v === '') return null;
+  if (v === '') throw Object.assign(new Error('La abreviatura de la empresa es obligatoria (de 2 a 8 letras o números)'), { statusCode: 400, code: 'PREFIJO_INVALIDO' });
   if (!/^[a-z0-9]{2,8}$/.test(v)) throw Object.assign(new Error('La abreviatura debe tener de 2 a 8 letras o números, sin espacios ni puntos'), { statusCode: 400, code: 'PREFIJO_INVALIDO' });
   return v;
 }
@@ -117,7 +118,7 @@ export async function listarActivas() {
 export async function crear({ nombre, nombre_corto, slug, prefijo, configuracion, marca }) {
   const fila = await prisma.empresa.create({ data: {
     nombre: nombre.trim(), nombre_corto: nombre_corto?.trim() || null, slug: slugDe(slug || nombre),
-    prefijo: limpiarPrefijo(prefijo) ?? prefijoDe(nombre_corto || nombre), // vacío explícito = sin abreviatura
+    prefijo: limpiarPrefijo(prefijo ?? prefijoDe(nombre_corto || nombre)), // sin abreviatura se sugiere desde el nombre
     configuracion: limpiarReglas(configuracion || {}), marca: limpiarMarca(marca || {}),
   } });
   return aPublica(fila);

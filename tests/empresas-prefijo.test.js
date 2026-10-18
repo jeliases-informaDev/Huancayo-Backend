@@ -11,7 +11,7 @@ test('la abreviatura se sugiere desde la palabra distintiva del nombre de la emp
 
 test('la abreviatura se normaliza y se valida (2 a 8 letras o números)', () => {
   assert.equal(limpiarPrefijo(' ARQ '), 'arq');
-  assert.equal(limpiarPrefijo(''), null, 'vacío explícito = sin abreviatura');
+  assert.throws(() => limpiarPrefijo(''), /obligatoria/, 'toda empresa debe tener abreviatura');
   assert.equal(limpiarPrefijo(undefined), undefined, 'no enviado = no cambia');
   assert.throws(() => limpiarPrefijo('a'), /2 a 8/);
   assert.throws(() => limpiarPrefijo('arq.x'), /2 a 8/);
