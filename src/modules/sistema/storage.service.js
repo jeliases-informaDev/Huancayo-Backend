@@ -139,4 +139,14 @@ async function readEvidence(key) {
   return buffer;
 }
 
-export default { createUpload, receiveUpload, verifyUploaded, readEvidence, TYPES };
+// Borra una evidencia. Solo para mantenimiento y para la prueba de almacenamiento (scripts/probar-almacenamiento.js): el sistema nunca
+// borra evidencias de visitas.
+async function borrarEvidencia(key) {
+  if (typeof key !== 'string' || key.includes('..')) {
+    throw Object.assign(new Error('Clave de evidencia inválida.'), { statusCode: 400, code: 'INVALID_EVIDENCE_KEY' });
+  }
+  if (usaBucket()) { await almacenS3().borrar(key); return; }
+  await fsp.rm(keyPath(key), { force: true });
+}
+
+export default { createUpload, receiveUpload, verifyUploaded, readEvidence, borrarEvidencia, TYPES };
