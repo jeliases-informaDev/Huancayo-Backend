@@ -2,7 +2,7 @@
 // de sus casos (domicilio y negocios con coordenadas). Entrar a la geocerca = LLEGADA; alejarse más de 1,5 veces el
 // radio = SALIDA (el margen evita que un GPS que «baila» en el borde genere llegadas y salidas falsas).
 import prisma from '#core/config/prisma.js';
-import { env } from '#core/config/env.js';
+import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { puntosDeCaso, decidirEventos, claveDe } from './eventos-campo.logica.js';
 
 const inicioDelDia = (fecha) => (fecha ? new Date(`${fecha}T00:00:00`) : new Date(new Date().toDateString()));
@@ -21,7 +21,8 @@ const incluir = { usuario: { select: { username: true, nombres: true, apellidos:
 // Compara la posición con los casos del auditor, guarda los avisos nuevos y los devuelve listos para el panel.
 // Las asignaciones ya cerradas hoy solo pueden producir la SALIDA (el auditor terminó la visita y se retira).
 export async function registrarEventosDeCampo(usuarioId, { latitud, longitud, precision = null, simulada = false }) {
-  if (simulada || (precision !== null && precision > env.GEOFENCE_RADIO_METROS)) return [];
+  const radio = (await reglasEmpresa()).geocerca_radio_m;
+  if (simulada || (precision !== null && precision > radio)) return [];
   const desde = inicioDelDia();
   const asignaciones = await prisma.asignacionAuditoria.findMany({
     where: { id_usuario_auditor: usuarioId, OR: [{ estado: 'ACTIVA' }, { estado: 'FINALIZADA', fecha_fin: { gte: desde } }] },
@@ -36,7 +37,7 @@ export async function registrarEventosDeCampo(usuarioId, { latitud, longitud, pr
   const ultimo = new Map();
   for (const p of previos) { const k = claveDe(p.id_expediente, p.punto); if (!ultimo.has(k)) ultimo.set(k, p.tipo); }
   const dentro = new Set([...ultimo].filter(([, tipo]) => tipo === 'LLEGADA').map(([k]) => k));
-  const nuevos = decidirEventos({ latitud, longitud, precision, simulada, puntos, dentro, radio: env.GEOFENCE_RADIO_METROS });
+  const nuevos = decidirEventos({ latitud, longitud, precision, simulada, puntos, dentro, radio });
   const guardados = [];
   for (const n of nuevos) {
     const fila = await prisma.eventoCampo.create({ data: { id_usuario: usuarioId, id_expediente: n.id_expediente, punto: n.punto, tipo: n.tipo, distancia_m: n.distancia_m, latitud, longitud }, include: incluir });

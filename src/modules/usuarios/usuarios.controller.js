@@ -7,8 +7,17 @@ async function listar(_req, res, next) {
 async function listarAuditores(_req, res, next) {
   try { res.json({ data: await usuariosService.listarAuditores() }); } catch (error) { next(error); }
 }
+// El rol UNIVERSAL (administrador de Sulotec) solo lo da o quita otro universal; un administrador de empresa no puede.
+function soloUniversalDaUniversal(req, res) {
+  if (req.body?.rol === 'UNIVERSAL' && req.user.rol !== 'UNIVERSAL') {
+    res.status(403).json({ error: 'Solo el administrador universal puede asignar ese rol', code: 'ROL_NO_PERMITIDO', requestId: req.id });
+    return false;
+  }
+  return true;
+}
 async function crear(req, res, next) {
   try {
+    if (!soloUniversalDaUniversal(req, res)) return;
     const { _auditDiff, ...data } = await usuariosService.crear(req.body);
     req.auditContext = _auditDiff;
     res.status(201).json({ data });
@@ -16,6 +25,7 @@ async function crear(req, res, next) {
 }
 async function actualizar(req, res, next) {
   try {
+    if (!soloUniversalDaUniversal(req, res)) return;
     const { _auditDiff, ...data } = await usuariosService.actualizar(req.params.id, req.body, req.user.id);
     req.auditContext = _auditDiff;
     res.json({ data });

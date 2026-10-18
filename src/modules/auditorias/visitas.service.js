@@ -5,6 +5,7 @@ import { haversineMeters } from '#core/security/geofence.js';
 import { puntoDeReferencia, conUbicacionNegocio } from '#modules/expedientes/ubicaciones.js';
 import { registrarEventosDeCampo } from './eventos-campo.js';
 import { estadoDeMovimiento } from '#modules/usuarios/movimiento.js';
+import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { logger } from '#core/config/logger.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
@@ -23,7 +24,7 @@ async function presignEvidencia(auditorId, id_expediente, payload) {
 
 async function recibirEvidencia({ key, buffer, auditorId, id_expediente, tipo }) {
   const { hash } = await storageService.receiveUpload({ key, buffer, auditorId, expedienteId: id_expediente, tipo });
-  const existente = await prisma.evidencia.findUnique({ where: { hash_sha256: hash } });
+  const existente = await prisma.evidencia.findFirst({ where: { hash_sha256: hash } });
   if (existente) {
     throw Object.assign(new Error('Esta fotografía ya fue utilizada como evidencia en otra visita. Debes tomar una foto nueva desde la cámara.'), { statusCode: 409, code: 'EVIDENCE_REUSED' });
   }
@@ -91,14 +92,14 @@ function validarFichaMype(payload) {
 
 // La distancia se mide contra el punto que el auditor declaró visitar: el domicilio de la persona o,
 // en MYPE, uno de los negocios. Sin ese dato (apps anteriores) se usa el domicilio, como siempre.
-function evaluarSenales({ punto, payload, serverNow }) {
+function evaluarSenales({ punto, payload, serverNow, reglas }) {
   const alertas = [];
   let distancia = null;
   if (punto.latitud != null && punto.longitud != null) {
     distancia = haversineMeters(punto.latitud, punto.longitud, payload.latitud, payload.longitud);
-    if (distancia > env.GEOFENCE_RADIO_METROS) alertas.push('GEOCERCA_EXCEDIDA');
+    if (distancia > reglas.geocerca_radio_m) alertas.push('GEOCERCA_EXCEDIDA');
   }
-  if (payload.precision_metros != null && payload.precision_metros > env.GEOFENCE_PRECISION_MAXIMA_METROS) {
+  if (payload.precision_metros != null && payload.precision_metros > reglas.precision_maxima_m) {
     alertas.push('PRECISION_INSUFICIENTE');
   }
   const checkin = new Date(payload.fecha_hora_checkin);
@@ -139,7 +140,7 @@ async function crearVisita(auditorId, payload) {
   }
 
   const serverNow = new Date();
-  const { alertas, distancia } = evaluarSenales({ punto, payload, serverNow });
+  const { alertas, distancia } = evaluarSenales({ reglas: await reglasEmpresa(), punto, payload, serverNow });
   // Señales "blandas" (geocerca, precisión, reloj adelantado): no se bloquean, porque
   // pueden tener explicaciones legítimas, pero se obliga a declararlas — el auditor no
   // puede marcar la visita como CONFORME sin dejar constancia del motivo.
@@ -160,7 +161,7 @@ async function crearVisita(auditorId, payload) {
     throw Object.assign(new Error('Debes registrar dos fotografías diferentes.'), { statusCode: 400, code: 'DUPLICATE_EVIDENCE' });
   }
   for (const evidencia of [principal, adicional].filter(Boolean)) {
-    const existente = await prisma.evidencia.findUnique({ where: { hash_sha256: evidencia.hash } });
+    const existente = await prisma.evidencia.findFirst({ where: { hash_sha256: evidencia.hash } });
     if (existente) throw Object.assign(new Error('Una de las fotografías ya fue utilizada como evidencia en otra visita.'), { statusCode: 409, code: 'EVIDENCE_REUSED' });
   }
 
@@ -270,7 +271,7 @@ async function obtener(id) {
     trazabilidad: {
       asignacion: asignacion ? { id_asignacion: asignacion.id_asignacion, fecha_asignacion: asignacion.fecha_asignacion, fecha_fin: asignacion.fecha_fin, origen: asignacion.origen, prioridad: asignacion.prioridad, asignado_por: asignador } : null,
       importacion,
-      geocerca_m: env.GEOFENCE_RADIO_METROS,
+      geocerca_m: (await reglasEmpresa()).geocerca_radio_m,
       cambios_ubicacion: cambiosUbicacion.map((c) => ({ ...c, id_cambio: String(c.id_cambio) })),
     },
   });

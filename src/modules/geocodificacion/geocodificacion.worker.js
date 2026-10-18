@@ -3,6 +3,8 @@
 import { logger } from '#core/config/logger.js';
 import { geocodificacionActiva, geocodificarPendientes } from './geocodificacion.service.js';
 import { tamanoMaximoLote } from './proveedores.js';
+import { conEmpresa } from '#core/tenant/contexto.js';
+import { listarActivas } from '#modules/empresas/empresas.service.js';
 
 const LOTE = Math.min(Math.max(Number(process.env.GEOCODING_BATCH_SIZE) || 5, 1), tamanoMaximoLote());
 const CONTINUAR_MS = 2000; // si el lote salió completo hay más en cola: se sigue casi de inmediato
@@ -24,7 +26,13 @@ async function ciclo() {
   procesando = true;
   let siguiente = INTERVALO_MS;
   try {
-    const r = await geocodificarPendientes({ limit: LOTE });
+    // Una empresa por vez: la cola de direcciones de cada una se procesa dentro de su propio contexto.
+    const r = { procesados: 0, detenido: false };
+    for (const empresa of await listarActivas()) {
+      const parcial = await conEmpresa(empresa.id_empresa, () => geocodificarPendientes({ limit: LOTE }));
+      r.procesados += parcial.procesados || 0; r.detenido = r.detenido || Boolean(parcial.detenido);
+      if (r.procesados >= LOTE) break;
+    }
     // Con el servidor público de OpenStreetMap se mantiene siempre el ritmo lento; solo un proveedor con clave avanza rápido.
     if (tamanoMaximoLote() > 20 && !r.detenido && r.procesados >= LOTE) siguiente = CONTINUAR_MS;
     if (r.procesados > 0) logger.info(r, 'geocodificacion_lote_listo');

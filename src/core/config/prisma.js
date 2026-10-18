@@ -3,6 +3,7 @@ import { env } from './env.js';
 
 // Con la corrección del schema, esta ruta ahora sí encontrará el archivo físico
 import { PrismaClient } from '../../generated/prisma/index.js';
+import { extensionEmpresa } from '#core/tenant/empresa.prisma.js';
 
 // Se parsea DATABASE_URL a un objeto de configuración (en vez de pasar el string
 // directo) porque el parser de connection-string de `mariadb` exige el esquema
@@ -34,6 +35,7 @@ function parseDatabaseUrl(url) {
 }
 
 const adapter = new PrismaMariaDb(parseDatabaseUrl(env.DATABASE_URL));
-const prisma = new PrismaClient({ adapter });
+// Todas las consultas a datos de empresa pasan por el filtro de src/core/tenant (ver empresa.prisma.js).
+const prisma = new PrismaClient({ adapter }).$extends(extensionEmpresa());
 
 export default prisma;

@@ -120,8 +120,21 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.EmpresaScalarFieldEnum = {
+  id_empresa: 'id_empresa',
+  nombre: 'nombre',
+  nombre_corto: 'nombre_corto',
+  slug: 'slug',
+  estado: 'estado',
+  configuracion: 'configuracion',
+  marca: 'marca',
+  creado_en: 'creado_en',
+  actualizado_en: 'actualizado_en'
+};
+
 exports.Prisma.UsuarioScalarFieldEnum = {
   id_usuario: 'id_usuario',
+  empresa_id: 'empresa_id',
   username: 'username',
   nombres: 'nombres',
   apellidos: 'apellidos',
@@ -159,6 +172,7 @@ exports.Prisma.UsuarioScalarFieldEnum = {
 
 exports.Prisma.TrackingUbicacionScalarFieldEnum = {
   id_tracking: 'id_tracking',
+  empresa_id: 'empresa_id',
   id_usuario: 'id_usuario',
   latitud: 'latitud',
   longitud: 'longitud',
@@ -169,6 +183,7 @@ exports.Prisma.TrackingUbicacionScalarFieldEnum = {
 
 exports.Prisma.EventoCampoScalarFieldEnum = {
   id_evento: 'id_evento',
+  empresa_id: 'empresa_id',
   id_usuario: 'id_usuario',
   id_expediente: 'id_expediente',
   punto: 'punto',
@@ -180,6 +195,7 @@ exports.Prisma.EventoCampoScalarFieldEnum = {
 };
 
 exports.Prisma.ConfiguracionSistemaScalarFieldEnum = {
+  empresa_id: 'empresa_id',
   clave: 'clave',
   valor: 'valor',
   actualizado_por: 'actualizado_por',
@@ -188,6 +204,7 @@ exports.Prisma.ConfiguracionSistemaScalarFieldEnum = {
 
 exports.Prisma.DispositivoAutorizadoScalarFieldEnum = {
   id_dispositivo: 'id_dispositivo',
+  empresa_id: 'empresa_id',
   id_usuario: 'id_usuario',
   device_id: 'device_id',
   nombre_dispositivo: 'nombre_dispositivo',
@@ -198,6 +215,7 @@ exports.Prisma.DispositivoAutorizadoScalarFieldEnum = {
 
 exports.Prisma.ExpedienteScalarFieldEnum = {
   id_expediente: 'id_expediente',
+  empresa_id: 'empresa_id',
   codigo_expediente: 'codigo_expediente',
   tipo_credito: 'tipo_credito',
   oficina: 'oficina',
@@ -242,6 +260,7 @@ exports.Prisma.ExpedienteScalarFieldEnum = {
 
 exports.Prisma.ExpedienteCambioScalarFieldEnum = {
   id_cambio: 'id_cambio',
+  empresa_id: 'empresa_id',
   id_expediente: 'id_expediente',
   id_importacion: 'id_importacion',
   actor_id: 'actor_id',
@@ -252,6 +271,7 @@ exports.Prisma.ExpedienteCambioScalarFieldEnum = {
 
 exports.Prisma.AsignacionAuditoriaScalarFieldEnum = {
   id_asignacion: 'id_asignacion',
+  empresa_id: 'empresa_id',
   id_expediente: 'id_expediente',
   id_usuario_auditor: 'id_usuario_auditor',
   fecha_asignacion: 'fecha_asignacion',
@@ -264,6 +284,7 @@ exports.Prisma.AsignacionAuditoriaScalarFieldEnum = {
 
 exports.Prisma.VisitaAuditoriaScalarFieldEnum = {
   id_visita: 'id_visita',
+  empresa_id: 'empresa_id',
   client_sync_id: 'client_sync_id',
   id_asignacion: 'id_asignacion',
   id_expediente: 'id_expediente',
@@ -301,6 +322,7 @@ exports.Prisma.VisitaAuditoriaScalarFieldEnum = {
 
 exports.Prisma.EvidenciaScalarFieldEnum = {
   id_evidencia: 'id_evidencia',
+  empresa_id: 'empresa_id',
   id_visita: 'id_visita',
   tipo: 'tipo',
   object_key: 'object_key',
@@ -313,6 +335,7 @@ exports.Prisma.EvidenciaScalarFieldEnum = {
 
 exports.Prisma.AuditoriaSeguridadScalarFieldEnum = {
   id_auditoria: 'id_auditoria',
+  empresa_id: 'empresa_id',
   fecha: 'fecha',
   request_id: 'request_id',
   actor_id: 'actor_id',
@@ -334,6 +357,7 @@ exports.Prisma.AuditoriaSeguridadScalarFieldEnum = {
 
 exports.Prisma.ImportacionMasivaScalarFieldEnum = {
   id_importacion: 'id_importacion',
+  empresa_id: 'empresa_id',
   tipo: 'tipo',
   estado: 'estado',
   archivo: 'archivo',
@@ -368,13 +392,33 @@ exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
 
+exports.Prisma.EmpresaOrderByRelevanceFieldEnum = {
+  id_empresa: 'id_empresa',
+  nombre: 'nombre',
+  nombre_corto: 'nombre_corto',
+  slug: 'slug',
+  estado: 'estado'
+};
+
 exports.Prisma.UsuarioOrderByRelevanceFieldEnum = {
   id_usuario: 'id_usuario',
+  empresa_id: 'empresa_id',
   username: 'username',
   nombres: 'nombres',
   apellidos: 'apellidos',
@@ -390,16 +434,19 @@ exports.Prisma.UsuarioOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.TrackingUbicacionOrderByRelevanceFieldEnum = {
+  empresa_id: 'empresa_id',
   id_usuario: 'id_usuario'
 };
 
 exports.Prisma.EventoCampoOrderByRelevanceFieldEnum = {
+  empresa_id: 'empresa_id',
   id_usuario: 'id_usuario',
   punto: 'punto',
   tipo: 'tipo'
 };
 
 exports.Prisma.ConfiguracionSistemaOrderByRelevanceFieldEnum = {
+  empresa_id: 'empresa_id',
   clave: 'clave',
   valor: 'valor',
   actualizado_por: 'actualizado_por'
@@ -407,23 +454,14 @@ exports.Prisma.ConfiguracionSistemaOrderByRelevanceFieldEnum = {
 
 exports.Prisma.DispositivoAutorizadoOrderByRelevanceFieldEnum = {
   id_dispositivo: 'id_dispositivo',
+  empresa_id: 'empresa_id',
   id_usuario: 'id_usuario',
   device_id: 'device_id',
   nombre_dispositivo: 'nombre_dispositivo'
 };
 
-exports.Prisma.JsonNullValueFilter = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull,
-  AnyNull: Prisma.AnyNull
-};
-
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-};
-
 exports.Prisma.ExpedienteOrderByRelevanceFieldEnum = {
+  empresa_id: 'empresa_id',
   codigo_expediente: 'codigo_expediente',
   oficina: 'oficina',
   numero_documento_cliente: 'numero_documento_cliente',
@@ -448,12 +486,14 @@ exports.Prisma.ExpedienteOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.ExpedienteCambioOrderByRelevanceFieldEnum = {
+  empresa_id: 'empresa_id',
   id_importacion: 'id_importacion',
   actor_id: 'actor_id',
   tipo: 'tipo'
 };
 
 exports.Prisma.AsignacionAuditoriaOrderByRelevanceFieldEnum = {
+  empresa_id: 'empresa_id',
   id_usuario_auditor: 'id_usuario_auditor',
   estado: 'estado',
   prioridad: 'prioridad',
@@ -462,6 +502,7 @@ exports.Prisma.AsignacionAuditoriaOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.VisitaAuditoriaOrderByRelevanceFieldEnum = {
+  empresa_id: 'empresa_id',
   client_sync_id: 'client_sync_id',
   id_usuario_auditor: 'id_usuario_auditor',
   ubicacion_visitada: 'ubicacion_visitada',
@@ -481,6 +522,7 @@ exports.Prisma.VisitaAuditoriaOrderByRelevanceFieldEnum = {
 
 exports.Prisma.EvidenciaOrderByRelevanceFieldEnum = {
   id_evidencia: 'id_evidencia',
+  empresa_id: 'empresa_id',
   tipo: 'tipo',
   object_key: 'object_key',
   hash_sha256: 'hash_sha256'
@@ -488,6 +530,7 @@ exports.Prisma.EvidenciaOrderByRelevanceFieldEnum = {
 
 exports.Prisma.AuditoriaSeguridadOrderByRelevanceFieldEnum = {
   id_auditoria: 'id_auditoria',
+  empresa_id: 'empresa_id',
   request_id: 'request_id',
   actor_id: 'actor_id',
   actor: 'actor',
@@ -504,6 +547,7 @@ exports.Prisma.AuditoriaSeguridadOrderByRelevanceFieldEnum = {
 
 exports.Prisma.ImportacionMasivaOrderByRelevanceFieldEnum = {
   id_importacion: 'id_importacion',
+  empresa_id: 'empresa_id',
   tipo: 'tipo',
   estado: 'estado',
   archivo: 'archivo',
@@ -525,6 +569,7 @@ exports.TipoDocumento = exports.$Enums.TipoDocumento = {
 };
 
 exports.Prisma.ModelName = {
+  Empresa: 'Empresa',
   Usuario: 'Usuario',
   TrackingUbicacion: 'TrackingUbicacion',
   EventoCampo: 'EventoCampo',

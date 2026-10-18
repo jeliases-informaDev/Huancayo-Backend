@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '#core/config/prisma.js';
+import { sinEmpresa } from '#core/tenant/contexto.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
 import { normalizeRole, FIELD_ROLES } from '#core/security/roles.js';
 import * as mfaService from './mfa.service.js';
@@ -10,7 +11,7 @@ function mapearUsuario(usuario) {
   return {
     id: usuario.id_usuario, username: usuario.username, rol: normalizeRole(usuario.rol),
     nombres: usuario.nombres || null, apellidos: usuario.apellidos || null,
-    estado: usuario.estado,
+    estado: usuario.estado, empresa_id: usuario.empresa_id || null,
   };
 }
 
@@ -24,7 +25,8 @@ function accessTokenExpiresIn(role) {
 function issueAccessToken(usuario, clientPlatform = 'web') {
   const role = normalizeRole(usuario.rol);
   return jwt.sign(
-    { username: usuario.username, rol: role, channel: normalizeClientPlatform(clientPlatform), type: 'access', ver: usuario.token_version },
+    // emp: empresa de la cuenta, solo informativo para los clientes; el servidor la toma siempre de la base.
+    { username: usuario.username, rol: role, channel: normalizeClientPlatform(clientPlatform), type: 'access', ver: usuario.token_version, emp: usuario.empresa_id || null },
     env.JWT_SECRET,
     {
       expiresIn: accessTokenExpiresIn(role), algorithm: 'HS256', issuer: env.JWT_ISSUER,
@@ -48,7 +50,7 @@ async function enforceDeviceBinding(usuario, deviceId) {
   if (!existing) {
     try {
       await prisma.dispositivoAutorizado.create({
-        data: { id_usuario: usuario.id_usuario, device_id: deviceId, primer_uso: new Date(), ultimo_uso: new Date() },
+        data: { empresa_id: usuario.empresa_id, id_usuario: usuario.id_usuario, device_id: deviceId, primer_uso: new Date(), ultimo_uso: new Date() },
       });
     } catch (error) {
       // Dos logins casi simultáneos (doble tap, reintento de red) pueden pasar ambos
@@ -71,6 +73,9 @@ async function enforceDeviceBinding(usuario, deviceId) {
 }
 
 async function login(username, password, clientPlatform, deviceId) {
+  return sinEmpresa(() => loginDentro(username, password, clientPlatform, deviceId));
+}
+async function loginDentro(username, password, clientPlatform, deviceId) {
   try {
     const normalizedUsername = String(username || '').trim().toLowerCase();
     const usuario = await prisma.usuario.findUnique({ where: { username: normalizedUsername } });
@@ -123,22 +128,22 @@ async function login(username, password, clientPlatform, deviceId) {
 }
 
 async function verifyMfa(challengeToken, code) {
-  const { usuario, clientPlatform } = await mfaService.verifyChallenge(challengeToken, code);
+  const { usuario, clientPlatform } = await sinEmpresa(() => mfaService.verifyChallenge(challengeToken, code));
   return { success: true, token: issueAccessToken(usuario, clientPlatform), user: mapearUsuario(usuario) };
 }
 
 async function setupMfaEnrollment(challengeToken) {
-  return mfaService.setupEnrollment(challengeToken);
+  return sinEmpresa(() => mfaService.setupEnrollment(challengeToken));
 }
 
 async function confirmMfaEnrollment(challengeToken, code) {
-  const { usuario, clientPlatform } = await mfaService.confirmEnrollment(challengeToken, code);
+  const { usuario, clientPlatform } = await sinEmpresa(() => mfaService.confirmEnrollment(challengeToken, code));
   return { success: true, token: issueAccessToken(usuario, clientPlatform), user: mapearUsuario(usuario) };
 }
 
 async function me(idUsuario) {
   try {
-    const usuario = await prisma.usuario.findUnique({ where: { id_usuario: idUsuario } });
+    const usuario = await sinEmpresa(() => prisma.usuario.findUnique({ where: { id_usuario: idUsuario } }));
     if (!usuario) return { success: false, code: 'USER_NOT_FOUND', error: 'Usuario no encontrado' };
     if (usuario.estado !== 'ACTIVO') return { success: false, code: 'USER_INACTIVE', error: 'Cuenta inactiva' };
     return { success: true, user: mapearUsuario(usuario) };
@@ -148,7 +153,7 @@ async function me(idUsuario) {
 }
 
 async function logout(idUsuario) {
-  await prisma.usuario.update({ where: { id_usuario: idUsuario }, data: { token_version: { increment: 1 } } });
+  await sinEmpresa(() => prisma.usuario.update({ where: { id_usuario: idUsuario }, data: { token_version: { increment: 1 } } }));
 }
 
 export default { login, verifyMfa, setupMfaEnrollment, confirmMfaEnrollment, me, logout };

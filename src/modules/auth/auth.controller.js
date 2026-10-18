@@ -1,4 +1,6 @@
 import authService from "./auth.service.js";
+import { sinEmpresa } from '#core/tenant/contexto.js';
+import { publica as empresaPublica } from '#modules/empresas/empresas.service.js';
 import * as mfaService from "./mfa.service.js";
 
 // Mapa de traducción de códigos de error internos a códigos de estado HTTP
@@ -69,15 +71,15 @@ async function confirmMfaEnrollment(req, res, next) {
 }
 
 async function setupMfa(req, res, next) {
-  try { res.json(await mfaService.setup(req.user.id, req.user.username)); } catch (error) { next(error); }
+  try { res.json(await sinEmpresa(() => mfaService.setup(req.user.id, req.user.username))); } catch (error) { next(error); }
 }
 
 async function confirmMfa(req, res, next) {
-  try { await mfaService.confirm(req.user.id, req.body.code); res.json({ message: 'MFA habilitado correctamente' }); } catch (error) { next(error); }
+  try { await sinEmpresa(() => mfaService.confirm(req.user.id, req.body.code)); res.json({ message: 'MFA habilitado correctamente' }); } catch (error) { next(error); }
 }
 
 async function disableMfa(req, res, next) {
-  try { await mfaService.disable(req.user.id, req.body.password); res.json({ message: 'MFA deshabilitado correctamente' }); } catch (error) { next(error); }
+  try { await sinEmpresa(() => mfaService.disable(req.user.id, req.body.password)); res.json({ message: 'MFA deshabilitado correctamente' }); } catch (error) { next(error); }
 }
 
 async function logout(req, res, next) {
@@ -102,8 +104,11 @@ async function me(req, res) {
       return res.status(status).json({ error: resultado.error });
     }
 
+    // La empresa del usuario (nombre, marca, reglas): el panel y la app la muestran al entrar. Para el universal, la elegida por cabecera.
+    const empresa = await empresaPublica(req.user.empresa_id);
     return res.status(200).json({
-      user: resultado.user
+      user: { ...resultado.user, empresa_id: req.user.empresa_id || null },
+      empresa,
     });
   } catch (error) {
     console.error("Error en authController.me:", error);

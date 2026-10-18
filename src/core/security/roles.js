@@ -1,11 +1,15 @@
 export const ROLES = Object.freeze({
   ADMINISTRADOR: 'ADMINISTRADOR', SUPERVISOR: 'SUPERVISOR', AUDITOR: 'AUDITOR',
+  // Administrador universal de Sulotec: no pertenece a ninguna empresa; entra a cada una (cabecera x-empresa-id) con permisos de administrador.
+  UNIVERSAL: 'UNIVERSAL',
 });
 
 const aliases = Object.freeze({ ADMIN: ROLES.ADMINISTRADOR });
 export const normalizeRole = role => aliases[role] || role;
 export const ALL_ROLES = Object.freeze(Object.values(ROLES));
 export const ADMIN_ROLES = Object.freeze([ROLES.ADMINISTRADOR]);
+// Roles que puede asignar un administrador de empresa (el universal solo lo crea otro universal).
+export const ROLES_DE_EMPRESA = Object.freeze([ROLES.ADMINISTRADOR, ROLES.SUPERVISOR, ROLES.AUDITOR]);
 // Único rol que sale a la calle y usa la app móvil (hace la entrevista al cliente).
 // El Auditor de Oficina (SUPERVISOR) nunca sale a campo: opera 100% desde la web,
 // igual que el Administrador.

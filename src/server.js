@@ -28,6 +28,8 @@ import asignacionesRoutes from '#modules/auditorias/asignaciones.routes.js';
 import visitasRoutes from '#modules/auditorias/visitas.routes.js';
 import reportesRoutes from '#modules/reportes/reportes.routes.js';
 import seguridadRoutes from '#modules/sistema/seguridad.routes.js';
+import empresasRoutes from '#modules/empresas/empresas.routes.js';
+import { sinEmpresa } from '#core/tenant/contexto.js';
 import { iniciarGeocodificacion } from '#modules/geocodificacion/geocodificacion.worker.js';
 import { iniciarRetencionTracking } from '#modules/auditorias/tracking.retencion.js';
 
@@ -79,7 +81,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Request-Id', 'X-Client-Platform', 'X-Device-Id'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Request-Id', 'X-Client-Platform', 'X-Device-Id', 'X-Empresa-Id'], // X-Empresa-Id: empresa elegida por el administrador universal
   exposedHeaders: ['X-Request-Id'], maxAge: 600,
 }));
 
@@ -157,6 +159,7 @@ app.use('/api/asignaciones', asignacionesRoutes);
 app.use('/api/visitas', visitasRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/seguridad', seguridadRoutes);
+app.use('/api/empresas', empresasRoutes);
 
 // Manejo de errores
 app.use(notFoundHandler);
@@ -167,7 +170,7 @@ app.use(errorHandler);
 // ============================================================================
 const server = app.listen(env.PORT, () => {
   // Una carga que quedó "procesando" por un reinicio del servidor no va a terminar nunca: se marca.
-  importador.marcarInterrumpidas().catch(() => {});
+  sinEmpresa(() => importador.marcarInterrumpidas()).catch(() => {});
   iniciarRetencionTracking();
   iniciarGeocodificacion(); // apagado salvo GEOCODING_WORKER_ENABLED=true (enviar direcciones a un proveedor externo requiere autorización del banco)
   if (env.NODE_ENV === 'development') process.stdout.write(`http://localhost:${env.PORT}\n`);
@@ -200,18 +203,22 @@ io.use(async (socket, next) => {
       algorithms: ['HS256'], issuer: env.JWT_ISSUER, audience: env.JWT_AUDIENCE,
     });
     if (decoded.type !== 'access') return next(new Error('INVALID_TOKEN'));
-    const usuario = await prisma.usuario.findUnique({ where: { id_usuario: decoded.sub } });
+    const usuario = await sinEmpresa(() => prisma.usuario.findUnique({ where: { id_usuario: decoded.sub } }));
     if (!usuario || usuario.estado !== 'ACTIVO' || usuario.username !== decoded.username || usuario.token_version !== decoded.ver) {
       return next(new Error('INVALID_SESSION'));
     }
-    socket.user = { id: usuario.id_usuario, username: usuario.username, rol: normalizeRole(usuario.rol) };
+    // El tiempo real también es por empresa: cada sala lleva la empresa del usuario (el universal pasa la suya en auth.empresa).
+    const empresaId = usuario.empresa_id || (normalizeRole(usuario.rol) === 'UNIVERSAL' && /^[0-9a-f-]{36}$/i.test(String(socket.handshake.auth?.empresa || '')) ? socket.handshake.auth.empresa : null);
+    socket.user = { id: usuario.id_usuario, username: usuario.username, rol: normalizeRole(usuario.rol), empresa_id: empresaId };
     next();
   } catch { next(new Error('INVALID_TOKEN')); }
 });
 
 io.on('connection', socket => {
-  socket.join(`role:${socket.user.rol}`);
-  socket.join(`auditor:${socket.user.id}`);
+  if (socket.user.empresa_id) {
+    socket.join(`empresa:${socket.user.empresa_id}:role:${socket.user.rol === 'UNIVERSAL' ? 'ADMINISTRADOR' : socket.user.rol}`);
+    socket.join(`empresa:${socket.user.empresa_id}:auditor:${socket.user.id}`);
+  }
   logger.info({ event: 'socket_connected', userId: socket.user.id, role: socket.user.rol, socketId: socket.id }, 'realtime_session_started');
   socket.on('disconnect', reason => logger.info({ event: 'socket_disconnected', userId: socket.user.id, socketId: socket.id, reason }, 'realtime_session_finished'));
 });

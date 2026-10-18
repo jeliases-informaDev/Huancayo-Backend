@@ -1,5 +1,5 @@
 import prisma from '#core/config/prisma.js';
-import { env } from '#core/config/env.js';
+import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 
 // Resumen operativo para la pantalla de inicio del panel: avance de la muestra, resultados de las
 // visitas, actividad reciente, carga por auditor y la cola de visitas que conviene revisar primero.
@@ -10,14 +10,14 @@ const MAX_COLA = 12;
 const conteo = (filas, clave) => Object.fromEntries(filas.map((f) => [f[clave], f._count._all]));
 
 // Por qué una visita está en la cola de revisión. El orden de los motivos es el de gravedad.
-function motivosDeRevision(v) {
+function motivosDeRevision(v, geocercaM) {
   const motivos = [];
   if (v.mock_location) motivos.push('GPS simulado');
   if (!v.device_integrity_ok) motivos.push('Dispositivo con observaciones');
   if (v.resultado === 'RECHAZADO') motivos.push('Rechazada');
   if (v.resultado === 'NO_UBICADO') motivos.push('Cliente no ubicado');
   if (v.resultado === 'OBSERVADO') motivos.push('Observada por el auditor');
-  if (v.distancia_domicilio_m != null && Number(v.distancia_domicilio_m) > env.GEOFENCE_RADIO_METROS) {
+  if (v.distancia_domicilio_m != null && Number(v.distancia_domicilio_m) > geocercaM) {
     motivos.push(`A ${Math.round(Number(v.distancia_domicilio_m))} m del domicilio`);
   }
   if (!v.evidencias.length) motivos.push('Sin fotos');
@@ -25,6 +25,7 @@ function motivosDeRevision(v) {
 }
 
 async function obtenerResumen() {
+  const geocercaM = (await reglasEmpresa()).geocerca_radio_m; // regla de la empresa de la petición
   const desde = new Date();
   desde.setDate(desde.getDate() - (DIAS_ACTIVIDAD - 1));
   desde.setHours(0, 0, 0, 0);
@@ -66,7 +67,7 @@ async function obtenerResumen() {
   const visitasPorAuditor = Object.fromEntries(visitas30.map((c) => [c.id_usuario_auditor, c._count._all]));
 
   const cola = ultimas
-    .map((v) => ({ v, motivos: motivosDeRevision(v) }))
+    .map((v) => ({ v, motivos: motivosDeRevision(v, geocercaM) }))
     .filter((x) => x.motivos.length)
     .slice(0, MAX_COLA)
     .map(({ v, motivos }) => ({
@@ -97,7 +98,7 @@ async function obtenerResumen() {
       }))
       .sort((x, y) => y.asignadas_activas - x.asignadas_activas),
     cola_revision: cola,
-    geocerca_m: env.GEOFENCE_RADIO_METROS,
+    geocerca_m: geocercaM,
   };
 }
 

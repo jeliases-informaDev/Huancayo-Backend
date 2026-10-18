@@ -22,8 +22,26 @@ enum TipoCredito {
 }
 
 /// Tabla física: usuarios (Administrador, Supervisor, Auditor)
+/// Empresas (clientes de Sulotec: cajas, financieras, negocios). Cada fila de las demás tablas pertenece a una empresa y el servidor
+/// filtra por ella en cada consulta (src/core/tenant). Los clientes no saben unos de otros: nadie elige empresa, la da su cuenta.
+model Empresa {
+  id_empresa     String   @id @default(uuid()) @db.VarChar(36)
+  nombre         String   @db.VarChar(150)
+  nombre_corto   String?  @db.VarChar(60)
+  slug           String   @unique @db.VarChar(60) // identificador legible y estable (p. ej. caja-huancayo)
+  estado         String   @default("ACTIVA") @db.VarChar(20) // ACTIVA, SUSPENDIDA
+  // Reglas de la empresa (geocerca, precisión, autoasignación…) y su marca (nombre que ve el usuario, colores, logo): datos, no código.
+  configuracion  Json?
+  marca          Json?
+  creado_en      DateTime @default(now())
+  actualizado_en DateTime @default(now()) @updatedAt
+
+  @@map("empresas")
+}
+
 model Usuario {
   id_usuario          String    @id @default(uuid()) @db.VarChar(36)
+  empresa_id          String?   @db.VarChar(36) // nulo solo para el rol UNIVERSAL (administrador de Sulotec)
   username            String    @unique @db.VarChar(50)
   nombres             String?   @db.VarChar(150)
   apellidos           String?   @db.VarChar(200)
@@ -74,6 +92,7 @@ model Usuario {
   trackings    TrackingUbicacion[]
   eventosCampo EventoCampo[]
 
+  @@index([empresa_id, rol])
   @@map("usuarios")
 }
 
@@ -81,6 +100,7 @@ model Usuario {
 /// reconstruir la ruta recorrida en el mapa de supervisión (Fase 2/Fase 6 del flujo).
 model TrackingUbicacion {
   id_tracking      BigInt   @id @default(autoincrement())
+  empresa_id       String   @db.VarChar(36)
   id_usuario       String   @db.VarChar(36)
   latitud          Decimal  @db.Decimal(10, 8)
   longitud         Decimal  @db.Decimal(11, 8)
@@ -92,6 +112,7 @@ model TrackingUbicacion {
 
   @@index([id_usuario, registrado_en])
   @@index([registrado_en]) // depuración de puntos antiguos
+  @@index([empresa_id])
   @@map("tracking_ubicacion")
 }
 
@@ -99,6 +120,7 @@ model TrackingUbicacion {
 /// Los calcula el servidor con cada posición en vivo; una posición simulada o muy imprecisa no genera avisos.
 model EventoCampo {
   id_evento     BigInt   @id @default(autoincrement())
+  empresa_id    String   @db.VarChar(36)
   id_usuario    String   @db.VarChar(36)
   id_expediente Int
   punto         String   @db.VarChar(20) // DOMICILIO o NEGOCIO:n
@@ -113,23 +135,27 @@ model EventoCampo {
 
   @@index([id_usuario, registrado_en])
   @@index([id_expediente])
+  @@index([empresa_id, registrado_en])
   @@map("eventos_campo")
 }
 
 /// Ajustes que un administrador cambia desde el panel (clave/valor). Hoy: autoasignacion (que el auditor pueda tomar casos por su cuenta).
 /// Si una clave no existe se usa el valor por defecto de la configuración del servidor.
 model ConfiguracionSistema {
-  clave           String   @id @db.VarChar(60)
+  empresa_id      String   @db.VarChar(36)
+  clave           String   @db.VarChar(60)
   valor           String   @db.VarChar(200)
   actualizado_por String?  @db.VarChar(36)
   actualizado_en  DateTime @default(now()) @updatedAt
 
+  @@id([empresa_id, clave])
   @@map("configuracion_sistema")
 }
 
 /// Tabla física: dispositivos_autorizados — vincula un usuario a los dispositivos desde los que ha iniciado sesión
 model DispositivoAutorizado {
   id_dispositivo     String    @id @default(uuid()) @db.VarChar(36)
+  empresa_id         String    @db.VarChar(36)
   id_usuario         String    @db.VarChar(36)
   device_id          String    @db.VarChar(150) // identificador estable del dispositivo (installationId)
   nombre_dispositivo String?   @db.VarChar(150)
@@ -141,13 +167,15 @@ model DispositivoAutorizado {
 
   @@unique([id_usuario, device_id])
   @@index([id_usuario])
+  @@index([empresa_id])
   @@map("dispositivos_autorizados")
 }
 
 /// Tabla física: expedientes — ficha de crédito/cliente a auditar, prellenada por importación
 model Expediente {
   id_expediente     Int         @id @default(autoincrement())
-  codigo_expediente String      @unique @db.VarChar(50) // N° de crédito / clave de importación
+  empresa_id        String      @db.VarChar(36)
+  codigo_expediente String      @db.VarChar(50) // N° de crédito / clave de importación (único dentro de cada empresa)
   tipo_credito      TipoCredito @default(CONSUMO)
   oficina           String?     @db.VarChar(100)
 
@@ -215,11 +243,13 @@ model Expediente {
   cambios      ExpedienteCambio[]
   eventosCampo EventoCampo[]
 
+  @@unique([empresa_id, codigo_expediente])
   @@index([latitud, longitud])
   @@index([distrito])
   @@index([departamento])
   @@index([geo_estado])
-  @@index([estado, autoasignable, departamento, fecha_creacion], map: "expedientes_disponibles_idx") // lista «Disponibles» paginada
+  @@index([empresa_id, estado])
+  @@index([empresa_id, estado, autoasignable, departamento, fecha_creacion], map: "expedientes_disponibles_idx") // lista «Disponibles» paginada
   @@index([asesor_responsable])
   @@index([id_importacion])
   @@map("expedientes")
@@ -229,6 +259,7 @@ model Expediente {
 /// qué campo cambió, de qué valor a cuál, cuándo y por qué importación/usuario.
 model ExpedienteCambio {
   id_cambio      BigInt   @id @default(autoincrement())
+  empresa_id     String   @db.VarChar(36)
   id_expediente  Int
   id_importacion String?  @db.VarChar(36)
   actor_id       String?  @db.VarChar(36)
@@ -240,12 +271,14 @@ model ExpedienteCambio {
 
   @@index([id_expediente, fecha])
   @@index([id_importacion])
+  @@index([empresa_id])
   @@map("expediente_cambios")
 }
 
 /// Tabla física: asignaciones_auditoria — auditor ↔ expediente (muestra a visitar)
 model AsignacionAuditoria {
   id_asignacion      Int       @id @default(autoincrement())
+  empresa_id         String    @db.VarChar(36)
   id_expediente      Int
   id_usuario_auditor String    @db.VarChar(36)
   fecha_asignacion   DateTime  @default(now())
@@ -262,13 +295,14 @@ model AsignacionAuditoria {
 
   @@index([id_usuario_auditor])
   @@index([id_expediente])
-  @@index([estado, id_usuario_auditor]) // «mi muestra», carga por auditor y mapa del supervisor
+  @@index([empresa_id, estado, id_usuario_auditor]) // «mi muestra», carga por auditor y mapa del supervisor
   @@map("asignaciones_auditoria")
 }
 
 /// Tabla física: visitas_auditoria — ejecución real de la ficha de entrevista en campo
 model VisitaAuditoria {
   id_visita          Int     @id @default(autoincrement())
+  empresa_id         String  @db.VarChar(36)
   client_sync_id     String? @unique @db.VarChar(100) // idempotencia para visitas creadas sin conexión
   id_asignacion      Int?
   id_expediente      Int
@@ -318,16 +352,18 @@ model VisitaAuditoria {
 
   @@index([id_expediente])
   @@index([id_usuario_auditor, fecha_hora_checkin])
+  @@index([empresa_id, fecha_creacion])
   @@map("visitas_auditoria")
 }
 
 /// Tabla física: evidencias — fotografías/documentos de una visita
 model Evidencia {
   id_evidencia     String   @id @default(uuid()) @db.VarChar(36)
+  empresa_id       String   @db.VarChar(36)
   id_visita        Int
   tipo             String   @db.VarChar(20) // FOTO_PRINCIPAL, FOTO_ADICIONAL
   object_key       String   @db.VarChar(255)
-  hash_sha256      String   @unique @db.VarChar(64) // detecta reuso de la misma foto entre visitas/clientes
+  hash_sha256      String   @db.VarChar(64) // detecta reuso de la misma foto entre visitas/clientes (dentro de la empresa)
   latitud_captura  Decimal? @db.Decimal(10, 8)
   longitud_captura Decimal? @db.Decimal(11, 8)
   capturado_en     DateTime
@@ -335,6 +371,7 @@ model Evidencia {
 
   visita VisitaAuditoria @relation(fields: [id_visita], references: [id_visita], onDelete: Restrict, onUpdate: Cascade)
 
+  @@unique([empresa_id, hash_sha256])
   @@index([id_visita])
   @@map("evidencias")
 }
@@ -342,6 +379,7 @@ model Evidencia {
 /// Registro inmutable de auditoría de seguridad (acceso y operaciones)
 model AuditoriaSeguridad {
   id_auditoria  String   @id @default(uuid()) @db.VarChar(36)
+  empresa_id    String?  @db.VarChar(36)
   fecha         DateTime @default(now())
   request_id    String?  @db.VarChar(100)
   actor_id      String?  @db.VarChar(36)
@@ -367,12 +405,14 @@ model AuditoriaSeguridad {
 
   @@index([fecha])
   @@index([actor_id, fecha])
+  @@index([empresa_id, fecha])
   @@map("auditoria_seguridad")
 }
 
 /// Importación masiva de expedientes por Excel (no hay integración en vivo con Caja Huancayo todavía)
 model ImportacionMasiva {
   id_importacion String    @id @default(uuid()) @db.VarChar(36)
+  empresa_id     String    @db.VarChar(36)
   tipo           String    @db.VarChar(30)
   estado         String    @default("PENDIENTE") @db.VarChar(20)
   archivo        String    @db.VarChar(255)
@@ -396,5 +436,6 @@ model ImportacionMasiva {
 
   @@index([estado, fecha_creacion])
   @@index([actor_id, fecha_creacion])
+  @@index([empresa_id, fecha_creacion])
   @@map("importaciones_masivas")
 }

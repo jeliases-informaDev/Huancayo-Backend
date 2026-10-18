@@ -14,8 +14,15 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
- * Model Usuario
+ * Model Empresa
  * Tabla física: usuarios (Administrador, Supervisor, Auditor)
+ * Empresas (clientes de Sulotec: cajas, financieras, negocios). Cada fila de las demás tablas pertenece a una empresa y el servidor
+ * filtra por ella en cada consulta (src/core/tenant). Los clientes no saben unos de otros: nadie elige empresa, la da su cuenta.
+ */
+export type Empresa = $Result.DefaultSelection<Prisma.$EmpresaPayload>
+/**
+ * Model Usuario
+ * 
  */
 export type Usuario = $Result.DefaultSelection<Prisma.$UsuarioPayload>
 /**
@@ -118,8 +125,8 @@ export const TipoCredito: typeof $Enums.TipoCredito
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Usuarios
- * const usuarios = await prisma.usuario.findMany()
+ * // Fetch zero or more Empresas
+ * const empresas = await prisma.empresa.findMany()
  * ```
  *
  *
@@ -141,8 +148,8 @@ export class PrismaClient<
    * const prisma = new PrismaClient({
    *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
    * })
-   * // Fetch zero or more Usuarios
-   * const usuarios = await prisma.usuario.findMany()
+   * // Fetch zero or more Empresas
+   * const empresas = await prisma.empresa.findMany()
    * ```
    *
    *
@@ -231,6 +238,16 @@ export class PrismaClient<
   }>>
 
       /**
+   * `prisma.empresa`: Exposes CRUD operations for the **Empresa** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Empresas
+    * const empresas = await prisma.empresa.findMany()
+    * ```
+    */
+  get empresa(): Prisma.EmpresaDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.usuario`: Exposes CRUD operations for the **Usuario** model.
     * Example usage:
     * ```ts
@@ -796,6 +813,7 @@ export namespace Prisma {
 
 
   export const ModelName: {
+    Empresa: 'Empresa',
     Usuario: 'Usuario',
     TrackingUbicacion: 'TrackingUbicacion',
     EventoCampo: 'EventoCampo',
@@ -823,10 +841,76 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "usuario" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva"
+      modelProps: "empresa" | "usuario" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
+      Empresa: {
+        payload: Prisma.$EmpresaPayload<ExtArgs>
+        fields: Prisma.EmpresaFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EmpresaFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmpresaPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EmpresaFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmpresaPayload>
+          }
+          findFirst: {
+            args: Prisma.EmpresaFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmpresaPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EmpresaFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmpresaPayload>
+          }
+          findMany: {
+            args: Prisma.EmpresaFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmpresaPayload>[]
+          }
+          create: {
+            args: Prisma.EmpresaCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmpresaPayload>
+          }
+          createMany: {
+            args: Prisma.EmpresaCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.EmpresaDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmpresaPayload>
+          }
+          update: {
+            args: Prisma.EmpresaUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmpresaPayload>
+          }
+          deleteMany: {
+            args: Prisma.EmpresaDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EmpresaUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.EmpresaUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EmpresaPayload>
+          }
+          aggregate: {
+            args: Prisma.EmpresaAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEmpresa>
+          }
+          groupBy: {
+            args: Prisma.EmpresaGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EmpresaGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EmpresaCountArgs<ExtArgs>
+            result: $Utils.Optional<EmpresaCountAggregateOutputType> | number
+          }
+        }
+      }
       Usuario: {
         payload: Prisma.$UsuarioPayload<ExtArgs>
         fields: Prisma.UsuarioFieldRefs
@@ -1742,6 +1826,7 @@ export namespace Prisma {
     comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
+    empresa?: EmpresaOmit
     usuario?: UsuarioOmit
     trackingUbicacion?: TrackingUbicacionOmit
     eventoCampo?: EventoCampoOmit
@@ -1990,6 +2075,929 @@ export namespace Prisma {
    */
 
   /**
+   * Model Empresa
+   */
+
+  export type AggregateEmpresa = {
+    _count: EmpresaCountAggregateOutputType | null
+    _min: EmpresaMinAggregateOutputType | null
+    _max: EmpresaMaxAggregateOutputType | null
+  }
+
+  export type EmpresaMinAggregateOutputType = {
+    id_empresa: string | null
+    nombre: string | null
+    nombre_corto: string | null
+    slug: string | null
+    estado: string | null
+    creado_en: Date | null
+    actualizado_en: Date | null
+  }
+
+  export type EmpresaMaxAggregateOutputType = {
+    id_empresa: string | null
+    nombre: string | null
+    nombre_corto: string | null
+    slug: string | null
+    estado: string | null
+    creado_en: Date | null
+    actualizado_en: Date | null
+  }
+
+  export type EmpresaCountAggregateOutputType = {
+    id_empresa: number
+    nombre: number
+    nombre_corto: number
+    slug: number
+    estado: number
+    configuracion: number
+    marca: number
+    creado_en: number
+    actualizado_en: number
+    _all: number
+  }
+
+
+  export type EmpresaMinAggregateInputType = {
+    id_empresa?: true
+    nombre?: true
+    nombre_corto?: true
+    slug?: true
+    estado?: true
+    creado_en?: true
+    actualizado_en?: true
+  }
+
+  export type EmpresaMaxAggregateInputType = {
+    id_empresa?: true
+    nombre?: true
+    nombre_corto?: true
+    slug?: true
+    estado?: true
+    creado_en?: true
+    actualizado_en?: true
+  }
+
+  export type EmpresaCountAggregateInputType = {
+    id_empresa?: true
+    nombre?: true
+    nombre_corto?: true
+    slug?: true
+    estado?: true
+    configuracion?: true
+    marca?: true
+    creado_en?: true
+    actualizado_en?: true
+    _all?: true
+  }
+
+  export type EmpresaAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Empresa to aggregate.
+     */
+    where?: EmpresaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Empresas to fetch.
+     */
+    orderBy?: EmpresaOrderByWithRelationInput | EmpresaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EmpresaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Empresas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Empresas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Empresas
+    **/
+    _count?: true | EmpresaCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EmpresaMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EmpresaMaxAggregateInputType
+  }
+
+  export type GetEmpresaAggregateType<T extends EmpresaAggregateArgs> = {
+        [P in keyof T & keyof AggregateEmpresa]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEmpresa[P]>
+      : GetScalarType<T[P], AggregateEmpresa[P]>
+  }
+
+
+
+
+  export type EmpresaGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EmpresaWhereInput
+    orderBy?: EmpresaOrderByWithAggregationInput | EmpresaOrderByWithAggregationInput[]
+    by: EmpresaScalarFieldEnum[] | EmpresaScalarFieldEnum
+    having?: EmpresaScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EmpresaCountAggregateInputType | true
+    _min?: EmpresaMinAggregateInputType
+    _max?: EmpresaMaxAggregateInputType
+  }
+
+  export type EmpresaGroupByOutputType = {
+    id_empresa: string
+    nombre: string
+    nombre_corto: string | null
+    slug: string
+    estado: string
+    configuracion: JsonValue | null
+    marca: JsonValue | null
+    creado_en: Date
+    actualizado_en: Date
+    _count: EmpresaCountAggregateOutputType | null
+    _min: EmpresaMinAggregateOutputType | null
+    _max: EmpresaMaxAggregateOutputType | null
+  }
+
+  type GetEmpresaGroupByPayload<T extends EmpresaGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EmpresaGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EmpresaGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EmpresaGroupByOutputType[P]>
+            : GetScalarType<T[P], EmpresaGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EmpresaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id_empresa?: boolean
+    nombre?: boolean
+    nombre_corto?: boolean
+    slug?: boolean
+    estado?: boolean
+    configuracion?: boolean
+    marca?: boolean
+    creado_en?: boolean
+    actualizado_en?: boolean
+  }, ExtArgs["result"]["empresa"]>
+
+
+
+  export type EmpresaSelectScalar = {
+    id_empresa?: boolean
+    nombre?: boolean
+    nombre_corto?: boolean
+    slug?: boolean
+    estado?: boolean
+    configuracion?: boolean
+    marca?: boolean
+    creado_en?: boolean
+    actualizado_en?: boolean
+  }
+
+  export type EmpresaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_empresa" | "nombre" | "nombre_corto" | "slug" | "estado" | "configuracion" | "marca" | "creado_en" | "actualizado_en", ExtArgs["result"]["empresa"]>
+
+  export type $EmpresaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Empresa"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id_empresa: string
+      nombre: string
+      nombre_corto: string | null
+      slug: string
+      estado: string
+      configuracion: Prisma.JsonValue | null
+      marca: Prisma.JsonValue | null
+      creado_en: Date
+      actualizado_en: Date
+    }, ExtArgs["result"]["empresa"]>
+    composites: {}
+  }
+
+  type EmpresaGetPayload<S extends boolean | null | undefined | EmpresaDefaultArgs> = $Result.GetResult<Prisma.$EmpresaPayload, S>
+
+  type EmpresaCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EmpresaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EmpresaCountAggregateInputType | true
+    }
+
+  export interface EmpresaDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Empresa'], meta: { name: 'Empresa' } }
+    /**
+     * Find zero or one Empresa that matches the filter.
+     * @param {EmpresaFindUniqueArgs} args - Arguments to find a Empresa
+     * @example
+     * // Get one Empresa
+     * const empresa = await prisma.empresa.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EmpresaFindUniqueArgs>(args: SelectSubset<T, EmpresaFindUniqueArgs<ExtArgs>>): Prisma__EmpresaClient<$Result.GetResult<Prisma.$EmpresaPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Empresa that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EmpresaFindUniqueOrThrowArgs} args - Arguments to find a Empresa
+     * @example
+     * // Get one Empresa
+     * const empresa = await prisma.empresa.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EmpresaFindUniqueOrThrowArgs>(args: SelectSubset<T, EmpresaFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EmpresaClient<$Result.GetResult<Prisma.$EmpresaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Empresa that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmpresaFindFirstArgs} args - Arguments to find a Empresa
+     * @example
+     * // Get one Empresa
+     * const empresa = await prisma.empresa.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EmpresaFindFirstArgs>(args?: SelectSubset<T, EmpresaFindFirstArgs<ExtArgs>>): Prisma__EmpresaClient<$Result.GetResult<Prisma.$EmpresaPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Empresa that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmpresaFindFirstOrThrowArgs} args - Arguments to find a Empresa
+     * @example
+     * // Get one Empresa
+     * const empresa = await prisma.empresa.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EmpresaFindFirstOrThrowArgs>(args?: SelectSubset<T, EmpresaFindFirstOrThrowArgs<ExtArgs>>): Prisma__EmpresaClient<$Result.GetResult<Prisma.$EmpresaPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Empresas that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmpresaFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Empresas
+     * const empresas = await prisma.empresa.findMany()
+     * 
+     * // Get first 10 Empresas
+     * const empresas = await prisma.empresa.findMany({ take: 10 })
+     * 
+     * // Only select the `id_empresa`
+     * const empresaWithId_empresaOnly = await prisma.empresa.findMany({ select: { id_empresa: true } })
+     * 
+     */
+    findMany<T extends EmpresaFindManyArgs>(args?: SelectSubset<T, EmpresaFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmpresaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Empresa.
+     * @param {EmpresaCreateArgs} args - Arguments to create a Empresa.
+     * @example
+     * // Create one Empresa
+     * const Empresa = await prisma.empresa.create({
+     *   data: {
+     *     // ... data to create a Empresa
+     *   }
+     * })
+     * 
+     */
+    create<T extends EmpresaCreateArgs>(args: SelectSubset<T, EmpresaCreateArgs<ExtArgs>>): Prisma__EmpresaClient<$Result.GetResult<Prisma.$EmpresaPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Empresas.
+     * @param {EmpresaCreateManyArgs} args - Arguments to create many Empresas.
+     * @example
+     * // Create many Empresas
+     * const empresa = await prisma.empresa.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EmpresaCreateManyArgs>(args?: SelectSubset<T, EmpresaCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Empresa.
+     * @param {EmpresaDeleteArgs} args - Arguments to delete one Empresa.
+     * @example
+     * // Delete one Empresa
+     * const Empresa = await prisma.empresa.delete({
+     *   where: {
+     *     // ... filter to delete one Empresa
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EmpresaDeleteArgs>(args: SelectSubset<T, EmpresaDeleteArgs<ExtArgs>>): Prisma__EmpresaClient<$Result.GetResult<Prisma.$EmpresaPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Empresa.
+     * @param {EmpresaUpdateArgs} args - Arguments to update one Empresa.
+     * @example
+     * // Update one Empresa
+     * const empresa = await prisma.empresa.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EmpresaUpdateArgs>(args: SelectSubset<T, EmpresaUpdateArgs<ExtArgs>>): Prisma__EmpresaClient<$Result.GetResult<Prisma.$EmpresaPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Empresas.
+     * @param {EmpresaDeleteManyArgs} args - Arguments to filter Empresas to delete.
+     * @example
+     * // Delete a few Empresas
+     * const { count } = await prisma.empresa.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EmpresaDeleteManyArgs>(args?: SelectSubset<T, EmpresaDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Empresas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmpresaUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Empresas
+     * const empresa = await prisma.empresa.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EmpresaUpdateManyArgs>(args: SelectSubset<T, EmpresaUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Empresa.
+     * @param {EmpresaUpsertArgs} args - Arguments to update or create a Empresa.
+     * @example
+     * // Update or create a Empresa
+     * const empresa = await prisma.empresa.upsert({
+     *   create: {
+     *     // ... data to create a Empresa
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Empresa we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EmpresaUpsertArgs>(args: SelectSubset<T, EmpresaUpsertArgs<ExtArgs>>): Prisma__EmpresaClient<$Result.GetResult<Prisma.$EmpresaPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Empresas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmpresaCountArgs} args - Arguments to filter Empresas to count.
+     * @example
+     * // Count the number of Empresas
+     * const count = await prisma.empresa.count({
+     *   where: {
+     *     // ... the filter for the Empresas we want to count
+     *   }
+     * })
+    **/
+    count<T extends EmpresaCountArgs>(
+      args?: Subset<T, EmpresaCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EmpresaCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Empresa.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmpresaAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EmpresaAggregateArgs>(args: Subset<T, EmpresaAggregateArgs>): Prisma.PrismaPromise<GetEmpresaAggregateType<T>>
+
+    /**
+     * Group by Empresa.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EmpresaGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EmpresaGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EmpresaGroupByArgs['orderBy'] }
+        : { orderBy?: EmpresaGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EmpresaGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEmpresaGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Empresa model
+   */
+  readonly fields: EmpresaFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Empresa.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EmpresaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Empresa model
+   */
+  interface EmpresaFieldRefs {
+    readonly id_empresa: FieldRef<"Empresa", 'String'>
+    readonly nombre: FieldRef<"Empresa", 'String'>
+    readonly nombre_corto: FieldRef<"Empresa", 'String'>
+    readonly slug: FieldRef<"Empresa", 'String'>
+    readonly estado: FieldRef<"Empresa", 'String'>
+    readonly configuracion: FieldRef<"Empresa", 'Json'>
+    readonly marca: FieldRef<"Empresa", 'Json'>
+    readonly creado_en: FieldRef<"Empresa", 'DateTime'>
+    readonly actualizado_en: FieldRef<"Empresa", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Empresa findUnique
+   */
+  export type EmpresaFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+    /**
+     * Filter, which Empresa to fetch.
+     */
+    where: EmpresaWhereUniqueInput
+  }
+
+  /**
+   * Empresa findUniqueOrThrow
+   */
+  export type EmpresaFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+    /**
+     * Filter, which Empresa to fetch.
+     */
+    where: EmpresaWhereUniqueInput
+  }
+
+  /**
+   * Empresa findFirst
+   */
+  export type EmpresaFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+    /**
+     * Filter, which Empresa to fetch.
+     */
+    where?: EmpresaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Empresas to fetch.
+     */
+    orderBy?: EmpresaOrderByWithRelationInput | EmpresaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Empresas.
+     */
+    cursor?: EmpresaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Empresas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Empresas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Empresas.
+     */
+    distinct?: EmpresaScalarFieldEnum | EmpresaScalarFieldEnum[]
+  }
+
+  /**
+   * Empresa findFirstOrThrow
+   */
+  export type EmpresaFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+    /**
+     * Filter, which Empresa to fetch.
+     */
+    where?: EmpresaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Empresas to fetch.
+     */
+    orderBy?: EmpresaOrderByWithRelationInput | EmpresaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Empresas.
+     */
+    cursor?: EmpresaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Empresas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Empresas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Empresas.
+     */
+    distinct?: EmpresaScalarFieldEnum | EmpresaScalarFieldEnum[]
+  }
+
+  /**
+   * Empresa findMany
+   */
+  export type EmpresaFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+    /**
+     * Filter, which Empresas to fetch.
+     */
+    where?: EmpresaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Empresas to fetch.
+     */
+    orderBy?: EmpresaOrderByWithRelationInput | EmpresaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Empresas.
+     */
+    cursor?: EmpresaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Empresas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Empresas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Empresas.
+     */
+    distinct?: EmpresaScalarFieldEnum | EmpresaScalarFieldEnum[]
+  }
+
+  /**
+   * Empresa create
+   */
+  export type EmpresaCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Empresa.
+     */
+    data: XOR<EmpresaCreateInput, EmpresaUncheckedCreateInput>
+  }
+
+  /**
+   * Empresa createMany
+   */
+  export type EmpresaCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Empresas.
+     */
+    data: EmpresaCreateManyInput | EmpresaCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Empresa update
+   */
+  export type EmpresaUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Empresa.
+     */
+    data: XOR<EmpresaUpdateInput, EmpresaUncheckedUpdateInput>
+    /**
+     * Choose, which Empresa to update.
+     */
+    where: EmpresaWhereUniqueInput
+  }
+
+  /**
+   * Empresa updateMany
+   */
+  export type EmpresaUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Empresas.
+     */
+    data: XOR<EmpresaUpdateManyMutationInput, EmpresaUncheckedUpdateManyInput>
+    /**
+     * Filter which Empresas to update
+     */
+    where?: EmpresaWhereInput
+    /**
+     * Limit how many Empresas to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Empresa upsert
+   */
+  export type EmpresaUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Empresa to update in case it exists.
+     */
+    where: EmpresaWhereUniqueInput
+    /**
+     * In case the Empresa found by the `where` argument doesn't exist, create a new Empresa with this data.
+     */
+    create: XOR<EmpresaCreateInput, EmpresaUncheckedCreateInput>
+    /**
+     * In case the Empresa was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EmpresaUpdateInput, EmpresaUncheckedUpdateInput>
+  }
+
+  /**
+   * Empresa delete
+   */
+  export type EmpresaDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+    /**
+     * Filter which Empresa to delete.
+     */
+    where: EmpresaWhereUniqueInput
+  }
+
+  /**
+   * Empresa deleteMany
+   */
+  export type EmpresaDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Empresas to delete
+     */
+    where?: EmpresaWhereInput
+    /**
+     * Limit how many Empresas to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Empresa without action
+   */
+  export type EmpresaDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Empresa
+     */
+    select?: EmpresaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Empresa
+     */
+    omit?: EmpresaOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model Usuario
    */
 
@@ -2023,6 +3031,7 @@ export namespace Prisma {
 
   export type UsuarioMinAggregateOutputType = {
     id_usuario: string | null
+    empresa_id: string | null
     username: string | null
     nombres: string | null
     apellidos: string | null
@@ -2060,6 +3069,7 @@ export namespace Prisma {
 
   export type UsuarioMaxAggregateOutputType = {
     id_usuario: string | null
+    empresa_id: string | null
     username: string | null
     nombres: string | null
     apellidos: string | null
@@ -2097,6 +3107,7 @@ export namespace Prisma {
 
   export type UsuarioCountAggregateOutputType = {
     id_usuario: number
+    empresa_id: number
     username: number
     nombres: number
     apellidos: number
@@ -2156,6 +3167,7 @@ export namespace Prisma {
 
   export type UsuarioMinAggregateInputType = {
     id_usuario?: true
+    empresa_id?: true
     username?: true
     nombres?: true
     apellidos?: true
@@ -2193,6 +3205,7 @@ export namespace Prisma {
 
   export type UsuarioMaxAggregateInputType = {
     id_usuario?: true
+    empresa_id?: true
     username?: true
     nombres?: true
     apellidos?: true
@@ -2230,6 +3243,7 @@ export namespace Prisma {
 
   export type UsuarioCountAggregateInputType = {
     id_usuario?: true
+    empresa_id?: true
     username?: true
     nombres?: true
     apellidos?: true
@@ -2354,6 +3368,7 @@ export namespace Prisma {
 
   export type UsuarioGroupByOutputType = {
     id_usuario: string
+    empresa_id: string | null
     username: string
     nombres: string | null
     apellidos: string | null
@@ -2410,6 +3425,7 @@ export namespace Prisma {
 
   export type UsuarioSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_usuario?: boolean
+    empresa_id?: boolean
     username?: boolean
     nombres?: boolean
     apellidos?: boolean
@@ -2455,6 +3471,7 @@ export namespace Prisma {
 
   export type UsuarioSelectScalar = {
     id_usuario?: boolean
+    empresa_id?: boolean
     username?: boolean
     nombres?: boolean
     apellidos?: boolean
@@ -2490,7 +3507,7 @@ export namespace Prisma {
     jornada_fin?: boolean
   }
 
-  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud" | "ubicacion_en" | "ubicacion_precision" | "ubicacion_simulada" | "bateria_porcentaje" | "bateria_cargando" | "mov_estado" | "mov_desde" | "mov_velocidad" | "mov_modo" | "jornada_inicio" | "jornada_fin", ExtArgs["result"]["usuario"]>
+  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "empresa_id" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud" | "ubicacion_en" | "ubicacion_precision" | "ubicacion_simulada" | "bateria_porcentaje" | "bateria_cargando" | "mov_estado" | "mov_desde" | "mov_velocidad" | "mov_modo" | "jornada_inicio" | "jornada_fin", ExtArgs["result"]["usuario"]>
   export type UsuarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
@@ -2511,6 +3528,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id_usuario: string
+      empresa_id: string | null
       username: string
       nombres: string | null
       apellidos: string | null
@@ -2919,6 +3937,7 @@ export namespace Prisma {
    */
   interface UsuarioFieldRefs {
     readonly id_usuario: FieldRef<"Usuario", 'String'>
+    readonly empresa_id: FieldRef<"Usuario", 'String'>
     readonly username: FieldRef<"Usuario", 'String'>
     readonly nombres: FieldRef<"Usuario", 'String'>
     readonly apellidos: FieldRef<"Usuario", 'String'>
@@ -3466,6 +4485,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionMinAggregateOutputType = {
     id_tracking: bigint | null
+    empresa_id: string | null
     id_usuario: string | null
     latitud: Decimal | null
     longitud: Decimal | null
@@ -3476,6 +4496,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionMaxAggregateOutputType = {
     id_tracking: bigint | null
+    empresa_id: string | null
     id_usuario: string | null
     latitud: Decimal | null
     longitud: Decimal | null
@@ -3486,6 +4507,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionCountAggregateOutputType = {
     id_tracking: number
+    empresa_id: number
     id_usuario: number
     latitud: number
     longitud: number
@@ -3512,6 +4534,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionMinAggregateInputType = {
     id_tracking?: true
+    empresa_id?: true
     id_usuario?: true
     latitud?: true
     longitud?: true
@@ -3522,6 +4545,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionMaxAggregateInputType = {
     id_tracking?: true
+    empresa_id?: true
     id_usuario?: true
     latitud?: true
     longitud?: true
@@ -3532,6 +4556,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionCountAggregateInputType = {
     id_tracking?: true
+    empresa_id?: true
     id_usuario?: true
     latitud?: true
     longitud?: true
@@ -3629,6 +4654,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionGroupByOutputType = {
     id_tracking: bigint
+    empresa_id: string
     id_usuario: string
     latitud: Decimal
     longitud: Decimal
@@ -3658,6 +4684,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_tracking?: boolean
+    empresa_id?: boolean
     id_usuario?: boolean
     latitud?: boolean
     longitud?: boolean
@@ -3671,6 +4698,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionSelectScalar = {
     id_tracking?: boolean
+    empresa_id?: boolean
     id_usuario?: boolean
     latitud?: boolean
     longitud?: boolean
@@ -3679,7 +4707,7 @@ export namespace Prisma {
     registrado_en?: boolean
   }
 
-  export type TrackingUbicacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_tracking" | "id_usuario" | "latitud" | "longitud" | "precision_metros" | "simulada" | "registrado_en", ExtArgs["result"]["trackingUbicacion"]>
+  export type TrackingUbicacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_tracking" | "empresa_id" | "id_usuario" | "latitud" | "longitud" | "precision_metros" | "simulada" | "registrado_en", ExtArgs["result"]["trackingUbicacion"]>
   export type TrackingUbicacionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }
@@ -3691,6 +4719,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id_tracking: bigint
+      empresa_id: string
       id_usuario: string
       latitud: Prisma.Decimal
       longitud: Prisma.Decimal
@@ -4068,6 +5097,7 @@ export namespace Prisma {
    */
   interface TrackingUbicacionFieldRefs {
     readonly id_tracking: FieldRef<"TrackingUbicacion", 'BigInt'>
+    readonly empresa_id: FieldRef<"TrackingUbicacion", 'String'>
     readonly id_usuario: FieldRef<"TrackingUbicacion", 'String'>
     readonly latitud: FieldRef<"TrackingUbicacion", 'Decimal'>
     readonly longitud: FieldRef<"TrackingUbicacion", 'Decimal'>
@@ -4470,6 +5500,7 @@ export namespace Prisma {
 
   export type EventoCampoMinAggregateOutputType = {
     id_evento: bigint | null
+    empresa_id: string | null
     id_usuario: string | null
     id_expediente: number | null
     punto: string | null
@@ -4482,6 +5513,7 @@ export namespace Prisma {
 
   export type EventoCampoMaxAggregateOutputType = {
     id_evento: bigint | null
+    empresa_id: string | null
     id_usuario: string | null
     id_expediente: number | null
     punto: string | null
@@ -4494,6 +5526,7 @@ export namespace Prisma {
 
   export type EventoCampoCountAggregateOutputType = {
     id_evento: number
+    empresa_id: number
     id_usuario: number
     id_expediente: number
     punto: number
@@ -4524,6 +5557,7 @@ export namespace Prisma {
 
   export type EventoCampoMinAggregateInputType = {
     id_evento?: true
+    empresa_id?: true
     id_usuario?: true
     id_expediente?: true
     punto?: true
@@ -4536,6 +5570,7 @@ export namespace Prisma {
 
   export type EventoCampoMaxAggregateInputType = {
     id_evento?: true
+    empresa_id?: true
     id_usuario?: true
     id_expediente?: true
     punto?: true
@@ -4548,6 +5583,7 @@ export namespace Prisma {
 
   export type EventoCampoCountAggregateInputType = {
     id_evento?: true
+    empresa_id?: true
     id_usuario?: true
     id_expediente?: true
     punto?: true
@@ -4647,6 +5683,7 @@ export namespace Prisma {
 
   export type EventoCampoGroupByOutputType = {
     id_evento: bigint
+    empresa_id: string
     id_usuario: string
     id_expediente: number
     punto: string
@@ -4678,6 +5715,7 @@ export namespace Prisma {
 
   export type EventoCampoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_evento?: boolean
+    empresa_id?: boolean
     id_usuario?: boolean
     id_expediente?: boolean
     punto?: boolean
@@ -4694,6 +5732,7 @@ export namespace Prisma {
 
   export type EventoCampoSelectScalar = {
     id_evento?: boolean
+    empresa_id?: boolean
     id_usuario?: boolean
     id_expediente?: boolean
     punto?: boolean
@@ -4704,7 +5743,7 @@ export namespace Prisma {
     registrado_en?: boolean
   }
 
-  export type EventoCampoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_evento" | "id_usuario" | "id_expediente" | "punto" | "tipo" | "distancia_m" | "latitud" | "longitud" | "registrado_en", ExtArgs["result"]["eventoCampo"]>
+  export type EventoCampoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_evento" | "empresa_id" | "id_usuario" | "id_expediente" | "punto" | "tipo" | "distancia_m" | "latitud" | "longitud" | "registrado_en", ExtArgs["result"]["eventoCampo"]>
   export type EventoCampoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
@@ -4718,6 +5757,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id_evento: bigint
+      empresa_id: string
       id_usuario: string
       id_expediente: number
       punto: string
@@ -5098,6 +6138,7 @@ export namespace Prisma {
    */
   interface EventoCampoFieldRefs {
     readonly id_evento: FieldRef<"EventoCampo", 'BigInt'>
+    readonly empresa_id: FieldRef<"EventoCampo", 'String'>
     readonly id_usuario: FieldRef<"EventoCampo", 'String'>
     readonly id_expediente: FieldRef<"EventoCampo", 'Int'>
     readonly punto: FieldRef<"EventoCampo", 'String'>
@@ -5483,6 +6524,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaMinAggregateOutputType = {
+    empresa_id: string | null
     clave: string | null
     valor: string | null
     actualizado_por: string | null
@@ -5490,6 +6532,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaMaxAggregateOutputType = {
+    empresa_id: string | null
     clave: string | null
     valor: string | null
     actualizado_por: string | null
@@ -5497,6 +6540,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaCountAggregateOutputType = {
+    empresa_id: number
     clave: number
     valor: number
     actualizado_por: number
@@ -5506,6 +6550,7 @@ export namespace Prisma {
 
 
   export type ConfiguracionSistemaMinAggregateInputType = {
+    empresa_id?: true
     clave?: true
     valor?: true
     actualizado_por?: true
@@ -5513,6 +6558,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaMaxAggregateInputType = {
+    empresa_id?: true
     clave?: true
     valor?: true
     actualizado_por?: true
@@ -5520,6 +6566,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaCountAggregateInputType = {
+    empresa_id?: true
     clave?: true
     valor?: true
     actualizado_por?: true
@@ -5600,6 +6647,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaGroupByOutputType = {
+    empresa_id: string
     clave: string
     valor: string
     actualizado_por: string | null
@@ -5624,6 +6672,7 @@ export namespace Prisma {
 
 
   export type ConfiguracionSistemaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    empresa_id?: boolean
     clave?: boolean
     valor?: boolean
     actualizado_por?: boolean
@@ -5633,18 +6682,20 @@ export namespace Prisma {
 
 
   export type ConfiguracionSistemaSelectScalar = {
+    empresa_id?: boolean
     clave?: boolean
     valor?: boolean
     actualizado_por?: boolean
     actualizado_en?: boolean
   }
 
-  export type ConfiguracionSistemaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"clave" | "valor" | "actualizado_por" | "actualizado_en", ExtArgs["result"]["configuracionSistema"]>
+  export type ConfiguracionSistemaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"empresa_id" | "clave" | "valor" | "actualizado_por" | "actualizado_en", ExtArgs["result"]["configuracionSistema"]>
 
   export type $ConfiguracionSistemaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ConfiguracionSistema"
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
+      empresa_id: string
       clave: string
       valor: string
       actualizado_por: string | null
@@ -5732,8 +6783,8 @@ export namespace Prisma {
      * // Get first 10 ConfiguracionSistemas
      * const configuracionSistemas = await prisma.configuracionSistema.findMany({ take: 10 })
      * 
-     * // Only select the `clave`
-     * const configuracionSistemaWithClaveOnly = await prisma.configuracionSistema.findMany({ select: { clave: true } })
+     * // Only select the `empresa_id`
+     * const configuracionSistemaWithEmpresa_idOnly = await prisma.configuracionSistema.findMany({ select: { empresa_id: true } })
      * 
      */
     findMany<T extends ConfiguracionSistemaFindManyArgs>(args?: SelectSubset<T, ConfiguracionSistemaFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ConfiguracionSistemaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -6018,6 +7069,7 @@ export namespace Prisma {
    * Fields of the ConfiguracionSistema model
    */
   interface ConfiguracionSistemaFieldRefs {
+    readonly empresa_id: FieldRef<"ConfiguracionSistema", 'String'>
     readonly clave: FieldRef<"ConfiguracionSistema", 'String'>
     readonly valor: FieldRef<"ConfiguracionSistema", 'String'>
     readonly actualizado_por: FieldRef<"ConfiguracionSistema", 'String'>
@@ -6360,6 +7412,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoMinAggregateOutputType = {
     id_dispositivo: string | null
+    empresa_id: string | null
     id_usuario: string | null
     device_id: string | null
     nombre_dispositivo: string | null
@@ -6370,6 +7423,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoMaxAggregateOutputType = {
     id_dispositivo: string | null
+    empresa_id: string | null
     id_usuario: string | null
     device_id: string | null
     nombre_dispositivo: string | null
@@ -6380,6 +7434,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoCountAggregateOutputType = {
     id_dispositivo: number
+    empresa_id: number
     id_usuario: number
     device_id: number
     nombre_dispositivo: number
@@ -6392,6 +7447,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoMinAggregateInputType = {
     id_dispositivo?: true
+    empresa_id?: true
     id_usuario?: true
     device_id?: true
     nombre_dispositivo?: true
@@ -6402,6 +7458,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoMaxAggregateInputType = {
     id_dispositivo?: true
+    empresa_id?: true
     id_usuario?: true
     device_id?: true
     nombre_dispositivo?: true
@@ -6412,6 +7469,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoCountAggregateInputType = {
     id_dispositivo?: true
+    empresa_id?: true
     id_usuario?: true
     device_id?: true
     nombre_dispositivo?: true
@@ -6495,6 +7553,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoGroupByOutputType = {
     id_dispositivo: string
+    empresa_id: string
     id_usuario: string
     device_id: string
     nombre_dispositivo: string | null
@@ -6522,6 +7581,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_dispositivo?: boolean
+    empresa_id?: boolean
     id_usuario?: boolean
     device_id?: boolean
     nombre_dispositivo?: boolean
@@ -6535,6 +7595,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoSelectScalar = {
     id_dispositivo?: boolean
+    empresa_id?: boolean
     id_usuario?: boolean
     device_id?: boolean
     nombre_dispositivo?: boolean
@@ -6543,7 +7604,7 @@ export namespace Prisma {
     ultimo_uso?: boolean
   }
 
-  export type DispositivoAutorizadoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_dispositivo" | "id_usuario" | "device_id" | "nombre_dispositivo" | "activo" | "primer_uso" | "ultimo_uso", ExtArgs["result"]["dispositivoAutorizado"]>
+  export type DispositivoAutorizadoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_dispositivo" | "empresa_id" | "id_usuario" | "device_id" | "nombre_dispositivo" | "activo" | "primer_uso" | "ultimo_uso", ExtArgs["result"]["dispositivoAutorizado"]>
   export type DispositivoAutorizadoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }
@@ -6555,6 +7616,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id_dispositivo: string
+      empresa_id: string
       id_usuario: string
       device_id: string
       nombre_dispositivo: string | null
@@ -6932,6 +7994,7 @@ export namespace Prisma {
    */
   interface DispositivoAutorizadoFieldRefs {
     readonly id_dispositivo: FieldRef<"DispositivoAutorizado", 'String'>
+    readonly empresa_id: FieldRef<"DispositivoAutorizado", 'String'>
     readonly id_usuario: FieldRef<"DispositivoAutorizado", 'String'>
     readonly device_id: FieldRef<"DispositivoAutorizado", 'String'>
     readonly nombre_dispositivo: FieldRef<"DispositivoAutorizado", 'String'>
@@ -7338,6 +8401,7 @@ export namespace Prisma {
 
   export type ExpedienteMinAggregateOutputType = {
     id_expediente: number | null
+    empresa_id: string | null
     codigo_expediente: string | null
     tipo_credito: $Enums.TipoCredito | null
     oficina: string | null
@@ -7375,6 +8439,7 @@ export namespace Prisma {
 
   export type ExpedienteMaxAggregateOutputType = {
     id_expediente: number | null
+    empresa_id: string | null
     codigo_expediente: string | null
     tipo_credito: $Enums.TipoCredito | null
     oficina: string | null
@@ -7412,6 +8477,7 @@ export namespace Prisma {
 
   export type ExpedienteCountAggregateOutputType = {
     id_expediente: number
+    empresa_id: number
     codigo_expediente: number
     tipo_credito: number
     oficina: number
@@ -7478,6 +8544,7 @@ export namespace Prisma {
 
   export type ExpedienteMinAggregateInputType = {
     id_expediente?: true
+    empresa_id?: true
     codigo_expediente?: true
     tipo_credito?: true
     oficina?: true
@@ -7515,6 +8582,7 @@ export namespace Prisma {
 
   export type ExpedienteMaxAggregateInputType = {
     id_expediente?: true
+    empresa_id?: true
     codigo_expediente?: true
     tipo_credito?: true
     oficina?: true
@@ -7552,6 +8620,7 @@ export namespace Prisma {
 
   export type ExpedienteCountAggregateInputType = {
     id_expediente?: true
+    empresa_id?: true
     codigo_expediente?: true
     tipo_credito?: true
     oficina?: true
@@ -7683,6 +8752,7 @@ export namespace Prisma {
 
   export type ExpedienteGroupByOutputType = {
     id_expediente: number
+    empresa_id: string
     codigo_expediente: string
     tipo_credito: $Enums.TipoCredito
     oficina: string | null
@@ -7746,6 +8816,7 @@ export namespace Prisma {
 
   export type ExpedienteSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_expediente?: boolean
+    empresa_id?: boolean
     codigo_expediente?: boolean
     tipo_credito?: boolean
     oficina?: boolean
@@ -7797,6 +8868,7 @@ export namespace Prisma {
 
   export type ExpedienteSelectScalar = {
     id_expediente?: boolean
+    empresa_id?: boolean
     codigo_expediente?: boolean
     tipo_credito?: boolean
     oficina?: boolean
@@ -7839,7 +8911,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "direccion_normalizada" | "direccion_componentes" | "geo_estado" | "geo_confianza" | "geo_precision" | "geo_proveedor" | "geo_latitud" | "geo_longitud" | "geo_direccion_encontrada" | "geo_fecha" | "ubicacion_origen" | "autoasignable" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
+  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "empresa_id" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "direccion_normalizada" | "direccion_componentes" | "geo_estado" | "geo_confianza" | "geo_precision" | "geo_proveedor" | "geo_latitud" | "geo_longitud" | "geo_direccion_encontrada" | "geo_fecha" | "ubicacion_origen" | "autoasignable" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
   export type ExpedienteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Expediente$asignacionesArgs<ExtArgs>
     visitas?: boolean | Expediente$visitasArgs<ExtArgs>
@@ -7858,6 +8930,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id_expediente: number
+      empresa_id: string
       codigo_expediente: string
       tipo_credito: $Enums.TipoCredito
       oficina: string | null
@@ -8272,6 +9345,7 @@ export namespace Prisma {
    */
   interface ExpedienteFieldRefs {
     readonly id_expediente: FieldRef<"Expediente", 'Int'>
+    readonly empresa_id: FieldRef<"Expediente", 'String'>
     readonly codigo_expediente: FieldRef<"Expediente", 'String'>
     readonly tipo_credito: FieldRef<"Expediente", 'TipoCredito'>
     readonly oficina: FieldRef<"Expediente", 'String'>
@@ -8798,6 +9872,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioMinAggregateOutputType = {
     id_cambio: bigint | null
+    empresa_id: string | null
     id_expediente: number | null
     id_importacion: string | null
     actor_id: string | null
@@ -8807,6 +9882,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioMaxAggregateOutputType = {
     id_cambio: bigint | null
+    empresa_id: string | null
     id_expediente: number | null
     id_importacion: string | null
     actor_id: string | null
@@ -8816,6 +9892,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioCountAggregateOutputType = {
     id_cambio: number
+    empresa_id: number
     id_expediente: number
     id_importacion: number
     actor_id: number
@@ -8838,6 +9915,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioMinAggregateInputType = {
     id_cambio?: true
+    empresa_id?: true
     id_expediente?: true
     id_importacion?: true
     actor_id?: true
@@ -8847,6 +9925,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioMaxAggregateInputType = {
     id_cambio?: true
+    empresa_id?: true
     id_expediente?: true
     id_importacion?: true
     actor_id?: true
@@ -8856,6 +9935,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioCountAggregateInputType = {
     id_cambio?: true
+    empresa_id?: true
     id_expediente?: true
     id_importacion?: true
     actor_id?: true
@@ -8953,6 +10033,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioGroupByOutputType = {
     id_cambio: bigint
+    empresa_id: string
     id_expediente: number
     id_importacion: string | null
     actor_id: string | null
@@ -8982,6 +10063,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_cambio?: boolean
+    empresa_id?: boolean
     id_expediente?: boolean
     id_importacion?: boolean
     actor_id?: boolean
@@ -8995,6 +10077,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioSelectScalar = {
     id_cambio?: boolean
+    empresa_id?: boolean
     id_expediente?: boolean
     id_importacion?: boolean
     actor_id?: boolean
@@ -9003,7 +10086,7 @@ export namespace Prisma {
     fecha?: boolean
   }
 
-  export type ExpedienteCambioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_cambio" | "id_expediente" | "id_importacion" | "actor_id" | "tipo" | "cambios" | "fecha", ExtArgs["result"]["expedienteCambio"]>
+  export type ExpedienteCambioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_cambio" | "empresa_id" | "id_expediente" | "id_importacion" | "actor_id" | "tipo" | "cambios" | "fecha", ExtArgs["result"]["expedienteCambio"]>
   export type ExpedienteCambioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
   }
@@ -9015,6 +10098,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id_cambio: bigint
+      empresa_id: string
       id_expediente: number
       id_importacion: string | null
       actor_id: string | null
@@ -9392,6 +10476,7 @@ export namespace Prisma {
    */
   interface ExpedienteCambioFieldRefs {
     readonly id_cambio: FieldRef<"ExpedienteCambio", 'BigInt'>
+    readonly empresa_id: FieldRef<"ExpedienteCambio", 'String'>
     readonly id_expediente: FieldRef<"ExpedienteCambio", 'Int'>
     readonly id_importacion: FieldRef<"ExpedienteCambio", 'String'>
     readonly actor_id: FieldRef<"ExpedienteCambio", 'String'>
@@ -9788,6 +10873,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaMinAggregateOutputType = {
     id_asignacion: number | null
+    empresa_id: string | null
     id_expediente: number | null
     id_usuario_auditor: string | null
     fecha_asignacion: Date | null
@@ -9800,6 +10886,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaMaxAggregateOutputType = {
     id_asignacion: number | null
+    empresa_id: string | null
     id_expediente: number | null
     id_usuario_auditor: string | null
     fecha_asignacion: Date | null
@@ -9812,6 +10899,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaCountAggregateOutputType = {
     id_asignacion: number
+    empresa_id: number
     id_expediente: number
     id_usuario_auditor: number
     fecha_asignacion: number
@@ -9836,6 +10924,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaMinAggregateInputType = {
     id_asignacion?: true
+    empresa_id?: true
     id_expediente?: true
     id_usuario_auditor?: true
     fecha_asignacion?: true
@@ -9848,6 +10937,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaMaxAggregateInputType = {
     id_asignacion?: true
+    empresa_id?: true
     id_expediente?: true
     id_usuario_auditor?: true
     fecha_asignacion?: true
@@ -9860,6 +10950,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaCountAggregateInputType = {
     id_asignacion?: true
+    empresa_id?: true
     id_expediente?: true
     id_usuario_auditor?: true
     fecha_asignacion?: true
@@ -9959,6 +11050,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaGroupByOutputType = {
     id_asignacion: number
+    empresa_id: string
     id_expediente: number
     id_usuario_auditor: string
     fecha_asignacion: Date
@@ -9990,6 +11082,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_asignacion?: boolean
+    empresa_id?: boolean
     id_expediente?: boolean
     id_usuario_auditor?: boolean
     fecha_asignacion?: boolean
@@ -10006,6 +11099,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaSelectScalar = {
     id_asignacion?: boolean
+    empresa_id?: boolean
     id_expediente?: boolean
     id_usuario_auditor?: boolean
     fecha_asignacion?: boolean
@@ -10016,7 +11110,7 @@ export namespace Prisma {
     asignado_por?: boolean
   }
 
-  export type AsignacionAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_asignacion" | "id_expediente" | "id_usuario_auditor" | "fecha_asignacion" | "fecha_fin" | "estado" | "prioridad" | "origen" | "asignado_por", ExtArgs["result"]["asignacionAuditoria"]>
+  export type AsignacionAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_asignacion" | "empresa_id" | "id_expediente" | "id_usuario_auditor" | "fecha_asignacion" | "fecha_fin" | "estado" | "prioridad" | "origen" | "asignado_por", ExtArgs["result"]["asignacionAuditoria"]>
   export type AsignacionAuditoriaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
     auditor?: boolean | UsuarioDefaultArgs<ExtArgs>
@@ -10030,6 +11124,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id_asignacion: number
+      empresa_id: string
       id_expediente: number
       id_usuario_auditor: string
       fecha_asignacion: Date
@@ -10410,6 +11505,7 @@ export namespace Prisma {
    */
   interface AsignacionAuditoriaFieldRefs {
     readonly id_asignacion: FieldRef<"AsignacionAuditoria", 'Int'>
+    readonly empresa_id: FieldRef<"AsignacionAuditoria", 'String'>
     readonly id_expediente: FieldRef<"AsignacionAuditoria", 'Int'>
     readonly id_usuario_auditor: FieldRef<"AsignacionAuditoria", 'String'>
     readonly fecha_asignacion: FieldRef<"AsignacionAuditoria", 'DateTime'>
@@ -10818,6 +11914,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaMinAggregateOutputType = {
     id_visita: number | null
+    empresa_id: string | null
     client_sync_id: string | null
     id_asignacion: number | null
     id_expediente: number | null
@@ -10850,6 +11947,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaMaxAggregateOutputType = {
     id_visita: number | null
+    empresa_id: string | null
     client_sync_id: string | null
     id_asignacion: number | null
     id_expediente: number | null
@@ -10882,6 +11980,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaCountAggregateOutputType = {
     id_visita: number
+    empresa_id: number
     client_sync_id: number
     id_asignacion: number
     id_expediente: number
@@ -10941,6 +12040,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaMinAggregateInputType = {
     id_visita?: true
+    empresa_id?: true
     client_sync_id?: true
     id_asignacion?: true
     id_expediente?: true
@@ -10973,6 +12073,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaMaxAggregateInputType = {
     id_visita?: true
+    empresa_id?: true
     client_sync_id?: true
     id_asignacion?: true
     id_expediente?: true
@@ -11005,6 +12106,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaCountAggregateInputType = {
     id_visita?: true
+    empresa_id?: true
     client_sync_id?: true
     id_asignacion?: true
     id_expediente?: true
@@ -11129,6 +12231,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaGroupByOutputType = {
     id_visita: number
+    empresa_id: string
     client_sync_id: string | null
     id_asignacion: number | null
     id_expediente: number
@@ -11185,6 +12288,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_visita?: boolean
+    empresa_id?: boolean
     client_sync_id?: boolean
     id_asignacion?: boolean
     id_expediente?: boolean
@@ -11228,6 +12332,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaSelectScalar = {
     id_visita?: boolean
+    empresa_id?: boolean
     client_sync_id?: boolean
     id_asignacion?: boolean
     id_expediente?: boolean
@@ -11263,7 +12368,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type VisitaAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_visita" | "client_sync_id" | "id_asignacion" | "id_expediente" | "id_usuario_auditor" | "fecha_hora_checkin" | "fecha_hora_checkout" | "latitud" | "longitud" | "precision_metros" | "distancia_domicilio_m" | "ubicacion_visitada" | "direccion_visitada" | "mock_location" | "device_integrity_ok" | "device_id" | "server_received_at" | "resultado" | "respuestas_cuestionario" | "comentario_negocio" | "comentario_auditor" | "otros_clientes_domicilio" | "otros_ingresos" | "firma_evidencia" | "plantilla" | "expediente_snapshot" | "estado_negocio" | "propiedad_local" | "otros_pasivos" | "conformidad_financiera" | "firmante_documento" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["visitaAuditoria"]>
+  export type VisitaAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_visita" | "empresa_id" | "client_sync_id" | "id_asignacion" | "id_expediente" | "id_usuario_auditor" | "fecha_hora_checkin" | "fecha_hora_checkout" | "latitud" | "longitud" | "precision_metros" | "distancia_domicilio_m" | "ubicacion_visitada" | "direccion_visitada" | "mock_location" | "device_integrity_ok" | "device_id" | "server_received_at" | "resultado" | "respuestas_cuestionario" | "comentario_negocio" | "comentario_auditor" | "otros_clientes_domicilio" | "otros_ingresos" | "firma_evidencia" | "plantilla" | "expediente_snapshot" | "estado_negocio" | "propiedad_local" | "otros_pasivos" | "conformidad_financiera" | "firmante_documento" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["visitaAuditoria"]>
   export type VisitaAuditoriaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
     auditor?: boolean | UsuarioDefaultArgs<ExtArgs>
@@ -11280,6 +12385,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id_visita: number
+      empresa_id: string
       client_sync_id: string | null
       id_asignacion: number | null
       id_expediente: number
@@ -11686,6 +12792,7 @@ export namespace Prisma {
    */
   interface VisitaAuditoriaFieldRefs {
     readonly id_visita: FieldRef<"VisitaAuditoria", 'Int'>
+    readonly empresa_id: FieldRef<"VisitaAuditoria", 'String'>
     readonly client_sync_id: FieldRef<"VisitaAuditoria", 'String'>
     readonly id_asignacion: FieldRef<"VisitaAuditoria", 'Int'>
     readonly id_expediente: FieldRef<"VisitaAuditoria", 'Int'>
@@ -12135,6 +13242,7 @@ export namespace Prisma {
 
   export type EvidenciaMinAggregateOutputType = {
     id_evidencia: string | null
+    empresa_id: string | null
     id_visita: number | null
     tipo: string | null
     object_key: string | null
@@ -12147,6 +13255,7 @@ export namespace Prisma {
 
   export type EvidenciaMaxAggregateOutputType = {
     id_evidencia: string | null
+    empresa_id: string | null
     id_visita: number | null
     tipo: string | null
     object_key: string | null
@@ -12159,6 +13268,7 @@ export namespace Prisma {
 
   export type EvidenciaCountAggregateOutputType = {
     id_evidencia: number
+    empresa_id: number
     id_visita: number
     tipo: number
     object_key: number
@@ -12185,6 +13295,7 @@ export namespace Prisma {
 
   export type EvidenciaMinAggregateInputType = {
     id_evidencia?: true
+    empresa_id?: true
     id_visita?: true
     tipo?: true
     object_key?: true
@@ -12197,6 +13308,7 @@ export namespace Prisma {
 
   export type EvidenciaMaxAggregateInputType = {
     id_evidencia?: true
+    empresa_id?: true
     id_visita?: true
     tipo?: true
     object_key?: true
@@ -12209,6 +13321,7 @@ export namespace Prisma {
 
   export type EvidenciaCountAggregateInputType = {
     id_evidencia?: true
+    empresa_id?: true
     id_visita?: true
     tipo?: true
     object_key?: true
@@ -12308,6 +13421,7 @@ export namespace Prisma {
 
   export type EvidenciaGroupByOutputType = {
     id_evidencia: string
+    empresa_id: string
     id_visita: number
     tipo: string
     object_key: string
@@ -12339,6 +13453,7 @@ export namespace Prisma {
 
   export type EvidenciaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_evidencia?: boolean
+    empresa_id?: boolean
     id_visita?: boolean
     tipo?: boolean
     object_key?: boolean
@@ -12354,6 +13469,7 @@ export namespace Prisma {
 
   export type EvidenciaSelectScalar = {
     id_evidencia?: boolean
+    empresa_id?: boolean
     id_visita?: boolean
     tipo?: boolean
     object_key?: boolean
@@ -12364,7 +13480,7 @@ export namespace Prisma {
     fecha_creacion?: boolean
   }
 
-  export type EvidenciaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_evidencia" | "id_visita" | "tipo" | "object_key" | "hash_sha256" | "latitud_captura" | "longitud_captura" | "capturado_en" | "fecha_creacion", ExtArgs["result"]["evidencia"]>
+  export type EvidenciaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_evidencia" | "empresa_id" | "id_visita" | "tipo" | "object_key" | "hash_sha256" | "latitud_captura" | "longitud_captura" | "capturado_en" | "fecha_creacion", ExtArgs["result"]["evidencia"]>
   export type EvidenciaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     visita?: boolean | VisitaAuditoriaDefaultArgs<ExtArgs>
   }
@@ -12376,6 +13492,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id_evidencia: string
+      empresa_id: string
       id_visita: number
       tipo: string
       object_key: string
@@ -12755,6 +13872,7 @@ export namespace Prisma {
    */
   interface EvidenciaFieldRefs {
     readonly id_evidencia: FieldRef<"Evidencia", 'String'>
+    readonly empresa_id: FieldRef<"Evidencia", 'String'>
     readonly id_visita: FieldRef<"Evidencia", 'Int'>
     readonly tipo: FieldRef<"Evidencia", 'String'>
     readonly object_key: FieldRef<"Evidencia", 'String'>
@@ -13151,6 +14269,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadMinAggregateOutputType = {
     id_auditoria: string | null
+    empresa_id: string | null
     fecha: Date | null
     request_id: string | null
     actor_id: string | null
@@ -13170,6 +14289,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadMaxAggregateOutputType = {
     id_auditoria: string | null
+    empresa_id: string | null
     fecha: Date | null
     request_id: string | null
     actor_id: string | null
@@ -13189,6 +14309,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadCountAggregateOutputType = {
     id_auditoria: number
+    empresa_id: number
     fecha: number
     request_id: number
     actor_id: number
@@ -13220,6 +14341,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadMinAggregateInputType = {
     id_auditoria?: true
+    empresa_id?: true
     fecha?: true
     request_id?: true
     actor_id?: true
@@ -13239,6 +14361,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadMaxAggregateInputType = {
     id_auditoria?: true
+    empresa_id?: true
     fecha?: true
     request_id?: true
     actor_id?: true
@@ -13258,6 +14381,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadCountAggregateInputType = {
     id_auditoria?: true
+    empresa_id?: true
     fecha?: true
     request_id?: true
     actor_id?: true
@@ -13366,6 +14490,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadGroupByOutputType = {
     id_auditoria: string
+    empresa_id: string | null
     fecha: Date
     request_id: string | null
     actor_id: string | null
@@ -13406,6 +14531,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_auditoria?: boolean
+    empresa_id?: boolean
     fecha?: boolean
     request_id?: boolean
     actor_id?: boolean
@@ -13429,6 +14555,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadSelectScalar = {
     id_auditoria?: boolean
+    empresa_id?: boolean
     fecha?: boolean
     request_id?: boolean
     actor_id?: boolean
@@ -13448,13 +14575,14 @@ export namespace Prisma {
     valor_nuevo?: boolean
   }
 
-  export type AuditoriaSeguridadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_auditoria" | "fecha" | "request_id" | "actor_id" | "actor" | "rol" | "metodo" | "ruta" | "estado_http" | "ip_address" | "ip_hash" | "user_agent" | "device_id" | "mock_location" | "entidad" | "entidad_id" | "valor_anterior" | "valor_nuevo", ExtArgs["result"]["auditoriaSeguridad"]>
+  export type AuditoriaSeguridadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_auditoria" | "empresa_id" | "fecha" | "request_id" | "actor_id" | "actor" | "rol" | "metodo" | "ruta" | "estado_http" | "ip_address" | "ip_hash" | "user_agent" | "device_id" | "mock_location" | "entidad" | "entidad_id" | "valor_anterior" | "valor_nuevo", ExtArgs["result"]["auditoriaSeguridad"]>
 
   export type $AuditoriaSeguridadPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AuditoriaSeguridad"
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id_auditoria: string
+      empresa_id: string | null
       fecha: Date
       request_id: string | null
       actor_id: string | null
@@ -13842,6 +14970,7 @@ export namespace Prisma {
    */
   interface AuditoriaSeguridadFieldRefs {
     readonly id_auditoria: FieldRef<"AuditoriaSeguridad", 'String'>
+    readonly empresa_id: FieldRef<"AuditoriaSeguridad", 'String'>
     readonly fecha: FieldRef<"AuditoriaSeguridad", 'DateTime'>
     readonly request_id: FieldRef<"AuditoriaSeguridad", 'String'>
     readonly actor_id: FieldRef<"AuditoriaSeguridad", 'String'>
@@ -14217,6 +15346,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaMinAggregateOutputType = {
     id_importacion: string | null
+    empresa_id: string | null
     tipo: string | null
     estado: string | null
     archivo: string | null
@@ -14237,6 +15367,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaMaxAggregateOutputType = {
     id_importacion: string | null
+    empresa_id: string | null
     tipo: string | null
     estado: string | null
     archivo: string | null
@@ -14257,6 +15388,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaCountAggregateOutputType = {
     id_importacion: number
+    empresa_id: number
     tipo: number
     estado: number
     archivo: number
@@ -14299,6 +15431,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaMinAggregateInputType = {
     id_importacion?: true
+    empresa_id?: true
     tipo?: true
     estado?: true
     archivo?: true
@@ -14319,6 +15452,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaMaxAggregateInputType = {
     id_importacion?: true
+    empresa_id?: true
     tipo?: true
     estado?: true
     archivo?: true
@@ -14339,6 +15473,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaCountAggregateInputType = {
     id_importacion?: true
+    empresa_id?: true
     tipo?: true
     estado?: true
     archivo?: true
@@ -14448,6 +15583,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaGroupByOutputType = {
     id_importacion: string
+    empresa_id: string
     tipo: string
     estado: string
     archivo: string
@@ -14489,6 +15625,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id_importacion?: boolean
+    empresa_id?: boolean
     tipo?: boolean
     estado?: boolean
     archivo?: boolean
@@ -14513,6 +15650,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaSelectScalar = {
     id_importacion?: boolean
+    empresa_id?: boolean
     tipo?: boolean
     estado?: boolean
     archivo?: boolean
@@ -14533,13 +15671,14 @@ export namespace Prisma {
     fecha_fin?: boolean
   }
 
-  export type ImportacionMasivaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_importacion" | "tipo" | "estado" | "archivo" | "ruta_temporal" | "actor_id" | "total_filas" | "procesadas" | "insertadas" | "actualizadas" | "omitidas" | "errores" | "detalle_error" | "archivo_sha256" | "formato" | "advertencias" | "fecha_creacion" | "fecha_inicio" | "fecha_fin", ExtArgs["result"]["importacionMasiva"]>
+  export type ImportacionMasivaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_importacion" | "empresa_id" | "tipo" | "estado" | "archivo" | "ruta_temporal" | "actor_id" | "total_filas" | "procesadas" | "insertadas" | "actualizadas" | "omitidas" | "errores" | "detalle_error" | "archivo_sha256" | "formato" | "advertencias" | "fecha_creacion" | "fecha_inicio" | "fecha_fin", ExtArgs["result"]["importacionMasiva"]>
 
   export type $ImportacionMasivaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ImportacionMasiva"
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id_importacion: string
+      empresa_id: string
       tipo: string
       estado: string
       archivo: string
@@ -14928,6 +16067,7 @@ export namespace Prisma {
    */
   interface ImportacionMasivaFieldRefs {
     readonly id_importacion: FieldRef<"ImportacionMasiva", 'String'>
+    readonly empresa_id: FieldRef<"ImportacionMasiva", 'String'>
     readonly tipo: FieldRef<"ImportacionMasiva", 'String'>
     readonly estado: FieldRef<"ImportacionMasiva", 'String'>
     readonly archivo: FieldRef<"ImportacionMasiva", 'String'>
@@ -15286,8 +16426,24 @@ export namespace Prisma {
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+  export const EmpresaScalarFieldEnum: {
+    id_empresa: 'id_empresa',
+    nombre: 'nombre',
+    nombre_corto: 'nombre_corto',
+    slug: 'slug',
+    estado: 'estado',
+    configuracion: 'configuracion',
+    marca: 'marca',
+    creado_en: 'creado_en',
+    actualizado_en: 'actualizado_en'
+  };
+
+  export type EmpresaScalarFieldEnum = (typeof EmpresaScalarFieldEnum)[keyof typeof EmpresaScalarFieldEnum]
+
+
   export const UsuarioScalarFieldEnum: {
     id_usuario: 'id_usuario',
+    empresa_id: 'empresa_id',
     username: 'username',
     nombres: 'nombres',
     apellidos: 'apellidos',
@@ -15328,6 +16484,7 @@ export namespace Prisma {
 
   export const TrackingUbicacionScalarFieldEnum: {
     id_tracking: 'id_tracking',
+    empresa_id: 'empresa_id',
     id_usuario: 'id_usuario',
     latitud: 'latitud',
     longitud: 'longitud',
@@ -15341,6 +16498,7 @@ export namespace Prisma {
 
   export const EventoCampoScalarFieldEnum: {
     id_evento: 'id_evento',
+    empresa_id: 'empresa_id',
     id_usuario: 'id_usuario',
     id_expediente: 'id_expediente',
     punto: 'punto',
@@ -15355,6 +16513,7 @@ export namespace Prisma {
 
 
   export const ConfiguracionSistemaScalarFieldEnum: {
+    empresa_id: 'empresa_id',
     clave: 'clave',
     valor: 'valor',
     actualizado_por: 'actualizado_por',
@@ -15366,6 +16525,7 @@ export namespace Prisma {
 
   export const DispositivoAutorizadoScalarFieldEnum: {
     id_dispositivo: 'id_dispositivo',
+    empresa_id: 'empresa_id',
     id_usuario: 'id_usuario',
     device_id: 'device_id',
     nombre_dispositivo: 'nombre_dispositivo',
@@ -15379,6 +16539,7 @@ export namespace Prisma {
 
   export const ExpedienteScalarFieldEnum: {
     id_expediente: 'id_expediente',
+    empresa_id: 'empresa_id',
     codigo_expediente: 'codigo_expediente',
     tipo_credito: 'tipo_credito',
     oficina: 'oficina',
@@ -15426,6 +16587,7 @@ export namespace Prisma {
 
   export const ExpedienteCambioScalarFieldEnum: {
     id_cambio: 'id_cambio',
+    empresa_id: 'empresa_id',
     id_expediente: 'id_expediente',
     id_importacion: 'id_importacion',
     actor_id: 'actor_id',
@@ -15439,6 +16601,7 @@ export namespace Prisma {
 
   export const AsignacionAuditoriaScalarFieldEnum: {
     id_asignacion: 'id_asignacion',
+    empresa_id: 'empresa_id',
     id_expediente: 'id_expediente',
     id_usuario_auditor: 'id_usuario_auditor',
     fecha_asignacion: 'fecha_asignacion',
@@ -15454,6 +16617,7 @@ export namespace Prisma {
 
   export const VisitaAuditoriaScalarFieldEnum: {
     id_visita: 'id_visita',
+    empresa_id: 'empresa_id',
     client_sync_id: 'client_sync_id',
     id_asignacion: 'id_asignacion',
     id_expediente: 'id_expediente',
@@ -15494,6 +16658,7 @@ export namespace Prisma {
 
   export const EvidenciaScalarFieldEnum: {
     id_evidencia: 'id_evidencia',
+    empresa_id: 'empresa_id',
     id_visita: 'id_visita',
     tipo: 'tipo',
     object_key: 'object_key',
@@ -15509,6 +16674,7 @@ export namespace Prisma {
 
   export const AuditoriaSeguridadScalarFieldEnum: {
     id_auditoria: 'id_auditoria',
+    empresa_id: 'empresa_id',
     fecha: 'fecha',
     request_id: 'request_id',
     actor_id: 'actor_id',
@@ -15533,6 +16699,7 @@ export namespace Prisma {
 
   export const ImportacionMasivaScalarFieldEnum: {
     id_importacion: 'id_importacion',
+    empresa_id: 'empresa_id',
     tipo: 'tipo',
     estado: 'estado',
     archivo: 'archivo',
@@ -15579,6 +16746,23 @@ export namespace Prisma {
   export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+  export const QueryMode: {
+    default: 'default',
+    insensitive: 'insensitive'
+  };
+
+  export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
   export const NullsOrder: {
     first: 'first',
     last: 'last'
@@ -15587,8 +16771,20 @@ export namespace Prisma {
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
+  export const EmpresaOrderByRelevanceFieldEnum: {
+    id_empresa: 'id_empresa',
+    nombre: 'nombre',
+    nombre_corto: 'nombre_corto',
+    slug: 'slug',
+    estado: 'estado'
+  };
+
+  export type EmpresaOrderByRelevanceFieldEnum = (typeof EmpresaOrderByRelevanceFieldEnum)[keyof typeof EmpresaOrderByRelevanceFieldEnum]
+
+
   export const UsuarioOrderByRelevanceFieldEnum: {
     id_usuario: 'id_usuario',
+    empresa_id: 'empresa_id',
     username: 'username',
     nombres: 'nombres',
     apellidos: 'apellidos',
@@ -15607,6 +16803,7 @@ export namespace Prisma {
 
 
   export const TrackingUbicacionOrderByRelevanceFieldEnum: {
+    empresa_id: 'empresa_id',
     id_usuario: 'id_usuario'
   };
 
@@ -15614,6 +16811,7 @@ export namespace Prisma {
 
 
   export const EventoCampoOrderByRelevanceFieldEnum: {
+    empresa_id: 'empresa_id',
     id_usuario: 'id_usuario',
     punto: 'punto',
     tipo: 'tipo'
@@ -15623,6 +16821,7 @@ export namespace Prisma {
 
 
   export const ConfiguracionSistemaOrderByRelevanceFieldEnum: {
+    empresa_id: 'empresa_id',
     clave: 'clave',
     valor: 'valor',
     actualizado_por: 'actualizado_por'
@@ -15633,6 +16832,7 @@ export namespace Prisma {
 
   export const DispositivoAutorizadoOrderByRelevanceFieldEnum: {
     id_dispositivo: 'id_dispositivo',
+    empresa_id: 'empresa_id',
     id_usuario: 'id_usuario',
     device_id: 'device_id',
     nombre_dispositivo: 'nombre_dispositivo'
@@ -15641,24 +16841,8 @@ export namespace Prisma {
   export type DispositivoAutorizadoOrderByRelevanceFieldEnum = (typeof DispositivoAutorizadoOrderByRelevanceFieldEnum)[keyof typeof DispositivoAutorizadoOrderByRelevanceFieldEnum]
 
 
-  export const JsonNullValueFilter: {
-    DbNull: typeof DbNull,
-    JsonNull: typeof JsonNull,
-    AnyNull: typeof AnyNull
-  };
-
-  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-  export const QueryMode: {
-    default: 'default',
-    insensitive: 'insensitive'
-  };
-
-  export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
-
-
   export const ExpedienteOrderByRelevanceFieldEnum: {
+    empresa_id: 'empresa_id',
     codigo_expediente: 'codigo_expediente',
     oficina: 'oficina',
     numero_documento_cliente: 'numero_documento_cliente',
@@ -15686,6 +16870,7 @@ export namespace Prisma {
 
 
   export const ExpedienteCambioOrderByRelevanceFieldEnum: {
+    empresa_id: 'empresa_id',
     id_importacion: 'id_importacion',
     actor_id: 'actor_id',
     tipo: 'tipo'
@@ -15695,6 +16880,7 @@ export namespace Prisma {
 
 
   export const AsignacionAuditoriaOrderByRelevanceFieldEnum: {
+    empresa_id: 'empresa_id',
     id_usuario_auditor: 'id_usuario_auditor',
     estado: 'estado',
     prioridad: 'prioridad',
@@ -15706,6 +16892,7 @@ export namespace Prisma {
 
 
   export const VisitaAuditoriaOrderByRelevanceFieldEnum: {
+    empresa_id: 'empresa_id',
     client_sync_id: 'client_sync_id',
     id_usuario_auditor: 'id_usuario_auditor',
     ubicacion_visitada: 'ubicacion_visitada',
@@ -15728,6 +16915,7 @@ export namespace Prisma {
 
   export const EvidenciaOrderByRelevanceFieldEnum: {
     id_evidencia: 'id_evidencia',
+    empresa_id: 'empresa_id',
     tipo: 'tipo',
     object_key: 'object_key',
     hash_sha256: 'hash_sha256'
@@ -15738,6 +16926,7 @@ export namespace Prisma {
 
   export const AuditoriaSeguridadOrderByRelevanceFieldEnum: {
     id_auditoria: 'id_auditoria',
+    empresa_id: 'empresa_id',
     request_id: 'request_id',
     actor_id: 'actor_id',
     actor: 'actor',
@@ -15757,6 +16946,7 @@ export namespace Prisma {
 
   export const ImportacionMasivaOrderByRelevanceFieldEnum: {
     id_importacion: 'id_importacion',
+    empresa_id: 'empresa_id',
     tipo: 'tipo',
     estado: 'estado',
     archivo: 'archivo',
@@ -15778,6 +16968,20 @@ export namespace Prisma {
    * Reference to a field of type 'String'
    */
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -15831,20 +17035,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -15854,11 +17044,85 @@ export namespace Prisma {
    */
 
 
+  export type EmpresaWhereInput = {
+    AND?: EmpresaWhereInput | EmpresaWhereInput[]
+    OR?: EmpresaWhereInput[]
+    NOT?: EmpresaWhereInput | EmpresaWhereInput[]
+    id_empresa?: StringFilter<"Empresa"> | string
+    nombre?: StringFilter<"Empresa"> | string
+    nombre_corto?: StringNullableFilter<"Empresa"> | string | null
+    slug?: StringFilter<"Empresa"> | string
+    estado?: StringFilter<"Empresa"> | string
+    configuracion?: JsonNullableFilter<"Empresa">
+    marca?: JsonNullableFilter<"Empresa">
+    creado_en?: DateTimeFilter<"Empresa"> | Date | string
+    actualizado_en?: DateTimeFilter<"Empresa"> | Date | string
+  }
+
+  export type EmpresaOrderByWithRelationInput = {
+    id_empresa?: SortOrder
+    nombre?: SortOrder
+    nombre_corto?: SortOrderInput | SortOrder
+    slug?: SortOrder
+    estado?: SortOrder
+    configuracion?: SortOrderInput | SortOrder
+    marca?: SortOrderInput | SortOrder
+    creado_en?: SortOrder
+    actualizado_en?: SortOrder
+    _relevance?: EmpresaOrderByRelevanceInput
+  }
+
+  export type EmpresaWhereUniqueInput = Prisma.AtLeast<{
+    id_empresa?: string
+    slug?: string
+    AND?: EmpresaWhereInput | EmpresaWhereInput[]
+    OR?: EmpresaWhereInput[]
+    NOT?: EmpresaWhereInput | EmpresaWhereInput[]
+    nombre?: StringFilter<"Empresa"> | string
+    nombre_corto?: StringNullableFilter<"Empresa"> | string | null
+    estado?: StringFilter<"Empresa"> | string
+    configuracion?: JsonNullableFilter<"Empresa">
+    marca?: JsonNullableFilter<"Empresa">
+    creado_en?: DateTimeFilter<"Empresa"> | Date | string
+    actualizado_en?: DateTimeFilter<"Empresa"> | Date | string
+  }, "id_empresa" | "slug">
+
+  export type EmpresaOrderByWithAggregationInput = {
+    id_empresa?: SortOrder
+    nombre?: SortOrder
+    nombre_corto?: SortOrderInput | SortOrder
+    slug?: SortOrder
+    estado?: SortOrder
+    configuracion?: SortOrderInput | SortOrder
+    marca?: SortOrderInput | SortOrder
+    creado_en?: SortOrder
+    actualizado_en?: SortOrder
+    _count?: EmpresaCountOrderByAggregateInput
+    _max?: EmpresaMaxOrderByAggregateInput
+    _min?: EmpresaMinOrderByAggregateInput
+  }
+
+  export type EmpresaScalarWhereWithAggregatesInput = {
+    AND?: EmpresaScalarWhereWithAggregatesInput | EmpresaScalarWhereWithAggregatesInput[]
+    OR?: EmpresaScalarWhereWithAggregatesInput[]
+    NOT?: EmpresaScalarWhereWithAggregatesInput | EmpresaScalarWhereWithAggregatesInput[]
+    id_empresa?: StringWithAggregatesFilter<"Empresa"> | string
+    nombre?: StringWithAggregatesFilter<"Empresa"> | string
+    nombre_corto?: StringNullableWithAggregatesFilter<"Empresa"> | string | null
+    slug?: StringWithAggregatesFilter<"Empresa"> | string
+    estado?: StringWithAggregatesFilter<"Empresa"> | string
+    configuracion?: JsonNullableWithAggregatesFilter<"Empresa">
+    marca?: JsonNullableWithAggregatesFilter<"Empresa">
+    creado_en?: DateTimeWithAggregatesFilter<"Empresa"> | Date | string
+    actualizado_en?: DateTimeWithAggregatesFilter<"Empresa"> | Date | string
+  }
+
   export type UsuarioWhereInput = {
     AND?: UsuarioWhereInput | UsuarioWhereInput[]
     OR?: UsuarioWhereInput[]
     NOT?: UsuarioWhereInput | UsuarioWhereInput[]
     id_usuario?: StringFilter<"Usuario"> | string
+    empresa_id?: StringNullableFilter<"Usuario"> | string | null
     username?: StringFilter<"Usuario"> | string
     nombres?: StringNullableFilter<"Usuario"> | string | null
     apellidos?: StringNullableFilter<"Usuario"> | string | null
@@ -15901,6 +17165,7 @@ export namespace Prisma {
 
   export type UsuarioOrderByWithRelationInput = {
     id_usuario?: SortOrder
+    empresa_id?: SortOrderInput | SortOrder
     username?: SortOrder
     nombres?: SortOrderInput | SortOrder
     apellidos?: SortOrderInput | SortOrder
@@ -15948,6 +17213,7 @@ export namespace Prisma {
     AND?: UsuarioWhereInput | UsuarioWhereInput[]
     OR?: UsuarioWhereInput[]
     NOT?: UsuarioWhereInput | UsuarioWhereInput[]
+    empresa_id?: StringNullableFilter<"Usuario"> | string | null
     nombres?: StringNullableFilter<"Usuario"> | string | null
     apellidos?: StringNullableFilter<"Usuario"> | string | null
     email?: StringNullableFilter<"Usuario"> | string | null
@@ -15989,6 +17255,7 @@ export namespace Prisma {
 
   export type UsuarioOrderByWithAggregationInput = {
     id_usuario?: SortOrder
+    empresa_id?: SortOrderInput | SortOrder
     username?: SortOrder
     nombres?: SortOrderInput | SortOrder
     apellidos?: SortOrderInput | SortOrder
@@ -16034,6 +17301,7 @@ export namespace Prisma {
     OR?: UsuarioScalarWhereWithAggregatesInput[]
     NOT?: UsuarioScalarWhereWithAggregatesInput | UsuarioScalarWhereWithAggregatesInput[]
     id_usuario?: StringWithAggregatesFilter<"Usuario"> | string
+    empresa_id?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
     username?: StringWithAggregatesFilter<"Usuario"> | string
     nombres?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
     apellidos?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
@@ -16074,6 +17342,7 @@ export namespace Prisma {
     OR?: TrackingUbicacionWhereInput[]
     NOT?: TrackingUbicacionWhereInput | TrackingUbicacionWhereInput[]
     id_tracking?: BigIntFilter<"TrackingUbicacion"> | bigint | number
+    empresa_id?: StringFilter<"TrackingUbicacion"> | string
     id_usuario?: StringFilter<"TrackingUbicacion"> | string
     latitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
@@ -16085,6 +17354,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionOrderByWithRelationInput = {
     id_tracking?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
@@ -16100,6 +17370,7 @@ export namespace Prisma {
     AND?: TrackingUbicacionWhereInput | TrackingUbicacionWhereInput[]
     OR?: TrackingUbicacionWhereInput[]
     NOT?: TrackingUbicacionWhereInput | TrackingUbicacionWhereInput[]
+    empresa_id?: StringFilter<"TrackingUbicacion"> | string
     id_usuario?: StringFilter<"TrackingUbicacion"> | string
     latitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
@@ -16111,6 +17382,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionOrderByWithAggregationInput = {
     id_tracking?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
@@ -16129,6 +17401,7 @@ export namespace Prisma {
     OR?: TrackingUbicacionScalarWhereWithAggregatesInput[]
     NOT?: TrackingUbicacionScalarWhereWithAggregatesInput | TrackingUbicacionScalarWhereWithAggregatesInput[]
     id_tracking?: BigIntWithAggregatesFilter<"TrackingUbicacion"> | bigint | number
+    empresa_id?: StringWithAggregatesFilter<"TrackingUbicacion"> | string
     id_usuario?: StringWithAggregatesFilter<"TrackingUbicacion"> | string
     latitud?: DecimalWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     longitud?: DecimalWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
@@ -16142,6 +17415,7 @@ export namespace Prisma {
     OR?: EventoCampoWhereInput[]
     NOT?: EventoCampoWhereInput | EventoCampoWhereInput[]
     id_evento?: BigIntFilter<"EventoCampo"> | bigint | number
+    empresa_id?: StringFilter<"EventoCampo"> | string
     id_usuario?: StringFilter<"EventoCampo"> | string
     id_expediente?: IntFilter<"EventoCampo"> | number
     punto?: StringFilter<"EventoCampo"> | string
@@ -16156,6 +17430,7 @@ export namespace Prisma {
 
   export type EventoCampoOrderByWithRelationInput = {
     id_evento?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     id_expediente?: SortOrder
     punto?: SortOrder
@@ -16174,6 +17449,7 @@ export namespace Prisma {
     AND?: EventoCampoWhereInput | EventoCampoWhereInput[]
     OR?: EventoCampoWhereInput[]
     NOT?: EventoCampoWhereInput | EventoCampoWhereInput[]
+    empresa_id?: StringFilter<"EventoCampo"> | string
     id_usuario?: StringFilter<"EventoCampo"> | string
     id_expediente?: IntFilter<"EventoCampo"> | number
     punto?: StringFilter<"EventoCampo"> | string
@@ -16188,6 +17464,7 @@ export namespace Prisma {
 
   export type EventoCampoOrderByWithAggregationInput = {
     id_evento?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     id_expediente?: SortOrder
     punto?: SortOrder
@@ -16208,6 +17485,7 @@ export namespace Prisma {
     OR?: EventoCampoScalarWhereWithAggregatesInput[]
     NOT?: EventoCampoScalarWhereWithAggregatesInput | EventoCampoScalarWhereWithAggregatesInput[]
     id_evento?: BigIntWithAggregatesFilter<"EventoCampo"> | bigint | number
+    empresa_id?: StringWithAggregatesFilter<"EventoCampo"> | string
     id_usuario?: StringWithAggregatesFilter<"EventoCampo"> | string
     id_expediente?: IntWithAggregatesFilter<"EventoCampo"> | number
     punto?: StringWithAggregatesFilter<"EventoCampo"> | string
@@ -16222,6 +17500,7 @@ export namespace Prisma {
     AND?: ConfiguracionSistemaWhereInput | ConfiguracionSistemaWhereInput[]
     OR?: ConfiguracionSistemaWhereInput[]
     NOT?: ConfiguracionSistemaWhereInput | ConfiguracionSistemaWhereInput[]
+    empresa_id?: StringFilter<"ConfiguracionSistema"> | string
     clave?: StringFilter<"ConfiguracionSistema"> | string
     valor?: StringFilter<"ConfiguracionSistema"> | string
     actualizado_por?: StringNullableFilter<"ConfiguracionSistema"> | string | null
@@ -16229,6 +17508,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaOrderByWithRelationInput = {
+    empresa_id?: SortOrder
     clave?: SortOrder
     valor?: SortOrder
     actualizado_por?: SortOrderInput | SortOrder
@@ -16237,16 +17517,19 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaWhereUniqueInput = Prisma.AtLeast<{
-    clave?: string
+    empresa_id_clave?: ConfiguracionSistemaEmpresa_idClaveCompoundUniqueInput
     AND?: ConfiguracionSistemaWhereInput | ConfiguracionSistemaWhereInput[]
     OR?: ConfiguracionSistemaWhereInput[]
     NOT?: ConfiguracionSistemaWhereInput | ConfiguracionSistemaWhereInput[]
+    empresa_id?: StringFilter<"ConfiguracionSistema"> | string
+    clave?: StringFilter<"ConfiguracionSistema"> | string
     valor?: StringFilter<"ConfiguracionSistema"> | string
     actualizado_por?: StringNullableFilter<"ConfiguracionSistema"> | string | null
     actualizado_en?: DateTimeFilter<"ConfiguracionSistema"> | Date | string
-  }, "clave">
+  }, "empresa_id_clave">
 
   export type ConfiguracionSistemaOrderByWithAggregationInput = {
+    empresa_id?: SortOrder
     clave?: SortOrder
     valor?: SortOrder
     actualizado_por?: SortOrderInput | SortOrder
@@ -16260,6 +17543,7 @@ export namespace Prisma {
     AND?: ConfiguracionSistemaScalarWhereWithAggregatesInput | ConfiguracionSistemaScalarWhereWithAggregatesInput[]
     OR?: ConfiguracionSistemaScalarWhereWithAggregatesInput[]
     NOT?: ConfiguracionSistemaScalarWhereWithAggregatesInput | ConfiguracionSistemaScalarWhereWithAggregatesInput[]
+    empresa_id?: StringWithAggregatesFilter<"ConfiguracionSistema"> | string
     clave?: StringWithAggregatesFilter<"ConfiguracionSistema"> | string
     valor?: StringWithAggregatesFilter<"ConfiguracionSistema"> | string
     actualizado_por?: StringNullableWithAggregatesFilter<"ConfiguracionSistema"> | string | null
@@ -16271,6 +17555,7 @@ export namespace Prisma {
     OR?: DispositivoAutorizadoWhereInput[]
     NOT?: DispositivoAutorizadoWhereInput | DispositivoAutorizadoWhereInput[]
     id_dispositivo?: StringFilter<"DispositivoAutorizado"> | string
+    empresa_id?: StringFilter<"DispositivoAutorizado"> | string
     id_usuario?: StringFilter<"DispositivoAutorizado"> | string
     device_id?: StringFilter<"DispositivoAutorizado"> | string
     nombre_dispositivo?: StringNullableFilter<"DispositivoAutorizado"> | string | null
@@ -16282,6 +17567,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoOrderByWithRelationInput = {
     id_dispositivo?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     device_id?: SortOrder
     nombre_dispositivo?: SortOrderInput | SortOrder
@@ -16298,6 +17584,7 @@ export namespace Prisma {
     AND?: DispositivoAutorizadoWhereInput | DispositivoAutorizadoWhereInput[]
     OR?: DispositivoAutorizadoWhereInput[]
     NOT?: DispositivoAutorizadoWhereInput | DispositivoAutorizadoWhereInput[]
+    empresa_id?: StringFilter<"DispositivoAutorizado"> | string
     id_usuario?: StringFilter<"DispositivoAutorizado"> | string
     device_id?: StringFilter<"DispositivoAutorizado"> | string
     nombre_dispositivo?: StringNullableFilter<"DispositivoAutorizado"> | string | null
@@ -16309,6 +17596,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoOrderByWithAggregationInput = {
     id_dispositivo?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     device_id?: SortOrder
     nombre_dispositivo?: SortOrderInput | SortOrder
@@ -16325,6 +17613,7 @@ export namespace Prisma {
     OR?: DispositivoAutorizadoScalarWhereWithAggregatesInput[]
     NOT?: DispositivoAutorizadoScalarWhereWithAggregatesInput | DispositivoAutorizadoScalarWhereWithAggregatesInput[]
     id_dispositivo?: StringWithAggregatesFilter<"DispositivoAutorizado"> | string
+    empresa_id?: StringWithAggregatesFilter<"DispositivoAutorizado"> | string
     id_usuario?: StringWithAggregatesFilter<"DispositivoAutorizado"> | string
     device_id?: StringWithAggregatesFilter<"DispositivoAutorizado"> | string
     nombre_dispositivo?: StringNullableWithAggregatesFilter<"DispositivoAutorizado"> | string | null
@@ -16338,6 +17627,7 @@ export namespace Prisma {
     OR?: ExpedienteWhereInput[]
     NOT?: ExpedienteWhereInput | ExpedienteWhereInput[]
     id_expediente?: IntFilter<"Expediente"> | number
+    empresa_id?: StringFilter<"Expediente"> | string
     codigo_expediente?: StringFilter<"Expediente"> | string
     tipo_credito?: EnumTipoCreditoFilter<"Expediente"> | $Enums.TipoCredito
     oficina?: StringNullableFilter<"Expediente"> | string | null
@@ -16386,6 +17676,7 @@ export namespace Prisma {
 
   export type ExpedienteOrderByWithRelationInput = {
     id_expediente?: SortOrder
+    empresa_id?: SortOrder
     codigo_expediente?: SortOrder
     tipo_credito?: SortOrder
     oficina?: SortOrderInput | SortOrder
@@ -16435,10 +17726,12 @@ export namespace Prisma {
 
   export type ExpedienteWhereUniqueInput = Prisma.AtLeast<{
     id_expediente?: number
-    codigo_expediente?: string
+    empresa_id_codigo_expediente?: ExpedienteEmpresa_idCodigo_expedienteCompoundUniqueInput
     AND?: ExpedienteWhereInput | ExpedienteWhereInput[]
     OR?: ExpedienteWhereInput[]
     NOT?: ExpedienteWhereInput | ExpedienteWhereInput[]
+    empresa_id?: StringFilter<"Expediente"> | string
+    codigo_expediente?: StringFilter<"Expediente"> | string
     tipo_credito?: EnumTipoCreditoFilter<"Expediente"> | $Enums.TipoCredito
     oficina?: StringNullableFilter<"Expediente"> | string | null
     tipo_documento_cliente?: EnumTipoDocumentoFilter<"Expediente"> | $Enums.TipoDocumento
@@ -16482,10 +17775,11 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaListRelationFilter
     cambios?: ExpedienteCambioListRelationFilter
     eventosCampo?: EventoCampoListRelationFilter
-  }, "id_expediente" | "codigo_expediente">
+  }, "id_expediente" | "empresa_id_codigo_expediente">
 
   export type ExpedienteOrderByWithAggregationInput = {
     id_expediente?: SortOrder
+    empresa_id?: SortOrder
     codigo_expediente?: SortOrder
     tipo_credito?: SortOrder
     oficina?: SortOrderInput | SortOrder
@@ -16538,6 +17832,7 @@ export namespace Prisma {
     OR?: ExpedienteScalarWhereWithAggregatesInput[]
     NOT?: ExpedienteScalarWhereWithAggregatesInput | ExpedienteScalarWhereWithAggregatesInput[]
     id_expediente?: IntWithAggregatesFilter<"Expediente"> | number
+    empresa_id?: StringWithAggregatesFilter<"Expediente"> | string
     codigo_expediente?: StringWithAggregatesFilter<"Expediente"> | string
     tipo_credito?: EnumTipoCreditoWithAggregatesFilter<"Expediente"> | $Enums.TipoCredito
     oficina?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
@@ -16585,6 +17880,7 @@ export namespace Prisma {
     OR?: ExpedienteCambioWhereInput[]
     NOT?: ExpedienteCambioWhereInput | ExpedienteCambioWhereInput[]
     id_cambio?: BigIntFilter<"ExpedienteCambio"> | bigint | number
+    empresa_id?: StringFilter<"ExpedienteCambio"> | string
     id_expediente?: IntFilter<"ExpedienteCambio"> | number
     id_importacion?: StringNullableFilter<"ExpedienteCambio"> | string | null
     actor_id?: StringNullableFilter<"ExpedienteCambio"> | string | null
@@ -16596,6 +17892,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioOrderByWithRelationInput = {
     id_cambio?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
     actor_id?: SortOrderInput | SortOrder
@@ -16611,6 +17908,7 @@ export namespace Prisma {
     AND?: ExpedienteCambioWhereInput | ExpedienteCambioWhereInput[]
     OR?: ExpedienteCambioWhereInput[]
     NOT?: ExpedienteCambioWhereInput | ExpedienteCambioWhereInput[]
+    empresa_id?: StringFilter<"ExpedienteCambio"> | string
     id_expediente?: IntFilter<"ExpedienteCambio"> | number
     id_importacion?: StringNullableFilter<"ExpedienteCambio"> | string | null
     actor_id?: StringNullableFilter<"ExpedienteCambio"> | string | null
@@ -16622,6 +17920,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioOrderByWithAggregationInput = {
     id_cambio?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
     actor_id?: SortOrderInput | SortOrder
@@ -16640,6 +17939,7 @@ export namespace Prisma {
     OR?: ExpedienteCambioScalarWhereWithAggregatesInput[]
     NOT?: ExpedienteCambioScalarWhereWithAggregatesInput | ExpedienteCambioScalarWhereWithAggregatesInput[]
     id_cambio?: BigIntWithAggregatesFilter<"ExpedienteCambio"> | bigint | number
+    empresa_id?: StringWithAggregatesFilter<"ExpedienteCambio"> | string
     id_expediente?: IntWithAggregatesFilter<"ExpedienteCambio"> | number
     id_importacion?: StringNullableWithAggregatesFilter<"ExpedienteCambio"> | string | null
     actor_id?: StringNullableWithAggregatesFilter<"ExpedienteCambio"> | string | null
@@ -16653,6 +17953,7 @@ export namespace Prisma {
     OR?: AsignacionAuditoriaWhereInput[]
     NOT?: AsignacionAuditoriaWhereInput | AsignacionAuditoriaWhereInput[]
     id_asignacion?: IntFilter<"AsignacionAuditoria"> | number
+    empresa_id?: StringFilter<"AsignacionAuditoria"> | string
     id_expediente?: IntFilter<"AsignacionAuditoria"> | number
     id_usuario_auditor?: StringFilter<"AsignacionAuditoria"> | string
     fecha_asignacion?: DateTimeFilter<"AsignacionAuditoria"> | Date | string
@@ -16667,6 +17968,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaOrderByWithRelationInput = {
     id_asignacion?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_usuario_auditor?: SortOrder
     fecha_asignacion?: SortOrder
@@ -16685,6 +17987,7 @@ export namespace Prisma {
     AND?: AsignacionAuditoriaWhereInput | AsignacionAuditoriaWhereInput[]
     OR?: AsignacionAuditoriaWhereInput[]
     NOT?: AsignacionAuditoriaWhereInput | AsignacionAuditoriaWhereInput[]
+    empresa_id?: StringFilter<"AsignacionAuditoria"> | string
     id_expediente?: IntFilter<"AsignacionAuditoria"> | number
     id_usuario_auditor?: StringFilter<"AsignacionAuditoria"> | string
     fecha_asignacion?: DateTimeFilter<"AsignacionAuditoria"> | Date | string
@@ -16699,6 +18002,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaOrderByWithAggregationInput = {
     id_asignacion?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_usuario_auditor?: SortOrder
     fecha_asignacion?: SortOrder
@@ -16719,6 +18023,7 @@ export namespace Prisma {
     OR?: AsignacionAuditoriaScalarWhereWithAggregatesInput[]
     NOT?: AsignacionAuditoriaScalarWhereWithAggregatesInput | AsignacionAuditoriaScalarWhereWithAggregatesInput[]
     id_asignacion?: IntWithAggregatesFilter<"AsignacionAuditoria"> | number
+    empresa_id?: StringWithAggregatesFilter<"AsignacionAuditoria"> | string
     id_expediente?: IntWithAggregatesFilter<"AsignacionAuditoria"> | number
     id_usuario_auditor?: StringWithAggregatesFilter<"AsignacionAuditoria"> | string
     fecha_asignacion?: DateTimeWithAggregatesFilter<"AsignacionAuditoria"> | Date | string
@@ -16734,6 +18039,7 @@ export namespace Prisma {
     OR?: VisitaAuditoriaWhereInput[]
     NOT?: VisitaAuditoriaWhereInput | VisitaAuditoriaWhereInput[]
     id_visita?: IntFilter<"VisitaAuditoria"> | number
+    empresa_id?: StringFilter<"VisitaAuditoria"> | string
     client_sync_id?: StringNullableFilter<"VisitaAuditoria"> | string | null
     id_asignacion?: IntNullableFilter<"VisitaAuditoria"> | number | null
     id_expediente?: IntFilter<"VisitaAuditoria"> | number
@@ -16774,6 +18080,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaOrderByWithRelationInput = {
     id_visita?: SortOrder
+    empresa_id?: SortOrder
     client_sync_id?: SortOrderInput | SortOrder
     id_asignacion?: SortOrderInput | SortOrder
     id_expediente?: SortOrder
@@ -16819,6 +18126,7 @@ export namespace Prisma {
     AND?: VisitaAuditoriaWhereInput | VisitaAuditoriaWhereInput[]
     OR?: VisitaAuditoriaWhereInput[]
     NOT?: VisitaAuditoriaWhereInput | VisitaAuditoriaWhereInput[]
+    empresa_id?: StringFilter<"VisitaAuditoria"> | string
     id_asignacion?: IntNullableFilter<"VisitaAuditoria"> | number | null
     id_expediente?: IntFilter<"VisitaAuditoria"> | number
     id_usuario_auditor?: StringFilter<"VisitaAuditoria"> | string
@@ -16858,6 +18166,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaOrderByWithAggregationInput = {
     id_visita?: SortOrder
+    empresa_id?: SortOrder
     client_sync_id?: SortOrderInput | SortOrder
     id_asignacion?: SortOrderInput | SortOrder
     id_expediente?: SortOrder
@@ -16903,6 +18212,7 @@ export namespace Prisma {
     OR?: VisitaAuditoriaScalarWhereWithAggregatesInput[]
     NOT?: VisitaAuditoriaScalarWhereWithAggregatesInput | VisitaAuditoriaScalarWhereWithAggregatesInput[]
     id_visita?: IntWithAggregatesFilter<"VisitaAuditoria"> | number
+    empresa_id?: StringWithAggregatesFilter<"VisitaAuditoria"> | string
     client_sync_id?: StringNullableWithAggregatesFilter<"VisitaAuditoria"> | string | null
     id_asignacion?: IntNullableWithAggregatesFilter<"VisitaAuditoria"> | number | null
     id_expediente?: IntWithAggregatesFilter<"VisitaAuditoria"> | number
@@ -16943,6 +18253,7 @@ export namespace Prisma {
     OR?: EvidenciaWhereInput[]
     NOT?: EvidenciaWhereInput | EvidenciaWhereInput[]
     id_evidencia?: StringFilter<"Evidencia"> | string
+    empresa_id?: StringFilter<"Evidencia"> | string
     id_visita?: IntFilter<"Evidencia"> | number
     tipo?: StringFilter<"Evidencia"> | string
     object_key?: StringFilter<"Evidencia"> | string
@@ -16956,6 +18267,7 @@ export namespace Prisma {
 
   export type EvidenciaOrderByWithRelationInput = {
     id_evidencia?: SortOrder
+    empresa_id?: SortOrder
     id_visita?: SortOrder
     tipo?: SortOrder
     object_key?: SortOrder
@@ -16970,22 +18282,25 @@ export namespace Prisma {
 
   export type EvidenciaWhereUniqueInput = Prisma.AtLeast<{
     id_evidencia?: string
-    hash_sha256?: string
+    empresa_id_hash_sha256?: EvidenciaEmpresa_idHash_sha256CompoundUniqueInput
     AND?: EvidenciaWhereInput | EvidenciaWhereInput[]
     OR?: EvidenciaWhereInput[]
     NOT?: EvidenciaWhereInput | EvidenciaWhereInput[]
+    empresa_id?: StringFilter<"Evidencia"> | string
     id_visita?: IntFilter<"Evidencia"> | number
     tipo?: StringFilter<"Evidencia"> | string
     object_key?: StringFilter<"Evidencia"> | string
+    hash_sha256?: StringFilter<"Evidencia"> | string
     latitud_captura?: DecimalNullableFilter<"Evidencia"> | Decimal | DecimalJsLike | number | string | null
     longitud_captura?: DecimalNullableFilter<"Evidencia"> | Decimal | DecimalJsLike | number | string | null
     capturado_en?: DateTimeFilter<"Evidencia"> | Date | string
     fecha_creacion?: DateTimeFilter<"Evidencia"> | Date | string
     visita?: XOR<VisitaAuditoriaScalarRelationFilter, VisitaAuditoriaWhereInput>
-  }, "id_evidencia" | "hash_sha256">
+  }, "id_evidencia" | "empresa_id_hash_sha256">
 
   export type EvidenciaOrderByWithAggregationInput = {
     id_evidencia?: SortOrder
+    empresa_id?: SortOrder
     id_visita?: SortOrder
     tipo?: SortOrder
     object_key?: SortOrder
@@ -17006,6 +18321,7 @@ export namespace Prisma {
     OR?: EvidenciaScalarWhereWithAggregatesInput[]
     NOT?: EvidenciaScalarWhereWithAggregatesInput | EvidenciaScalarWhereWithAggregatesInput[]
     id_evidencia?: StringWithAggregatesFilter<"Evidencia"> | string
+    empresa_id?: StringWithAggregatesFilter<"Evidencia"> | string
     id_visita?: IntWithAggregatesFilter<"Evidencia"> | number
     tipo?: StringWithAggregatesFilter<"Evidencia"> | string
     object_key?: StringWithAggregatesFilter<"Evidencia"> | string
@@ -17021,6 +18337,7 @@ export namespace Prisma {
     OR?: AuditoriaSeguridadWhereInput[]
     NOT?: AuditoriaSeguridadWhereInput | AuditoriaSeguridadWhereInput[]
     id_auditoria?: StringFilter<"AuditoriaSeguridad"> | string
+    empresa_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     fecha?: DateTimeFilter<"AuditoriaSeguridad"> | Date | string
     request_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     actor_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
@@ -17042,6 +18359,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadOrderByWithRelationInput = {
     id_auditoria?: SortOrder
+    empresa_id?: SortOrderInput | SortOrder
     fecha?: SortOrder
     request_id?: SortOrderInput | SortOrder
     actor_id?: SortOrderInput | SortOrder
@@ -17067,6 +18385,7 @@ export namespace Prisma {
     AND?: AuditoriaSeguridadWhereInput | AuditoriaSeguridadWhereInput[]
     OR?: AuditoriaSeguridadWhereInput[]
     NOT?: AuditoriaSeguridadWhereInput | AuditoriaSeguridadWhereInput[]
+    empresa_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     fecha?: DateTimeFilter<"AuditoriaSeguridad"> | Date | string
     request_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     actor_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
@@ -17088,6 +18407,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadOrderByWithAggregationInput = {
     id_auditoria?: SortOrder
+    empresa_id?: SortOrderInput | SortOrder
     fecha?: SortOrder
     request_id?: SortOrderInput | SortOrder
     actor_id?: SortOrderInput | SortOrder
@@ -17117,6 +18437,7 @@ export namespace Prisma {
     OR?: AuditoriaSeguridadScalarWhereWithAggregatesInput[]
     NOT?: AuditoriaSeguridadScalarWhereWithAggregatesInput | AuditoriaSeguridadScalarWhereWithAggregatesInput[]
     id_auditoria?: StringWithAggregatesFilter<"AuditoriaSeguridad"> | string
+    empresa_id?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
     fecha?: DateTimeWithAggregatesFilter<"AuditoriaSeguridad"> | Date | string
     request_id?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
     actor_id?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
@@ -17141,6 +18462,7 @@ export namespace Prisma {
     OR?: ImportacionMasivaWhereInput[]
     NOT?: ImportacionMasivaWhereInput | ImportacionMasivaWhereInput[]
     id_importacion?: StringFilter<"ImportacionMasiva"> | string
+    empresa_id?: StringFilter<"ImportacionMasiva"> | string
     tipo?: StringFilter<"ImportacionMasiva"> | string
     estado?: StringFilter<"ImportacionMasiva"> | string
     archivo?: StringFilter<"ImportacionMasiva"> | string
@@ -17163,6 +18485,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaOrderByWithRelationInput = {
     id_importacion?: SortOrder
+    empresa_id?: SortOrder
     tipo?: SortOrder
     estado?: SortOrder
     archivo?: SortOrder
@@ -17189,6 +18512,7 @@ export namespace Prisma {
     AND?: ImportacionMasivaWhereInput | ImportacionMasivaWhereInput[]
     OR?: ImportacionMasivaWhereInput[]
     NOT?: ImportacionMasivaWhereInput | ImportacionMasivaWhereInput[]
+    empresa_id?: StringFilter<"ImportacionMasiva"> | string
     tipo?: StringFilter<"ImportacionMasiva"> | string
     estado?: StringFilter<"ImportacionMasiva"> | string
     archivo?: StringFilter<"ImportacionMasiva"> | string
@@ -17211,6 +18535,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaOrderByWithAggregationInput = {
     id_importacion?: SortOrder
+    empresa_id?: SortOrder
     tipo?: SortOrder
     estado?: SortOrder
     archivo?: SortOrder
@@ -17241,6 +18566,7 @@ export namespace Prisma {
     OR?: ImportacionMasivaScalarWhereWithAggregatesInput[]
     NOT?: ImportacionMasivaScalarWhereWithAggregatesInput | ImportacionMasivaScalarWhereWithAggregatesInput[]
     id_importacion?: StringWithAggregatesFilter<"ImportacionMasiva"> | string
+    empresa_id?: StringWithAggregatesFilter<"ImportacionMasiva"> | string
     tipo?: StringWithAggregatesFilter<"ImportacionMasiva"> | string
     estado?: StringWithAggregatesFilter<"ImportacionMasiva"> | string
     archivo?: StringWithAggregatesFilter<"ImportacionMasiva"> | string
@@ -17261,8 +18587,93 @@ export namespace Prisma {
     fecha_fin?: DateTimeNullableWithAggregatesFilter<"ImportacionMasiva"> | Date | string | null
   }
 
+  export type EmpresaCreateInput = {
+    id_empresa?: string
+    nombre: string
+    nombre_corto?: string | null
+    slug: string
+    estado?: string
+    configuracion?: NullableJsonNullValueInput | InputJsonValue
+    marca?: NullableJsonNullValueInput | InputJsonValue
+    creado_en?: Date | string
+    actualizado_en?: Date | string
+  }
+
+  export type EmpresaUncheckedCreateInput = {
+    id_empresa?: string
+    nombre: string
+    nombre_corto?: string | null
+    slug: string
+    estado?: string
+    configuracion?: NullableJsonNullValueInput | InputJsonValue
+    marca?: NullableJsonNullValueInput | InputJsonValue
+    creado_en?: Date | string
+    actualizado_en?: Date | string
+  }
+
+  export type EmpresaUpdateInput = {
+    id_empresa?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    nombre_corto?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    configuracion?: NullableJsonNullValueInput | InputJsonValue
+    marca?: NullableJsonNullValueInput | InputJsonValue
+    creado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    actualizado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmpresaUncheckedUpdateInput = {
+    id_empresa?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    nombre_corto?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    configuracion?: NullableJsonNullValueInput | InputJsonValue
+    marca?: NullableJsonNullValueInput | InputJsonValue
+    creado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    actualizado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmpresaCreateManyInput = {
+    id_empresa?: string
+    nombre: string
+    nombre_corto?: string | null
+    slug: string
+    estado?: string
+    configuracion?: NullableJsonNullValueInput | InputJsonValue
+    marca?: NullableJsonNullValueInput | InputJsonValue
+    creado_en?: Date | string
+    actualizado_en?: Date | string
+  }
+
+  export type EmpresaUpdateManyMutationInput = {
+    id_empresa?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    nombre_corto?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    configuracion?: NullableJsonNullValueInput | InputJsonValue
+    marca?: NullableJsonNullValueInput | InputJsonValue
+    creado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    actualizado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EmpresaUncheckedUpdateManyInput = {
+    id_empresa?: StringFieldUpdateOperationsInput | string
+    nombre?: StringFieldUpdateOperationsInput | string
+    nombre_corto?: NullableStringFieldUpdateOperationsInput | string | null
+    slug?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    configuracion?: NullableJsonNullValueInput | InputJsonValue
+    marca?: NullableJsonNullValueInput | InputJsonValue
+    creado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    actualizado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UsuarioCreateInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -17305,6 +18716,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedCreateInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -17347,6 +18759,7 @@ export namespace Prisma {
 
   export type UsuarioUpdateInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17389,6 +18802,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedUpdateInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17431,6 +18845,7 @@ export namespace Prisma {
 
   export type UsuarioCreateManyInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -17468,6 +18883,7 @@ export namespace Prisma {
 
   export type UsuarioUpdateManyMutationInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17505,6 +18921,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedUpdateManyInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17542,6 +18959,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionCreateInput = {
     id_tracking?: bigint | number
+    empresa_id: string
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
@@ -17552,6 +18970,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionUncheckedCreateInput = {
     id_tracking?: bigint | number
+    empresa_id: string
     id_usuario: string
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
@@ -17562,6 +18981,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionUpdateInput = {
     id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -17572,6 +18992,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionUncheckedUpdateInput = {
     id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario?: StringFieldUpdateOperationsInput | string
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -17582,6 +19003,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionCreateManyInput = {
     id_tracking?: bigint | number
+    empresa_id: string
     id_usuario: string
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
@@ -17592,6 +19014,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionUpdateManyMutationInput = {
     id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -17601,6 +19024,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionUncheckedUpdateManyInput = {
     id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario?: StringFieldUpdateOperationsInput | string
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -17611,6 +19035,7 @@ export namespace Prisma {
 
   export type EventoCampoCreateInput = {
     id_evento?: bigint | number
+    empresa_id: string
     punto: string
     tipo: string
     distancia_m?: Decimal | DecimalJsLike | number | string | null
@@ -17623,6 +19048,7 @@ export namespace Prisma {
 
   export type EventoCampoUncheckedCreateInput = {
     id_evento?: bigint | number
+    empresa_id: string
     id_usuario: string
     id_expediente: number
     punto: string
@@ -17635,6 +19061,7 @@ export namespace Prisma {
 
   export type EventoCampoUpdateInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     punto?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -17647,6 +19074,7 @@ export namespace Prisma {
 
   export type EventoCampoUncheckedUpdateInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     punto?: StringFieldUpdateOperationsInput | string
@@ -17659,6 +19087,7 @@ export namespace Prisma {
 
   export type EventoCampoCreateManyInput = {
     id_evento?: bigint | number
+    empresa_id: string
     id_usuario: string
     id_expediente: number
     punto: string
@@ -17671,6 +19100,7 @@ export namespace Prisma {
 
   export type EventoCampoUpdateManyMutationInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     punto?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -17681,6 +19111,7 @@ export namespace Prisma {
 
   export type EventoCampoUncheckedUpdateManyInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     punto?: StringFieldUpdateOperationsInput | string
@@ -17692,6 +19123,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaCreateInput = {
+    empresa_id: string
     clave: string
     valor: string
     actualizado_por?: string | null
@@ -17699,6 +19131,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaUncheckedCreateInput = {
+    empresa_id: string
     clave: string
     valor: string
     actualizado_por?: string | null
@@ -17706,6 +19139,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaUpdateInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     clave?: StringFieldUpdateOperationsInput | string
     valor?: StringFieldUpdateOperationsInput | string
     actualizado_por?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17713,6 +19147,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaUncheckedUpdateInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     clave?: StringFieldUpdateOperationsInput | string
     valor?: StringFieldUpdateOperationsInput | string
     actualizado_por?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17720,6 +19155,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaCreateManyInput = {
+    empresa_id: string
     clave: string
     valor: string
     actualizado_por?: string | null
@@ -17727,6 +19163,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaUpdateManyMutationInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     clave?: StringFieldUpdateOperationsInput | string
     valor?: StringFieldUpdateOperationsInput | string
     actualizado_por?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17734,6 +19171,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaUncheckedUpdateManyInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     clave?: StringFieldUpdateOperationsInput | string
     valor?: StringFieldUpdateOperationsInput | string
     actualizado_por?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17742,6 +19180,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoCreateInput = {
     id_dispositivo?: string
+    empresa_id: string
     device_id: string
     nombre_dispositivo?: string | null
     activo?: boolean
@@ -17752,6 +19191,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoUncheckedCreateInput = {
     id_dispositivo?: string
+    empresa_id: string
     id_usuario: string
     device_id: string
     nombre_dispositivo?: string | null
@@ -17762,6 +19202,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoUpdateInput = {
     id_dispositivo?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     device_id?: StringFieldUpdateOperationsInput | string
     nombre_dispositivo?: NullableStringFieldUpdateOperationsInput | string | null
     activo?: BoolFieldUpdateOperationsInput | boolean
@@ -17772,6 +19213,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoUncheckedUpdateInput = {
     id_dispositivo?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario?: StringFieldUpdateOperationsInput | string
     device_id?: StringFieldUpdateOperationsInput | string
     nombre_dispositivo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17782,6 +19224,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoCreateManyInput = {
     id_dispositivo?: string
+    empresa_id: string
     id_usuario: string
     device_id: string
     nombre_dispositivo?: string | null
@@ -17792,6 +19235,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoUpdateManyMutationInput = {
     id_dispositivo?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     device_id?: StringFieldUpdateOperationsInput | string
     nombre_dispositivo?: NullableStringFieldUpdateOperationsInput | string | null
     activo?: BoolFieldUpdateOperationsInput | boolean
@@ -17801,6 +19245,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoUncheckedUpdateManyInput = {
     id_dispositivo?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario?: StringFieldUpdateOperationsInput | string
     device_id?: StringFieldUpdateOperationsInput | string
     nombre_dispositivo?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17810,6 +19255,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteCreateInput = {
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -17858,6 +19304,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedCreateInput = {
     id_expediente?: number
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -17905,6 +19352,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteUpdateInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17953,6 +19401,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedUpdateInput = {
     id_expediente?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18001,6 +19450,7 @@ export namespace Prisma {
 
   export type ExpedienteCreateManyInput = {
     id_expediente?: number
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -18044,6 +19494,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteUpdateManyMutationInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18088,6 +19539,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedUpdateManyInput = {
     id_expediente?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18132,6 +19584,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioCreateInput = {
     id_cambio?: bigint | number
+    empresa_id: string
     id_importacion?: string | null
     actor_id?: string | null
     tipo: string
@@ -18142,6 +19595,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioUncheckedCreateInput = {
     id_cambio?: bigint | number
+    empresa_id: string
     id_expediente: number
     id_importacion?: string | null
     actor_id?: string | null
@@ -18152,6 +19606,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioUpdateInput = {
     id_cambio?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
     tipo?: StringFieldUpdateOperationsInput | string
@@ -18162,6 +19617,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioUncheckedUpdateInput = {
     id_cambio?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18172,6 +19628,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioCreateManyInput = {
     id_cambio?: bigint | number
+    empresa_id: string
     id_expediente: number
     id_importacion?: string | null
     actor_id?: string | null
@@ -18182,6 +19639,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioUpdateManyMutationInput = {
     id_cambio?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
     tipo?: StringFieldUpdateOperationsInput | string
@@ -18191,6 +19649,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioUncheckedUpdateManyInput = {
     id_cambio?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18200,6 +19659,7 @@ export namespace Prisma {
   }
 
   export type AsignacionAuditoriaCreateInput = {
+    empresa_id: string
     fecha_asignacion?: Date | string
     fecha_fin?: Date | string | null
     estado?: string
@@ -18212,6 +19672,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaUncheckedCreateInput = {
     id_asignacion?: number
+    empresa_id: string
     id_expediente: number
     id_usuario_auditor: string
     fecha_asignacion?: Date | string
@@ -18223,6 +19684,7 @@ export namespace Prisma {
   }
 
   export type AsignacionAuditoriaUpdateInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estado?: StringFieldUpdateOperationsInput | string
@@ -18235,6 +19697,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaUncheckedUpdateInput = {
     id_asignacion?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     id_usuario_auditor?: StringFieldUpdateOperationsInput | string
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18247,6 +19710,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaCreateManyInput = {
     id_asignacion?: number
+    empresa_id: string
     id_expediente: number
     id_usuario_auditor: string
     fecha_asignacion?: Date | string
@@ -18258,6 +19722,7 @@ export namespace Prisma {
   }
 
   export type AsignacionAuditoriaUpdateManyMutationInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estado?: StringFieldUpdateOperationsInput | string
@@ -18268,6 +19733,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaUncheckedUpdateManyInput = {
     id_asignacion?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     id_usuario_auditor?: StringFieldUpdateOperationsInput | string
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18279,6 +19745,7 @@ export namespace Prisma {
   }
 
   export type VisitaAuditoriaCreateInput = {
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     fecha_hora_checkin: Date | string
@@ -18317,6 +19784,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedCreateInput = {
     id_visita?: number
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     id_expediente: number
@@ -18354,6 +19822,7 @@ export namespace Prisma {
   }
 
   export type VisitaAuditoriaUpdateInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     fecha_hora_checkin?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18392,6 +19861,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedUpdateInput = {
     id_visita?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     id_expediente?: IntFieldUpdateOperationsInput | number
@@ -18430,6 +19900,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaCreateManyInput = {
     id_visita?: number
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     id_expediente: number
@@ -18466,6 +19937,7 @@ export namespace Prisma {
   }
 
   export type VisitaAuditoriaUpdateManyMutationInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     fecha_hora_checkin?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -18501,6 +19973,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedUpdateManyInput = {
     id_visita?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     id_expediente?: IntFieldUpdateOperationsInput | number
@@ -18538,6 +20011,7 @@ export namespace Prisma {
 
   export type EvidenciaCreateInput = {
     id_evidencia?: string
+    empresa_id: string
     tipo: string
     object_key: string
     hash_sha256: string
@@ -18550,6 +20024,7 @@ export namespace Prisma {
 
   export type EvidenciaUncheckedCreateInput = {
     id_evidencia?: string
+    empresa_id: string
     id_visita: number
     tipo: string
     object_key: string
@@ -18562,6 +20037,7 @@ export namespace Prisma {
 
   export type EvidenciaUpdateInput = {
     id_evidencia?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     object_key?: StringFieldUpdateOperationsInput | string
     hash_sha256?: StringFieldUpdateOperationsInput | string
@@ -18574,6 +20050,7 @@ export namespace Prisma {
 
   export type EvidenciaUncheckedUpdateInput = {
     id_evidencia?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_visita?: IntFieldUpdateOperationsInput | number
     tipo?: StringFieldUpdateOperationsInput | string
     object_key?: StringFieldUpdateOperationsInput | string
@@ -18586,6 +20063,7 @@ export namespace Prisma {
 
   export type EvidenciaCreateManyInput = {
     id_evidencia?: string
+    empresa_id: string
     id_visita: number
     tipo: string
     object_key: string
@@ -18598,6 +20076,7 @@ export namespace Prisma {
 
   export type EvidenciaUpdateManyMutationInput = {
     id_evidencia?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     object_key?: StringFieldUpdateOperationsInput | string
     hash_sha256?: StringFieldUpdateOperationsInput | string
@@ -18609,6 +20088,7 @@ export namespace Prisma {
 
   export type EvidenciaUncheckedUpdateManyInput = {
     id_evidencia?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_visita?: IntFieldUpdateOperationsInput | number
     tipo?: StringFieldUpdateOperationsInput | string
     object_key?: StringFieldUpdateOperationsInput | string
@@ -18621,6 +20101,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadCreateInput = {
     id_auditoria?: string
+    empresa_id?: string | null
     fecha?: Date | string
     request_id?: string | null
     actor_id?: string | null
@@ -18642,6 +20123,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadUncheckedCreateInput = {
     id_auditoria?: string
+    empresa_id?: string | null
     fecha?: Date | string
     request_id?: string | null
     actor_id?: string | null
@@ -18663,6 +20145,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadUpdateInput = {
     id_auditoria?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     request_id?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18684,6 +20167,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadUncheckedUpdateInput = {
     id_auditoria?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     request_id?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18705,6 +20189,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadCreateManyInput = {
     id_auditoria?: string
+    empresa_id?: string | null
     fecha?: Date | string
     request_id?: string | null
     actor_id?: string | null
@@ -18726,6 +20211,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadUpdateManyMutationInput = {
     id_auditoria?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     request_id?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18747,6 +20233,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadUncheckedUpdateManyInput = {
     id_auditoria?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
     request_id?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18768,6 +20255,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaCreateInput = {
     id_importacion?: string
+    empresa_id: string
     tipo: string
     estado?: string
     archivo: string
@@ -18790,6 +20278,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaUncheckedCreateInput = {
     id_importacion?: string
+    empresa_id: string
     tipo: string
     estado?: string
     archivo: string
@@ -18812,6 +20301,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaUpdateInput = {
     id_importacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
     archivo?: StringFieldUpdateOperationsInput | string
@@ -18834,6 +20324,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaUncheckedUpdateInput = {
     id_importacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
     archivo?: StringFieldUpdateOperationsInput | string
@@ -18856,6 +20347,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaCreateManyInput = {
     id_importacion?: string
+    empresa_id: string
     tipo: string
     estado?: string
     archivo: string
@@ -18878,6 +20370,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaUpdateManyMutationInput = {
     id_importacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
     archivo?: StringFieldUpdateOperationsInput | string
@@ -18900,6 +20393,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaUncheckedUpdateManyInput = {
     id_importacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     estado?: StringFieldUpdateOperationsInput | string
     archivo?: StringFieldUpdateOperationsInput | string
@@ -18949,6 +20443,29 @@ export namespace Prisma {
     search?: string
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -18959,6 +20476,125 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type EmpresaOrderByRelevanceInput = {
+    fields: EmpresaOrderByRelevanceFieldEnum | EmpresaOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type EmpresaCountOrderByAggregateInput = {
+    id_empresa?: SortOrder
+    nombre?: SortOrder
+    nombre_corto?: SortOrder
+    slug?: SortOrder
+    estado?: SortOrder
+    configuracion?: SortOrder
+    marca?: SortOrder
+    creado_en?: SortOrder
+    actualizado_en?: SortOrder
+  }
+
+  export type EmpresaMaxOrderByAggregateInput = {
+    id_empresa?: SortOrder
+    nombre?: SortOrder
+    nombre_corto?: SortOrder
+    slug?: SortOrder
+    estado?: SortOrder
+    creado_en?: SortOrder
+    actualizado_en?: SortOrder
+  }
+
+  export type EmpresaMinOrderByAggregateInput = {
+    id_empresa?: SortOrder
+    nombre?: SortOrder
+    nombre_corto?: SortOrder
+    slug?: SortOrder
+    estado?: SortOrder
+    creado_en?: SortOrder
+    actualizado_en?: SortOrder
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[]
+    notIn?: Date[] | string[]
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type BoolFilter<$PrismaModel = never> = {
@@ -19040,11 +20676,6 @@ export namespace Prisma {
     none?: EventoCampoWhereInput
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
   export type AsignacionAuditoriaOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -19073,6 +20704,7 @@ export namespace Prisma {
 
   export type UsuarioCountOrderByAggregateInput = {
     id_usuario?: SortOrder
+    empresa_id?: SortOrder
     username?: SortOrder
     nombres?: SortOrder
     apellidos?: SortOrder
@@ -19120,6 +20752,7 @@ export namespace Prisma {
 
   export type UsuarioMaxOrderByAggregateInput = {
     id_usuario?: SortOrder
+    empresa_id?: SortOrder
     username?: SortOrder
     nombres?: SortOrder
     apellidos?: SortOrder
@@ -19157,6 +20790,7 @@ export namespace Prisma {
 
   export type UsuarioMinOrderByAggregateInput = {
     id_usuario?: SortOrder
+    empresa_id?: SortOrder
     username?: SortOrder
     nombres?: SortOrder
     apellidos?: SortOrder
@@ -19200,56 +20834,6 @@ export namespace Prisma {
     ubicacion_precision?: SortOrder
     bateria_porcentaje?: SortOrder
     mov_velocidad?: SortOrder
-  }
-
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    search?: string
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    search?: string
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -19357,6 +20941,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionCountOrderByAggregateInput = {
     id_tracking?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
@@ -19374,6 +20959,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionMaxOrderByAggregateInput = {
     id_tracking?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
@@ -19384,6 +20970,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionMinOrderByAggregateInput = {
     id_tracking?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     latitud?: SortOrder
     longitud?: SortOrder
@@ -19444,6 +21031,7 @@ export namespace Prisma {
 
   export type EventoCampoCountOrderByAggregateInput = {
     id_evento?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     id_expediente?: SortOrder
     punto?: SortOrder
@@ -19464,6 +21052,7 @@ export namespace Prisma {
 
   export type EventoCampoMaxOrderByAggregateInput = {
     id_evento?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     id_expediente?: SortOrder
     punto?: SortOrder
@@ -19476,6 +21065,7 @@ export namespace Prisma {
 
   export type EventoCampoMinOrderByAggregateInput = {
     id_evento?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     id_expediente?: SortOrder
     punto?: SortOrder
@@ -19500,7 +21090,13 @@ export namespace Prisma {
     search: string
   }
 
+  export type ConfiguracionSistemaEmpresa_idClaveCompoundUniqueInput = {
+    empresa_id: string
+    clave: string
+  }
+
   export type ConfiguracionSistemaCountOrderByAggregateInput = {
+    empresa_id?: SortOrder
     clave?: SortOrder
     valor?: SortOrder
     actualizado_por?: SortOrder
@@ -19508,6 +21104,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaMaxOrderByAggregateInput = {
+    empresa_id?: SortOrder
     clave?: SortOrder
     valor?: SortOrder
     actualizado_por?: SortOrder
@@ -19515,6 +21112,7 @@ export namespace Prisma {
   }
 
   export type ConfiguracionSistemaMinOrderByAggregateInput = {
+    empresa_id?: SortOrder
     clave?: SortOrder
     valor?: SortOrder
     actualizado_por?: SortOrder
@@ -19534,6 +21132,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoCountOrderByAggregateInput = {
     id_dispositivo?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     device_id?: SortOrder
     nombre_dispositivo?: SortOrder
@@ -19544,6 +21143,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoMaxOrderByAggregateInput = {
     id_dispositivo?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     device_id?: SortOrder
     nombre_dispositivo?: SortOrder
@@ -19554,6 +21154,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoMinOrderByAggregateInput = {
     id_dispositivo?: SortOrder
+    empresa_id?: SortOrder
     id_usuario?: SortOrder
     device_id?: SortOrder
     nombre_dispositivo?: SortOrder
@@ -19575,29 +21176,6 @@ export namespace Prisma {
     notIn?: $Enums.TipoDocumento[]
     not?: NestedEnumTipoDocumentoFilter<$PrismaModel> | $Enums.TipoDocumento
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue
-    lte?: InputJsonValue
-    gt?: InputJsonValue
-    gte?: InputJsonValue
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type ExpedienteCambioListRelationFilter = {
     every?: ExpedienteCambioWhereInput
@@ -19615,8 +21193,14 @@ export namespace Prisma {
     search: string
   }
 
+  export type ExpedienteEmpresa_idCodigo_expedienteCompoundUniqueInput = {
+    empresa_id: string
+    codigo_expediente: string
+  }
+
   export type ExpedienteCountOrderByAggregateInput = {
     id_expediente?: SortOrder
+    empresa_id?: SortOrder
     codigo_expediente?: SortOrder
     tipo_credito?: SortOrder
     oficina?: SortOrder
@@ -19671,6 +21255,7 @@ export namespace Prisma {
 
   export type ExpedienteMaxOrderByAggregateInput = {
     id_expediente?: SortOrder
+    empresa_id?: SortOrder
     codigo_expediente?: SortOrder
     tipo_credito?: SortOrder
     oficina?: SortOrder
@@ -19708,6 +21293,7 @@ export namespace Prisma {
 
   export type ExpedienteMinOrderByAggregateInput = {
     id_expediente?: SortOrder
+    empresa_id?: SortOrder
     codigo_expediente?: SortOrder
     tipo_credito?: SortOrder
     oficina?: SortOrder
@@ -19772,32 +21358,6 @@ export namespace Prisma {
     _min?: NestedEnumTipoDocumentoFilter<$PrismaModel>
     _max?: NestedEnumTipoDocumentoFilter<$PrismaModel>
   }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue
-    lte?: InputJsonValue
-    gt?: InputJsonValue
-    gte?: InputJsonValue
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
-  }
   export type JsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -19830,6 +21390,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioCountOrderByAggregateInput = {
     id_cambio?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_importacion?: SortOrder
     actor_id?: SortOrder
@@ -19845,6 +21406,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioMaxOrderByAggregateInput = {
     id_cambio?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_importacion?: SortOrder
     actor_id?: SortOrder
@@ -19854,6 +21416,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioMinOrderByAggregateInput = {
     id_cambio?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_importacion?: SortOrder
     actor_id?: SortOrder
@@ -19900,6 +21463,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaCountOrderByAggregateInput = {
     id_asignacion?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_usuario_auditor?: SortOrder
     fecha_asignacion?: SortOrder
@@ -19917,6 +21481,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaMaxOrderByAggregateInput = {
     id_asignacion?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_usuario_auditor?: SortOrder
     fecha_asignacion?: SortOrder
@@ -19929,6 +21494,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaMinOrderByAggregateInput = {
     id_asignacion?: SortOrder
+    empresa_id?: SortOrder
     id_expediente?: SortOrder
     id_usuario_auditor?: SortOrder
     fecha_asignacion?: SortOrder
@@ -19962,6 +21528,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaCountOrderByAggregateInput = {
     id_visita?: SortOrder
+    empresa_id?: SortOrder
     client_sync_id?: SortOrder
     id_asignacion?: SortOrder
     id_expediente?: SortOrder
@@ -20009,6 +21576,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaMaxOrderByAggregateInput = {
     id_visita?: SortOrder
+    empresa_id?: SortOrder
     client_sync_id?: SortOrder
     id_asignacion?: SortOrder
     id_expediente?: SortOrder
@@ -20041,6 +21609,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaMinOrderByAggregateInput = {
     id_visita?: SortOrder
+    empresa_id?: SortOrder
     client_sync_id?: SortOrder
     id_asignacion?: SortOrder
     id_expediente?: SortOrder
@@ -20092,8 +21661,14 @@ export namespace Prisma {
     search: string
   }
 
+  export type EvidenciaEmpresa_idHash_sha256CompoundUniqueInput = {
+    empresa_id: string
+    hash_sha256: string
+  }
+
   export type EvidenciaCountOrderByAggregateInput = {
     id_evidencia?: SortOrder
+    empresa_id?: SortOrder
     id_visita?: SortOrder
     tipo?: SortOrder
     object_key?: SortOrder
@@ -20112,6 +21687,7 @@ export namespace Prisma {
 
   export type EvidenciaMaxOrderByAggregateInput = {
     id_evidencia?: SortOrder
+    empresa_id?: SortOrder
     id_visita?: SortOrder
     tipo?: SortOrder
     object_key?: SortOrder
@@ -20124,6 +21700,7 @@ export namespace Prisma {
 
   export type EvidenciaMinOrderByAggregateInput = {
     id_evidencia?: SortOrder
+    empresa_id?: SortOrder
     id_visita?: SortOrder
     tipo?: SortOrder
     object_key?: SortOrder
@@ -20153,6 +21730,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadCountOrderByAggregateInput = {
     id_auditoria?: SortOrder
+    empresa_id?: SortOrder
     fecha?: SortOrder
     request_id?: SortOrder
     actor_id?: SortOrder
@@ -20178,6 +21756,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadMaxOrderByAggregateInput = {
     id_auditoria?: SortOrder
+    empresa_id?: SortOrder
     fecha?: SortOrder
     request_id?: SortOrder
     actor_id?: SortOrder
@@ -20197,6 +21776,7 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadMinOrderByAggregateInput = {
     id_auditoria?: SortOrder
+    empresa_id?: SortOrder
     fecha?: SortOrder
     request_id?: SortOrder
     actor_id?: SortOrder
@@ -20234,6 +21814,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaCountOrderByAggregateInput = {
     id_importacion?: SortOrder
+    empresa_id?: SortOrder
     tipo?: SortOrder
     estado?: SortOrder
     archivo?: SortOrder
@@ -20265,6 +21846,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaMaxOrderByAggregateInput = {
     id_importacion?: SortOrder
+    empresa_id?: SortOrder
     tipo?: SortOrder
     estado?: SortOrder
     archivo?: SortOrder
@@ -20285,6 +21867,7 @@ export namespace Prisma {
 
   export type ImportacionMasivaMinOrderByAggregateInput = {
     id_importacion?: SortOrder
+    empresa_id?: SortOrder
     tipo?: SortOrder
     estado?: SortOrder
     archivo?: SortOrder
@@ -20310,6 +21893,18 @@ export namespace Prisma {
     actualizadas?: SortOrder
     omitidas?: SortOrder
     errores?: SortOrder
+  }
+
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
   }
 
   export type AsignacionAuditoriaCreateNestedManyWithoutAuditorInput = {
@@ -20380,18 +21975,6 @@ export namespace Prisma {
     connectOrCreate?: EventoCampoCreateOrConnectWithoutUsuarioInput | EventoCampoCreateOrConnectWithoutUsuarioInput[]
     createMany?: EventoCampoCreateManyUsuarioInputEnvelope
     connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
-  }
-
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -20985,55 +22568,6 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
-  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -21050,6 +22584,17 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -21070,6 +22615,40 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -21082,6 +22661,33 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
   }
 
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -21263,29 +22869,6 @@ export namespace Prisma {
     _min?: NestedEnumTipoDocumentoFilter<$PrismaModel>
     _max?: NestedEnumTipoDocumentoFilter<$PrismaModel>
   }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue
-    lte?: InputJsonValue
-    gt?: InputJsonValue
-    gte?: InputJsonValue
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
   export type NestedJsonFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -21324,6 +22907,7 @@ export namespace Prisma {
   }
 
   export type AsignacionAuditoriaCreateWithoutAuditorInput = {
+    empresa_id: string
     fecha_asignacion?: Date | string
     fecha_fin?: Date | string | null
     estado?: string
@@ -21335,6 +22919,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaUncheckedCreateWithoutAuditorInput = {
     id_asignacion?: number
+    empresa_id: string
     id_expediente: number
     fecha_asignacion?: Date | string
     fecha_fin?: Date | string | null
@@ -21355,6 +22940,7 @@ export namespace Prisma {
   }
 
   export type VisitaAuditoriaCreateWithoutAuditorInput = {
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     fecha_hora_checkin: Date | string
@@ -21392,6 +22978,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedCreateWithoutAuditorInput = {
     id_visita?: number
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     id_expediente: number
@@ -21439,6 +23026,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoCreateWithoutUsuarioInput = {
     id_dispositivo?: string
+    empresa_id: string
     device_id: string
     nombre_dispositivo?: string | null
     activo?: boolean
@@ -21448,6 +23036,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoUncheckedCreateWithoutUsuarioInput = {
     id_dispositivo?: string
+    empresa_id: string
     device_id: string
     nombre_dispositivo?: string | null
     activo?: boolean
@@ -21467,6 +23056,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionCreateWithoutUsuarioInput = {
     id_tracking?: bigint | number
+    empresa_id: string
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
@@ -21476,6 +23066,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionUncheckedCreateWithoutUsuarioInput = {
     id_tracking?: bigint | number
+    empresa_id: string
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
@@ -21495,6 +23086,7 @@ export namespace Prisma {
 
   export type EventoCampoCreateWithoutUsuarioInput = {
     id_evento?: bigint | number
+    empresa_id: string
     punto: string
     tipo: string
     distancia_m?: Decimal | DecimalJsLike | number | string | null
@@ -21506,6 +23098,7 @@ export namespace Prisma {
 
   export type EventoCampoUncheckedCreateWithoutUsuarioInput = {
     id_evento?: bigint | number
+    empresa_id: string
     id_expediente: number
     punto: string
     tipo: string
@@ -21546,6 +23139,7 @@ export namespace Prisma {
     OR?: AsignacionAuditoriaScalarWhereInput[]
     NOT?: AsignacionAuditoriaScalarWhereInput | AsignacionAuditoriaScalarWhereInput[]
     id_asignacion?: IntFilter<"AsignacionAuditoria"> | number
+    empresa_id?: StringFilter<"AsignacionAuditoria"> | string
     id_expediente?: IntFilter<"AsignacionAuditoria"> | number
     id_usuario_auditor?: StringFilter<"AsignacionAuditoria"> | string
     fecha_asignacion?: DateTimeFilter<"AsignacionAuditoria"> | Date | string
@@ -21577,6 +23171,7 @@ export namespace Prisma {
     OR?: VisitaAuditoriaScalarWhereInput[]
     NOT?: VisitaAuditoriaScalarWhereInput | VisitaAuditoriaScalarWhereInput[]
     id_visita?: IntFilter<"VisitaAuditoria"> | number
+    empresa_id?: StringFilter<"VisitaAuditoria"> | string
     client_sync_id?: StringNullableFilter<"VisitaAuditoria"> | string | null
     id_asignacion?: IntNullableFilter<"VisitaAuditoria"> | number | null
     id_expediente?: IntFilter<"VisitaAuditoria"> | number
@@ -21633,6 +23228,7 @@ export namespace Prisma {
     OR?: DispositivoAutorizadoScalarWhereInput[]
     NOT?: DispositivoAutorizadoScalarWhereInput | DispositivoAutorizadoScalarWhereInput[]
     id_dispositivo?: StringFilter<"DispositivoAutorizado"> | string
+    empresa_id?: StringFilter<"DispositivoAutorizado"> | string
     id_usuario?: StringFilter<"DispositivoAutorizado"> | string
     device_id?: StringFilter<"DispositivoAutorizado"> | string
     nombre_dispositivo?: StringNullableFilter<"DispositivoAutorizado"> | string | null
@@ -21662,6 +23258,7 @@ export namespace Prisma {
     OR?: TrackingUbicacionScalarWhereInput[]
     NOT?: TrackingUbicacionScalarWhereInput | TrackingUbicacionScalarWhereInput[]
     id_tracking?: BigIntFilter<"TrackingUbicacion"> | bigint | number
+    empresa_id?: StringFilter<"TrackingUbicacion"> | string
     id_usuario?: StringFilter<"TrackingUbicacion"> | string
     latitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string
@@ -21691,6 +23288,7 @@ export namespace Prisma {
     OR?: EventoCampoScalarWhereInput[]
     NOT?: EventoCampoScalarWhereInput | EventoCampoScalarWhereInput[]
     id_evento?: BigIntFilter<"EventoCampo"> | bigint | number
+    empresa_id?: StringFilter<"EventoCampo"> | string
     id_usuario?: StringFilter<"EventoCampo"> | string
     id_expediente?: IntFilter<"EventoCampo"> | number
     punto?: StringFilter<"EventoCampo"> | string
@@ -21703,6 +23301,7 @@ export namespace Prisma {
 
   export type UsuarioCreateWithoutTrackingsInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -21744,6 +23343,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedCreateWithoutTrackingsInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -21801,6 +23401,7 @@ export namespace Prisma {
 
   export type UsuarioUpdateWithoutTrackingsInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -21842,6 +23443,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedUpdateWithoutTrackingsInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -21883,6 +23485,7 @@ export namespace Prisma {
 
   export type UsuarioCreateWithoutEventosCampoInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -21924,6 +23527,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedCreateWithoutEventosCampoInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -21969,6 +23573,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteCreateWithoutEventosCampoInput = {
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -22016,6 +23621,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedCreateWithoutEventosCampoInput = {
     id_expediente?: number
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -22079,6 +23685,7 @@ export namespace Prisma {
 
   export type UsuarioUpdateWithoutEventosCampoInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22120,6 +23727,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedUpdateWithoutEventosCampoInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22171,6 +23779,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteUpdateWithoutEventosCampoInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22218,6 +23827,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedUpdateWithoutEventosCampoInput = {
     id_expediente?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22265,6 +23875,7 @@ export namespace Prisma {
 
   export type UsuarioCreateWithoutDispositivosInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -22306,6 +23917,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedCreateWithoutDispositivosInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -22363,6 +23975,7 @@ export namespace Prisma {
 
   export type UsuarioUpdateWithoutDispositivosInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22404,6 +24017,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedUpdateWithoutDispositivosInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22444,6 +24058,7 @@ export namespace Prisma {
   }
 
   export type AsignacionAuditoriaCreateWithoutExpedienteInput = {
+    empresa_id: string
     fecha_asignacion?: Date | string
     fecha_fin?: Date | string | null
     estado?: string
@@ -22455,6 +24070,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaUncheckedCreateWithoutExpedienteInput = {
     id_asignacion?: number
+    empresa_id: string
     id_usuario_auditor: string
     fecha_asignacion?: Date | string
     fecha_fin?: Date | string | null
@@ -22475,6 +24091,7 @@ export namespace Prisma {
   }
 
   export type VisitaAuditoriaCreateWithoutExpedienteInput = {
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     fecha_hora_checkin: Date | string
@@ -22512,6 +24129,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedCreateWithoutExpedienteInput = {
     id_visita?: number
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     id_usuario_auditor: string
@@ -22559,6 +24177,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioCreateWithoutExpedienteInput = {
     id_cambio?: bigint | number
+    empresa_id: string
     id_importacion?: string | null
     actor_id?: string | null
     tipo: string
@@ -22568,6 +24187,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioUncheckedCreateWithoutExpedienteInput = {
     id_cambio?: bigint | number
+    empresa_id: string
     id_importacion?: string | null
     actor_id?: string | null
     tipo: string
@@ -22587,6 +24207,7 @@ export namespace Prisma {
 
   export type EventoCampoCreateWithoutExpedienteInput = {
     id_evento?: bigint | number
+    empresa_id: string
     punto: string
     tipo: string
     distancia_m?: Decimal | DecimalJsLike | number | string | null
@@ -22598,6 +24219,7 @@ export namespace Prisma {
 
   export type EventoCampoUncheckedCreateWithoutExpedienteInput = {
     id_evento?: bigint | number
+    empresa_id: string
     id_usuario: string
     punto: string
     tipo: string
@@ -22670,6 +24292,7 @@ export namespace Prisma {
     OR?: ExpedienteCambioScalarWhereInput[]
     NOT?: ExpedienteCambioScalarWhereInput | ExpedienteCambioScalarWhereInput[]
     id_cambio?: BigIntFilter<"ExpedienteCambio"> | bigint | number
+    empresa_id?: StringFilter<"ExpedienteCambio"> | string
     id_expediente?: IntFilter<"ExpedienteCambio"> | number
     id_importacion?: StringNullableFilter<"ExpedienteCambio"> | string | null
     actor_id?: StringNullableFilter<"ExpedienteCambio"> | string | null
@@ -22695,6 +24318,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteCreateWithoutCambiosInput = {
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -22742,6 +24366,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedCreateWithoutCambiosInput = {
     id_expediente?: number
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -22804,6 +24429,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteUpdateWithoutCambiosInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22851,6 +24477,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedUpdateWithoutCambiosInput = {
     id_expediente?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22897,6 +24524,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteCreateWithoutAsignacionesInput = {
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -22944,6 +24572,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedCreateWithoutAsignacionesInput = {
     id_expediente?: number
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -22996,6 +24625,7 @@ export namespace Prisma {
 
   export type UsuarioCreateWithoutAsignacionesInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -23037,6 +24667,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedCreateWithoutAsignacionesInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -23093,6 +24724,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteUpdateWithoutAsignacionesInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23140,6 +24772,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedUpdateWithoutAsignacionesInput = {
     id_expediente?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23198,6 +24831,7 @@ export namespace Prisma {
 
   export type UsuarioUpdateWithoutAsignacionesInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23239,6 +24873,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedUpdateWithoutAsignacionesInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23279,6 +24914,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteCreateWithoutVisitasInput = {
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -23326,6 +24962,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedCreateWithoutVisitasInput = {
     id_expediente?: number
+    empresa_id: string
     codigo_expediente: string
     tipo_credito?: $Enums.TipoCredito
     oficina?: string | null
@@ -23378,6 +25015,7 @@ export namespace Prisma {
 
   export type UsuarioCreateWithoutVisitasInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -23419,6 +25057,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedCreateWithoutVisitasInput = {
     id_usuario?: string
+    empresa_id?: string | null
     username: string
     nombres?: string | null
     apellidos?: string | null
@@ -23465,6 +25104,7 @@ export namespace Prisma {
 
   export type EvidenciaCreateWithoutVisitaInput = {
     id_evidencia?: string
+    empresa_id: string
     tipo: string
     object_key: string
     hash_sha256: string
@@ -23476,6 +25116,7 @@ export namespace Prisma {
 
   export type EvidenciaUncheckedCreateWithoutVisitaInput = {
     id_evidencia?: string
+    empresa_id: string
     tipo: string
     object_key: string
     hash_sha256: string
@@ -23507,6 +25148,7 @@ export namespace Prisma {
   }
 
   export type ExpedienteUpdateWithoutVisitasInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23554,6 +25196,7 @@ export namespace Prisma {
 
   export type ExpedienteUncheckedUpdateWithoutVisitasInput = {
     id_expediente?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     codigo_expediente?: StringFieldUpdateOperationsInput | string
     tipo_credito?: EnumTipoCreditoFieldUpdateOperationsInput | $Enums.TipoCredito
     oficina?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23612,6 +25255,7 @@ export namespace Prisma {
 
   export type UsuarioUpdateWithoutVisitasInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23653,6 +25297,7 @@ export namespace Prisma {
 
   export type UsuarioUncheckedUpdateWithoutVisitasInput = {
     id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
     username?: StringFieldUpdateOperationsInput | string
     nombres?: NullableStringFieldUpdateOperationsInput | string | null
     apellidos?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23713,6 +25358,7 @@ export namespace Prisma {
     OR?: EvidenciaScalarWhereInput[]
     NOT?: EvidenciaScalarWhereInput | EvidenciaScalarWhereInput[]
     id_evidencia?: StringFilter<"Evidencia"> | string
+    empresa_id?: StringFilter<"Evidencia"> | string
     id_visita?: IntFilter<"Evidencia"> | number
     tipo?: StringFilter<"Evidencia"> | string
     object_key?: StringFilter<"Evidencia"> | string
@@ -23724,6 +25370,7 @@ export namespace Prisma {
   }
 
   export type VisitaAuditoriaCreateWithoutEvidenciasInput = {
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     fecha_hora_checkin: Date | string
@@ -23761,6 +25408,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedCreateWithoutEvidenciasInput = {
     id_visita?: number
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     id_expediente: number
@@ -23813,6 +25461,7 @@ export namespace Prisma {
   }
 
   export type VisitaAuditoriaUpdateWithoutEvidenciasInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     fecha_hora_checkin?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23850,6 +25499,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedUpdateWithoutEvidenciasInput = {
     id_visita?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     id_expediente?: IntFieldUpdateOperationsInput | number
@@ -23887,6 +25537,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaCreateManyAuditorInput = {
     id_asignacion?: number
+    empresa_id: string
     id_expediente: number
     fecha_asignacion?: Date | string
     fecha_fin?: Date | string | null
@@ -23898,6 +25549,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaCreateManyAuditorInput = {
     id_visita?: number
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     id_expediente: number
@@ -23934,6 +25586,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoCreateManyUsuarioInput = {
     id_dispositivo?: string
+    empresa_id: string
     device_id: string
     nombre_dispositivo?: string | null
     activo?: boolean
@@ -23943,6 +25596,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionCreateManyUsuarioInput = {
     id_tracking?: bigint | number
+    empresa_id: string
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     precision_metros?: Decimal | DecimalJsLike | number | string | null
@@ -23952,6 +25606,7 @@ export namespace Prisma {
 
   export type EventoCampoCreateManyUsuarioInput = {
     id_evento?: bigint | number
+    empresa_id: string
     id_expediente: number
     punto: string
     tipo: string
@@ -23962,6 +25617,7 @@ export namespace Prisma {
   }
 
   export type AsignacionAuditoriaUpdateWithoutAuditorInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estado?: StringFieldUpdateOperationsInput | string
@@ -23973,6 +25629,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaUncheckedUpdateWithoutAuditorInput = {
     id_asignacion?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23984,6 +25641,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorInput = {
     id_asignacion?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23994,6 +25652,7 @@ export namespace Prisma {
   }
 
   export type VisitaAuditoriaUpdateWithoutAuditorInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     fecha_hora_checkin?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24031,6 +25690,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedUpdateWithoutAuditorInput = {
     id_visita?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     id_expediente?: IntFieldUpdateOperationsInput | number
@@ -24068,6 +25728,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedUpdateManyWithoutAuditorInput = {
     id_visita?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     id_expediente?: IntFieldUpdateOperationsInput | number
@@ -24104,6 +25765,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoUpdateWithoutUsuarioInput = {
     id_dispositivo?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     device_id?: StringFieldUpdateOperationsInput | string
     nombre_dispositivo?: NullableStringFieldUpdateOperationsInput | string | null
     activo?: BoolFieldUpdateOperationsInput | boolean
@@ -24113,6 +25775,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoUncheckedUpdateWithoutUsuarioInput = {
     id_dispositivo?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     device_id?: StringFieldUpdateOperationsInput | string
     nombre_dispositivo?: NullableStringFieldUpdateOperationsInput | string | null
     activo?: BoolFieldUpdateOperationsInput | boolean
@@ -24122,6 +25785,7 @@ export namespace Prisma {
 
   export type DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioInput = {
     id_dispositivo?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     device_id?: StringFieldUpdateOperationsInput | string
     nombre_dispositivo?: NullableStringFieldUpdateOperationsInput | string | null
     activo?: BoolFieldUpdateOperationsInput | boolean
@@ -24131,6 +25795,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionUpdateWithoutUsuarioInput = {
     id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -24140,6 +25805,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionUncheckedUpdateWithoutUsuarioInput = {
     id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -24149,6 +25815,7 @@ export namespace Prisma {
 
   export type TrackingUbicacionUncheckedUpdateManyWithoutUsuarioInput = {
     id_tracking?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -24158,6 +25825,7 @@ export namespace Prisma {
 
   export type EventoCampoUpdateWithoutUsuarioInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     punto?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -24169,6 +25837,7 @@ export namespace Prisma {
 
   export type EventoCampoUncheckedUpdateWithoutUsuarioInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     punto?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
@@ -24180,6 +25849,7 @@ export namespace Prisma {
 
   export type EventoCampoUncheckedUpdateManyWithoutUsuarioInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_expediente?: IntFieldUpdateOperationsInput | number
     punto?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
@@ -24191,6 +25861,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaCreateManyExpedienteInput = {
     id_asignacion?: number
+    empresa_id: string
     id_usuario_auditor: string
     fecha_asignacion?: Date | string
     fecha_fin?: Date | string | null
@@ -24202,6 +25873,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaCreateManyExpedienteInput = {
     id_visita?: number
+    empresa_id: string
     client_sync_id?: string | null
     id_asignacion?: number | null
     id_usuario_auditor: string
@@ -24238,6 +25910,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioCreateManyExpedienteInput = {
     id_cambio?: bigint | number
+    empresa_id: string
     id_importacion?: string | null
     actor_id?: string | null
     tipo: string
@@ -24247,6 +25920,7 @@ export namespace Prisma {
 
   export type EventoCampoCreateManyExpedienteInput = {
     id_evento?: bigint | number
+    empresa_id: string
     id_usuario: string
     punto: string
     tipo: string
@@ -24257,6 +25931,7 @@ export namespace Prisma {
   }
 
   export type AsignacionAuditoriaUpdateWithoutExpedienteInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estado?: StringFieldUpdateOperationsInput | string
@@ -24268,6 +25943,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaUncheckedUpdateWithoutExpedienteInput = {
     id_asignacion?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario_auditor?: StringFieldUpdateOperationsInput | string
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -24279,6 +25955,7 @@ export namespace Prisma {
 
   export type AsignacionAuditoriaUncheckedUpdateManyWithoutExpedienteInput = {
     id_asignacion?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario_auditor?: StringFieldUpdateOperationsInput | string
     fecha_asignacion?: DateTimeFieldUpdateOperationsInput | Date | string
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -24289,6 +25966,7 @@ export namespace Prisma {
   }
 
   export type VisitaAuditoriaUpdateWithoutExpedienteInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     fecha_hora_checkin?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24326,6 +26004,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedUpdateWithoutExpedienteInput = {
     id_visita?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     id_usuario_auditor?: StringFieldUpdateOperationsInput | string
@@ -24363,6 +26042,7 @@ export namespace Prisma {
 
   export type VisitaAuditoriaUncheckedUpdateManyWithoutExpedienteInput = {
     id_visita?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     client_sync_id?: NullableStringFieldUpdateOperationsInput | string | null
     id_asignacion?: NullableIntFieldUpdateOperationsInput | number | null
     id_usuario_auditor?: StringFieldUpdateOperationsInput | string
@@ -24399,6 +26079,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioUpdateWithoutExpedienteInput = {
     id_cambio?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
     tipo?: StringFieldUpdateOperationsInput | string
@@ -24408,6 +26089,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioUncheckedUpdateWithoutExpedienteInput = {
     id_cambio?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
     tipo?: StringFieldUpdateOperationsInput | string
@@ -24417,6 +26099,7 @@ export namespace Prisma {
 
   export type ExpedienteCambioUncheckedUpdateManyWithoutExpedienteInput = {
     id_cambio?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
     actor_id?: NullableStringFieldUpdateOperationsInput | string | null
     tipo?: StringFieldUpdateOperationsInput | string
@@ -24426,6 +26109,7 @@ export namespace Prisma {
 
   export type EventoCampoUpdateWithoutExpedienteInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     punto?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     distancia_m?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
@@ -24437,6 +26121,7 @@ export namespace Prisma {
 
   export type EventoCampoUncheckedUpdateWithoutExpedienteInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario?: StringFieldUpdateOperationsInput | string
     punto?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
@@ -24448,6 +26133,7 @@ export namespace Prisma {
 
   export type EventoCampoUncheckedUpdateManyWithoutExpedienteInput = {
     id_evento?: BigIntFieldUpdateOperationsInput | bigint | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
     id_usuario?: StringFieldUpdateOperationsInput | string
     punto?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
@@ -24459,6 +26145,7 @@ export namespace Prisma {
 
   export type EvidenciaCreateManyVisitaInput = {
     id_evidencia?: string
+    empresa_id: string
     tipo: string
     object_key: string
     hash_sha256: string
@@ -24470,6 +26157,7 @@ export namespace Prisma {
 
   export type EvidenciaUpdateWithoutVisitaInput = {
     id_evidencia?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     object_key?: StringFieldUpdateOperationsInput | string
     hash_sha256?: StringFieldUpdateOperationsInput | string
@@ -24481,6 +26169,7 @@ export namespace Prisma {
 
   export type EvidenciaUncheckedUpdateWithoutVisitaInput = {
     id_evidencia?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     object_key?: StringFieldUpdateOperationsInput | string
     hash_sha256?: StringFieldUpdateOperationsInput | string
@@ -24492,6 +26181,7 @@ export namespace Prisma {
 
   export type EvidenciaUncheckedUpdateManyWithoutVisitaInput = {
     id_evidencia?: StringFieldUpdateOperationsInput | string
+    empresa_id?: StringFieldUpdateOperationsInput | string
     tipo?: StringFieldUpdateOperationsInput | string
     object_key?: StringFieldUpdateOperationsInput | string
     hash_sha256?: StringFieldUpdateOperationsInput | string
