@@ -157,7 +157,7 @@ export const jornadaBody = z.object({ accion: z.enum(['INICIAR', 'TERMINAR']) })
 export const autoasignacionBody = z.object({ activa: z.boolean() }).strict();
 
 // --- Empresas (solo el administrador universal) ---
-const reglasEmpresa = z.object({ geocerca_radio_m: z.coerce.number().int().optional(), precision_maxima_m: z.coerce.number().int().optional() }).strict();
+const reglasEmpresa = z.object({ geocerca_radio_m: z.coerce.number().int().optional(), precision_maxima_m: z.coerce.number().int().optional(), formatos_importacion: z.array(z.enum(['CORE_262', 'SIMPLE'])).min(1).max(10).optional() }).strict();
 const marcaEmpresa = z.object({ nombre: z.string().max(80).optional(), producto: z.string().max(80).optional(), color: z.string().max(7).optional(), logo_url: z.string().max(500).optional() }).strict();
 export const empresaCreateBody = z.object({
   nombre: cleanString(150), nombre_corto: z.string().trim().max(60).optional(), slug: z.string().trim().max(60).optional(),

@@ -69,6 +69,10 @@ const schema = z.object({
   ACCOUNT_LOCK_MINUTES: z.coerce.number().int().min(5).max(1440).default(15),
   // Almacenamiento local de evidencias (fase 1 — sin credenciales cloud todavía).
   EVIDENCIAS_DIR: z.string().default('./storage/evidencias'),
+  // Dónde se guardan las fotos: disco local (desarrollo/demo) o un bucket compatible con S3 (Oracle Object Storage en Sulotec).
+  EVIDENCIAS_BACKEND: z.enum(['local', 's3']).default('local'),
+  S3_BUCKET: z.string().trim().optional(), S3_ENDPOINT: z.string().trim().optional(), S3_REGION: z.string().trim().optional(),
+  S3_ACCESS_KEY_ID: z.string().optional(), S3_SECRET_ACCESS_KEY: z.string().optional(), S3_FORCE_PATH_STYLE: z.enum(['true', 'false']).optional(),
   // Render inyecta RENDER_EXTERNAL_URL con la URL pública del propio servicio; se usa
   // como valor por defecto para no tener que configurarlo a mano tras cada deploy.
   EVIDENCIAS_BASE_URL: z.string().default(process.env.RENDER_EXTERNAL_URL || 'http://localhost:4100'),
@@ -87,6 +91,10 @@ if (result.data.NODE_ENV === 'production' && !process.env.FRONTEND_URL?.trim()) 
 }
 if (result.data.NODE_ENV === 'production' && result.data.CORS_ALLOW_ALL === 'true') {
   throw new Error('Configuración de entorno inválida: CORS_ALLOW_ALL no puede habilitarse en producción');
+}
+if (result.data.EVIDENCIAS_BACKEND === 's3') {
+  const faltan = ['S3_BUCKET', 'S3_ENDPOINT', 'S3_REGION', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY'].filter((k) => !result.data[k]);
+  if (faltan.length) throw new Error(`Configuración de entorno inválida: EVIDENCIAS_BACKEND=s3 requiere ${faltan.join(', ')}`);
 }
 if (result.data.NODE_ENV === 'production' && result.data.ENFORCE_DEVICE_BINDING === 'false') {
   throw new Error('Configuración de entorno inválida: ENFORCE_DEVICE_BINDING no puede desactivarse en producción');
