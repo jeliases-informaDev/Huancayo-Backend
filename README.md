@@ -30,8 +30,8 @@ La API corre como contenedor (`Dockerfile`, imagen `linux/arm64` o x64) en la VM
 `https://api-auditoria.sulotec.com`. El kit de despliegue (compose, `preparar.sh`, `migrar-datos.sh`, `desplegar.sh`,
 `probar.sh`) vive en `Sulotec/Sulotec-infra` → `apps/auditoria/`; la configuración y los secretos solo en
 `/opt/sulotec/auditoria.env` del servidor. Las fotos van a un bucket compatible con S3 (`EVIDENCIAS_BACKEND=s3`);
-`node scripts/probar-almacenamiento.js` comprueba el bucket de punta a punta. `render.yaml` queda solo como referencia
-del despliegue anterior en Render.
+`node scripts/probar-almacenamiento.js` comprueba el bucket de punta a punta. La demo anterior en Render y Aiven quedo retirada;
+ya no hay archivos de despliegue para ella.
 
 ## Usuarios de prueba (creados por `seed-test-data.js`)
 
