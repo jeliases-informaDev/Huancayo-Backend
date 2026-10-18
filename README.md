@@ -24,6 +24,15 @@ npm run dev                   # http://localhost:4100
 Variables de entorno: copiar `.env.example` a `.env` y completar `JWT_SECRET`,
 `MFA_ENCRYPTION_KEY` (32+ caracteres cada uno) e `INITIAL_ADMIN_PASSWORD`.
 
+## Producción (Sulotec, servidor de Oracle)
+
+La API corre como contenedor (`Dockerfile`, imagen `linux/arm64` o x64) en la VM de Sulotec, detrás de Cloudflare:
+`https://api-auditoria.sulotec.com`. El kit de despliegue (compose, `preparar.sh`, `migrar-datos.sh`, `desplegar.sh`,
+`probar.sh`) vive en `Sulotec/Sulotec-infra` → `apps/auditoria/`; la configuración y los secretos solo en
+`/opt/sulotec/auditoria.env` del servidor. Las fotos van a un bucket compatible con S3 (`EVIDENCIAS_BACKEND=s3`);
+`node scripts/probar-almacenamiento.js` comprueba el bucket de punta a punta. `render.yaml` queda solo como referencia
+del despliegue anterior en Render.
+
 ## Usuarios de prueba (creados por `seed-test-data.js`)
 
 Contraseña para todos: `CajaHuancayo2026!`

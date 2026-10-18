@@ -1,6 +1,6 @@
 // Bucket compatible con S3 para las evidencias (Oracle Object Storage en Sulotec; también sirve Backblaze o AWS). Solo se usa con
 // EVIDENCIAS_BACKEND=s3. Oracle necesita direcciones por ruta (forcePathStyle) y sumas de verificación solo cuando se piden.
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { env } from '#core/config/env.js';
 
 let cliente = null;
@@ -41,6 +41,11 @@ export function almacenS3() {
         if (error?.name === 'NoSuchKey' || error?.$metadata?.httpStatusCode === 404) return null;
         throw error;
       }
+    },
+    // Solo mantenimiento y pruebas de almacenamiento: el sistema nunca borra evidencias de visitas.
+    async borrar(key) {
+      const { bucket, s3 } = conexion();
+      await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
     },
   };
 }
