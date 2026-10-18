@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import ExcelJS from 'exceljs';
 import prisma from '#core/config/prisma.js';
 import { conEmpresa, empresaActual } from '#core/tenant/contexto.js';
+import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { Prisma } from '../../../generated/prisma/index.js';
 import { esFormatoCore, FORMATO_CORE, mapearFilaCore } from './formato-core.js';
 import { conservarUbicacionesNegocio } from '../ubicaciones.js';
@@ -262,7 +263,7 @@ async function procesarHoja(nombre, filasHoja, ctx) {
     if (!filas.length) return;
     const lote = { hoja: nombre, filas, numeros };
     filas = []; numeros = [];
-    if (esFormatoCore(encabezados)) { ctx.formato = FORMATO_CORE; await procesarLoteCore(lote, ctx); } else { ctx.formato ||= 'SIMPLE'; await procesarLoteSimple(lote, ctx); }
+    if (esFormatoCore(encabezados)) { ctx.formato = FORMATO_CORE; await procesarLoteCore(lote, ctx); } else { ctx.formato = 'SIMPLE'; await procesarLoteSimple(lote, ctx); }
     ctx.procesadas += lote.filas.length;
     await guardarAvance(ctx);
   };
@@ -270,9 +271,14 @@ async function procesarHoja(nombre, filasHoja, ctx) {
     if (fila.number === 1) {
       encabezados = fila.values.slice(1).map((h) => String(valorCelda(h)).trim());
       // Hojas de instrucciones u otras sin columnas de un formato conocido: se ignoran (y se deja constancia).
-      if (!esFormatoCore(encabezados) && !encabezados.includes('codigo_expediente')) {
+      const formatoHoja = esFormatoCore(encabezados) ? FORMATO_CORE : encabezados.includes('codigo_expediente') ? 'SIMPLE' : null;
+      if (!formatoHoja) {
         ignorar = true;
         ctx.registrar({ hoja: nombre, resultado: 'HOJA_IGNORADA', motivo: 'No tiene las columnas de ningún formato conocido' });
+      } else if (ctx.formatosPermitidos && !ctx.formatosPermitidos.includes(formatoHoja)) {
+        // La empresa no acepta este formato: no se mezcla la base de un cliente con la plantilla de otro.
+        ignorar = true;
+        ctx.registrar({ hoja: nombre, resultado: 'HOJA_IGNORADA', motivo: `La empresa no acepta el formato ${formatoHoja} (acepta: ${ctx.formatosPermitidos.join(', ')})` });
       }
       continue;
     }
@@ -350,6 +356,7 @@ async function iniciarImportacion({ ruta, actorId, archivo, archivoSha256, simul
   const ctx = {
     idImportacion: importacion.id_importacion, actorId, archivo, simular, autoasignable, formato: null,
     procesadas: 0, insertadas: 0, actualizadas: 0, sinCambios: 0, omitidas: 0, errores: 0, advertencias: {}, vistos: new Set(), detalle,
+    formatosPermitidos: (await reglasEmpresa()).formatos_importacion,
     registrar(item) { if (detalle.length < MAX_DETALLE) detalle.push(item); },
   };
   const empresaId = empresaActual();

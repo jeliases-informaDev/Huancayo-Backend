@@ -13,8 +13,12 @@ export const slugDe = (texto) => String(texto || '').normalize('NFD').replace(/[
 export const REGLAS_POR_DEFECTO = () => ({
   geocerca_radio_m: env.GEOFENCE_RADIO_METROS,
   precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS,
+  formatos_importacion: [...FORMATOS_IMPORTACION],
 });
 const REGLAS_PERMITIDAS = Object.freeze({ geocerca_radio_m: [10, 50000], precision_maxima_m: [5, 5000] });
+// Formatos de Excel que la empresa acepta al cargar expedientes: CORE_262 (base del sistema core de Caja Huancayo) y SIMPLE (plantilla
+// de demostración). Una empresa nueva trae ambos; cada formato nuevo se suma aquí y en el importador, sin tocar los demás.
+export const FORMATOS_IMPORTACION = Object.freeze(['CORE_262', 'SIMPLE']);
 const MARCA_PERMITIDA = Object.freeze(['nombre', 'producto', 'color', 'logo_url']);
 
 function limpiarReglas(configuracion = {}) {
@@ -24,6 +28,11 @@ function limpiarReglas(configuracion = {}) {
     const n = Number(configuracion[clave]);
     if (!Number.isInteger(n) || n < min || n > max) throw Object.assign(new Error(`${clave} debe ser un entero entre ${min} y ${max}`), { statusCode: 400, code: 'REGLA_INVALIDA' });
     limpias[clave] = n;
+  }
+  if (configuracion.formatos_importacion !== undefined && configuracion.formatos_importacion !== null) {
+    const lista = Array.isArray(configuracion.formatos_importacion) ? configuracion.formatos_importacion.map((f) => String(f).toUpperCase()) : [];
+    if (!lista.length || lista.some((f) => !FORMATOS_IMPORTACION.includes(f))) throw Object.assign(new Error(`formatos_importacion debe ser una lista con valores de: ${FORMATOS_IMPORTACION.join(', ')}`), { statusCode: 400, code: 'REGLA_INVALIDA' });
+    limpias.formatos_importacion = [...new Set(lista)];
   }
   return limpias;
 }

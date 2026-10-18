@@ -280,7 +280,7 @@ async function obtener(id) {
 async function obtenerArchivoEvidencia(idEvidencia) {
   const evidencia = await prisma.evidencia.findUnique({ where: { id_evidencia: idEvidencia } });
   if (!evidencia) throw Object.assign(new Error('Evidencia no encontrada'), { statusCode: 404 });
-  return { path: storageService.absolutePath(evidencia.object_key), tipo: evidencia.tipo };
+  return { bytes: await storageService.readEvidence(evidencia.object_key), tipo: evidencia.tipo };
 }
 
 async function actualizarUbicacionEnVivo(usuarioId, payload) {

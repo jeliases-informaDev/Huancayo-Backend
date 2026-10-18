@@ -48,10 +48,10 @@ async function obtener(req, res, next) {
 
 async function archivoEvidencia(req, res, next) {
   try {
-    const { path } = await visitasService.obtenerArchivoEvidencia(req.params.idEvidencia);
+    const { bytes } = await visitasService.obtenerArchivoEvidencia(req.params.idEvidencia);
     res.setHeader('Content-Type', 'image/jpeg');
     res.setHeader('Cache-Control', 'private, max-age=300');
-    res.sendFile(path);
+    res.send(bytes);
   } catch (error) { next(error); }
 }
 

@@ -4,6 +4,7 @@ import {
   ShadingType, VerticalAlign, Footer, PageNumber, TableLayoutType,
 } from 'docx';
 import prisma from '#core/config/prisma.js';
+import { publica as empresaPublica } from '#modules/empresas/empresas.service.js';
 
 // Ficha de entrevista en Word. Reproduce los formatos físicos de Caja Huancayo:
 //   · MYPE (créditos "OTROS"): la ficha de 13 secciones de la base real (historial, ingresos
@@ -87,13 +88,13 @@ function tablaPares(filas) {
 }
 
 // ---------- cabecera ----------
-function seccionEncabezado(e, visita, plantilla) {
+function seccionEncabezado(e, visita, plantilla, empresa) {
   const sub = plantilla === 'MYPE_V1' ? 'FICHA DE ENTREVISTA — CRÉDITOS MYPE (OTROS)' : 'FICHA DE ENTREVISTA — CRÉDITOS DE CONSUMO';
   const a = [2900, 3100, 1000, 1000, 2206];
   return [
     parrafo(sub, { bold: true, size: 22, align: AlignmentType.CENTER, after: 80 }),
     tabla(a, [[
-      celda('UAI - CAJA HUANCAYO', { w: a[0], bold: true, fill: GRIS }),
+      celda(`UAI - ${String(empresa?.nombre_corto || empresa?.nombre || '').toUpperCase()}`, { w: a[0], bold: true, fill: GRIS }),
       celda(`AGENCIA/OF. ESP.: ${val(e.oficina)}`, { w: a[1] }),
       celda(`FECHA\n${soloFecha(visita.fecha_hora_checkin)}`, { w: a[2] }),
       celda(`HORA\n${soloHora(visita.fecha_hora_checkin)}`, { w: a[3] }),
@@ -430,11 +431,12 @@ async function generarWordVisita(idVisita) {
     ? await prisma.importacionMasiva.findUnique({ where: { id_importacion: idImportacion }, select: { archivo: true, fecha_creacion: true, archivo_sha256: true } })
     : null;
   const huella = huellaDeFicha(visita, e);
+  const empresa = await empresaPublica(); // la ficha lleva el nombre de la empresa de la petición
 
   const esMype = plantilla === 'MYPE_V1';
   const cuerpo = esMype
     ? [
-        ...seccionEncabezado(e, visita, plantilla),
+        ...seccionEncabezado(e, visita, plantilla, empresa),
         ...seccionClienteNegocioMype(e, visita),
         ...seccionHistorialMype(e),
         ...seccionCreditoYParticipantes(e),
@@ -450,7 +452,7 @@ async function generarWordVisita(idVisita) {
         ...seccionTrazabilidad(visita, e, importacion, huella),
       ]
     : [
-        ...seccionEncabezado(e, visita, plantilla),
+        ...seccionEncabezado(e, visita, plantilla, empresa),
         ...seccionClienteConsumo(e),
         ...seccionHistorialMype(e),
         ...seccionCreditoYParticipantes(e),
@@ -466,7 +468,7 @@ async function generarWordVisita(idVisita) {
       ];
 
   const documento = new Document({
-    creator: 'Auditoría de Visitas · Caja Huancayo',
+    creator: `Auditoría de Visitas · ${empresa?.nombre || 'Sulotec'}`,
     title: `Ficha de entrevista — visita ${visita.id_visita}`,
     styles: { default: { document: { run: { font: FONT, size: FS } } } },
     sections: [{

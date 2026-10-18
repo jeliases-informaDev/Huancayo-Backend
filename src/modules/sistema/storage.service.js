@@ -4,14 +4,19 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { env } from '#core/config/env.js';
 import { empresaActual } from '#core/tenant/contexto.js';
+import { almacenS3 } from './storage.s3.js';
 
-// Fase 1: evidencias en disco local del servidor (sin credenciales cloud todavía).
-// El contrato "presign + subir + confirmar" se conserva igual que en Afacop, así que
-// migrar a S3/Backblaze B2 más adelante solo implica reescribir este archivo.
+// Evidencias (fotos de las visitas). Dos destinos, elegidos por EVIDENCIAS_BACKEND:
+//   · local: disco del servidor (desarrollo y demo);
+//   · s3: un bucket compatible con S3 (Oracle Object Storage en Sulotec, también Backblaze/AWS).
+// El contrato "pedir clave + subir + confirmar" es el mismo en ambos y cada clave lleva el prefijo de su empresa (empresa/<id>/…), así
+// que cambiar de destino no cambia nada en la app ni en la base.
 const TYPES = {
   FOTO_PRINCIPAL: { extension: 'jpg', maxBytes: 4 * 1024 * 1024 },
   FOTO_ADICIONAL: { extension: 'jpg', maxBytes: 4 * 1024 * 1024 },
 };
+
+const usaBucket = () => env.EVIDENCIAS_BACKEND === 's3';
 
 function baseDir() {
   const dir = path.resolve(env.EVIDENCIAS_DIR);
@@ -37,6 +42,11 @@ function ownershipSignature({ auditorId, expedienteId, tipo, timestamp, id }) {
     .digest('hex').slice(0, 24);
 }
 
+// Clave de una evidencia nueva: empresa/<id de empresa>/aaaa/mm/dd/<expediente>/<tipo>-<momento>-<id>-<firma>.jpg
+export function claveEvidencia({ empresaId, expedienteId, tipo, timestamp, id, signature, extension, date }) {
+  return `empresa/${empresaId}/${datePath(date)}/${expedienteId}/${tipo}-${timestamp}-${id}-${signature}.${extension}`;
+}
+
 function validateOwnedKey(key, auditorId, expedienteId, tipo) {
   const config = TYPES[tipo];
   const filename = typeof key === 'string' ? key.split('/').at(-1) : '';
@@ -45,7 +55,9 @@ function validateOwnedKey(key, auditorId, expedienteId, tipo) {
   const expectedSignature = match ? ownershipSignature({ auditorId, expedienteId, tipo: keyType, timestamp, id }) : '';
   const validSignature = suppliedSignature && expectedSignature
     && crypto.timingSafeEqual(Buffer.from(suppliedSignature), Buffer.from(expectedSignature));
-  if (!config || typeof key !== 'string' || key.includes('..') || keyType !== tipo || extension !== config.extension || !validSignature || key.length > 255) {
+  // La clave debe ser de la empresa de la petición: ni siquiera con una firma válida se toca una evidencia de otra empresa.
+  const deEstaEmpresa = typeof key === 'string' && key.startsWith(`empresa/${empresaActual()}/`);
+  if (!config || typeof key !== 'string' || key.includes('..') || keyType !== tipo || extension !== config.extension || !validSignature || key.length > 255 || !deEstaEmpresa) {
     throw Object.assign(new Error(`La evidencia de ${tipo} no es válida para este auditor y expediente.`), { statusCode: 400, code: 'INVALID_EVIDENCE_KEY' });
   }
   return key;
@@ -60,8 +72,7 @@ function createUpload({ auditorId, expedienteId, tipo, contentType, size }) {
   const timestamp = Date.now();
   const id = crypto.randomUUID();
   const signature = ownershipSignature({ auditorId, expedienteId, tipo, timestamp, id });
-  // Prefijo por empresa: en disco hoy, y el mismo prefijo cuando las evidencias pasen a un bucket.
-  const key = `empresa/${empresaActual()}/${datePath()}/${expedienteId}/${tipo}-${timestamp}-${id}-${signature}.${config.extension}`;
+  const key = claveEvidencia({ empresaId: empresaActual(), expedienteId, tipo, timestamp, id, signature, extension: config.extension });
   const query = new URLSearchParams({ id_expediente: String(expedienteId), tipo }).toString();
   return {
     key,
@@ -78,8 +89,21 @@ function isJpegSignature(buffer) {
   return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
 }
 
-// Recibe los bytes crudos (PUT) y los escribe en disco. La clave ya trae la firma
-// de propiedad; validarla aquí evita que un auditor suba evidencia con la clave de otro.
+async function guardarBytes(key, buffer) {
+  if (usaBucket()) { await almacenS3().subir(key, buffer, 'image/jpeg'); return; }
+  const resolved = keyPath(key);
+  await fsp.mkdir(path.dirname(resolved), { recursive: true, mode: 0o700 });
+  await fsp.writeFile(resolved, buffer, { mode: 0o600 });
+}
+
+// Devuelve los bytes de una evidencia (o null si no existe), venga del disco o del bucket.
+async function leerBytes(key) {
+  if (usaBucket()) return almacenS3().leer(key);
+  try { return await fsp.readFile(keyPath(key)); } catch (error) { if (error.code === 'ENOENT') return null; throw error; }
+}
+
+// Recibe los bytes crudos (PUT) y los guarda. La clave ya trae la firma de propiedad;
+// validarla aquí evita que un auditor suba evidencia con la clave de otro.
 async function receiveUpload({ key, buffer, auditorId, expedienteId, tipo }) {
   const ownedKey = validateOwnedKey(key, auditorId, expedienteId, tipo);
   const config = TYPES[tipo];
@@ -87,38 +111,32 @@ async function receiveUpload({ key, buffer, auditorId, expedienteId, tipo }) {
     throw Object.assign(new Error('El archivo recibido no es válido.'), { statusCode: 400, code: 'INVALID_EVIDENCE_FILE' });
   }
   const hash = crypto.createHash('sha256').update(buffer).digest('hex');
-  const resolved = keyPath(ownedKey);
-  await fsp.mkdir(path.dirname(resolved), { recursive: true, mode: 0o700 });
-  await fsp.writeFile(resolved, buffer, { mode: 0o600 });
+  await guardarBytes(ownedKey, buffer);
   return { key: ownedKey, hash, size: buffer.length };
 }
 
 // Confirma que la evidencia referenciada en una visita realmente fue subida por este
-// auditor para este expediente, y recalcula el hash desde el archivo en disco (nunca
-// confiar en un hash enviado por el cliente).
+// auditor para este expediente, y recalcula el hash desde lo guardado (nunca confiar
+// en un hash enviado por el cliente).
 async function verifyUploaded(key, auditorId, expedienteId, tipo) {
   const ownedKey = validateOwnedKey(key, auditorId, expedienteId, tipo);
-  const resolved = keyPath(ownedKey);
-  let stat;
-  try {
-    stat = await fsp.stat(resolved);
-  } catch {
-    throw Object.assign(new Error(`No se encontró la evidencia de ${tipo} cargada correctamente.`), { statusCode: 400, code: 'EVIDENCE_UPLOAD_INCOMPLETE' });
-  }
   const config = TYPES[tipo];
-  if (!stat.isFile() || stat.size < 1 || stat.size > config.maxBytes) {
+  const buffer = await leerBytes(ownedKey);
+  if (!buffer || buffer.length < 1 || buffer.length > config.maxBytes) {
     throw Object.assign(new Error(`No se encontró la evidencia de ${tipo} cargada correctamente.`), { statusCode: 400, code: 'EVIDENCE_UPLOAD_INCOMPLETE' });
   }
-  const buffer = await fsp.readFile(resolved);
   const hash = crypto.createHash('sha256').update(buffer).digest('hex');
-  return { key: ownedKey, hash, size: stat.size };
+  return { key: ownedKey, hash, size: buffer.length };
 }
 
-function absolutePath(key) {
+// Bytes de una evidencia ya registrada, para servirla al panel. La clave viene de la base (de la fila de la propia empresa).
+async function readEvidence(key) {
   if (typeof key !== 'string' || key.includes('..')) {
     throw Object.assign(new Error('Clave de evidencia inválida.'), { statusCode: 400, code: 'INVALID_EVIDENCE_KEY' });
   }
-  return keyPath(key);
+  const buffer = await leerBytes(key);
+  if (!buffer) throw Object.assign(new Error('Evidencia no encontrada'), { statusCode: 404, code: 'NOT_FOUND' });
+  return buffer;
 }
 
-export default { createUpload, receiveUpload, verifyUploaded, absolutePath, TYPES };
+export default { createUpload, receiveUpload, verifyUploaded, readEvidence, TYPES };
