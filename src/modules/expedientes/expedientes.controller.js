@@ -2,6 +2,8 @@ import crypto from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import expedientesService from './expedientes.service.js';
+import { generarPlantilla } from './plantillas.service.js';
+import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 
 function sha256Archivo(ruta) {
   return new Promise((resolve, reject) => {
@@ -81,6 +83,19 @@ async function importar(req, res, next) {
     if (!delegado && ruta) await fs.rm(ruta, { force: true }).catch(() => {});
   }
 }
+// Plantilla de Excel del formato pedido, solo si la empresa lo acepta.
+async function plantilla(req, res, next) {
+  try {
+    const formato = req.validated.query.formato;
+    const permitidos = (await reglasEmpresa()).formatos_importacion || [];
+    if (!permitidos.includes(formato)) return res.status(403).json({ error: 'Tu empresa no acepta este formato de importación', code: 'FORMATO_NO_PERMITIDO' });
+    const archivo = await generarPlantilla(formato);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="plantilla-expedientes-${formato.toLowerCase()}.xlsx"`);
+    res.send(archivo);
+  } catch (error) { next(error); }
+}
+
 async function listarImportaciones(req, res, next) {
   try { res.json(await expedientesService.importador.listarImportaciones(req.validated.query)); } catch (error) { next(error); }
 }
@@ -96,4 +111,4 @@ async function liberarImportacion(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, geoResumen, geoProcesar, geoReencolar, geoUno, aceptarUbicacionSugerida, eliminar, importar, listarImportaciones, obtenerImportacion, liberarImportacion };
+export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, geoResumen, geoProcesar, geoReencolar, geoUno, aceptarUbicacionSugerida, eliminar, importar, plantilla, listarImportaciones, obtenerImportacion, liberarImportacion };

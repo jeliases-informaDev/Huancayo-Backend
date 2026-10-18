@@ -2,12 +2,15 @@ import { Router } from "express";
 import authController from "./auth.controller.js";
 import { authMiddleware } from "./auth.middleware.js";
 import { validate } from "#core/middlewares/validate.middleware.js";
-import { loginBody, mfaVerifyBody, mfaChallengeBody, mfaCodeBody, passwordBody } from "../../validation/schemas.js";
+import { loginBody, mfaVerifyBody, mfaChallengeBody, mfaCodeBody, passwordBody, ssoBody } from "../../validation/schemas.js";
 
 const router = Router();
 
 // Endpoint para iniciar sesión (público)
 router.post("/login", validate({ body: loginBody }), authController.login);
+// Inicio con la cuenta Sulotec (público): configuración para el panel y canje del código de autorización.
+router.get("/sso/config", authController.ssoConfig);
+router.post("/sso", validate({ body: ssoBody }), authController.sso);
 router.post("/mfa/verify", validate({ body: mfaVerifyBody }), authController.verifyMfa);
 router.post("/mfa/enroll/setup", validate({ body: mfaChallengeBody }), authController.setupMfaEnrollment);
 router.post("/mfa/enroll/confirm", validate({ body: mfaVerifyBody }), authController.confirmMfaEnrollment);
