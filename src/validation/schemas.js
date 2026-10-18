@@ -38,6 +38,30 @@ export const listQuery = z.object({
   // Situación de la dirección en el mapa: PENDIENTE | LOCALIZADO | REVISAR | NO_ENCONTRADO | ERROR | VERIFICADO.
   geo_estado: z.enum(['PENDIENTE', 'LOCALIZADO', 'REVISAR', 'NO_ENCONTRADO', 'ERROR', 'VERIFICADO']).optional(),
 }).strict();
+// «Mi muestra» del auditor: por páginas, con búsqueda y filtros en el servidor. `ligero` omite los bloques de la ficha (para mapa y resumen).
+export const miasQuery = z.object({
+  page: z.coerce.number().int().min(1).max(100000).optional(),
+  limit: z.coerce.number().int().min(1).max(200).optional(),
+  q: z.string().trim().max(100).optional(),
+  tipo: z.enum(['CONSUMO', 'OTROS']).optional(),
+  prioridad: z.enum(['ALTA', 'MEDIA', 'BAJA']).optional(),
+  ligero: z.enum(['true', 'false']).optional(),
+}).strict();
+export const disponiblesQuery = z.object({
+  page: z.coerce.number().int().min(1).max(100000).optional(),
+  limit: z.coerce.number().int().min(1).max(200).optional(),
+  q: z.string().trim().max(100).optional(),
+  tipo: z.enum(['CONSUMO', 'OTROS']).optional(),
+}).strict();
+// Puntos de clientes para el mapa del supervisor: por zona y con tope de seguridad (devuelve `truncado` si hay más).
+export const mapaQuery = z.object({
+  departamento: z.string().trim().max(100).optional(),
+  provincia: z.string().trim().max(100).optional(),
+  distrito: z.string().trim().max(100).optional(),
+  auditor: z.string().uuid().optional(),
+  q: z.string().trim().min(2).max(100).optional(),
+  limite: z.coerce.number().int().min(1).max(10000).optional(),
+}).strict();
 export const geocodificarQuery = z.object({ limite: z.coerce.number().int().min(1).max(20).optional() }).strict();
 export const importarQuery = z.object({
   simular: z.enum(['true', 'false']).optional(),

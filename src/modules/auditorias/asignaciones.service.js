@@ -1,5 +1,6 @@
 import prisma from '#core/config/prisma.js';
 import { autoasignacionPermitida } from '#modules/sistema/configuracion.service.js';
+import { normalizarPaginacion, infoPaginas, ordenarPorPrioridad, paginaDe, buscarEnExpediente } from './asignaciones.paginacion.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -15,6 +16,9 @@ const expedienteSelect = {
   distrito: true, provincia: true, departamento: true, latitud: true, longitud: true, direccion_normalizada: true,
   asesor_responsable: true, monto_desembolso: true, moneda: true, estado: true,
 };
+
+// Versión ligera (mapa, resumen): lo del listado más el teléfono, sin los bloques grandes de la ficha.
+const expedienteLigeroSelect = { ...expedienteSelect, telefono_cliente: true, tipo_documento_cliente: true };
 
 // El auditor recibe, solo de SUS expedientes asignados, los bloques de la ficha (cliente,
 // negocio, crédito, evaluación y deuda): los necesita en campo, incluso sin señal. La lista
@@ -62,23 +66,23 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId =
 // Expedientes PENDIENTE que un auditor podría tomar por su cuenta: solo los de su
 // propio departamento (misma regla geográfica que crear()). Sin departamento
 // configurado, no ve ninguno — evita que se autoasigne fuera de su zona por defecto.
-async function disponiblesParaAuditor(auditorId) {
-  if (!(await autoasignacionPermitida())) return [];
+async function disponiblesParaAuditor(auditorId, consulta = {}) {
+  const pag = normalizarPaginacion(consulta);
+  const vacio = { data: [], pagination: infoPaginas(pag, 0) };
+  if (!(await autoasignacionPermitida())) return vacio;
   const auditor = await prisma.usuario.findFirst({ where: { id_usuario: auditorId, rol: 'AUDITOR', estado: 'ACTIVO' } });
   if (!auditor) { const error = new Error('El auditor indicado no existe o está inactivo'); error.statusCode = 400; throw error; }
-  if (!auditor.departamento) return [];
-
-  const departamentos = await prisma.expediente.findMany({ where: { estado: 'PENDIENTE', autoasignable: true }, select: { departamento: true } });
-  const propios = departamentos.filter(d => normalizarTexto(d.departamento) === normalizarTexto(auditor.departamento));
-  if (!propios.length) return [];
-
-  const expedientes = await prisma.expediente.findMany({
-    where: { estado: 'PENDIENTE', autoasignable: true, departamento: { in: [...new Set(propios.map(d => d.departamento))] } },
-    select: expedienteSelect,
-    orderBy: { fecha_creacion: 'asc' },
-    take: 200,
-  });
-  return serialize(expedientes);
+  if (!auditor.departamento) return vacio;
+  const where = {
+    estado: 'PENDIENTE', autoasignable: true, departamento: auditor.departamento,
+    ...(consulta.tipo ? { tipo_credito: consulta.tipo } : {}),
+    ...(consulta.q ? buscarEnExpediente(consulta.q) : {}),
+  };
+  const [data, total] = await Promise.all([
+    prisma.expediente.findMany({ where, select: expedienteSelect, orderBy: [{ fecha_creacion: 'asc' }, { id_expediente: 'asc' }], skip: (pag.page - 1) * pag.limit, take: pag.limit }),
+    prisma.expediente.count({ where }),
+  ]);
+  return { data: serialize(data), pagination: infoPaginas(pag, total) };
 }
 
 // Auto-asignación: el propio auditor "toma" un expediente pendiente de su muestra,
@@ -135,14 +139,67 @@ async function crearMasivo({ id_usuario_auditor, id_expedientes, prioridad }, ac
   return resultados;
 }
 
-async function misAsignaciones(auditorId) {
-  const asignaciones = await prisma.asignacionAuditoria.findMany({
-    where: { id_usuario_auditor: auditorId, estado: 'ACTIVA' },
-    orderBy: [{ prioridad: 'asc' }, { fecha_asignacion: 'asc' }],
-    include: { expediente: { select: expedienteMuestraSelect } },
-    take: 150,
+// «Mi muestra» del auditor, por páginas. Sin page ni limit (apps anteriores) devuelve hasta 1000 en vez de cortar en 150.
+// Se ordena por prioridad real y antigüedad: primero se leen solo ids y prioridad (barato), y después las filas completas de la página pedida.
+async function misAsignaciones(auditorId, consulta = {}) {
+  const pag = normalizarPaginacion(consulta);
+  const base = { id_usuario_auditor: auditorId, estado: 'ACTIVA' };
+  const filtroExpediente = { ...(consulta.tipo ? { tipo_credito: consulta.tipo } : {}), ...(consulta.q ? buscarEnExpediente(consulta.q) : {}) };
+  const where = { ...base, ...(consulta.prioridad ? { prioridad: consulta.prioridad } : {}), ...(Object.keys(filtroExpediente).length ? { expediente: filtroExpediente } : {}) };
+  const filas = ordenarPorPrioridad(await prisma.asignacionAuditoria.findMany({ where, select: { id_asignacion: true, prioridad: true }, orderBy: [{ fecha_asignacion: 'asc' }, { id_asignacion: 'asc' }] }));
+  const ids = paginaDe(filas, pag).map((f) => f.id_asignacion);
+  const [datos, porPrioridad, porTipo] = await Promise.all([
+    ids.length ? prisma.asignacionAuditoria.findMany({ where: { id_asignacion: { in: ids } }, include: { expediente: { select: consulta.ligero === 'true' ? expedienteLigeroSelect : expedienteMuestraSelect } } }) : [],
+    prisma.asignacionAuditoria.groupBy({ by: ['prioridad'], where: base, _count: { _all: true } }),
+    prisma.expediente.groupBy({ by: ['tipo_credito'], where: { asignaciones: { some: base } }, _count: { _all: true } }),
+  ]);
+  const posicion = new Map(ids.map((id, i) => [id, i]));
+  datos.sort((a, b) => posicion.get(a.id_asignacion) - posicion.get(b.id_asignacion));
+  const cuenta = (lista, clave, valor) => lista.find((x) => x[clave] === valor)?._count._all ?? 0;
+  const resumen = {
+    total: porPrioridad.reduce((n, x) => n + x._count._all, 0),
+    ALTA: cuenta(porPrioridad, 'prioridad', 'ALTA'), MEDIA: cuenta(porPrioridad, 'prioridad', 'MEDIA'), BAJA: cuenta(porPrioridad, 'prioridad', 'BAJA'),
+    CONSUMO: cuenta(porTipo, 'tipo_credito', 'CONSUMO'), OTROS: cuenta(porTipo, 'tipo_credito', 'OTROS'),
+  };
+  return { data: serialize(datos), pagination: infoPaginas(pag, filas.length), resumen };
+}
+
+// Casos activos de cada auditor (para la carga en el panel): un conteo en la base, no una lista cortada.
+async function cargaPorAuditor() {
+  const filas = await prisma.asignacionAuditoria.groupBy({ by: ['id_usuario_auditor'], where: { estado: 'ACTIVA' }, _count: { _all: true } });
+  return filas.map((f) => ({ id_usuario_auditor: f.id_usuario_auditor, activas: f._count._all }));
+}
+
+// Puntos de clientes con caso activo para el mapa del supervisor: filtrados por zona en el servidor, con tope de seguridad y la lista de zonas
+// (departamento/provincia/distrito con su cantidad) para armar los filtros aunque la respuesta venga truncada.
+let cacheZonas = { hasta: 0, valor: null };
+async function zonasDelMapa() {
+  if (cacheZonas.valor && Date.now() < cacheZonas.hasta) return cacheZonas.valor;
+  const filas = await prisma.expediente.groupBy({
+    by: ['departamento', 'provincia', 'distrito'], _count: { _all: true },
+    where: { latitud: { not: null }, longitud: { not: null }, asignaciones: { some: { estado: 'ACTIVA' } } },
   });
-  return serialize(asignaciones);
+  const valor = filas.map((z) => ({ departamento: z.departamento, provincia: z.provincia, distrito: z.distrito, n: z._count._all }));
+  cacheZonas = { hasta: Date.now() + 30_000, valor };
+  return valor;
+}
+async function puntosParaMapa({ departamento, provincia, distrito, auditor, q, limite = 5000 } = {}) {
+  const expediente = {
+    latitud: { not: null }, longitud: { not: null },
+    ...(departamento ? { departamento } : {}), ...(provincia ? { provincia } : {}), ...(distrito ? { distrito } : {}),
+    ...(q ? buscarEnExpediente(q) : {}),
+  };
+  const where = { estado: 'ACTIVA', ...(auditor ? { id_usuario_auditor: auditor } : {}), expediente };
+  const [filas, total, zonas] = await Promise.all([
+    prisma.asignacionAuditoria.findMany({
+      where, orderBy: { id_asignacion: 'asc' }, take: limite + 1,
+      select: { id_asignacion: true, id_usuario_auditor: true, prioridad: true, expediente: { select: expedienteSelect }, auditor: { select: { id_usuario: true, username: true, nombres: true, apellidos: true } } },
+    }),
+    prisma.asignacionAuditoria.count({ where }),
+    q ? Promise.resolve(null) : zonasDelMapa(),
+  ]);
+  const truncado = filas.length > limite;
+  return { data: serialize(truncado ? filas.slice(0, limite) : filas), total, truncado, ...(zonas ? { zonas } : {}) };
 }
 
 async function listar({ page = 1, limit = 25, estado } = {}) {
@@ -216,4 +273,4 @@ async function cancelarTodasDeAuditor(auditorId) {
   return activas.length;
 }
 
-export default { crear, crearMasivo, misAsignaciones, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen };
+export default { crear, crearMasivo, misAsignaciones, cargaPorAuditor, puntosParaMapa, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen };

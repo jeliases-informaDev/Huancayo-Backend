@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import { ALL_ROLES, FIELD_ROLES, normalizeRole } from '#core/security/roles.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
 import asignacionesService from '#modules/auditorias/asignaciones.service.js';
-import { estadoDeMovimiento } from './movimiento.js';
 
 function mapUsuario(usuario) {
   const globallyRequired = env.REQUIRE_MFA === 'true'
@@ -148,31 +147,15 @@ async function resetDevice(id) {
 
 // Última posición conocida de cada supervisor/auditor activo, para el mapa en vivo
 // del panel web (Fase 2/Fase 6: "el Auditor de Agencia observa... en tiempo real").
-// Ventana de puntos con la que se calcula si el auditor camina, va en vehículo o está detenido.
-const VENTANA_MOVIMIENTO_MS = 60 * 60 * 1000;
-
 async function ubicacionesActivas() {
   const usuarios = await prisma.usuario.findMany({
     where: { estado: 'ACTIVO', rol: { in: FIELD_ROLES }, OR: [{ latitud: { not: null }, longitud: { not: null } }, { jornada_inicio: { not: null } }] },
-    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, latitud: true, longitud: true, ubicacion_en: true, ubicacion_precision: true, ubicacion_simulada: true, bateria_porcentaje: true, bateria_cargando: true, jornada_inicio: true, jornada_fin: true },
+    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, latitud: true, longitud: true, ubicacion_en: true, ubicacion_precision: true, ubicacion_simulada: true, mov_estado: true, mov_desde: true, mov_velocidad: true, mov_modo: true, bateria_porcentaje: true, bateria_cargando: true, jornada_inicio: true, jornada_fin: true },
   });
-  // Estado de movimiento a partir de los puntos que ya se guardan; solo de quienes transmitieron hace poco (los de GPS simulado no cuentan).
-  const ahoraMs = Date.now();
-  const recientes = usuarios.filter(u => u.ubicacion_en && ahoraMs - u.ubicacion_en.getTime() < VENTANA_MOVIMIENTO_MS).map(u => u.id_usuario);
-  const puntosPorUsuario = new Map();
-  if (recientes.length) {
-    const puntos = await prisma.trackingUbicacion.findMany({
-      where: { id_usuario: { in: recientes }, simulada: false, registrado_en: { gte: new Date(ahoraMs - VENTANA_MOVIMIENTO_MS) } },
-      orderBy: { registrado_en: 'asc' }, select: { id_usuario: true, latitud: true, longitud: true, registrado_en: true },
-    });
-    for (const p of puntos) {
-      if (!puntosPorUsuario.has(p.id_usuario)) puntosPorUsuario.set(p.id_usuario, []);
-      puntosPorUsuario.get(p.id_usuario).push({ latitud: Number(p.latitud), longitud: Number(p.longitud), fecha: p.registrado_en });
-    }
-  }
   return usuarios.map(u => ({
     id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '',
-    movimiento: estadoDeMovimiento(puntosPorUsuario.get(u.id_usuario) || [], ahoraMs),
+    // Calculado al recibir cada posición (ver visitas.service); aquí solo se lee.
+    movimiento: { estado: u.mov_estado || 'SIN_DATOS', desde: u.mov_desde ? u.mov_desde.toISOString() : null, velocidad_kmh: u.mov_velocidad != null ? Number(u.mov_velocidad) : null, modo: u.mov_modo || null },
     rol: normalizeRole(u.rol),
     latitud: u.latitud != null ? Number(u.latitud) : null,
     longitud: u.longitud != null ? Number(u.longitud) : null,

@@ -4,6 +4,7 @@ import { env } from '#core/config/env.js';
 import { haversineMeters } from '#core/security/geofence.js';
 import { puntoDeReferencia, conUbicacionNegocio } from '#modules/expedientes/ubicaciones.js';
 import { registrarEventosDeCampo } from './eventos-campo.js';
+import { estadoDeMovimiento } from '#modules/usuarios/movimiento.js';
 import { logger } from '#core/config/logger.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
@@ -291,8 +292,16 @@ async function actualizarUbicacionEnVivo(usuarioId, payload) {
   const bateria = payload.bateria != null ? Math.round(Number(payload.bateria)) : null;
   const cargando = payload.cargando === true;
   const ahora = new Date();
+  // Cómo se mueve (a pie, vehículo, detenido…): se calcula aquí, con los últimos puntos de ESTE auditor, y se guarda en su registro;
+  // así la lista en vivo del supervisor no tiene que releer los puntos de todos los auditores en cada refresco.
+  const previos = await prisma.trackingUbicacion.findMany({
+    where: { id_usuario: usuarioId, simulada: false, registrado_en: { gte: new Date(ahora.getTime() - 60 * 60 * 1000) } },
+    orderBy: { registrado_en: 'desc' }, take: 59, select: { latitud: true, longitud: true, registrado_en: true },
+  });
+  const serie = [...previos.reverse().map((p) => ({ latitud: Number(p.latitud), longitud: Number(p.longitud), fecha: p.registrado_en })), ...(simulada ? [] : [{ latitud, longitud, fecha: ahora }])];
+  const mov = estadoDeMovimiento(serie, ahora.getTime());
   const [usuario] = await prisma.$transaction([
-    prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud, ubicacion_en: ahora, ubicacion_precision: precision, ubicacion_simulada: simulada, bateria_porcentaje: bateria, bateria_cargando: cargando }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } }),
+    prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud, ubicacion_en: ahora, ubicacion_precision: precision, ubicacion_simulada: simulada, bateria_porcentaje: bateria, bateria_cargando: cargando, mov_estado: mov.estado, mov_desde: mov.desde ? new Date(mov.desde) : null, mov_velocidad: mov.velocidad_kmh, mov_modo: mov.modo }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } }),
     // Se conserva cada punto (no solo el último) para poder reconstruir la ruta recorrida
     // en el mapa de supervisión, tal como pide el flujo (Fase 2/Fase 6).
     prisma.trackingUbicacion.create({ data: { id_usuario: usuarioId, latitud, longitud, precision_metros: precision, simulada, registrado_en: ahora } }),

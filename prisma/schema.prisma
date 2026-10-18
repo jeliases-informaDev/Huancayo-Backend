@@ -57,6 +57,12 @@ model Usuario {
   // Estado del celular en la última posición: con la batería se distingue «no se mueve» de «se quedó sin batería».
   bateria_porcentaje  Int?
   bateria_cargando    Boolean   @default(false)
+  // Cómo se mueve (a pie, vehículo, detenido…): se calcula al recibir cada posición y se guarda aquí, así la lista en vivo no
+  // tiene que releer los puntos GPS de todos los auditores en cada refresco.
+  mov_estado          String?   @db.VarChar(15)
+  mov_desde           DateTime?
+  mov_velocidad       Decimal?  @db.Decimal(6, 1)
+  mov_modo            String?   @db.VarChar(12)
   // Jornada de campo: el auditor la inicia y la termina desde la app; solo durante ella la app comparte su ubicación
   // aunque la pantalla esté apagada. En jornada = jornada_inicio con jornada_fin vacío o anterior al inicio.
   jornada_inicio      DateTime?
@@ -85,6 +91,7 @@ model TrackingUbicacion {
   usuario Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
 
   @@index([id_usuario, registrado_en])
+  @@index([registrado_en]) // depuración de puntos antiguos
   @@map("tracking_ubicacion")
 }
 
@@ -212,6 +219,7 @@ model Expediente {
   @@index([distrito])
   @@index([departamento])
   @@index([geo_estado])
+  @@index([estado, autoasignable, departamento, fecha_creacion], map: "expedientes_disponibles_idx") // lista «Disponibles» paginada
   @@index([asesor_responsable])
   @@index([id_importacion])
   @@map("expedientes")
@@ -254,6 +262,7 @@ model AsignacionAuditoria {
 
   @@index([id_usuario_auditor])
   @@index([id_expediente])
+  @@index([estado, id_usuario_auditor]) // «mi muestra», carga por auditor y mapa del supervisor
   @@map("asignaciones_auditoria")
 }
 

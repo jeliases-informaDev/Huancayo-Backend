@@ -149,6 +149,10 @@ exports.Prisma.UsuarioScalarFieldEnum = {
   ubicacion_simulada: 'ubicacion_simulada',
   bateria_porcentaje: 'bateria_porcentaje',
   bateria_cargando: 'bateria_cargando',
+  mov_estado: 'mov_estado',
+  mov_desde: 'mov_desde',
+  mov_velocidad: 'mov_velocidad',
+  mov_modo: 'mov_modo',
   jornada_inicio: 'jornada_inicio',
   jornada_fin: 'jornada_fin'
 };
@@ -380,7 +384,9 @@ exports.Prisma.UsuarioOrderByRelevanceFieldEnum = {
   password_hash: 'password_hash',
   rol: 'rol',
   estado: 'estado',
-  mfa_secreto: 'mfa_secreto'
+  mfa_secreto: 'mfa_secreto',
+  mov_estado: 'mov_estado',
+  mov_modo: 'mov_modo'
 };
 
 exports.Prisma.TrackingUbicacionOrderByRelevanceFieldEnum = {

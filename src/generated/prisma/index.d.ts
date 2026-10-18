@@ -2008,6 +2008,7 @@ export namespace Prisma {
     longitud: Decimal | null
     ubicacion_precision: Decimal | null
     bateria_porcentaje: number | null
+    mov_velocidad: Decimal | null
   }
 
   export type UsuarioSumAggregateOutputType = {
@@ -2017,6 +2018,7 @@ export namespace Prisma {
     longitud: Decimal | null
     ubicacion_precision: Decimal | null
     bateria_porcentaje: number | null
+    mov_velocidad: Decimal | null
   }
 
   export type UsuarioMinAggregateOutputType = {
@@ -2048,6 +2050,10 @@ export namespace Prisma {
     ubicacion_simulada: boolean | null
     bateria_porcentaje: number | null
     bateria_cargando: boolean | null
+    mov_estado: string | null
+    mov_desde: Date | null
+    mov_velocidad: Decimal | null
+    mov_modo: string | null
     jornada_inicio: Date | null
     jornada_fin: Date | null
   }
@@ -2081,6 +2087,10 @@ export namespace Prisma {
     ubicacion_simulada: boolean | null
     bateria_porcentaje: number | null
     bateria_cargando: boolean | null
+    mov_estado: string | null
+    mov_desde: Date | null
+    mov_velocidad: Decimal | null
+    mov_modo: string | null
     jornada_inicio: Date | null
     jornada_fin: Date | null
   }
@@ -2114,6 +2124,10 @@ export namespace Prisma {
     ubicacion_simulada: number
     bateria_porcentaje: number
     bateria_cargando: number
+    mov_estado: number
+    mov_desde: number
+    mov_velocidad: number
+    mov_modo: number
     jornada_inicio: number
     jornada_fin: number
     _all: number
@@ -2127,6 +2141,7 @@ export namespace Prisma {
     longitud?: true
     ubicacion_precision?: true
     bateria_porcentaje?: true
+    mov_velocidad?: true
   }
 
   export type UsuarioSumAggregateInputType = {
@@ -2136,6 +2151,7 @@ export namespace Prisma {
     longitud?: true
     ubicacion_precision?: true
     bateria_porcentaje?: true
+    mov_velocidad?: true
   }
 
   export type UsuarioMinAggregateInputType = {
@@ -2167,6 +2183,10 @@ export namespace Prisma {
     ubicacion_simulada?: true
     bateria_porcentaje?: true
     bateria_cargando?: true
+    mov_estado?: true
+    mov_desde?: true
+    mov_velocidad?: true
+    mov_modo?: true
     jornada_inicio?: true
     jornada_fin?: true
   }
@@ -2200,6 +2220,10 @@ export namespace Prisma {
     ubicacion_simulada?: true
     bateria_porcentaje?: true
     bateria_cargando?: true
+    mov_estado?: true
+    mov_desde?: true
+    mov_velocidad?: true
+    mov_modo?: true
     jornada_inicio?: true
     jornada_fin?: true
   }
@@ -2233,6 +2257,10 @@ export namespace Prisma {
     ubicacion_simulada?: true
     bateria_porcentaje?: true
     bateria_cargando?: true
+    mov_estado?: true
+    mov_desde?: true
+    mov_velocidad?: true
+    mov_modo?: true
     jornada_inicio?: true
     jornada_fin?: true
     _all?: true
@@ -2353,6 +2381,10 @@ export namespace Prisma {
     ubicacion_simulada: boolean
     bateria_porcentaje: number | null
     bateria_cargando: boolean
+    mov_estado: string | null
+    mov_desde: Date | null
+    mov_velocidad: Decimal | null
+    mov_modo: string | null
     jornada_inicio: Date | null
     jornada_fin: Date | null
     _count: UsuarioCountAggregateOutputType | null
@@ -2405,6 +2437,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: boolean
     bateria_cargando?: boolean
+    mov_estado?: boolean
+    mov_desde?: boolean
+    mov_velocidad?: boolean
+    mov_modo?: boolean
     jornada_inicio?: boolean
     jornada_fin?: boolean
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
@@ -2446,11 +2482,15 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: boolean
     bateria_cargando?: boolean
+    mov_estado?: boolean
+    mov_desde?: boolean
+    mov_velocidad?: boolean
+    mov_modo?: boolean
     jornada_inicio?: boolean
     jornada_fin?: boolean
   }
 
-  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud" | "ubicacion_en" | "ubicacion_precision" | "ubicacion_simulada" | "bateria_porcentaje" | "bateria_cargando" | "jornada_inicio" | "jornada_fin", ExtArgs["result"]["usuario"]>
+  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud" | "ubicacion_en" | "ubicacion_precision" | "ubicacion_simulada" | "bateria_porcentaje" | "bateria_cargando" | "mov_estado" | "mov_desde" | "mov_velocidad" | "mov_modo" | "jornada_inicio" | "jornada_fin", ExtArgs["result"]["usuario"]>
   export type UsuarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
@@ -2498,6 +2538,10 @@ export namespace Prisma {
       ubicacion_simulada: boolean
       bateria_porcentaje: number | null
       bateria_cargando: boolean
+      mov_estado: string | null
+      mov_desde: Date | null
+      mov_velocidad: Prisma.Decimal | null
+      mov_modo: string | null
       jornada_inicio: Date | null
       jornada_fin: Date | null
     }, ExtArgs["result"]["usuario"]>
@@ -2902,6 +2946,10 @@ export namespace Prisma {
     readonly ubicacion_simulada: FieldRef<"Usuario", 'Boolean'>
     readonly bateria_porcentaje: FieldRef<"Usuario", 'Int'>
     readonly bateria_cargando: FieldRef<"Usuario", 'Boolean'>
+    readonly mov_estado: FieldRef<"Usuario", 'String'>
+    readonly mov_desde: FieldRef<"Usuario", 'DateTime'>
+    readonly mov_velocidad: FieldRef<"Usuario", 'Decimal'>
+    readonly mov_modo: FieldRef<"Usuario", 'String'>
     readonly jornada_inicio: FieldRef<"Usuario", 'DateTime'>
     readonly jornada_fin: FieldRef<"Usuario", 'DateTime'>
   }
@@ -15267,6 +15315,10 @@ export namespace Prisma {
     ubicacion_simulada: 'ubicacion_simulada',
     bateria_porcentaje: 'bateria_porcentaje',
     bateria_cargando: 'bateria_cargando',
+    mov_estado: 'mov_estado',
+    mov_desde: 'mov_desde',
+    mov_velocidad: 'mov_velocidad',
+    mov_modo: 'mov_modo',
     jornada_inicio: 'jornada_inicio',
     jornada_fin: 'jornada_fin'
   };
@@ -15546,7 +15598,9 @@ export namespace Prisma {
     password_hash: 'password_hash',
     rol: 'rol',
     estado: 'estado',
-    mfa_secreto: 'mfa_secreto'
+    mfa_secreto: 'mfa_secreto',
+    mov_estado: 'mov_estado',
+    mov_modo: 'mov_modo'
   };
 
   export type UsuarioOrderByRelevanceFieldEnum = (typeof UsuarioOrderByRelevanceFieldEnum)[keyof typeof UsuarioOrderByRelevanceFieldEnum]
@@ -15832,6 +15886,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFilter<"Usuario"> | boolean
     bateria_porcentaje?: IntNullableFilter<"Usuario"> | number | null
     bateria_cargando?: BoolFilter<"Usuario"> | boolean
+    mov_estado?: StringNullableFilter<"Usuario"> | string | null
+    mov_desde?: DateTimeNullableFilter<"Usuario"> | Date | string | null
+    mov_velocidad?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: StringNullableFilter<"Usuario"> | string | null
     jornada_inicio?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     jornada_fin?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     asignaciones?: AsignacionAuditoriaListRelationFilter
@@ -15870,6 +15928,10 @@ export namespace Prisma {
     ubicacion_simulada?: SortOrder
     bateria_porcentaje?: SortOrderInput | SortOrder
     bateria_cargando?: SortOrder
+    mov_estado?: SortOrderInput | SortOrder
+    mov_desde?: SortOrderInput | SortOrder
+    mov_velocidad?: SortOrderInput | SortOrder
+    mov_modo?: SortOrderInput | SortOrder
     jornada_inicio?: SortOrderInput | SortOrder
     jornada_fin?: SortOrderInput | SortOrder
     asignaciones?: AsignacionAuditoriaOrderByRelationAggregateInput
@@ -15912,6 +15974,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFilter<"Usuario"> | boolean
     bateria_porcentaje?: IntNullableFilter<"Usuario"> | number | null
     bateria_cargando?: BoolFilter<"Usuario"> | boolean
+    mov_estado?: StringNullableFilter<"Usuario"> | string | null
+    mov_desde?: DateTimeNullableFilter<"Usuario"> | Date | string | null
+    mov_velocidad?: DecimalNullableFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: StringNullableFilter<"Usuario"> | string | null
     jornada_inicio?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     jornada_fin?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     asignaciones?: AsignacionAuditoriaListRelationFilter
@@ -15950,6 +16016,10 @@ export namespace Prisma {
     ubicacion_simulada?: SortOrder
     bateria_porcentaje?: SortOrderInput | SortOrder
     bateria_cargando?: SortOrder
+    mov_estado?: SortOrderInput | SortOrder
+    mov_desde?: SortOrderInput | SortOrder
+    mov_velocidad?: SortOrderInput | SortOrder
+    mov_modo?: SortOrderInput | SortOrder
     jornada_inicio?: SortOrderInput | SortOrder
     jornada_fin?: SortOrderInput | SortOrder
     _count?: UsuarioCountOrderByAggregateInput
@@ -15991,6 +16061,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolWithAggregatesFilter<"Usuario"> | boolean
     bateria_porcentaje?: IntNullableWithAggregatesFilter<"Usuario"> | number | null
     bateria_cargando?: BoolWithAggregatesFilter<"Usuario"> | boolean
+    mov_estado?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
+    mov_desde?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
+    mov_velocidad?: DecimalNullableWithAggregatesFilter<"Usuario"> | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
     jornada_inicio?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
     jornada_fin?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
   }
@@ -17216,6 +17290,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
@@ -17254,6 +17332,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
@@ -17292,6 +17374,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
@@ -17330,6 +17416,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
@@ -17368,6 +17458,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
   }
@@ -17401,6 +17495,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -17434,6 +17532,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -18998,6 +19100,10 @@ export namespace Prisma {
     ubicacion_simulada?: SortOrder
     bateria_porcentaje?: SortOrder
     bateria_cargando?: SortOrder
+    mov_estado?: SortOrder
+    mov_desde?: SortOrder
+    mov_velocidad?: SortOrder
+    mov_modo?: SortOrder
     jornada_inicio?: SortOrder
     jornada_fin?: SortOrder
   }
@@ -19009,6 +19115,7 @@ export namespace Prisma {
     longitud?: SortOrder
     ubicacion_precision?: SortOrder
     bateria_porcentaje?: SortOrder
+    mov_velocidad?: SortOrder
   }
 
   export type UsuarioMaxOrderByAggregateInput = {
@@ -19040,6 +19147,10 @@ export namespace Prisma {
     ubicacion_simulada?: SortOrder
     bateria_porcentaje?: SortOrder
     bateria_cargando?: SortOrder
+    mov_estado?: SortOrder
+    mov_desde?: SortOrder
+    mov_velocidad?: SortOrder
+    mov_modo?: SortOrder
     jornada_inicio?: SortOrder
     jornada_fin?: SortOrder
   }
@@ -19073,6 +19184,10 @@ export namespace Prisma {
     ubicacion_simulada?: SortOrder
     bateria_porcentaje?: SortOrder
     bateria_cargando?: SortOrder
+    mov_estado?: SortOrder
+    mov_desde?: SortOrder
+    mov_velocidad?: SortOrder
+    mov_modo?: SortOrder
     jornada_inicio?: SortOrder
     jornada_fin?: SortOrder
   }
@@ -19084,6 +19199,7 @@ export namespace Prisma {
     longitud?: SortOrder
     ubicacion_precision?: SortOrder
     bateria_porcentaje?: SortOrder
+    mov_velocidad?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -21614,6 +21730,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
@@ -21651,6 +21771,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
@@ -21704,6 +21828,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
@@ -21741,6 +21869,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
@@ -21778,6 +21910,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
@@ -21815,6 +21951,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
@@ -21966,6 +22106,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
@@ -22003,6 +22147,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
@@ -22144,6 +22292,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
@@ -22181,6 +22333,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
@@ -22234,6 +22390,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
@@ -22271,6 +22431,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
@@ -22859,6 +23023,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
@@ -22896,6 +23064,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
@@ -23053,6 +23225,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
@@ -23090,6 +23266,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
@@ -23225,6 +23405,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
@@ -23262,6 +23446,10 @@ export namespace Prisma {
     ubicacion_simulada?: boolean
     bateria_porcentaje?: number | null
     bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
@@ -23451,6 +23639,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
@@ -23488,6 +23680,10 @@ export namespace Prisma {
     ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
     bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
     bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput

@@ -23,10 +23,10 @@ async function crearMasivo(req, res, next) {
   } catch (error) { next(error); }
 }
 async function misAsignaciones(req, res, next) {
-  try { res.json({ data: await asignacionesService.misAsignaciones(req.user.id) }); } catch (error) { next(error); }
+  try { res.json(await asignacionesService.misAsignaciones(req.user.id, req.validated?.query || {})); } catch (error) { next(error); }
 }
 async function disponibles(req, res, next) {
-  try { res.json({ data: await asignacionesService.disponiblesParaAuditor(req.user.id) }); } catch (error) { next(error); }
+  try { res.json(await asignacionesService.disponiblesParaAuditor(req.user.id, req.validated?.query || {})); } catch (error) { next(error); }
 }
 async function autoAsignar(req, res, next) {
   try {
@@ -37,6 +37,12 @@ async function autoAsignar(req, res, next) {
 }
 async function listar(req, res, next) {
   try { res.json(await asignacionesService.listar(req.validated.query)); } catch (error) { next(error); }
+}
+async function carga(_req, res, next) {
+  try { res.json({ data: await asignacionesService.cargaPorAuditor() }); } catch (error) { next(error); }
+}
+async function mapa(req, res, next) {
+  try { res.json(await asignacionesService.puntosParaMapa(req.validated?.query || {})); } catch (error) { next(error); }
 }
 async function resumenOrigen(_req, res, next) {
   try { res.json({ data: await asignacionesService.resumenPorOrigen() }); } catch (error) { next(error); }
@@ -57,4 +63,4 @@ async function cancelar(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, resumenOrigen, fijarAutoasignacion };
+export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, resumenOrigen, fijarAutoasignacion, carga, mapa };
