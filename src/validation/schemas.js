@@ -34,6 +34,7 @@ export const listQuery = z.object({
   distrito: z.string().trim().max(100).optional(),
   departamento: z.string().trim().max(100).optional(),
   tipo_credito: z.enum(['CONSUMO', 'OTROS']).optional(),
+  auditor: z.string().uuid().optional(), // asignaciones de un auditor
   sin_ubicacion: z.enum(['true', 'false']).optional(),
   // Situación de la dirección en el mapa: PENDIENTE | LOCALIZADO | REVISAR | NO_ENCONTRADO | ERROR | VERIFICADO.
   geo_estado: z.enum(['PENDIENTE', 'LOCALIZADO', 'REVISAR', 'NO_ENCONTRADO', 'ERROR', 'VERIFICADO']).optional(),
