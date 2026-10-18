@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 import prisma from '#core/config/prisma.js';
 import { env } from '#core/config/env.js';
-import { normalizeRole, FIELD_ROLES } from '#core/security/roles.js';
+import { normalizeRole, FIELD_ROLES, ROLES } from '#core/security/roles.js';
+import { conEmpresa, sinEmpresa } from '#core/tenant/contexto.js';
+import { empresaActivaPorId } from '#modules/empresas/empresas.service.js';
 
 export async function authMiddleware(req, res, next) {
   try {
@@ -24,7 +26,8 @@ export async function authMiddleware(req, res, next) {
     if (decoded.type !== 'access') {
       return res.status(401).json({ error: 'Token de acceso inválido', code: 'INVALID_TOKEN', requestId: req.id });
     }
-    const usuario = await prisma.usuario.findUnique({ where: { id_usuario: decoded.sub } });
+    // Identidad: se busca por id, sin empresa todavía (la empresa sale de esta misma fila, nunca del token ni de la petición).
+    const usuario = await sinEmpresa(() => prisma.usuario.findUnique({ where: { id_usuario: decoded.sub } }));
     if (!usuario || usuario.username !== decoded.username) {
       return res.status(401).json({ error: 'Sesión no válida', code: 'INVALID_SESSION', requestId: req.id });
     }
@@ -46,8 +49,20 @@ export async function authMiddleware(req, res, next) {
     if (!FIELD_ROLES.includes(role) && (decoded.channel === 'mobile' || requestPlatform === 'mobile')) {
       return res.status(403).json({ error: 'El acceso de administradores y auditores de oficina está permitido únicamente desde el backoffice web', code: 'WEB_APP_REQUIRED', requestId: req.id });
     }
-    req.user = { id: usuario.id_usuario, username: usuario.username, rol: role };
-    next();
+    // Empresa de la petición: la del usuario. El administrador universal (sin empresa) elige una con x-empresa-id; si no la elige,
+    // solo puede usar lo que no es de ninguna empresa (su sesión y el catálogo de empresas).
+    let empresaId = usuario.empresa_id || null;
+    if (role === ROLES.UNIVERSAL) {
+      const pedida = req.get('x-empresa-id');
+      empresaId = pedida ? (await empresaActivaPorId(pedida))?.id_empresa || null : null;
+      if (pedida && !empresaId) return res.status(404).json({ error: 'La empresa indicada no existe o está suspendida', code: 'EMPRESA_NO_ENCONTRADA', requestId: req.id });
+    } else if (!empresaId) {
+      return res.status(403).json({ error: 'La cuenta no pertenece a ninguna empresa', code: 'SIN_EMPRESA', requestId: req.id });
+    } else if (!(await empresaActivaPorId(empresaId))) {
+      return res.status(403).json({ error: 'La empresa de la cuenta está suspendida', code: 'EMPRESA_SUSPENDIDA', requestId: req.id });
+    }
+    req.user = { id: usuario.id_usuario, username: usuario.username, rol: role, empresa_id: empresaId };
+    conEmpresa(empresaId, () => next());
   } catch (error) {
     next(error);
   }

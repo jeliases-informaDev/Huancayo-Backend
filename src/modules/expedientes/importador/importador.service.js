@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import ExcelJS from 'exceljs';
 import prisma from '#core/config/prisma.js';
+import { conEmpresa, empresaActual } from '#core/tenant/contexto.js';
 import { Prisma } from '../../../generated/prisma/index.js';
 import { esFormatoCore, FORMATO_CORE, mapearFilaCore } from './formato-core.js';
 import { conservarUbicacionesNegocio } from '../ubicaciones.js';
@@ -217,7 +218,7 @@ async function procesarLoteSimple({ hoja, filas, numeros }, ctx) {
         id_importacion: ctx.idImportacion, fila_origen: numeroFila,
       };
       Object.assign(data, camposDeDireccion({ direccion: data.direccion_domicilio, distrito: data.distrito, provincia: data.provincia, tieneCoordenadas: latitud != null && longitud != null }).campos);
-      const existente = await prisma.expediente.findUnique({ where: { codigo_expediente: data.codigo_expediente } });
+      const existente = await prisma.expediente.findFirst({ where: { codigo_expediente: data.codigo_expediente } });
       // Misma dirección que antes: se conserva lo que ya se averiguó (sugerencia del mapa, verificación) en vez de volver a la cola.
       if (existente && existente.direccion_normalizada === data.direccion_normalizada) delete data.geo_estado;
       else if (existente) Object.assign(data, SIN_SUGERENCIA); // la dirección cambió: la sugerencia anterior ya no vale
@@ -351,7 +352,8 @@ async function iniciarImportacion({ ruta, actorId, archivo, archivoSha256, simul
     procesadas: 0, insertadas: 0, actualizadas: 0, sinCambios: 0, omitidas: 0, errores: 0, advertencias: {}, vistos: new Set(), detalle,
     registrar(item) { if (detalle.length < MAX_DETALLE) detalle.push(item); },
   };
-  ejecutar(ctx, ruta).catch(() => { importacionEnCurso = null; });
+  const empresaId = empresaActual();
+  conEmpresa(empresaId, () => ejecutar(ctx, ruta)).catch(() => { importacionEnCurso = null; });
   return { id_importacion: importacion.id_importacion, estado: 'PROCESANDO', simulacion: simular, archivo_repetido: repetido };
 }
 

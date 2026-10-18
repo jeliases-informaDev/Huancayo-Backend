@@ -60,6 +60,10 @@ const schema = z.object({
   // Interruptor de «Disponibles / Tomar este caso»: con false el auditor ya no puede tomar casos por su cuenta y solo trabaja los que
   // le asigna un supervisor. Encendido por defecto; además, cada carga de Excel decide si sus casos son tomables (autoasignable).
   PERMITIR_AUTOASIGNACION: z.enum(['true', 'false']).default('true'),
+  // Primera empresa (se crea si no existe ninguna) y, opcionalmente, el administrador universal de Sulotec.
+  EMPRESA_INICIAL_NOMBRE: z.string().trim().min(2).max(150).default('Caja Huancayo'),
+  INITIAL_UNIVERSAL_USERNAME: z.string().trim().max(50).optional(),
+  INITIAL_UNIVERSAL_PASSWORD: z.string().max(128).optional(),
   // Días que se conservan los puntos GPS de tracking_ubicacion (el recorrido de un día se puede ver mientras exista). 0 = no depurar.
   TRACKING_RETENCION_DIAS: z.coerce.number().int().min(0).max(3650).default(90),
   ACCOUNT_LOCK_MINUTES: z.coerce.number().int().min(5).max(1440).default(15),

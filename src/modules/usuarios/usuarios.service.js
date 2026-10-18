@@ -1,6 +1,7 @@
 import prisma from '#core/config/prisma.js';
 import bcrypt from 'bcryptjs';
-import { ALL_ROLES, FIELD_ROLES, normalizeRole } from '#core/security/roles.js';
+import { ALL_ROLES, FIELD_ROLES, ROLES, normalizeRole } from '#core/security/roles.js';
+import { sinEmpresa } from '#core/tenant/contexto.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
 import asignacionesService from '#modules/auditorias/asignaciones.service.js';
 
@@ -54,8 +55,10 @@ async function listarAuditores() {
 
 async function crear(datos) {
   assertRole(datos.rol);
-  const usuario = await prisma.usuario.create({
-    data: {
+  // El administrador universal de Sulotec no pertenece a ninguna empresa: se crea fuera del contexto y con empresa nula.
+  const universal = normalizeRole(datos.rol) === ROLES.UNIVERSAL;
+  const crearFila = (data) => (universal ? sinEmpresa(() => prisma.usuario.create({ data: { ...data, empresa_id: null } })) : prisma.usuario.create({ data }));
+  const usuario = await crearFila({
       username: datos.username.trim().toLowerCase(), password_hash: await bcrypt.hash(datos.password, 12),
       nombres: datos.nombres?.trim() || null,
       apellidos: datos.apellidos?.trim() || null,
@@ -65,7 +68,6 @@ async function crear(datos) {
       rol: normalizeRole(datos.rol), estado: datos.estado || 'ACTIVO',
       mfa_requerido: datos.mfa_habilitado === true,
       mfa_exento: datos.mfa_habilitado !== true,
-    },
   });
   return { ...mapUsuario(usuario), _auditDiff: { entidad: 'Usuario', entidad_id: usuario.id_usuario, valor_anterior: null, valor_nuevo: auditSnapshot(usuario) } };
 }

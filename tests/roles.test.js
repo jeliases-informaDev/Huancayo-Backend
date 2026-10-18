@@ -5,8 +5,8 @@ import {
 } from '#core/security/roles.js';
 
 describe('roles.js', () => {
-  test('ROLES contiene exactamente los 3 roles del sistema', () => {
-    assert.deepEqual(Object.keys(ROLES).sort(), ['ADMINISTRADOR', 'AUDITOR', 'SUPERVISOR']);
+  test('ROLES contiene los 3 roles de empresa y el administrador universal de Sulotec', () => {
+    assert.deepEqual(Object.keys(ROLES).sort(), ['ADMINISTRADOR', 'AUDITOR', 'SUPERVISOR', 'UNIVERSAL']);
   });
 
   test('normalizeRole traduce el alias legado ADMIN a ADMINISTRADOR', () => {
@@ -38,7 +38,7 @@ describe('roles.js', () => {
     assert.deepEqual([...ADMIN_ROLES], ['ADMINISTRADOR']);
   });
 
-  test('ALL_ROLES cubre los mismos 3 roles que ROLES, sin duplicados', () => {
+  test('ALL_ROLES cubre los mismos 4 roles que ROLES, sin duplicados', () => {
     assert.deepEqual([...ALL_ROLES].sort(), Object.values(ROLES).sort());
   });
 

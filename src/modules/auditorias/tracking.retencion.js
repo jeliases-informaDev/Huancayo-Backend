@@ -3,6 +3,7 @@
 import prisma from '#core/config/prisma.js';
 import { env } from '#core/config/env.js';
 import { logger } from '#core/config/logger.js';
+import { sinEmpresa } from '#core/tenant/contexto.js';
 
 const LOTE = 5000;
 const MAX_LOTES_POR_CORRIDA = 40; // 200 000 filas por corrida como máximo: si hay más atrasado, sigue en la corrida siguiente
@@ -23,7 +24,7 @@ export async function depurarTracking({ dias = env.TRACKING_RETENCION_DIAS, lote
 
 export function iniciarRetencionTracking() {
   if (!env.TRACKING_RETENCION_DIAS) return;
-  const correr = () => depurarTracking().catch((error) => logger.warn({ err: error.message }, 'tracking_depuracion_fallo'));
+  const correr = () => sinEmpresa(() => depurarTracking()).catch((error) => logger.warn({ err: error.message }, 'tracking_depuracion_fallo'));
   setTimeout(correr, 60_000).unref();
   setInterval(correr, CADA_MS).unref();
 }

@@ -2,6 +2,7 @@
 // defecto de las variables de entorno; así un servidor recién instalado se comporta como siempre.
 import prisma from '#core/config/prisma.js';
 import { env } from '#core/config/env.js';
+import { empresaActual } from '#core/tenant/contexto.js';
 
 export const CLAVES = Object.freeze({ AUTOASIGNACION: 'autoasignacion' });
 const TTL_MS = 10_000; // el valor se relee cada 10 s: un cambio en el panel llega a todos los procesos del servidor casi al instante
@@ -9,12 +10,14 @@ const cache = new Map();
 
 const porDefecto = (clave) => (clave === CLAVES.AUTOASIGNACION ? env.PERMITIR_AUTOASIGNACION === 'true' : false);
 
+// Cada empresa tiene sus ajustes: la caché y la fila se identifican por empresa y clave.
+const claveCache = (clave) => `${empresaActual()}:${clave}`;
 async function leerBool(clave) {
-  const hit = cache.get(clave);
+  const hit = cache.get(claveCache(clave));
   if (hit && Date.now() - hit.en < TTL_MS) return hit.valor;
-  const fila = await prisma.configuracionSistema.findUnique({ where: { clave } });
+  const fila = await prisma.configuracionSistema.findFirst({ where: { clave } });
   const valor = fila ? fila.valor === 'true' : porDefecto(clave);
-  cache.set(clave, { valor, en: Date.now() });
+  cache.set(claveCache(clave), { valor, en: Date.now() });
   return valor;
 }
 
@@ -23,11 +26,8 @@ export const autoasignacionPermitida = () => leerBool(CLAVES.AUTOASIGNACION);
 // Devuelve el valor anterior y el nuevo, para dejarlos en el registro de auditoría.
 export async function fijarAutoasignacion(activa, actorId) {
   const anterior = await autoasignacionPermitida();
-  await prisma.configuracionSistema.upsert({
-    where: { clave: CLAVES.AUTOASIGNACION },
-    create: { clave: CLAVES.AUTOASIGNACION, valor: String(activa), actualizado_por: actorId },
-    update: { valor: String(activa), actualizado_por: actorId },
-  });
-  cache.set(CLAVES.AUTOASIGNACION, { valor: activa, en: Date.now() });
+  const cambiadas = await prisma.configuracionSistema.updateMany({ where: { clave: CLAVES.AUTOASIGNACION }, data: { valor: String(activa), actualizado_por: actorId } });
+  if (!cambiadas.count) await prisma.configuracionSistema.create({ data: { clave: CLAVES.AUTOASIGNACION, valor: String(activa), actualizado_por: actorId } });
+  cache.set(claveCache(CLAVES.AUTOASIGNACION), { valor: activa, en: Date.now() });
   return { anterior, nuevo: activa };
 }

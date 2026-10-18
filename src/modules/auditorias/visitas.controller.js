@@ -1,11 +1,13 @@
 import visitasService from './visitas.service.js';
 import { env } from '#core/config/env.js';
 import { autoasignacionPermitida } from '#modules/sistema/configuracion.service.js';
+import { publica as empresaPublica } from '#modules/empresas/empresas.service.js';
 
 function notifyRoles(req, event, data) {
   const io = req.app.get('io');
   if (!io) return;
-  ['ADMINISTRADOR', 'SUPERVISOR'].forEach(rol => io.to(`role:${rol}`).emit(event, data));
+  const e = req.user.empresa_id; // solo la empresa de la petición recibe el aviso
+  ['ADMINISTRADOR', 'SUPERVISOR'].forEach(rol => io.to(`empresa:${e}:role:${rol}`).emit(event, data));
 }
 
 async function presignEvidencia(req, res, next) {
@@ -71,7 +73,11 @@ async function jornada(req, res, next) {
 }
 
 async function config(_req, res, next) {
-  try { res.json({ data: { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS, autoasignacion: await autoasignacionPermitida() } }); } catch (error) { next(error); }
+  try {
+    // Reglas y marca de la empresa del usuario (las del producto si no tiene propias).
+    const empresa = await empresaPublica();
+    res.json({ data: { ...(empresa?.reglas || { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS }), autoasignacion: await autoasignacionPermitida(), empresa: empresa ? { id: empresa.id, nombre: empresa.nombre, marca: empresa.marca } : null } });
+  } catch (error) { next(error); }
 }
 
 export default { presignEvidencia, subirEvidencia, crear, listar, obtener, archivoEvidencia, ubicacion, jornada, config };

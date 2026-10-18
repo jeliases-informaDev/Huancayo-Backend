@@ -18,7 +18,7 @@ export const passwordBody = z.object({ password: z.string().min(1).max(128) }).s
 export const userCreateBody = z.object({
   username: cleanString(50).regex(/^[A-Za-z0-9._-]+$/, 'El usuario contiene caracteres no permitidos'),
   password: z.string().min(12, 'La contraseña debe tener al menos 12 caracteres').max(128, 'La contraseña no puede superar 128 caracteres'),
-  rol: z.enum(['ADMINISTRADOR', 'SUPERVISOR', 'AUDITOR']),
+  rol: z.enum(['ADMINISTRADOR', 'SUPERVISOR', 'AUDITOR', 'UNIVERSAL']),
   estado: z.enum(['ACTIVO', 'INACTIVO']).optional(), nombres: z.string().max(150).optional(),
   apellidos: z.string().max(200).optional(), email: z.string().email().max(150).optional().or(z.literal('')),
   sede: z.string().max(100).optional(), mfa_habilitado: z.boolean().optional(),
@@ -155,6 +155,18 @@ export const ubicacionBody = z.object({
 export const jornadaBody = z.object({ accion: z.enum(['INICIAR', 'TERMINAR']) }).strict();
 
 export const autoasignacionBody = z.object({ activa: z.boolean() }).strict();
+
+// --- Empresas (solo el administrador universal) ---
+const reglasEmpresa = z.object({ geocerca_radio_m: z.coerce.number().int().optional(), precision_maxima_m: z.coerce.number().int().optional() }).strict();
+const marcaEmpresa = z.object({ nombre: z.string().max(80).optional(), producto: z.string().max(80).optional(), color: z.string().max(7).optional(), logo_url: z.string().max(500).optional() }).strict();
+export const empresaCreateBody = z.object({
+  nombre: cleanString(150), nombre_corto: z.string().trim().max(60).optional(), slug: z.string().trim().max(60).optional(),
+  configuracion: reglasEmpresa.optional(), marca: marcaEmpresa.optional(),
+}).strict();
+export const empresaUpdateBody = z.object({
+  nombre: cleanString(150).optional(), nombre_corto: z.string().trim().max(60).optional(), estado: z.enum(['ACTIVA', 'SUSPENDIDA']).optional(),
+  configuracion: reglasEmpresa.optional(), marca: marcaEmpresa.optional(),
+}).strict().refine((d) => Object.keys(d).length > 0, 'Debe enviar al menos un campo');
 
 export const trackingQuery = z.object({
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),

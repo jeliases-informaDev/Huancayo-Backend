@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { env } from '#core/config/env.js';
+import { empresaActual } from '#core/tenant/contexto.js';
 
 // Fase 1: evidencias en disco local del servidor (sin credenciales cloud todavía).
 // El contrato "presign + subir + confirmar" se conserva igual que en Afacop, así que
@@ -59,7 +60,8 @@ function createUpload({ auditorId, expedienteId, tipo, contentType, size }) {
   const timestamp = Date.now();
   const id = crypto.randomUUID();
   const signature = ownershipSignature({ auditorId, expedienteId, tipo, timestamp, id });
-  const key = `${datePath()}/${expedienteId}/${tipo}-${timestamp}-${id}-${signature}.${config.extension}`;
+  // Prefijo por empresa: en disco hoy, y el mismo prefijo cuando las evidencias pasen a un bucket.
+  const key = `empresa/${empresaActual()}/${datePath()}/${expedienteId}/${tipo}-${timestamp}-${id}-${signature}.${config.extension}`;
   const query = new URLSearchParams({ id_expediente: String(expedienteId), tipo }).toString();
   return {
     key,

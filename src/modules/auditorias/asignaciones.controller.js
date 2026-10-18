@@ -4,8 +4,9 @@ import { fijarAutoasignacion as fijarAjuste } from '#modules/sistema/configuraci
 function notifyRoles(req, event, data) {
   const io = req.app.get('io');
   if (!io) return;
-  ['ADMINISTRADOR', 'SUPERVISOR'].forEach(rol => io.to(`role:${rol}`).emit(event, data));
-  if (data.id_usuario_auditor) io.to(`auditor:${data.id_usuario_auditor}`).emit(event, data);
+  const e = req.user.empresa_id; // solo la empresa de la petición recibe el aviso
+  ['ADMINISTRADOR', 'SUPERVISOR'].forEach(rol => io.to(`empresa:${e}:role:${rol}`).emit(event, data));
+  if (data.id_usuario_auditor) io.to(`empresa:${e}:auditor:${data.id_usuario_auditor}`).emit(event, data);
 }
 
 async function crear(req, res, next) {

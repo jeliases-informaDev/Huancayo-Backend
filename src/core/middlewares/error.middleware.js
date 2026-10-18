@@ -10,7 +10,9 @@ export function errorHandler(error, req, res, _next) {
   // Restricción de unicidad de Prisma (ej. username o codigo_expediente repetido) sin
   // manejo especifico rio arriba: se traduce a un 409 legible en vez de un 500 generico.
   const duplicateKeyError = error?.code === 'P2002';
-  const status = Number(error.statusCode) || (error instanceof ZodError || uploadError ? 400 : duplicateKeyError ? 409 : 500);
+  // P2025: Prisma no encontró la fila a cambiar o borrar (p. ej. porque es de otra empresa): para quien pide, no existe.
+  const notFoundError = error?.code === 'P2025';
+  const status = Number(error.statusCode) || (error instanceof ZodError || uploadError ? 400 : duplicateKeyError ? 409 : notFoundError ? 404 : 500);
   const operational = status < 500;
   logger[operational ? 'warn' : 'error']({ err: error, requestId: req.id, method: req.method, path: req.originalUrl }, 'request_failed');
 
@@ -27,6 +29,7 @@ export function errorHandler(error, req, res, _next) {
     payload.error = error.code === 'LIMIT_FILE_SIZE' ? 'El archivo supera el límite de 100 MB' : 'Carga de archivo inválida';
     payload.code = error.code;
   }
+  if (notFoundError) { payload.error = 'Recurso no encontrado'; payload.code = 'NOT_FOUND'; }
   if (duplicateKeyError) {
     const campo = Array.isArray(error.meta?.target) ? error.meta.target.join(', ') : error.meta?.target;
     payload.error = campo ? `Ya existe un registro con ese valor en: ${campo}` : 'Ya existe un registro con ese valor único';
