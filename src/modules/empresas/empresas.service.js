@@ -115,10 +115,30 @@ export async function listarActivas() {
   return prisma.empresa.findMany({ where: { estado: 'ACTIVA' }, select: { id_empresa: true, nombre: true } });
 }
 
+// La abreviatura es única: la sugerida puede estar ocupada (dos «Caja …» parecidas), así que se le suma un número hasta que quede
+// libre; una abreviatura indicada a mano que ya esté en uso se rechaza con un mensaje claro (no con el error genérico de la base).
+async function prefijoOcupado(prefijo, salvoId = null) {
+  const fila = await prisma.empresa.findFirst({ where: { prefijo }, select: { id_empresa: true } });
+  return Boolean(fila && fila.id_empresa !== salvoId);
+}
+async function prefijoLibre(base) {
+  for (let n = 1; n <= 99; n += 1) {
+    const candidato = n === 1 ? base : base.slice(0, 8 - String(n).length) + String(n);
+    if (!(await prefijoOcupado(candidato))) return candidato;
+  }
+  throw Object.assign(new Error('No se pudo sugerir una abreviatura libre: indica una'), { statusCode: 409, code: 'PREFIJO_EN_USO' });
+}
+async function prefijoValidado(prefijo, salvoId = null) {
+  const limpio = limpiarPrefijo(prefijo);
+  if (await prefijoOcupado(limpio, salvoId)) throw Object.assign(new Error('La abreviatura «' + limpio + '» ya la usa otra empresa: elige otra'), { statusCode: 409, code: 'PREFIJO_EN_USO' });
+  return limpio;
+}
+
 export async function crear({ nombre, nombre_corto, slug, prefijo, configuracion, marca }) {
+  const abreviatura = prefijo === undefined || prefijo === null ? await prefijoLibre(prefijoDe(nombre_corto || nombre)) : await prefijoValidado(prefijo);
   const fila = await prisma.empresa.create({ data: {
     nombre: nombre.trim(), nombre_corto: nombre_corto?.trim() || null, slug: slugDe(slug || nombre),
-    prefijo: limpiarPrefijo(prefijo ?? prefijoDe(nombre_corto || nombre)), // sin abreviatura se sugiere desde el nombre
+    prefijo: abreviatura, // sin abreviatura se sugiere desde el nombre (y se hace única)
     configuracion: limpiarReglas(configuracion || {}), marca: limpiarMarca(marca || {}),
   } });
   return aPublica(fila);
@@ -131,7 +151,7 @@ export async function actualizar(id, cambios) {
   if (cambios.nombre !== undefined) data.nombre = cambios.nombre.trim();
   if (cambios.nombre_corto !== undefined) data.nombre_corto = cambios.nombre_corto?.trim() || null;
   if (cambios.estado !== undefined) data.estado = cambios.estado;
-  if (cambios.prefijo !== undefined) data.prefijo = limpiarPrefijo(cambios.prefijo);
+  if (cambios.prefijo !== undefined) data.prefijo = await prefijoValidado(cambios.prefijo, id);
   if (cambios.configuracion !== undefined) data.configuracion = { ...(actual.configuracion || {}), ...limpiarReglas(cambios.configuracion || {}) };
   if (cambios.marca !== undefined) data.marca = { ...(actual.marca || {}), ...limpiarMarca(cambios.marca || {}) };
   const fila = await prisma.empresa.update({ where: { id_empresa: id }, data });
