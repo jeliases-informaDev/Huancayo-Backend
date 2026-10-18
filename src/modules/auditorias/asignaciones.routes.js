@@ -9,6 +9,7 @@ import { idParams, listQuery, asignacionCreateBody, asignacionBulkBody, autoasig
 const router = Router();
 router.use(authMiddleware);
 
+router.get('/mias/version', controller.versionMia);
 router.get('/mias', validate({ query: miasQuery }), controller.misAsignaciones);
 router.get('/disponibles', roleMiddleware([ROLES.AUDITOR]), validate({ query: disponiblesQuery }), controller.disponibles);
 router.post('/auto/:id', roleMiddleware([ROLES.AUDITOR]), validate({ params: idParams }), controller.autoAsignar);

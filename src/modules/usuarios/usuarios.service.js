@@ -149,7 +149,9 @@ async function resetDevice(id) {
 // del panel web (Fase 2/Fase 6: "el Auditor de Agencia observa... en tiempo real").
 async function ubicacionesActivas() {
   const usuarios = await prisma.usuario.findMany({
-    where: { estado: 'ACTIVO', rol: { in: FIELD_ROLES }, OR: [{ latitud: { not: null }, longitud: { not: null } }, { jornada_inicio: { not: null } }] },
+    // Solo quienes dieron señal o iniciaron jornada en los últimos 7 días: la lista en vivo no puede crecer con cada auditor que alguna vez usó la app
+    // (el listado completo de auditores se pide aparte con /api/usuarios/auditores).
+    where: { estado: 'ACTIVO', rol: { in: FIELD_ROLES }, OR: [{ ubicacion_en: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }, { jornada_inicio: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }] },
     select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, latitud: true, longitud: true, ubicacion_en: true, ubicacion_precision: true, ubicacion_simulada: true, mov_estado: true, mov_desde: true, mov_velocidad: true, mov_modo: true, bateria_porcentaje: true, bateria_cargando: true, jornada_inicio: true, jornada_fin: true },
   });
   return usuarios.map(u => ({

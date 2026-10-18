@@ -38,6 +38,9 @@ async function autoAsignar(req, res, next) {
 async function listar(req, res, next) {
   try { res.json(await asignacionesService.listar(req.validated.query)); } catch (error) { next(error); }
 }
+async function versionMia(req, res, next) {
+  try { res.json({ data: { version: await asignacionesService.versionMuestra(req.user.id) } }); } catch (error) { next(error); }
+}
 async function carga(_req, res, next) {
   try { res.json({ data: await asignacionesService.cargaPorAuditor() }); } catch (error) { next(error); }
 }
@@ -63,4 +66,4 @@ async function cancelar(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, resumenOrigen, fijarAutoasignacion, carga, mapa };
+export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, resumenOrigen, fijarAutoasignacion, carga, mapa, versionMia };

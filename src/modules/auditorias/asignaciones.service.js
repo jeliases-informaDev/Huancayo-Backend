@@ -139,6 +139,17 @@ async function crearMasivo({ id_usuario_auditor, id_expedientes, prioridad }, ac
   return resultados;
 }
 
+// Huella de la muestra de un auditor: cambia si se le asigna, quita o finaliza un caso o si se edita alguno de sus expedientes. La app la compara
+// (consulta barata) y solo vuelve a descargar la muestra completa cuando cambió, en vez de repetir la descarga cada pocos segundos.
+async function versionMuestra(auditorId) {
+  const base = { id_usuario_auditor: auditorId, estado: 'ACTIVA' };
+  const [a, e] = await Promise.all([
+    prisma.asignacionAuditoria.aggregate({ where: base, _count: { _all: true }, _max: { id_asignacion: true, fecha_asignacion: true } }),
+    prisma.expediente.aggregate({ where: { asignaciones: { some: base } }, _max: { fecha_actualizar: true } }),
+  ]);
+  return [a._count._all, a._max.id_asignacion ?? 0, a._max.fecha_asignacion ? a._max.fecha_asignacion.getTime() : 0, e._max.fecha_actualizar ? e._max.fecha_actualizar.getTime() : 0].join('|');
+}
+
 // «Mi muestra» del auditor, por páginas. Sin page ni limit (apps anteriores) devuelve hasta 1000 en vez de cortar en 150.
 // Se ordena por prioridad real y antigüedad: primero se leen solo ids y prioridad (barato), y después las filas completas de la página pedida.
 async function misAsignaciones(auditorId, consulta = {}) {
@@ -148,10 +159,11 @@ async function misAsignaciones(auditorId, consulta = {}) {
   const where = { ...base, ...(consulta.prioridad ? { prioridad: consulta.prioridad } : {}), ...(Object.keys(filtroExpediente).length ? { expediente: filtroExpediente } : {}) };
   const filas = ordenarPorPrioridad(await prisma.asignacionAuditoria.findMany({ where, select: { id_asignacion: true, prioridad: true }, orderBy: [{ fecha_asignacion: 'asc' }, { id_asignacion: 'asc' }] }));
   const ids = paginaDe(filas, pag).map((f) => f.id_asignacion);
-  const [datos, porPrioridad, porTipo] = await Promise.all([
+  const [datos, porPrioridad, porTipo, version] = await Promise.all([
     ids.length ? prisma.asignacionAuditoria.findMany({ where: { id_asignacion: { in: ids } }, include: { expediente: { select: consulta.ligero === 'true' ? expedienteLigeroSelect : expedienteMuestraSelect } } }) : [],
     prisma.asignacionAuditoria.groupBy({ by: ['prioridad'], where: base, _count: { _all: true } }),
     prisma.expediente.groupBy({ by: ['tipo_credito'], where: { asignaciones: { some: base } }, _count: { _all: true } }),
+    versionMuestra(auditorId),
   ]);
   const posicion = new Map(ids.map((id, i) => [id, i]));
   datos.sort((a, b) => posicion.get(a.id_asignacion) - posicion.get(b.id_asignacion));
@@ -161,7 +173,7 @@ async function misAsignaciones(auditorId, consulta = {}) {
     ALTA: cuenta(porPrioridad, 'prioridad', 'ALTA'), MEDIA: cuenta(porPrioridad, 'prioridad', 'MEDIA'), BAJA: cuenta(porPrioridad, 'prioridad', 'BAJA'),
     CONSUMO: cuenta(porTipo, 'tipo_credito', 'CONSUMO'), OTROS: cuenta(porTipo, 'tipo_credito', 'OTROS'),
   };
-  return { data: serialize(datos), pagination: infoPaginas(pag, filas.length), resumen };
+  return { data: serialize(datos), pagination: infoPaginas(pag, filas.length), resumen, version };
 }
 
 // Casos activos de cada auditor (para la carga en el panel): un conteo en la base, no una lista cortada.
@@ -202,8 +214,8 @@ async function puntosParaMapa({ departamento, provincia, distrito, auditor, q, l
   return { data: serialize(truncado ? filas.slice(0, limite) : filas), total, truncado, ...(zonas ? { zonas } : {}) };
 }
 
-async function listar({ page = 1, limit = 25, estado } = {}) {
-  const where = estado ? { estado } : {};
+async function listar({ page = 1, limit = 25, estado, auditor } = {}) {
+  const where = { ...(estado ? { estado } : {}), ...(auditor ? { id_usuario_auditor: auditor } : {}) };
   const [data, total] = await Promise.all([
     prisma.asignacionAuditoria.findMany({
       where, orderBy: { fecha_asignacion: 'desc' }, skip: (page - 1) * limit, take: limit,
@@ -273,4 +285,4 @@ async function cancelarTodasDeAuditor(auditorId) {
   return activas.length;
 }
 
-export default { crear, crearMasivo, misAsignaciones, cargaPorAuditor, puntosParaMapa, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen };
+export default { crear, crearMasivo, misAsignaciones, versionMuestra, cargaPorAuditor, puntosParaMapa, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen };
