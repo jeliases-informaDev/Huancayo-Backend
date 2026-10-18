@@ -125,6 +125,7 @@ exports.Prisma.EmpresaScalarFieldEnum = {
   nombre: 'nombre',
   nombre_corto: 'nombre_corto',
   slug: 'slug',
+  prefijo: 'prefijo',
   estado: 'estado',
   configuracion: 'configuracion',
   marca: 'marca',
@@ -413,6 +414,7 @@ exports.Prisma.EmpresaOrderByRelevanceFieldEnum = {
   nombre: 'nombre',
   nombre_corto: 'nombre_corto',
   slug: 'slug',
+  prefijo: 'prefijo',
   estado: 'estado'
 };
 
