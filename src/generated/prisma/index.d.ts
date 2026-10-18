@@ -2089,6 +2089,7 @@ export namespace Prisma {
     nombre: string | null
     nombre_corto: string | null
     slug: string | null
+    prefijo: string | null
     estado: string | null
     creado_en: Date | null
     actualizado_en: Date | null
@@ -2099,6 +2100,7 @@ export namespace Prisma {
     nombre: string | null
     nombre_corto: string | null
     slug: string | null
+    prefijo: string | null
     estado: string | null
     creado_en: Date | null
     actualizado_en: Date | null
@@ -2109,6 +2111,7 @@ export namespace Prisma {
     nombre: number
     nombre_corto: number
     slug: number
+    prefijo: number
     estado: number
     configuracion: number
     marca: number
@@ -2123,6 +2126,7 @@ export namespace Prisma {
     nombre?: true
     nombre_corto?: true
     slug?: true
+    prefijo?: true
     estado?: true
     creado_en?: true
     actualizado_en?: true
@@ -2133,6 +2137,7 @@ export namespace Prisma {
     nombre?: true
     nombre_corto?: true
     slug?: true
+    prefijo?: true
     estado?: true
     creado_en?: true
     actualizado_en?: true
@@ -2143,6 +2148,7 @@ export namespace Prisma {
     nombre?: true
     nombre_corto?: true
     slug?: true
+    prefijo?: true
     estado?: true
     configuracion?: true
     marca?: true
@@ -2228,6 +2234,7 @@ export namespace Prisma {
     nombre: string
     nombre_corto: string | null
     slug: string
+    prefijo: string | null
     estado: string
     configuracion: JsonValue | null
     marca: JsonValue | null
@@ -2257,6 +2264,7 @@ export namespace Prisma {
     nombre?: boolean
     nombre_corto?: boolean
     slug?: boolean
+    prefijo?: boolean
     estado?: boolean
     configuracion?: boolean
     marca?: boolean
@@ -2271,6 +2279,7 @@ export namespace Prisma {
     nombre?: boolean
     nombre_corto?: boolean
     slug?: boolean
+    prefijo?: boolean
     estado?: boolean
     configuracion?: boolean
     marca?: boolean
@@ -2278,7 +2287,7 @@ export namespace Prisma {
     actualizado_en?: boolean
   }
 
-  export type EmpresaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_empresa" | "nombre" | "nombre_corto" | "slug" | "estado" | "configuracion" | "marca" | "creado_en" | "actualizado_en", ExtArgs["result"]["empresa"]>
+  export type EmpresaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_empresa" | "nombre" | "nombre_corto" | "slug" | "prefijo" | "estado" | "configuracion" | "marca" | "creado_en" | "actualizado_en", ExtArgs["result"]["empresa"]>
 
   export type $EmpresaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Empresa"
@@ -2288,6 +2297,7 @@ export namespace Prisma {
       nombre: string
       nombre_corto: string | null
       slug: string
+      prefijo: string | null
       estado: string
       configuracion: Prisma.JsonValue | null
       marca: Prisma.JsonValue | null
@@ -2666,6 +2676,7 @@ export namespace Prisma {
     readonly nombre: FieldRef<"Empresa", 'String'>
     readonly nombre_corto: FieldRef<"Empresa", 'String'>
     readonly slug: FieldRef<"Empresa", 'String'>
+    readonly prefijo: FieldRef<"Empresa", 'String'>
     readonly estado: FieldRef<"Empresa", 'String'>
     readonly configuracion: FieldRef<"Empresa", 'Json'>
     readonly marca: FieldRef<"Empresa", 'Json'>
@@ -16431,6 +16442,7 @@ export namespace Prisma {
     nombre: 'nombre',
     nombre_corto: 'nombre_corto',
     slug: 'slug',
+    prefijo: 'prefijo',
     estado: 'estado',
     configuracion: 'configuracion',
     marca: 'marca',
@@ -16776,6 +16788,7 @@ export namespace Prisma {
     nombre: 'nombre',
     nombre_corto: 'nombre_corto',
     slug: 'slug',
+    prefijo: 'prefijo',
     estado: 'estado'
   };
 
@@ -17052,6 +17065,7 @@ export namespace Prisma {
     nombre?: StringFilter<"Empresa"> | string
     nombre_corto?: StringNullableFilter<"Empresa"> | string | null
     slug?: StringFilter<"Empresa"> | string
+    prefijo?: StringNullableFilter<"Empresa"> | string | null
     estado?: StringFilter<"Empresa"> | string
     configuracion?: JsonNullableFilter<"Empresa">
     marca?: JsonNullableFilter<"Empresa">
@@ -17064,6 +17078,7 @@ export namespace Prisma {
     nombre?: SortOrder
     nombre_corto?: SortOrderInput | SortOrder
     slug?: SortOrder
+    prefijo?: SortOrderInput | SortOrder
     estado?: SortOrder
     configuracion?: SortOrderInput | SortOrder
     marca?: SortOrderInput | SortOrder
@@ -17075,6 +17090,7 @@ export namespace Prisma {
   export type EmpresaWhereUniqueInput = Prisma.AtLeast<{
     id_empresa?: string
     slug?: string
+    prefijo?: string
     AND?: EmpresaWhereInput | EmpresaWhereInput[]
     OR?: EmpresaWhereInput[]
     NOT?: EmpresaWhereInput | EmpresaWhereInput[]
@@ -17085,13 +17101,14 @@ export namespace Prisma {
     marca?: JsonNullableFilter<"Empresa">
     creado_en?: DateTimeFilter<"Empresa"> | Date | string
     actualizado_en?: DateTimeFilter<"Empresa"> | Date | string
-  }, "id_empresa" | "slug">
+  }, "id_empresa" | "slug" | "prefijo">
 
   export type EmpresaOrderByWithAggregationInput = {
     id_empresa?: SortOrder
     nombre?: SortOrder
     nombre_corto?: SortOrderInput | SortOrder
     slug?: SortOrder
+    prefijo?: SortOrderInput | SortOrder
     estado?: SortOrder
     configuracion?: SortOrderInput | SortOrder
     marca?: SortOrderInput | SortOrder
@@ -17110,6 +17127,7 @@ export namespace Prisma {
     nombre?: StringWithAggregatesFilter<"Empresa"> | string
     nombre_corto?: StringNullableWithAggregatesFilter<"Empresa"> | string | null
     slug?: StringWithAggregatesFilter<"Empresa"> | string
+    prefijo?: StringNullableWithAggregatesFilter<"Empresa"> | string | null
     estado?: StringWithAggregatesFilter<"Empresa"> | string
     configuracion?: JsonNullableWithAggregatesFilter<"Empresa">
     marca?: JsonNullableWithAggregatesFilter<"Empresa">
@@ -18592,6 +18610,7 @@ export namespace Prisma {
     nombre: string
     nombre_corto?: string | null
     slug: string
+    prefijo?: string | null
     estado?: string
     configuracion?: NullableJsonNullValueInput | InputJsonValue
     marca?: NullableJsonNullValueInput | InputJsonValue
@@ -18604,6 +18623,7 @@ export namespace Prisma {
     nombre: string
     nombre_corto?: string | null
     slug: string
+    prefijo?: string | null
     estado?: string
     configuracion?: NullableJsonNullValueInput | InputJsonValue
     marca?: NullableJsonNullValueInput | InputJsonValue
@@ -18616,6 +18636,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     nombre_corto?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: StringFieldUpdateOperationsInput | string
+    prefijo?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     configuracion?: NullableJsonNullValueInput | InputJsonValue
     marca?: NullableJsonNullValueInput | InputJsonValue
@@ -18628,6 +18649,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     nombre_corto?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: StringFieldUpdateOperationsInput | string
+    prefijo?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     configuracion?: NullableJsonNullValueInput | InputJsonValue
     marca?: NullableJsonNullValueInput | InputJsonValue
@@ -18640,6 +18662,7 @@ export namespace Prisma {
     nombre: string
     nombre_corto?: string | null
     slug: string
+    prefijo?: string | null
     estado?: string
     configuracion?: NullableJsonNullValueInput | InputJsonValue
     marca?: NullableJsonNullValueInput | InputJsonValue
@@ -18652,6 +18675,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     nombre_corto?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: StringFieldUpdateOperationsInput | string
+    prefijo?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     configuracion?: NullableJsonNullValueInput | InputJsonValue
     marca?: NullableJsonNullValueInput | InputJsonValue
@@ -18664,6 +18688,7 @@ export namespace Prisma {
     nombre?: StringFieldUpdateOperationsInput | string
     nombre_corto?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: StringFieldUpdateOperationsInput | string
+    prefijo?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: StringFieldUpdateOperationsInput | string
     configuracion?: NullableJsonNullValueInput | InputJsonValue
     marca?: NullableJsonNullValueInput | InputJsonValue
@@ -20494,6 +20519,7 @@ export namespace Prisma {
     nombre?: SortOrder
     nombre_corto?: SortOrder
     slug?: SortOrder
+    prefijo?: SortOrder
     estado?: SortOrder
     configuracion?: SortOrder
     marca?: SortOrder
@@ -20506,6 +20532,7 @@ export namespace Prisma {
     nombre?: SortOrder
     nombre_corto?: SortOrder
     slug?: SortOrder
+    prefijo?: SortOrder
     estado?: SortOrder
     creado_en?: SortOrder
     actualizado_en?: SortOrder
@@ -20516,6 +20543,7 @@ export namespace Prisma {
     nombre?: SortOrder
     nombre_corto?: SortOrder
     slug?: SortOrder
+    prefijo?: SortOrder
     estado?: SortOrder
     creado_en?: SortOrder
     actualizado_en?: SortOrder

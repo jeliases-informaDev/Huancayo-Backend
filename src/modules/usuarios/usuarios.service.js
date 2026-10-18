@@ -1,9 +1,18 @@
 import prisma from '#core/config/prisma.js';
 import bcrypt from 'bcryptjs';
 import { ALL_ROLES, FIELD_ROLES, ROLES, normalizeRole } from '#core/security/roles.js';
-import { sinEmpresa } from '#core/tenant/contexto.js';
+import { empresaActual, sinEmpresa } from '#core/tenant/contexto.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
 import asignacionesService from '#modules/auditorias/asignaciones.service.js';
+import { publica as empresaPublica, usuarioConPrefijo } from '#modules/empresas/empresas.service.js';
+
+// Dentro de una empresa el nombre de usuario lleva su abreviatura fija (arq.jorge); el universal de Sulotec no tiene empresa ni prefijo.
+async function usernameDeEmpresa(empresaId, username) {
+  const prefijo = empresaId ? (await empresaPublica(empresaId))?.prefijo || null : null;
+  const completo = usuarioConPrefijo(prefijo, username);
+  if (completo.length > 50) throw Object.assign(new Error('El nombre de usuario, con la abreviatura de la empresa, supera los 50 caracteres'), { statusCode: 400, code: 'USERNAME_LARGO' });
+  return completo;
+}
 
 function mapUsuario(usuario) {
   const globallyRequired = env.REQUIRE_MFA === 'true'
@@ -59,7 +68,7 @@ async function crear(datos) {
   const universal = normalizeRole(datos.rol) === ROLES.UNIVERSAL;
   const crearFila = (data) => (universal ? sinEmpresa(() => prisma.usuario.create({ data: { ...data, empresa_id: null } })) : prisma.usuario.create({ data }));
   const usuario = await crearFila({
-      username: datos.username.trim().toLowerCase(), password_hash: await bcrypt.hash(datos.password, 12),
+      username: await usernameDeEmpresa(universal ? null : empresaActual(), datos.username), password_hash: await bcrypt.hash(datos.password, 12),
       nombres: datos.nombres?.trim() || null,
       apellidos: datos.apellidos?.trim() || null,
       email: datos.email?.trim().toLowerCase() || null,
@@ -82,7 +91,7 @@ async function actualizar(id, datos, actorId) {
     const error = new Error('Usuario no encontrado'); error.statusCode = 404; throw error;
   }
   const data = {
-    ...(datos.username ? { username: datos.username.trim().toLowerCase() } : {}),
+    ...(datos.username ? { username: await usernameDeEmpresa(actual.empresa_id, datos.username) } : {}),
     ...(datos.nombres !== undefined ? { nombres: datos.nombres.trim() || null } : {}),
     ...(datos.apellidos !== undefined ? { apellidos: datos.apellidos.trim() || null } : {}),
     ...(datos.email !== undefined ? { email: datos.email.trim().toLowerCase() || null } : {}),

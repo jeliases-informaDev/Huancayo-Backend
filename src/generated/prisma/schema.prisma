@@ -29,6 +29,7 @@ model Empresa {
   nombre         String   @db.VarChar(150)
   nombre_corto   String?  @db.VarChar(60)
   slug           String   @unique @db.VarChar(60) // identificador legible y estable (p. ej. caja-huancayo)
+  prefijo        String?  @unique @db.VarChar(8) // abreviatura fija de sus nombres de usuario (arq → arq.jorge); única entre empresas
   estado         String   @default("ACTIVA") @db.VarChar(20) // ACTIVA, SUSPENDIDA
   // Reglas de la empresa (geocerca, precisión, autoasignación…) y su marca (nombre que ve el usuario, colores, logo): datos, no código.
   configuracion  Json?

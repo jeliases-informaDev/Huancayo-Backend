@@ -161,11 +161,11 @@ const reglasEmpresa = z.object({ geocerca_radio_m: z.coerce.number().int().optio
 const marcaEmpresa = z.object({ nombre: z.string().max(80).optional(), producto: z.string().max(80).optional(), color: z.string().max(7).optional(), logo_url: z.string().max(500).optional() }).strict();
 export const empresaCreateBody = z.object({
   nombre: cleanString(150), nombre_corto: z.string().trim().max(60).optional(), slug: z.string().trim().max(60).optional(),
-  configuracion: reglasEmpresa.optional(), marca: marcaEmpresa.optional(),
+  prefijo: z.string().trim().max(8).optional(), configuracion: reglasEmpresa.optional(), marca: marcaEmpresa.optional(),
 }).strict();
 export const empresaUpdateBody = z.object({
   nombre: cleanString(150).optional(), nombre_corto: z.string().trim().max(60).optional(), estado: z.enum(['ACTIVA', 'SUSPENDIDA']).optional(),
-  configuracion: reglasEmpresa.optional(), marca: marcaEmpresa.optional(),
+  prefijo: z.string().trim().max(8).optional(), configuracion: reglasEmpresa.optional(), marca: marcaEmpresa.optional(),
 }).strict().refine((d) => Object.keys(d).length > 0, 'Debe enviar al menos un campo');
 
 export const trackingQuery = z.object({
