@@ -6,6 +6,7 @@ import { sinEmpresa } from '#core/tenant/contexto.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
 import { normalizeRole, FIELD_ROLES } from '#core/security/roles.js';
 import * as mfaService from './mfa.service.js';
+import { usuarioDesdeSulotec } from './sso.service.js';
 
 function mapearUsuario(usuario) {
   return {
@@ -141,6 +142,12 @@ async function confirmMfaEnrollment(challengeToken, code) {
   return { success: true, token: issueAccessToken(usuario, clientPlatform), user: mapearUsuario(usuario) };
 }
 
+// Inicio con la cuenta Sulotec: la identidad ya la verificó Keycloak (con su segundo factor); aquí solo se emite la sesión del panel.
+async function loginSso(datos) {
+  const usuario = await usuarioDesdeSulotec(datos);
+  return { success: true, token: issueAccessToken(usuario, 'web'), user: mapearUsuario(usuario) };
+}
+
 async function me(idUsuario) {
   try {
     const usuario = await sinEmpresa(() => prisma.usuario.findUnique({ where: { id_usuario: idUsuario } }));
@@ -156,4 +163,4 @@ async function logout(idUsuario) {
   await sinEmpresa(() => prisma.usuario.update({ where: { id_usuario: idUsuario }, data: { token_version: { increment: 1 } } }));
 }
 
-export default { login, verifyMfa, setupMfaEnrollment, confirmMfaEnrollment, me, logout };
+export default { login, loginSso, verifyMfa, setupMfaEnrollment, confirmMfaEnrollment, me, logout };

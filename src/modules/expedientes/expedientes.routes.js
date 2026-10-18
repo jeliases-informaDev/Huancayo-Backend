@@ -5,7 +5,7 @@ import { roleMiddleware } from '#core/middlewares/role.middleware.js';
 import { OPERATIONAL_MANAGERS } from '#core/security/roles.js';
 import { validate } from '#core/middlewares/validate.middleware.js';
 import upload from '#core/middlewares/upload.middleware.js';
-import { idParams, uuidParams, listQuery, importacionesQuery, importarQuery, expedienteCreateBody, expedienteUpdateBody, negocioParams, negocioUbicacionBody, geocodificarQuery } from '../../validation/schemas.js';
+import { idParams, uuidParams, listQuery, importacionesQuery, importarQuery, expedienteCreateBody, expedienteUpdateBody, negocioParams, negocioUbicacionBody, geocodificarQuery, plantillaQuery } from '../../validation/schemas.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -16,6 +16,7 @@ router.use(authMiddleware);
 router.use(roleMiddleware(OPERATIONAL_MANAGERS));
 router.get('/', validate({ query: listQuery }), controller.listar);
 // Historial de importaciones (trazabilidad del dato). Va antes de '/:id'.
+router.get('/plantilla', validate({ query: plantillaQuery }), controller.plantilla);
 router.get('/importaciones', validate({ query: importacionesQuery }), controller.listarImportaciones);
 router.get('/importaciones/:id', validate({ params: uuidParams }), controller.obtenerImportacion);
 router.post('/importaciones/:id/liberar', validate({ params: uuidParams }), controller.liberarImportacion);

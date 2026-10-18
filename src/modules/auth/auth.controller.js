@@ -2,6 +2,7 @@ import authService from "./auth.service.js";
 import { sinEmpresa } from '#core/tenant/contexto.js';
 import { publica as empresaPublica } from '#modules/empresas/empresas.service.js';
 import * as mfaService from "./mfa.service.js";
+import { configuracion as configuracionSso } from "./sso.service.js";
 
 // Mapa de traducción de códigos de error internos a códigos de estado HTTP
 const ERROR_STATUS_MAP = {
@@ -50,6 +51,19 @@ async function login(req, res) {
       error: "Error interno del servidor al procesar el inicio de sesión"
     });
   }
+}
+
+// Lo que el panel necesita para mandar a la persona a cuenta.sulotec.com (nada secreto).
+function ssoConfig(_req, res) {
+  const cfg = configuracionSso();
+  res.json(cfg.activo ? { activo: true, issuer: cfg.issuer, clientId: cfg.clientId } : { activo: false });
+}
+
+async function sso(req, res, next) {
+  try {
+    const resultado = await authService.loginSso(req.body);
+    res.json({ token: resultado.token, user: resultado.user });
+  } catch (error) { next(error); }
 }
 
 async function verifyMfa(req, res, next) {
@@ -118,7 +132,7 @@ async function me(req, res) {
   }
 }
 
-export default {
+export default { sso, ssoConfig,
   login,
   verifyMfa,
   setupMfaEnrollment,

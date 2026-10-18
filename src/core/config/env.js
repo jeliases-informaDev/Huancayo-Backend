@@ -76,6 +76,9 @@ const schema = z.object({
   // Render inyecta RENDER_EXTERNAL_URL con la URL pública del propio servicio; se usa
   // como valor por defecto para no tener que configurarlo a mano tras cada deploy.
   EVIDENCIAS_BASE_URL: z.string().default(process.env.RENDER_EXTERNAL_URL || 'http://localhost:4100'),
+  // Inicio de sesión con la cuenta Sulotec (Keycloak): emisor del realm y cliente público del panel. Vacíos = apagado.
+  SSO_ISSUER: z.string().trim().optional(),
+  SSO_CLIENT_ID: z.string().trim().max(100).optional(),
   // Anti-fraude: radio máximo (metros) entre el domicilio del expediente y el punto de la visita.
   GEOFENCE_RADIO_METROS: z.coerce.number().int().min(10).max(50000).default(100),
   GEOFENCE_PRECISION_MAXIMA_METROS: z.coerce.number().int().min(5).max(5000).default(100),
