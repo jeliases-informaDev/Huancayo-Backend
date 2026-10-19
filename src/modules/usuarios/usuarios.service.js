@@ -1,4 +1,5 @@
 import prisma from '#core/config/prisma.js';
+import { VERSION_TERMINOS } from '#modules/terminos/terminos.reglas.js';
 import bcrypt from 'bcryptjs';
 import { ALL_ROLES, FIELD_ROLES, ROLES, normalizeRole } from '#core/security/roles.js';
 import { empresaActual, sinEmpresa } from '#core/tenant/contexto.js';
@@ -47,8 +48,12 @@ function assertRole(role) {
 async function listar() {
   // Tope defensivo: hoy son unas pocas decenas de cuentas de personal, pero la
   // consulta no debe quedar sin límite si la planilla de usuarios crece.
-  const usuarios = await prisma.usuario.findMany({ orderBy: { fecha_creacion: 'asc' }, take: 1000 });
-  return usuarios.map(mapUsuario);
+  const usuarios = await prisma.usuario.findMany({
+    orderBy: { fecha_creacion: 'asc' }, take: 1000,
+    // Si ya aceptó la versión vigente de los términos (desde la app o el panel), para que el administrador lo vea.
+    include: { aceptacionesTerminos: { where: { version: VERSION_TERMINOS }, select: { version: true, fecha: true, plataforma: true }, take: 1 } },
+  });
+  return usuarios.map((u) => ({ ...mapUsuario(u), terminos: u.aceptacionesTerminos?.[0] || null }));
 }
 
 // Lista acotada para que el Auditor de Oficina arme asignaciones y filtre visitas,

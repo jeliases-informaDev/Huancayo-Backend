@@ -379,6 +379,17 @@ exports.Prisma.ImportacionMasivaScalarFieldEnum = {
   fecha_fin: 'fecha_fin'
 };
 
+exports.Prisma.AceptacionTerminosScalarFieldEnum = {
+  id_aceptacion: 'id_aceptacion',
+  empresa_id: 'empresa_id',
+  usuario_id: 'usuario_id',
+  version: 'version',
+  plataforma: 'plataforma',
+  ip: 'ip',
+  user_agent: 'user_agent',
+  fecha: 'fecha'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -558,6 +569,16 @@ exports.Prisma.ImportacionMasivaOrderByRelevanceFieldEnum = {
   archivo_sha256: 'archivo_sha256',
   formato: 'formato'
 };
+
+exports.Prisma.AceptacionTerminosOrderByRelevanceFieldEnum = {
+  id_aceptacion: 'id_aceptacion',
+  empresa_id: 'empresa_id',
+  usuario_id: 'usuario_id',
+  version: 'version',
+  plataforma: 'plataforma',
+  ip: 'ip',
+  user_agent: 'user_agent'
+};
 exports.TipoCredito = exports.$Enums.TipoCredito = {
   CONSUMO: 'CONSUMO',
   OTROS: 'OTROS'
@@ -583,7 +604,8 @@ exports.Prisma.ModelName = {
   VisitaAuditoria: 'VisitaAuditoria',
   Evidencia: 'Evidencia',
   AuditoriaSeguridad: 'AuditoriaSeguridad',
-  ImportacionMasiva: 'ImportacionMasiva'
+  ImportacionMasiva: 'ImportacionMasiva',
+  AceptacionTerminos: 'AceptacionTerminos'
 };
 
 /**

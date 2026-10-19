@@ -87,11 +87,12 @@ model Usuario {
   jornada_inicio      DateTime?
   jornada_fin         DateTime?
 
-  asignaciones AsignacionAuditoria[]
-  visitas      VisitaAuditoria[]
-  dispositivos DispositivoAutorizado[]
-  trackings    TrackingUbicacion[]
-  eventosCampo EventoCampo[]
+  asignaciones         AsignacionAuditoria[]
+  visitas              VisitaAuditoria[]
+  dispositivos         DispositivoAutorizado[]
+  trackings            TrackingUbicacion[]
+  eventosCampo         EventoCampo[]
+  aceptacionesTerminos AceptacionTerminos[]
 
   @@index([empresa_id, rol])
   @@map("usuarios")
@@ -439,4 +440,23 @@ model ImportacionMasiva {
   @@index([actor_id, fecha_creacion])
   @@index([empresa_id, fecha_creacion])
   @@map("importaciones_masivas")
+}
+
+// Aceptación de los términos y condiciones de uso: quién aceptó qué versión, cuándo y desde qué plataforma (app o panel).
+// Una aceptación por usuario y versión; al cambiar el texto se sube la versión y todos vuelven a aceptar.
+model AceptacionTerminos {
+  id_aceptacion String   @id @default(uuid()) @db.VarChar(36)
+  empresa_id    String?  @db.VarChar(36) // nulo solo para el administrador universal (exento)
+  usuario_id    String   @db.VarChar(36)
+  version       String   @db.VarChar(20)
+  plataforma    String   @db.VarChar(10) // WEB | MOVIL
+  ip            String?  @db.VarChar(64)
+  user_agent    String?  @db.VarChar(255)
+  fecha         DateTime @default(now())
+
+  usuario Usuario @relation(fields: [usuario_id], references: [id_usuario])
+
+  @@unique([usuario_id, version])
+  @@index([empresa_id])
+  @@map("aceptaciones_terminos")
 }

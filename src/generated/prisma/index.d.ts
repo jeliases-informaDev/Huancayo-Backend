@@ -84,6 +84,11 @@ export type AuditoriaSeguridad = $Result.DefaultSelection<Prisma.$AuditoriaSegur
  * Importación masiva de expedientes por Excel (no hay integración en vivo con Caja Huancayo todavía)
  */
 export type ImportacionMasiva = $Result.DefaultSelection<Prisma.$ImportacionMasivaPayload>
+/**
+ * Model AceptacionTerminos
+ * 
+ */
+export type AceptacionTerminos = $Result.DefaultSelection<Prisma.$AceptacionTerminosPayload>
 
 /**
  * Enums
@@ -366,6 +371,16 @@ export class PrismaClient<
     * ```
     */
   get importacionMasiva(): Prisma.ImportacionMasivaDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.aceptacionTerminos`: Exposes CRUD operations for the **AceptacionTerminos** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AceptacionTerminos
+    * const aceptacionTerminos = await prisma.aceptacionTerminos.findMany()
+    * ```
+    */
+  get aceptacionTerminos(): Prisma.AceptacionTerminosDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -825,7 +840,8 @@ export namespace Prisma {
     VisitaAuditoria: 'VisitaAuditoria',
     Evidencia: 'Evidencia',
     AuditoriaSeguridad: 'AuditoriaSeguridad',
-    ImportacionMasiva: 'ImportacionMasiva'
+    ImportacionMasiva: 'ImportacionMasiva',
+    AceptacionTerminos: 'AceptacionTerminos'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -841,7 +857,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "empresa" | "usuario" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva"
+      modelProps: "empresa" | "usuario" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva" | "aceptacionTerminos"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1703,6 +1719,72 @@ export namespace Prisma {
           }
         }
       }
+      AceptacionTerminos: {
+        payload: Prisma.$AceptacionTerminosPayload<ExtArgs>
+        fields: Prisma.AceptacionTerminosFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AceptacionTerminosFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AceptacionTerminosPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AceptacionTerminosFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AceptacionTerminosPayload>
+          }
+          findFirst: {
+            args: Prisma.AceptacionTerminosFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AceptacionTerminosPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AceptacionTerminosFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AceptacionTerminosPayload>
+          }
+          findMany: {
+            args: Prisma.AceptacionTerminosFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AceptacionTerminosPayload>[]
+          }
+          create: {
+            args: Prisma.AceptacionTerminosCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AceptacionTerminosPayload>
+          }
+          createMany: {
+            args: Prisma.AceptacionTerminosCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.AceptacionTerminosDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AceptacionTerminosPayload>
+          }
+          update: {
+            args: Prisma.AceptacionTerminosUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AceptacionTerminosPayload>
+          }
+          deleteMany: {
+            args: Prisma.AceptacionTerminosDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AceptacionTerminosUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AceptacionTerminosUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AceptacionTerminosPayload>
+          }
+          aggregate: {
+            args: Prisma.AceptacionTerminosAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAceptacionTerminos>
+          }
+          groupBy: {
+            args: Prisma.AceptacionTerminosGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AceptacionTerminosGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AceptacionTerminosCountArgs<ExtArgs>
+            result: $Utils.Optional<AceptacionTerminosCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1839,6 +1921,7 @@ export namespace Prisma {
     evidencia?: EvidenciaOmit
     auditoriaSeguridad?: AuditoriaSeguridadOmit
     importacionMasiva?: ImportacionMasivaOmit
+    aceptacionTerminos?: AceptacionTerminosOmit
   }
 
   /* Types for Logging */
@@ -1924,6 +2007,7 @@ export namespace Prisma {
     dispositivos: number
     trackings: number
     eventosCampo: number
+    aceptacionesTerminos: number
   }
 
   export type UsuarioCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1932,6 +2016,7 @@ export namespace Prisma {
     dispositivos?: boolean | UsuarioCountOutputTypeCountDispositivosArgs
     trackings?: boolean | UsuarioCountOutputTypeCountTrackingsArgs
     eventosCampo?: boolean | UsuarioCountOutputTypeCountEventosCampoArgs
+    aceptacionesTerminos?: boolean | UsuarioCountOutputTypeCountAceptacionesTerminosArgs
   }
 
   // Custom InputTypes
@@ -1978,6 +2063,13 @@ export namespace Prisma {
    */
   export type UsuarioCountOutputTypeCountEventosCampoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: EventoCampoWhereInput
+  }
+
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeCountAceptacionesTerminosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AceptacionTerminosWhereInput
   }
 
 
@@ -3475,6 +3567,7 @@ export namespace Prisma {
     dispositivos?: boolean | Usuario$dispositivosArgs<ExtArgs>
     trackings?: boolean | Usuario$trackingsArgs<ExtArgs>
     eventosCampo?: boolean | Usuario$eventosCampoArgs<ExtArgs>
+    aceptacionesTerminos?: boolean | Usuario$aceptacionesTerminosArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["usuario"]>
 
@@ -3525,6 +3618,7 @@ export namespace Prisma {
     dispositivos?: boolean | Usuario$dispositivosArgs<ExtArgs>
     trackings?: boolean | Usuario$trackingsArgs<ExtArgs>
     eventosCampo?: boolean | Usuario$eventosCampoArgs<ExtArgs>
+    aceptacionesTerminos?: boolean | Usuario$aceptacionesTerminosArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -3536,6 +3630,7 @@ export namespace Prisma {
       dispositivos: Prisma.$DispositivoAutorizadoPayload<ExtArgs>[]
       trackings: Prisma.$TrackingUbicacionPayload<ExtArgs>[]
       eventosCampo: Prisma.$EventoCampoPayload<ExtArgs>[]
+      aceptacionesTerminos: Prisma.$AceptacionTerminosPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id_usuario: string
@@ -3918,6 +4013,7 @@ export namespace Prisma {
     dispositivos<T extends Usuario$dispositivosArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$dispositivosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DispositivoAutorizadoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     trackings<T extends Usuario$trackingsArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$trackingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     eventosCampo<T extends Usuario$eventosCampoArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$eventosCampoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    aceptacionesTerminos<T extends Usuario$aceptacionesTerminosArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$aceptacionesTerminosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4447,6 +4543,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: EventoCampoScalarFieldEnum | EventoCampoScalarFieldEnum[]
+  }
+
+  /**
+   * Usuario.aceptacionesTerminos
+   */
+  export type Usuario$aceptacionesTerminosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    where?: AceptacionTerminosWhereInput
+    orderBy?: AceptacionTerminosOrderByWithRelationInput | AceptacionTerminosOrderByWithRelationInput[]
+    cursor?: AceptacionTerminosWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AceptacionTerminosScalarFieldEnum | AceptacionTerminosScalarFieldEnum[]
   }
 
   /**
@@ -16424,6 +16544,973 @@ export namespace Prisma {
 
 
   /**
+   * Model AceptacionTerminos
+   */
+
+  export type AggregateAceptacionTerminos = {
+    _count: AceptacionTerminosCountAggregateOutputType | null
+    _min: AceptacionTerminosMinAggregateOutputType | null
+    _max: AceptacionTerminosMaxAggregateOutputType | null
+  }
+
+  export type AceptacionTerminosMinAggregateOutputType = {
+    id_aceptacion: string | null
+    empresa_id: string | null
+    usuario_id: string | null
+    version: string | null
+    plataforma: string | null
+    ip: string | null
+    user_agent: string | null
+    fecha: Date | null
+  }
+
+  export type AceptacionTerminosMaxAggregateOutputType = {
+    id_aceptacion: string | null
+    empresa_id: string | null
+    usuario_id: string | null
+    version: string | null
+    plataforma: string | null
+    ip: string | null
+    user_agent: string | null
+    fecha: Date | null
+  }
+
+  export type AceptacionTerminosCountAggregateOutputType = {
+    id_aceptacion: number
+    empresa_id: number
+    usuario_id: number
+    version: number
+    plataforma: number
+    ip: number
+    user_agent: number
+    fecha: number
+    _all: number
+  }
+
+
+  export type AceptacionTerminosMinAggregateInputType = {
+    id_aceptacion?: true
+    empresa_id?: true
+    usuario_id?: true
+    version?: true
+    plataforma?: true
+    ip?: true
+    user_agent?: true
+    fecha?: true
+  }
+
+  export type AceptacionTerminosMaxAggregateInputType = {
+    id_aceptacion?: true
+    empresa_id?: true
+    usuario_id?: true
+    version?: true
+    plataforma?: true
+    ip?: true
+    user_agent?: true
+    fecha?: true
+  }
+
+  export type AceptacionTerminosCountAggregateInputType = {
+    id_aceptacion?: true
+    empresa_id?: true
+    usuario_id?: true
+    version?: true
+    plataforma?: true
+    ip?: true
+    user_agent?: true
+    fecha?: true
+    _all?: true
+  }
+
+  export type AceptacionTerminosAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AceptacionTerminos to aggregate.
+     */
+    where?: AceptacionTerminosWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AceptacionTerminos to fetch.
+     */
+    orderBy?: AceptacionTerminosOrderByWithRelationInput | AceptacionTerminosOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AceptacionTerminosWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AceptacionTerminos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AceptacionTerminos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AceptacionTerminos
+    **/
+    _count?: true | AceptacionTerminosCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AceptacionTerminosMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AceptacionTerminosMaxAggregateInputType
+  }
+
+  export type GetAceptacionTerminosAggregateType<T extends AceptacionTerminosAggregateArgs> = {
+        [P in keyof T & keyof AggregateAceptacionTerminos]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAceptacionTerminos[P]>
+      : GetScalarType<T[P], AggregateAceptacionTerminos[P]>
+  }
+
+
+
+
+  export type AceptacionTerminosGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AceptacionTerminosWhereInput
+    orderBy?: AceptacionTerminosOrderByWithAggregationInput | AceptacionTerminosOrderByWithAggregationInput[]
+    by: AceptacionTerminosScalarFieldEnum[] | AceptacionTerminosScalarFieldEnum
+    having?: AceptacionTerminosScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AceptacionTerminosCountAggregateInputType | true
+    _min?: AceptacionTerminosMinAggregateInputType
+    _max?: AceptacionTerminosMaxAggregateInputType
+  }
+
+  export type AceptacionTerminosGroupByOutputType = {
+    id_aceptacion: string
+    empresa_id: string | null
+    usuario_id: string
+    version: string
+    plataforma: string
+    ip: string | null
+    user_agent: string | null
+    fecha: Date
+    _count: AceptacionTerminosCountAggregateOutputType | null
+    _min: AceptacionTerminosMinAggregateOutputType | null
+    _max: AceptacionTerminosMaxAggregateOutputType | null
+  }
+
+  type GetAceptacionTerminosGroupByPayload<T extends AceptacionTerminosGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AceptacionTerminosGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AceptacionTerminosGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AceptacionTerminosGroupByOutputType[P]>
+            : GetScalarType<T[P], AceptacionTerminosGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AceptacionTerminosSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id_aceptacion?: boolean
+    empresa_id?: boolean
+    usuario_id?: boolean
+    version?: boolean
+    plataforma?: boolean
+    ip?: boolean
+    user_agent?: boolean
+    fecha?: boolean
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["aceptacionTerminos"]>
+
+
+
+  export type AceptacionTerminosSelectScalar = {
+    id_aceptacion?: boolean
+    empresa_id?: boolean
+    usuario_id?: boolean
+    version?: boolean
+    plataforma?: boolean
+    ip?: boolean
+    user_agent?: boolean
+    fecha?: boolean
+  }
+
+  export type AceptacionTerminosOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_aceptacion" | "empresa_id" | "usuario_id" | "version" | "plataforma" | "ip" | "user_agent" | "fecha", ExtArgs["result"]["aceptacionTerminos"]>
+  export type AceptacionTerminosInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }
+
+  export type $AceptacionTerminosPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AceptacionTerminos"
+    objects: {
+      usuario: Prisma.$UsuarioPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id_aceptacion: string
+      empresa_id: string | null
+      usuario_id: string
+      version: string
+      plataforma: string
+      ip: string | null
+      user_agent: string | null
+      fecha: Date
+    }, ExtArgs["result"]["aceptacionTerminos"]>
+    composites: {}
+  }
+
+  type AceptacionTerminosGetPayload<S extends boolean | null | undefined | AceptacionTerminosDefaultArgs> = $Result.GetResult<Prisma.$AceptacionTerminosPayload, S>
+
+  type AceptacionTerminosCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AceptacionTerminosFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AceptacionTerminosCountAggregateInputType | true
+    }
+
+  export interface AceptacionTerminosDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AceptacionTerminos'], meta: { name: 'AceptacionTerminos' } }
+    /**
+     * Find zero or one AceptacionTerminos that matches the filter.
+     * @param {AceptacionTerminosFindUniqueArgs} args - Arguments to find a AceptacionTerminos
+     * @example
+     * // Get one AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AceptacionTerminosFindUniqueArgs>(args: SelectSubset<T, AceptacionTerminosFindUniqueArgs<ExtArgs>>): Prisma__AceptacionTerminosClient<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AceptacionTerminos that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AceptacionTerminosFindUniqueOrThrowArgs} args - Arguments to find a AceptacionTerminos
+     * @example
+     * // Get one AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AceptacionTerminosFindUniqueOrThrowArgs>(args: SelectSubset<T, AceptacionTerminosFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AceptacionTerminosClient<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AceptacionTerminos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AceptacionTerminosFindFirstArgs} args - Arguments to find a AceptacionTerminos
+     * @example
+     * // Get one AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AceptacionTerminosFindFirstArgs>(args?: SelectSubset<T, AceptacionTerminosFindFirstArgs<ExtArgs>>): Prisma__AceptacionTerminosClient<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AceptacionTerminos that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AceptacionTerminosFindFirstOrThrowArgs} args - Arguments to find a AceptacionTerminos
+     * @example
+     * // Get one AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AceptacionTerminosFindFirstOrThrowArgs>(args?: SelectSubset<T, AceptacionTerminosFindFirstOrThrowArgs<ExtArgs>>): Prisma__AceptacionTerminosClient<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AceptacionTerminos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AceptacionTerminosFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.findMany()
+     * 
+     * // Get first 10 AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.findMany({ take: 10 })
+     * 
+     * // Only select the `id_aceptacion`
+     * const aceptacionTerminosWithId_aceptacionOnly = await prisma.aceptacionTerminos.findMany({ select: { id_aceptacion: true } })
+     * 
+     */
+    findMany<T extends AceptacionTerminosFindManyArgs>(args?: SelectSubset<T, AceptacionTerminosFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AceptacionTerminos.
+     * @param {AceptacionTerminosCreateArgs} args - Arguments to create a AceptacionTerminos.
+     * @example
+     * // Create one AceptacionTerminos
+     * const AceptacionTerminos = await prisma.aceptacionTerminos.create({
+     *   data: {
+     *     // ... data to create a AceptacionTerminos
+     *   }
+     * })
+     * 
+     */
+    create<T extends AceptacionTerminosCreateArgs>(args: SelectSubset<T, AceptacionTerminosCreateArgs<ExtArgs>>): Prisma__AceptacionTerminosClient<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AceptacionTerminos.
+     * @param {AceptacionTerminosCreateManyArgs} args - Arguments to create many AceptacionTerminos.
+     * @example
+     * // Create many AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AceptacionTerminosCreateManyArgs>(args?: SelectSubset<T, AceptacionTerminosCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a AceptacionTerminos.
+     * @param {AceptacionTerminosDeleteArgs} args - Arguments to delete one AceptacionTerminos.
+     * @example
+     * // Delete one AceptacionTerminos
+     * const AceptacionTerminos = await prisma.aceptacionTerminos.delete({
+     *   where: {
+     *     // ... filter to delete one AceptacionTerminos
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AceptacionTerminosDeleteArgs>(args: SelectSubset<T, AceptacionTerminosDeleteArgs<ExtArgs>>): Prisma__AceptacionTerminosClient<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AceptacionTerminos.
+     * @param {AceptacionTerminosUpdateArgs} args - Arguments to update one AceptacionTerminos.
+     * @example
+     * // Update one AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AceptacionTerminosUpdateArgs>(args: SelectSubset<T, AceptacionTerminosUpdateArgs<ExtArgs>>): Prisma__AceptacionTerminosClient<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AceptacionTerminos.
+     * @param {AceptacionTerminosDeleteManyArgs} args - Arguments to filter AceptacionTerminos to delete.
+     * @example
+     * // Delete a few AceptacionTerminos
+     * const { count } = await prisma.aceptacionTerminos.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AceptacionTerminosDeleteManyArgs>(args?: SelectSubset<T, AceptacionTerminosDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AceptacionTerminos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AceptacionTerminosUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AceptacionTerminosUpdateManyArgs>(args: SelectSubset<T, AceptacionTerminosUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AceptacionTerminos.
+     * @param {AceptacionTerminosUpsertArgs} args - Arguments to update or create a AceptacionTerminos.
+     * @example
+     * // Update or create a AceptacionTerminos
+     * const aceptacionTerminos = await prisma.aceptacionTerminos.upsert({
+     *   create: {
+     *     // ... data to create a AceptacionTerminos
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AceptacionTerminos we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AceptacionTerminosUpsertArgs>(args: SelectSubset<T, AceptacionTerminosUpsertArgs<ExtArgs>>): Prisma__AceptacionTerminosClient<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AceptacionTerminos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AceptacionTerminosCountArgs} args - Arguments to filter AceptacionTerminos to count.
+     * @example
+     * // Count the number of AceptacionTerminos
+     * const count = await prisma.aceptacionTerminos.count({
+     *   where: {
+     *     // ... the filter for the AceptacionTerminos we want to count
+     *   }
+     * })
+    **/
+    count<T extends AceptacionTerminosCountArgs>(
+      args?: Subset<T, AceptacionTerminosCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AceptacionTerminosCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AceptacionTerminos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AceptacionTerminosAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AceptacionTerminosAggregateArgs>(args: Subset<T, AceptacionTerminosAggregateArgs>): Prisma.PrismaPromise<GetAceptacionTerminosAggregateType<T>>
+
+    /**
+     * Group by AceptacionTerminos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AceptacionTerminosGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AceptacionTerminosGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AceptacionTerminosGroupByArgs['orderBy'] }
+        : { orderBy?: AceptacionTerminosGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AceptacionTerminosGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAceptacionTerminosGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AceptacionTerminos model
+   */
+  readonly fields: AceptacionTerminosFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AceptacionTerminos.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AceptacionTerminosClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AceptacionTerminos model
+   */
+  interface AceptacionTerminosFieldRefs {
+    readonly id_aceptacion: FieldRef<"AceptacionTerminos", 'String'>
+    readonly empresa_id: FieldRef<"AceptacionTerminos", 'String'>
+    readonly usuario_id: FieldRef<"AceptacionTerminos", 'String'>
+    readonly version: FieldRef<"AceptacionTerminos", 'String'>
+    readonly plataforma: FieldRef<"AceptacionTerminos", 'String'>
+    readonly ip: FieldRef<"AceptacionTerminos", 'String'>
+    readonly user_agent: FieldRef<"AceptacionTerminos", 'String'>
+    readonly fecha: FieldRef<"AceptacionTerminos", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AceptacionTerminos findUnique
+   */
+  export type AceptacionTerminosFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    /**
+     * Filter, which AceptacionTerminos to fetch.
+     */
+    where: AceptacionTerminosWhereUniqueInput
+  }
+
+  /**
+   * AceptacionTerminos findUniqueOrThrow
+   */
+  export type AceptacionTerminosFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    /**
+     * Filter, which AceptacionTerminos to fetch.
+     */
+    where: AceptacionTerminosWhereUniqueInput
+  }
+
+  /**
+   * AceptacionTerminos findFirst
+   */
+  export type AceptacionTerminosFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    /**
+     * Filter, which AceptacionTerminos to fetch.
+     */
+    where?: AceptacionTerminosWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AceptacionTerminos to fetch.
+     */
+    orderBy?: AceptacionTerminosOrderByWithRelationInput | AceptacionTerminosOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AceptacionTerminos.
+     */
+    cursor?: AceptacionTerminosWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AceptacionTerminos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AceptacionTerminos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AceptacionTerminos.
+     */
+    distinct?: AceptacionTerminosScalarFieldEnum | AceptacionTerminosScalarFieldEnum[]
+  }
+
+  /**
+   * AceptacionTerminos findFirstOrThrow
+   */
+  export type AceptacionTerminosFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    /**
+     * Filter, which AceptacionTerminos to fetch.
+     */
+    where?: AceptacionTerminosWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AceptacionTerminos to fetch.
+     */
+    orderBy?: AceptacionTerminosOrderByWithRelationInput | AceptacionTerminosOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AceptacionTerminos.
+     */
+    cursor?: AceptacionTerminosWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AceptacionTerminos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AceptacionTerminos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AceptacionTerminos.
+     */
+    distinct?: AceptacionTerminosScalarFieldEnum | AceptacionTerminosScalarFieldEnum[]
+  }
+
+  /**
+   * AceptacionTerminos findMany
+   */
+  export type AceptacionTerminosFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    /**
+     * Filter, which AceptacionTerminos to fetch.
+     */
+    where?: AceptacionTerminosWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AceptacionTerminos to fetch.
+     */
+    orderBy?: AceptacionTerminosOrderByWithRelationInput | AceptacionTerminosOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AceptacionTerminos.
+     */
+    cursor?: AceptacionTerminosWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AceptacionTerminos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AceptacionTerminos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AceptacionTerminos.
+     */
+    distinct?: AceptacionTerminosScalarFieldEnum | AceptacionTerminosScalarFieldEnum[]
+  }
+
+  /**
+   * AceptacionTerminos create
+   */
+  export type AceptacionTerminosCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AceptacionTerminos.
+     */
+    data: XOR<AceptacionTerminosCreateInput, AceptacionTerminosUncheckedCreateInput>
+  }
+
+  /**
+   * AceptacionTerminos createMany
+   */
+  export type AceptacionTerminosCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AceptacionTerminos.
+     */
+    data: AceptacionTerminosCreateManyInput | AceptacionTerminosCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AceptacionTerminos update
+   */
+  export type AceptacionTerminosUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AceptacionTerminos.
+     */
+    data: XOR<AceptacionTerminosUpdateInput, AceptacionTerminosUncheckedUpdateInput>
+    /**
+     * Choose, which AceptacionTerminos to update.
+     */
+    where: AceptacionTerminosWhereUniqueInput
+  }
+
+  /**
+   * AceptacionTerminos updateMany
+   */
+  export type AceptacionTerminosUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AceptacionTerminos.
+     */
+    data: XOR<AceptacionTerminosUpdateManyMutationInput, AceptacionTerminosUncheckedUpdateManyInput>
+    /**
+     * Filter which AceptacionTerminos to update
+     */
+    where?: AceptacionTerminosWhereInput
+    /**
+     * Limit how many AceptacionTerminos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AceptacionTerminos upsert
+   */
+  export type AceptacionTerminosUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AceptacionTerminos to update in case it exists.
+     */
+    where: AceptacionTerminosWhereUniqueInput
+    /**
+     * In case the AceptacionTerminos found by the `where` argument doesn't exist, create a new AceptacionTerminos with this data.
+     */
+    create: XOR<AceptacionTerminosCreateInput, AceptacionTerminosUncheckedCreateInput>
+    /**
+     * In case the AceptacionTerminos was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AceptacionTerminosUpdateInput, AceptacionTerminosUncheckedUpdateInput>
+  }
+
+  /**
+   * AceptacionTerminos delete
+   */
+  export type AceptacionTerminosDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+    /**
+     * Filter which AceptacionTerminos to delete.
+     */
+    where: AceptacionTerminosWhereUniqueInput
+  }
+
+  /**
+   * AceptacionTerminos deleteMany
+   */
+  export type AceptacionTerminosDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AceptacionTerminos to delete
+     */
+    where?: AceptacionTerminosWhereInput
+    /**
+     * Limit how many AceptacionTerminos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AceptacionTerminos without action
+   */
+  export type AceptacionTerminosDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AceptacionTerminos
+     */
+    select?: AceptacionTerminosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AceptacionTerminos
+     */
+    omit?: AceptacionTerminosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AceptacionTerminosInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -16735,6 +17822,20 @@ export namespace Prisma {
   export type ImportacionMasivaScalarFieldEnum = (typeof ImportacionMasivaScalarFieldEnum)[keyof typeof ImportacionMasivaScalarFieldEnum]
 
 
+  export const AceptacionTerminosScalarFieldEnum: {
+    id_aceptacion: 'id_aceptacion',
+    empresa_id: 'empresa_id',
+    usuario_id: 'usuario_id',
+    version: 'version',
+    plataforma: 'plataforma',
+    ip: 'ip',
+    user_agent: 'user_agent',
+    fecha: 'fecha'
+  };
+
+  export type AceptacionTerminosScalarFieldEnum = (typeof AceptacionTerminosScalarFieldEnum)[keyof typeof AceptacionTerminosScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -16972,6 +18073,19 @@ export namespace Prisma {
   export type ImportacionMasivaOrderByRelevanceFieldEnum = (typeof ImportacionMasivaOrderByRelevanceFieldEnum)[keyof typeof ImportacionMasivaOrderByRelevanceFieldEnum]
 
 
+  export const AceptacionTerminosOrderByRelevanceFieldEnum: {
+    id_aceptacion: 'id_aceptacion',
+    empresa_id: 'empresa_id',
+    usuario_id: 'usuario_id',
+    version: 'version',
+    plataforma: 'plataforma',
+    ip: 'ip',
+    user_agent: 'user_agent'
+  };
+
+  export type AceptacionTerminosOrderByRelevanceFieldEnum = (typeof AceptacionTerminosOrderByRelevanceFieldEnum)[keyof typeof AceptacionTerminosOrderByRelevanceFieldEnum]
+
+
   /**
    * Field references
    */
@@ -17179,6 +18293,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoListRelationFilter
     trackings?: TrackingUbicacionListRelationFilter
     eventosCampo?: EventoCampoListRelationFilter
+    aceptacionesTerminos?: AceptacionTerminosListRelationFilter
   }
 
   export type UsuarioOrderByWithRelationInput = {
@@ -17222,6 +18337,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoOrderByRelationAggregateInput
     trackings?: TrackingUbicacionOrderByRelationAggregateInput
     eventosCampo?: EventoCampoOrderByRelationAggregateInput
+    aceptacionesTerminos?: AceptacionTerminosOrderByRelationAggregateInput
     _relevance?: UsuarioOrderByRelevanceInput
   }
 
@@ -17269,6 +18385,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoListRelationFilter
     trackings?: TrackingUbicacionListRelationFilter
     eventosCampo?: EventoCampoListRelationFilter
+    aceptacionesTerminos?: AceptacionTerminosListRelationFilter
   }, "id_usuario" | "username">
 
   export type UsuarioOrderByWithAggregationInput = {
@@ -18605,6 +19722,78 @@ export namespace Prisma {
     fecha_fin?: DateTimeNullableWithAggregatesFilter<"ImportacionMasiva"> | Date | string | null
   }
 
+  export type AceptacionTerminosWhereInput = {
+    AND?: AceptacionTerminosWhereInput | AceptacionTerminosWhereInput[]
+    OR?: AceptacionTerminosWhereInput[]
+    NOT?: AceptacionTerminosWhereInput | AceptacionTerminosWhereInput[]
+    id_aceptacion?: StringFilter<"AceptacionTerminos"> | string
+    empresa_id?: StringNullableFilter<"AceptacionTerminos"> | string | null
+    usuario_id?: StringFilter<"AceptacionTerminos"> | string
+    version?: StringFilter<"AceptacionTerminos"> | string
+    plataforma?: StringFilter<"AceptacionTerminos"> | string
+    ip?: StringNullableFilter<"AceptacionTerminos"> | string | null
+    user_agent?: StringNullableFilter<"AceptacionTerminos"> | string | null
+    fecha?: DateTimeFilter<"AceptacionTerminos"> | Date | string
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }
+
+  export type AceptacionTerminosOrderByWithRelationInput = {
+    id_aceptacion?: SortOrder
+    empresa_id?: SortOrderInput | SortOrder
+    usuario_id?: SortOrder
+    version?: SortOrder
+    plataforma?: SortOrder
+    ip?: SortOrderInput | SortOrder
+    user_agent?: SortOrderInput | SortOrder
+    fecha?: SortOrder
+    usuario?: UsuarioOrderByWithRelationInput
+    _relevance?: AceptacionTerminosOrderByRelevanceInput
+  }
+
+  export type AceptacionTerminosWhereUniqueInput = Prisma.AtLeast<{
+    id_aceptacion?: string
+    usuario_id_version?: AceptacionTerminosUsuario_idVersionCompoundUniqueInput
+    AND?: AceptacionTerminosWhereInput | AceptacionTerminosWhereInput[]
+    OR?: AceptacionTerminosWhereInput[]
+    NOT?: AceptacionTerminosWhereInput | AceptacionTerminosWhereInput[]
+    empresa_id?: StringNullableFilter<"AceptacionTerminos"> | string | null
+    usuario_id?: StringFilter<"AceptacionTerminos"> | string
+    version?: StringFilter<"AceptacionTerminos"> | string
+    plataforma?: StringFilter<"AceptacionTerminos"> | string
+    ip?: StringNullableFilter<"AceptacionTerminos"> | string | null
+    user_agent?: StringNullableFilter<"AceptacionTerminos"> | string | null
+    fecha?: DateTimeFilter<"AceptacionTerminos"> | Date | string
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }, "id_aceptacion" | "usuario_id_version">
+
+  export type AceptacionTerminosOrderByWithAggregationInput = {
+    id_aceptacion?: SortOrder
+    empresa_id?: SortOrderInput | SortOrder
+    usuario_id?: SortOrder
+    version?: SortOrder
+    plataforma?: SortOrder
+    ip?: SortOrderInput | SortOrder
+    user_agent?: SortOrderInput | SortOrder
+    fecha?: SortOrder
+    _count?: AceptacionTerminosCountOrderByAggregateInput
+    _max?: AceptacionTerminosMaxOrderByAggregateInput
+    _min?: AceptacionTerminosMinOrderByAggregateInput
+  }
+
+  export type AceptacionTerminosScalarWhereWithAggregatesInput = {
+    AND?: AceptacionTerminosScalarWhereWithAggregatesInput | AceptacionTerminosScalarWhereWithAggregatesInput[]
+    OR?: AceptacionTerminosScalarWhereWithAggregatesInput[]
+    NOT?: AceptacionTerminosScalarWhereWithAggregatesInput | AceptacionTerminosScalarWhereWithAggregatesInput[]
+    id_aceptacion?: StringWithAggregatesFilter<"AceptacionTerminos"> | string
+    empresa_id?: StringNullableWithAggregatesFilter<"AceptacionTerminos"> | string | null
+    usuario_id?: StringWithAggregatesFilter<"AceptacionTerminos"> | string
+    version?: StringWithAggregatesFilter<"AceptacionTerminos"> | string
+    plataforma?: StringWithAggregatesFilter<"AceptacionTerminos"> | string
+    ip?: StringNullableWithAggregatesFilter<"AceptacionTerminos"> | string | null
+    user_agent?: StringNullableWithAggregatesFilter<"AceptacionTerminos"> | string | null
+    fecha?: DateTimeWithAggregatesFilter<"AceptacionTerminos"> | Date | string
+  }
+
   export type EmpresaCreateInput = {
     id_empresa?: string
     nombre: string
@@ -18737,6 +19926,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateInput = {
@@ -18780,6 +19970,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUpdateInput = {
@@ -18823,6 +20014,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateInput = {
@@ -18866,6 +20058,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateManyInput = {
@@ -20439,6 +21632,82 @@ export namespace Prisma {
     fecha_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type AceptacionTerminosCreateInput = {
+    id_aceptacion?: string
+    empresa_id?: string | null
+    version: string
+    plataforma: string
+    ip?: string | null
+    user_agent?: string | null
+    fecha?: Date | string
+    usuario: UsuarioCreateNestedOneWithoutAceptacionesTerminosInput
+  }
+
+  export type AceptacionTerminosUncheckedCreateInput = {
+    id_aceptacion?: string
+    empresa_id?: string | null
+    usuario_id: string
+    version: string
+    plataforma: string
+    ip?: string | null
+    user_agent?: string | null
+    fecha?: Date | string
+  }
+
+  export type AceptacionTerminosUpdateInput = {
+    id_aceptacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    version?: StringFieldUpdateOperationsInput | string
+    plataforma?: StringFieldUpdateOperationsInput | string
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    user_agent?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha?: DateTimeFieldUpdateOperationsInput | Date | string
+    usuario?: UsuarioUpdateOneRequiredWithoutAceptacionesTerminosNestedInput
+  }
+
+  export type AceptacionTerminosUncheckedUpdateInput = {
+    id_aceptacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    usuario_id?: StringFieldUpdateOperationsInput | string
+    version?: StringFieldUpdateOperationsInput | string
+    plataforma?: StringFieldUpdateOperationsInput | string
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    user_agent?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AceptacionTerminosCreateManyInput = {
+    id_aceptacion?: string
+    empresa_id?: string | null
+    usuario_id: string
+    version: string
+    plataforma: string
+    ip?: string | null
+    user_agent?: string | null
+    fecha?: Date | string
+  }
+
+  export type AceptacionTerminosUpdateManyMutationInput = {
+    id_aceptacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    version?: StringFieldUpdateOperationsInput | string
+    plataforma?: StringFieldUpdateOperationsInput | string
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    user_agent?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AceptacionTerminosUncheckedUpdateManyInput = {
+    id_aceptacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    usuario_id?: StringFieldUpdateOperationsInput | string
+    version?: StringFieldUpdateOperationsInput | string
+    plataforma?: StringFieldUpdateOperationsInput | string
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    user_agent?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -20704,6 +21973,12 @@ export namespace Prisma {
     none?: EventoCampoWhereInput
   }
 
+  export type AceptacionTerminosListRelationFilter = {
+    every?: AceptacionTerminosWhereInput
+    some?: AceptacionTerminosWhereInput
+    none?: AceptacionTerminosWhereInput
+  }
+
   export type AsignacionAuditoriaOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -20721,6 +21996,10 @@ export namespace Prisma {
   }
 
   export type EventoCampoOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AceptacionTerminosOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -21923,6 +23202,50 @@ export namespace Prisma {
     errores?: SortOrder
   }
 
+  export type AceptacionTerminosOrderByRelevanceInput = {
+    fields: AceptacionTerminosOrderByRelevanceFieldEnum | AceptacionTerminosOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type AceptacionTerminosUsuario_idVersionCompoundUniqueInput = {
+    usuario_id: string
+    version: string
+  }
+
+  export type AceptacionTerminosCountOrderByAggregateInput = {
+    id_aceptacion?: SortOrder
+    empresa_id?: SortOrder
+    usuario_id?: SortOrder
+    version?: SortOrder
+    plataforma?: SortOrder
+    ip?: SortOrder
+    user_agent?: SortOrder
+    fecha?: SortOrder
+  }
+
+  export type AceptacionTerminosMaxOrderByAggregateInput = {
+    id_aceptacion?: SortOrder
+    empresa_id?: SortOrder
+    usuario_id?: SortOrder
+    version?: SortOrder
+    plataforma?: SortOrder
+    ip?: SortOrder
+    user_agent?: SortOrder
+    fecha?: SortOrder
+  }
+
+  export type AceptacionTerminosMinOrderByAggregateInput = {
+    id_aceptacion?: SortOrder
+    empresa_id?: SortOrder
+    usuario_id?: SortOrder
+    version?: SortOrder
+    plataforma?: SortOrder
+    ip?: SortOrder
+    user_agent?: SortOrder
+    fecha?: SortOrder
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -21970,6 +23293,13 @@ export namespace Prisma {
     connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
   }
 
+  export type AceptacionTerminosCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<AceptacionTerminosCreateWithoutUsuarioInput, AceptacionTerminosUncheckedCreateWithoutUsuarioInput> | AceptacionTerminosCreateWithoutUsuarioInput[] | AceptacionTerminosUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: AceptacionTerminosCreateOrConnectWithoutUsuarioInput | AceptacionTerminosCreateOrConnectWithoutUsuarioInput[]
+    createMany?: AceptacionTerminosCreateManyUsuarioInputEnvelope
+    connect?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutAuditorInput, AsignacionAuditoriaUncheckedCreateWithoutAuditorInput> | AsignacionAuditoriaCreateWithoutAuditorInput[] | AsignacionAuditoriaUncheckedCreateWithoutAuditorInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutAuditorInput | AsignacionAuditoriaCreateOrConnectWithoutAuditorInput[]
@@ -22003,6 +23333,13 @@ export namespace Prisma {
     connectOrCreate?: EventoCampoCreateOrConnectWithoutUsuarioInput | EventoCampoCreateOrConnectWithoutUsuarioInput[]
     createMany?: EventoCampoCreateManyUsuarioInputEnvelope
     connect?: EventoCampoWhereUniqueInput | EventoCampoWhereUniqueInput[]
+  }
+
+  export type AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<AceptacionTerminosCreateWithoutUsuarioInput, AceptacionTerminosUncheckedCreateWithoutUsuarioInput> | AceptacionTerminosCreateWithoutUsuarioInput[] | AceptacionTerminosUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: AceptacionTerminosCreateOrConnectWithoutUsuarioInput | AceptacionTerminosCreateOrConnectWithoutUsuarioInput[]
+    createMany?: AceptacionTerminosCreateManyUsuarioInputEnvelope
+    connect?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -22107,6 +23444,20 @@ export namespace Prisma {
     deleteMany?: EventoCampoScalarWhereInput | EventoCampoScalarWhereInput[]
   }
 
+  export type AceptacionTerminosUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<AceptacionTerminosCreateWithoutUsuarioInput, AceptacionTerminosUncheckedCreateWithoutUsuarioInput> | AceptacionTerminosCreateWithoutUsuarioInput[] | AceptacionTerminosUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: AceptacionTerminosCreateOrConnectWithoutUsuarioInput | AceptacionTerminosCreateOrConnectWithoutUsuarioInput[]
+    upsert?: AceptacionTerminosUpsertWithWhereUniqueWithoutUsuarioInput | AceptacionTerminosUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: AceptacionTerminosCreateManyUsuarioInputEnvelope
+    set?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+    disconnect?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+    delete?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+    connect?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+    update?: AceptacionTerminosUpdateWithWhereUniqueWithoutUsuarioInput | AceptacionTerminosUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: AceptacionTerminosUpdateManyWithWhereWithoutUsuarioInput | AceptacionTerminosUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: AceptacionTerminosScalarWhereInput | AceptacionTerminosScalarWhereInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutAuditorInput, AsignacionAuditoriaUncheckedCreateWithoutAuditorInput> | AsignacionAuditoriaCreateWithoutAuditorInput[] | AsignacionAuditoriaUncheckedCreateWithoutAuditorInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutAuditorInput | AsignacionAuditoriaCreateOrConnectWithoutAuditorInput[]
@@ -22175,6 +23526,20 @@ export namespace Prisma {
     update?: EventoCampoUpdateWithWhereUniqueWithoutUsuarioInput | EventoCampoUpdateWithWhereUniqueWithoutUsuarioInput[]
     updateMany?: EventoCampoUpdateManyWithWhereWithoutUsuarioInput | EventoCampoUpdateManyWithWhereWithoutUsuarioInput[]
     deleteMany?: EventoCampoScalarWhereInput | EventoCampoScalarWhereInput[]
+  }
+
+  export type AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<AceptacionTerminosCreateWithoutUsuarioInput, AceptacionTerminosUncheckedCreateWithoutUsuarioInput> | AceptacionTerminosCreateWithoutUsuarioInput[] | AceptacionTerminosUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: AceptacionTerminosCreateOrConnectWithoutUsuarioInput | AceptacionTerminosCreateOrConnectWithoutUsuarioInput[]
+    upsert?: AceptacionTerminosUpsertWithWhereUniqueWithoutUsuarioInput | AceptacionTerminosUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: AceptacionTerminosCreateManyUsuarioInputEnvelope
+    set?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+    disconnect?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+    delete?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+    connect?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+    update?: AceptacionTerminosUpdateWithWhereUniqueWithoutUsuarioInput | AceptacionTerminosUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: AceptacionTerminosUpdateManyWithWhereWithoutUsuarioInput | AceptacionTerminosUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: AceptacionTerminosScalarWhereInput | AceptacionTerminosScalarWhereInput[]
   }
 
   export type UsuarioCreateNestedOneWithoutTrackingsInput = {
@@ -22553,6 +23918,20 @@ export namespace Prisma {
 
   export type NullableBoolFieldUpdateOperationsInput = {
     set?: boolean | null
+  }
+
+  export type UsuarioCreateNestedOneWithoutAceptacionesTerminosInput = {
+    create?: XOR<UsuarioCreateWithoutAceptacionesTerminosInput, UsuarioUncheckedCreateWithoutAceptacionesTerminosInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutAceptacionesTerminosInput
+    connect?: UsuarioWhereUniqueInput
+  }
+
+  export type UsuarioUpdateOneRequiredWithoutAceptacionesTerminosNestedInput = {
+    create?: XOR<UsuarioCreateWithoutAceptacionesTerminosInput, UsuarioUncheckedCreateWithoutAceptacionesTerminosInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutAceptacionesTerminosInput
+    upsert?: UsuarioUpsertWithoutAceptacionesTerminosInput
+    connect?: UsuarioWhereUniqueInput
+    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutAceptacionesTerminosInput, UsuarioUpdateWithoutAceptacionesTerminosInput>, UsuarioUncheckedUpdateWithoutAceptacionesTerminosInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -23146,6 +24525,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type AceptacionTerminosCreateWithoutUsuarioInput = {
+    id_aceptacion?: string
+    empresa_id?: string | null
+    version: string
+    plataforma: string
+    ip?: string | null
+    user_agent?: string | null
+    fecha?: Date | string
+  }
+
+  export type AceptacionTerminosUncheckedCreateWithoutUsuarioInput = {
+    id_aceptacion?: string
+    empresa_id?: string | null
+    version: string
+    plataforma: string
+    ip?: string | null
+    user_agent?: string | null
+    fecha?: Date | string
+  }
+
+  export type AceptacionTerminosCreateOrConnectWithoutUsuarioInput = {
+    where: AceptacionTerminosWhereUniqueInput
+    create: XOR<AceptacionTerminosCreateWithoutUsuarioInput, AceptacionTerminosUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type AceptacionTerminosCreateManyUsuarioInputEnvelope = {
+    data: AceptacionTerminosCreateManyUsuarioInput | AceptacionTerminosCreateManyUsuarioInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AsignacionAuditoriaUpsertWithWhereUniqueWithoutAuditorInput = {
     where: AsignacionAuditoriaWhereUniqueInput
     update: XOR<AsignacionAuditoriaUpdateWithoutAuditorInput, AsignacionAuditoriaUncheckedUpdateWithoutAuditorInput>
@@ -23327,6 +24736,36 @@ export namespace Prisma {
     registrado_en?: DateTimeFilter<"EventoCampo"> | Date | string
   }
 
+  export type AceptacionTerminosUpsertWithWhereUniqueWithoutUsuarioInput = {
+    where: AceptacionTerminosWhereUniqueInput
+    update: XOR<AceptacionTerminosUpdateWithoutUsuarioInput, AceptacionTerminosUncheckedUpdateWithoutUsuarioInput>
+    create: XOR<AceptacionTerminosCreateWithoutUsuarioInput, AceptacionTerminosUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type AceptacionTerminosUpdateWithWhereUniqueWithoutUsuarioInput = {
+    where: AceptacionTerminosWhereUniqueInput
+    data: XOR<AceptacionTerminosUpdateWithoutUsuarioInput, AceptacionTerminosUncheckedUpdateWithoutUsuarioInput>
+  }
+
+  export type AceptacionTerminosUpdateManyWithWhereWithoutUsuarioInput = {
+    where: AceptacionTerminosScalarWhereInput
+    data: XOR<AceptacionTerminosUpdateManyMutationInput, AceptacionTerminosUncheckedUpdateManyWithoutUsuarioInput>
+  }
+
+  export type AceptacionTerminosScalarWhereInput = {
+    AND?: AceptacionTerminosScalarWhereInput | AceptacionTerminosScalarWhereInput[]
+    OR?: AceptacionTerminosScalarWhereInput[]
+    NOT?: AceptacionTerminosScalarWhereInput | AceptacionTerminosScalarWhereInput[]
+    id_aceptacion?: StringFilter<"AceptacionTerminos"> | string
+    empresa_id?: StringNullableFilter<"AceptacionTerminos"> | string | null
+    usuario_id?: StringFilter<"AceptacionTerminos"> | string
+    version?: StringFilter<"AceptacionTerminos"> | string
+    plataforma?: StringFilter<"AceptacionTerminos"> | string
+    ip?: StringNullableFilter<"AceptacionTerminos"> | string | null
+    user_agent?: StringNullableFilter<"AceptacionTerminos"> | string | null
+    fecha?: DateTimeFilter<"AceptacionTerminos"> | Date | string
+  }
+
   export type UsuarioCreateWithoutTrackingsInput = {
     id_usuario?: string
     empresa_id?: string | null
@@ -23367,6 +24806,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutTrackingsInput = {
@@ -23409,6 +24849,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutTrackingsInput = {
@@ -23467,6 +24908,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutTrackingsInput = {
@@ -23509,6 +24951,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateWithoutEventosCampoInput = {
@@ -23551,6 +24994,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutEventosCampoInput = {
@@ -23593,6 +25037,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutEventosCampoInput = {
@@ -23751,6 +25196,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutEventosCampoInput = {
@@ -23793,6 +25239,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type ExpedienteUpsertWithoutEventosCampoInput = {
@@ -23941,6 +25388,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutDispositivosInput = {
@@ -23983,6 +25431,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutDispositivosInput = {
@@ -24041,6 +25490,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutDispositivosInput = {
@@ -24083,6 +25533,7 @@ export namespace Prisma {
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type AsignacionAuditoriaCreateWithoutExpedienteInput = {
@@ -24691,6 +26142,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutAsignacionesInput = {
@@ -24733,6 +26185,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutAsignacionesInput = {
@@ -24897,6 +26350,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutAsignacionesInput = {
@@ -24939,6 +26393,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type ExpedienteCreateWithoutVisitasInput = {
@@ -25081,6 +26536,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutVisitasInput = {
@@ -25123,6 +26579,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutVisitasInput = {
@@ -25321,6 +26778,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutVisitasInput = {
@@ -25363,6 +26821,7 @@ export namespace Prisma {
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type EvidenciaUpsertWithWhereUniqueWithoutVisitaInput = {
@@ -25563,6 +27022,194 @@ export namespace Prisma {
     fecha_actualizar?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type UsuarioCreateWithoutAceptacionesTerminosInput = {
+    id_usuario?: string
+    empresa_id?: string | null
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    departamento?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
+    asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
+    visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
+    dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioUncheckedCreateWithoutAceptacionesTerminosInput = {
+    id_usuario?: string
+    empresa_id?: string | null
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    departamento?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
+    asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
+    visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
+    dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioCreateOrConnectWithoutAceptacionesTerminosInput = {
+    where: UsuarioWhereUniqueInput
+    create: XOR<UsuarioCreateWithoutAceptacionesTerminosInput, UsuarioUncheckedCreateWithoutAceptacionesTerminosInput>
+  }
+
+  export type UsuarioUpsertWithoutAceptacionesTerminosInput = {
+    update: XOR<UsuarioUpdateWithoutAceptacionesTerminosInput, UsuarioUncheckedUpdateWithoutAceptacionesTerminosInput>
+    create: XOR<UsuarioCreateWithoutAceptacionesTerminosInput, UsuarioUncheckedCreateWithoutAceptacionesTerminosInput>
+    where?: UsuarioWhereInput
+  }
+
+  export type UsuarioUpdateToOneWithWhereWithoutAceptacionesTerminosInput = {
+    where?: UsuarioWhereInput
+    data: XOR<UsuarioUpdateWithoutAceptacionesTerminosInput, UsuarioUncheckedUpdateWithoutAceptacionesTerminosInput>
+  }
+
+  export type UsuarioUpdateWithoutAceptacionesTerminosInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
+    visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
+    dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
+  }
+
+  export type UsuarioUncheckedUpdateWithoutAceptacionesTerminosInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
+    visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
+    dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
+  }
+
   export type AsignacionAuditoriaCreateManyAuditorInput = {
     id_asignacion?: number
     empresa_id: string
@@ -25642,6 +27289,16 @@ export namespace Prisma {
     latitud: Decimal | DecimalJsLike | number | string
     longitud: Decimal | DecimalJsLike | number | string
     registrado_en?: Date | string
+  }
+
+  export type AceptacionTerminosCreateManyUsuarioInput = {
+    id_aceptacion?: string
+    empresa_id?: string | null
+    version: string
+    plataforma: string
+    ip?: string | null
+    user_agent?: string | null
+    fecha?: Date | string
   }
 
   export type AsignacionAuditoriaUpdateWithoutAuditorInput = {
@@ -25885,6 +27542,36 @@ export namespace Prisma {
     latitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     longitud?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AceptacionTerminosUpdateWithoutUsuarioInput = {
+    id_aceptacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    version?: StringFieldUpdateOperationsInput | string
+    plataforma?: StringFieldUpdateOperationsInput | string
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    user_agent?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AceptacionTerminosUncheckedUpdateWithoutUsuarioInput = {
+    id_aceptacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    version?: StringFieldUpdateOperationsInput | string
+    plataforma?: StringFieldUpdateOperationsInput | string
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    user_agent?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AceptacionTerminosUncheckedUpdateManyWithoutUsuarioInput = {
+    id_aceptacion?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    version?: StringFieldUpdateOperationsInput | string
+    plataforma?: StringFieldUpdateOperationsInput | string
+    ip?: NullableStringFieldUpdateOperationsInput | string | null
+    user_agent?: NullableStringFieldUpdateOperationsInput | string | null
+    fecha?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AsignacionAuditoriaCreateManyExpedienteInput = {
