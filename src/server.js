@@ -29,6 +29,7 @@ import visitasRoutes from '#modules/auditorias/visitas.routes.js';
 import reportesRoutes from '#modules/reportes/reportes.routes.js';
 import seguridadRoutes from '#modules/sistema/seguridad.routes.js';
 import empresasRoutes from '#modules/empresas/empresas.routes.js';
+import terminosRoutes from '#modules/terminos/terminos.routes.js';
 import { sinEmpresa } from '#core/tenant/contexto.js';
 import { iniciarGeocodificacion } from '#modules/geocodificacion/geocodificacion.worker.js';
 import { iniciarRetencionTracking } from '#modules/auditorias/tracking.retencion.js';
@@ -160,6 +161,7 @@ app.use('/api/visitas', visitasRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/seguridad', seguridadRoutes);
 app.use('/api/empresas', empresasRoutes);
+app.use('/api/terminos', terminosRoutes);
 
 // Manejo de errores
 app.use(notFoundHandler);

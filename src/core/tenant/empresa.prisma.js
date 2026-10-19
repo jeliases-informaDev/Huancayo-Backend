@@ -7,7 +7,7 @@ import { contextoEmpresa } from './contexto.js';
 // Modelos cuyas filas pertenecen a una empresa. Empresa (el catálogo) queda fuera.
 export const MODELOS_EMPRESA = Object.freeze(new Set([
   'Usuario', 'TrackingUbicacion', 'EventoCampo', 'ConfiguracionSistema', 'DispositivoAutorizado', 'Expediente', 'ExpedienteCambio',
-  'AsignacionAuditoria', 'VisitaAuditoria', 'Evidencia', 'AuditoriaSeguridad', 'ImportacionMasiva',
+  'AsignacionAuditoria', 'VisitaAuditoria', 'Evidencia', 'AuditoriaSeguridad', 'ImportacionMasiva', 'AceptacionTerminos',
 ]));
 
 const CON_FILTRO = new Set(['findFirst', 'findFirstOrThrow', 'findMany', 'updateMany', 'updateManyAndReturn', 'deleteMany', 'aggregate', 'count', 'groupBy']);

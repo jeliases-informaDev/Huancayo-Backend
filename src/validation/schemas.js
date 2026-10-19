@@ -222,3 +222,6 @@ export const visitaCreateBody = z.object({
   evidencia_principal_key: cleanString(255),
   evidencia_adicional_key: cleanString(255).optional(),
 }).strict();
+
+// --- Términos y condiciones: la aceptación lleva la versión leída (si cambió, el servidor la rechaza) ---
+export const terminosAceptarBody = z.object({ version: z.string().trim().min(1).max(20) }).strict();
