@@ -90,6 +90,23 @@ function ingresos(v) {
   return lineas;
 }
 
+// Ficha de Consumo: la base de consumo del banco trae hasta 3 ingresos del cliente (descripción, relación, moneda,
+// monto y tipo). La base MYPE de 262 columnas no trae estas columnas: entonces la lista queda vacía y no se guarda.
+function ingresosConsumo(v) {
+  const lineas = [];
+  for (let n = 1; n <= 3; n += 1) {
+    const linea = {
+      descripcion: texto(v(`DESCRIPCIONCONSUMO${n}`)),
+      relacion: texto(v(`RELACION${n}`)),
+      moneda: texto(v(`MONEDA${n}`)),
+      monto: numero(v(`NMONINGDEU${n}`)),
+      tipo_ingreso: texto(v(`TIPOING${n}`)),
+    };
+    if (linea.descripcion || linea.monto) lineas.push(linea);
+  }
+  return lineas;
+}
+
 function entidades(v, prefijo) {
   const lista = [];
   for (let n = 1; n <= 5; n += 1) {
@@ -230,6 +247,9 @@ export function mapearFilaCore(fila, { hoja }) {
     antiguedad_texto: texto(v('cAspExpAct')),
     negocios,
   };
+  // Documento con que el cliente de consumo sustenta sus ingresos (columna de la base de consumo; en la MYPE no existe).
+  const sustentoIngreso = texto(v('SustIngreso'));
+  if (sustentoIngreso) datosNegocio.sustento_ingreso = sustentoIngreso;
 
   const datosCredito = {
     numero_credito: codigo,
@@ -291,6 +311,8 @@ export function mapearFilaCore(fila, { hoja }) {
   }];
 
   const evaluacionFinanciera = { moneda: monedaCodigo, reevaluacion, anterior, ingresos: ingresos(v) };
+  const lineasConsumo = ingresosConsumo(v);
+  if (lineasConsumo.length) evaluacionFinanciera.ingresos_consumo = lineasConsumo;
   const endeudamiento = {
     fecha_corte: fecha(v('FECHAOBTENCION')),
     numero_entidades: datosCredito.numero_entidades,
