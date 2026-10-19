@@ -132,6 +132,17 @@ describe('importador — formato core (MYPE, 262 columnas)', () => {
     assert.ok(expediente.evaluacion_financiera.anterior);
   });
 
+  test('columnas propias de la base de consumo: sustento de ingreso e ingresos del cliente', () => {
+    const { expediente } = mapearFilaCore(filaBase({ SustIngreso: 'BOLETA DE PAGO', DESCRIPCIONCONSUMO1: 'SUELDO', RELACION1: 'TITULAR', MONEDA1: 'S/', NMONINGDEU1: '2500.00', TIPOING1: 'DEPENDIENTE', DESCRIPCIONCONSUMO2: 'NULL', NMONINGDEU2: '0.00' }), { hoja: 'CONSUMO' });
+    assert.equal(expediente.tipo_credito, 'CONSUMO');
+    assert.equal(expediente.datos_negocio.sustento_ingreso, 'BOLETA DE PAGO');
+    assert.deepEqual(expediente.evaluacion_financiera.ingresos_consumo, [{ descripcion: 'SUELDO', relacion: 'TITULAR', moneda: 'S/', monto: 2500, tipo_ingreso: 'DEPENDIENTE' }]);
+    // La base MYPE no trae estas columnas: no se agregan claves vacías (la huella de las filas ya importadas no cambia).
+    const mype = mapearFilaCore(filaBase(), { hoja: 'OTROS' }).expediente;
+    assert.equal('sustento_ingreso' in mype.datos_negocio, false);
+    assert.equal('ingresos_consumo' in mype.evaluacion_financiera, false);
+  });
+
   test('solo se guardan las líneas de ingreso y las entidades con contenido', () => {
     const { expediente } = mapearFilaCore(filaBase(), { hoja: 'OTROS' });
     assert.equal(expediente.evaluacion_financiera.ingresos.length, 1);
