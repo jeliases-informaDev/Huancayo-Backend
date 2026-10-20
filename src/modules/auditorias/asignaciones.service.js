@@ -1,13 +1,14 @@
 import prisma from '#core/config/prisma.js';
 import { autoasignacionPermitida } from '#modules/sistema/configuracion.service.js';
 import { normalizarPaginacion, infoPaginas, ordenarPorPrioridad, paginaDe, buscarEnExpediente } from './asignaciones.paginacion.js';
+import { zonaIncluye, filtroDeZona } from './zona.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
-// Comparación tolerante a mayúsculas/tildes: "Junín", "junin" y "JUNÍN" deben
-// contarse como el mismo departamento.
-function normalizarTexto(valor) {
-  return String(valor || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+// Cómo se dice dónde está un expediente en los mensajes de error («Lince, Lima»).
+function ubicacionDe(expediente) {
+  const partes = [expediente.distrito, expediente.provincia, expediente.departamento].filter(Boolean);
+  return partes.filter((p, i) => partes.findIndex((q) => String(q).toLowerCase() === String(p).toLowerCase()) === i).join(', ');
 }
 
 const expedienteSelect = {
@@ -51,8 +52,8 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId =
   // No tiene sentido operativo mandar a un auditor a visitar a otra ciudad: si el
   // auditor tiene una sede/departamento configurado, el cliente debe pertenecer a
   // esa misma zona.
-  if (auditor.departamento && expediente.departamento && normalizarTexto(auditor.departamento) !== normalizarTexto(expediente.departamento)) {
-    const error = new Error(`${auditor.nombres || auditor.username} trabaja en ${auditor.departamento} y este expediente está en ${expediente.departamento}. Asígnalo a un auditor de esa zona.`);
+  if (!zonaIncluye(auditor.departamento, expediente)) {
+    const error = new Error(`${auditor.nombres || auditor.username} trabaja en ${auditor.departamento} y este expediente está en ${ubicacionDe(expediente)}. Asígnalo a un auditor de esa zona o cambia la zona del auditor en Usuarios.`);
     error.statusCode = 422; error.code = 'GEOGRAPHIC_MISMATCH'; throw error;
   }
 
@@ -64,19 +65,20 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId =
 }
 
 // Expedientes PENDIENTE que un auditor podría tomar por su cuenta: solo los de su
-// propio departamento (misma regla geográfica que crear()). Sin departamento
-// configurado, no ve ninguno — evita que se autoasigne fuera de su zona por defecto.
+// propia zona (misma regla geográfica que crear(); ver zona.js). Sin zona
+// configurada, no ve ninguno — evita que se autoasigne fuera de su zona por defecto.
 async function disponiblesParaAuditor(auditorId, consulta = {}) {
   const pag = normalizarPaginacion(consulta);
   const vacio = { data: [], pagination: infoPaginas(pag, 0) };
   if (!(await autoasignacionPermitida())) return vacio;
   const auditor = await prisma.usuario.findFirst({ where: { id_usuario: auditorId, rol: 'AUDITOR', estado: 'ACTIVO' } });
   if (!auditor) { const error = new Error('El auditor indicado no existe o está inactivo'); error.statusCode = 400; throw error; }
-  if (!auditor.departamento) return vacio;
+  const zona = filtroDeZona(auditor.departamento);
+  if (!zona) return vacio;
   const where = {
-    estado: 'PENDIENTE', autoasignable: true, departamento: auditor.departamento,
+    estado: 'PENDIENTE', autoasignable: true,
+    AND: [zona, ...(consulta.q ? [buscarEnExpediente(consulta.q)] : [])],
     ...(consulta.tipo ? { tipo_credito: consulta.tipo } : {}),
-    ...(consulta.q ? buscarEnExpediente(consulta.q) : {}),
   };
   const [data, total] = await Promise.all([
     prisma.expediente.findMany({ where, select: expedienteSelect, orderBy: [{ fecha_creacion: 'asc' }, { id_expediente: 'asc' }], skip: (pag.page - 1) * pag.limit, take: pag.limit }),
@@ -110,8 +112,8 @@ async function autoAsignar(auditorId, idExpediente) {
     error.statusCode = 403; error.code = 'NOT_SELF_ASSIGNABLE'; throw error;
   }
 
-  if (auditor.departamento && expediente.departamento && normalizarTexto(auditor.departamento) !== normalizarTexto(expediente.departamento)) {
-    const error = new Error(`Este expediente está en ${expediente.departamento} y tú operas en ${auditor.departamento}. Solo puedes tomar expedientes de tu propia zona.`);
+  if (!zonaIncluye(auditor.departamento, expediente)) {
+    const error = new Error(`Este expediente está en ${ubicacionDe(expediente)} y tú operas en ${auditor.departamento}. Solo puedes tomar expedientes de tu propia zona.`);
     error.statusCode = 422; error.code = 'GEOGRAPHIC_MISMATCH'; throw error;
   }
 
@@ -246,7 +248,20 @@ async function resumenPorOrigen() {
   const auditores = [...porAuditor.values()].map((a) => ({ ...a, porcentaje: a.total ? Math.round((a.autoasignadas / a.total) * 100) : 0 })).sort((a, b) => b.autoasignadas - a.autoasignadas || b.total - a.total);
   const total = auditores.reduce((n, a) => n + a.total, 0);
   const autoasignadas = auditores.reduce((n, a) => n + a.autoasignadas, 0);
-  return { autoasignacion_activa: await autoasignacionPermitida(), total, autoasignadas, porcentaje: total ? Math.round((autoasignadas / total) * 100) : 0, auditores };
+  // Pendientes que los auditores ven en «Disponibles» frente a los que solo un supervisor puede asignar (cargas de Excel sin la casilla).
+  const pendientes = await prisma.expediente.groupBy({ by: ['autoasignable'], where: { estado: 'PENDIENTE' }, _count: { _all: true } });
+  const contar = (valor) => pendientes.find((p) => p.autoasignable === valor)?._count._all || 0;
+  return {
+    autoasignacion_activa: await autoasignacionPermitida(), total, autoasignadas, porcentaje: total ? Math.round((autoasignadas / total) * 100) : 0, auditores,
+    pendientes_tomables: contar(true), pendientes_reservados: contar(false),
+  };
+}
+
+// Deja tomables todos los pendientes que hoy solo asigna un supervisor. Una sola sentencia sobre el índice
+// (empresa, estado, autoasignable): no recorre expedientes uno a uno, así que aguanta cualquier volumen.
+async function liberarPendientes() {
+  const r = await prisma.expediente.updateMany({ where: { estado: 'PENDIENTE', autoasignable: false }, data: { autoasignable: true } });
+  return { liberados: r.count };
 }
 
 function auditSnapshotAsignacion(a) {
@@ -285,4 +300,4 @@ async function cancelarTodasDeAuditor(auditorId) {
   return activas.length;
 }
 
-export default { crear, crearMasivo, misAsignaciones, versionMuestra, cargaPorAuditor, puntosParaMapa, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen };
+export default { crear, crearMasivo, misAsignaciones, versionMuestra, cargaPorAuditor, puntosParaMapa, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen, liberarPendientes };

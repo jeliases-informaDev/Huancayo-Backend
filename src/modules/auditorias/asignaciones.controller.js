@@ -59,6 +59,14 @@ async function fijarAutoasignacion(req, res, next) {
     res.json({ data: await asignacionesService.resumenPorOrigen() });
   } catch (error) { next(error); }
 }
+// Solo el administrador: deja tomables por los auditores de su zona todos los pendientes que hoy solo asigna un supervisor.
+async function liberarPendientes(req, res, next) {
+  try {
+    const data = await asignacionesService.liberarPendientes();
+    req.auditContext = { entidad: 'Expediente', entidad_id: 'pendientes', valor_anterior: null, valor_nuevo: { accion: 'LIBERAR_A_AUDITORES', ...data } };
+    res.json({ data: { ...data, resumen: await asignacionesService.resumenPorOrigen() } });
+  } catch (error) { next(error); }
+}
 async function cancelar(req, res, next) {
   try {
     const { _auditDiff, ...data } = await asignacionesService.cancelar(req.validated.params.id);
@@ -67,4 +75,4 @@ async function cancelar(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, resumenOrigen, fijarAutoasignacion, carga, mapa, versionMia };
+export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, resumenOrigen, fijarAutoasignacion, liberarPendientes, carga, mapa, versionMia };
