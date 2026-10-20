@@ -20,6 +20,7 @@ router.get('/resumen-origen', controller.resumenOrigen);
 router.get('/carga', controller.carga);
 router.get('/mapa', validate({ query: mapaQuery }), controller.mapa);
 router.put('/autoasignacion', roleMiddleware(ADMIN_ROLES), validate({ body: autoasignacionBody }), controller.fijarAutoasignacion);
+router.post('/liberar', roleMiddleware(ADMIN_ROLES), controller.liberarPendientes);
 router.post('/', validate({ body: asignacionCreateBody }), controller.crear);
 router.post('/masivo', validate({ body: asignacionBulkBody }), controller.crearMasivo);
 router.post('/:id/cancelar', validate({ params: idParams }), controller.cancelar);
