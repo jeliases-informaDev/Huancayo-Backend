@@ -1,15 +1,11 @@
 import prisma from '#core/config/prisma.js';
 import { autoasignacionPermitida } from '#modules/sistema/configuracion.service.js';
 import { normalizarPaginacion, infoPaginas, ordenarPorPrioridad, paginaDe, buscarEnExpediente } from './asignaciones.paginacion.js';
-import { zonaIncluye, filtroDeZona } from './zona.js';
+import { Prisma } from '../../generated/prisma/index.js';
+import { empresaActual } from '#core/tenant/contexto.js';
+import { haversineMeters } from '#core/security/geofence.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
-
-// Cómo se dice dónde está un expediente en los mensajes de error («Lince, Lima»).
-function ubicacionDe(expediente) {
-  const partes = [expediente.distrito, expediente.provincia, expediente.departamento].filter(Boolean);
-  return partes.filter((p, i) => partes.findIndex((q) => String(q).toLowerCase() === String(p).toLowerCase()) === i).join(', ');
-}
 
 const expedienteSelect = {
   id_expediente: true, codigo_expediente: true, tipo_credito: true, oficina: true,
@@ -49,14 +45,6 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId =
     error.statusCode = 409; error.code = 'ALREADY_ASSIGNED'; throw error;
   }
 
-  // No tiene sentido operativo mandar a un auditor a visitar a otra ciudad: si el
-  // auditor tiene una sede/departamento configurado, el cliente debe pertenecer a
-  // esa misma zona.
-  if (!zonaIncluye(auditor.departamento, expediente)) {
-    const error = new Error(`${auditor.nombres || auditor.username} trabaja en ${auditor.departamento} y este expediente está en ${ubicacionDe(expediente)}. Asígnalo a un auditor de esa zona o cambia la zona del auditor en Usuarios.`);
-    error.statusCode = 422; error.code = 'GEOGRAPHIC_MISMATCH'; throw error;
-  }
-
   const [asignacion] = await prisma.$transaction([
     prisma.asignacionAuditoria.create({ data: { id_expediente, id_usuario_auditor, prioridad: prioridad || 'MEDIA', origen: 'SUPERVISOR', asignado_por: actorId } }),
     prisma.expediente.update({ where: { id_expediente }, data: { estado: 'ASIGNADO' } }),
@@ -64,27 +52,52 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId =
   return serialize(asignacion);
 }
 
-// Expedientes PENDIENTE que un auditor podría tomar por su cuenta: solo los de su
-// propia zona (misma regla geográfica que crear(); ver zona.js). Sin zona
-// configurada, no ve ninguno — evita que se autoasigne fuera de su zona por defecto.
+// Expedientes PENDIENTE que un auditor puede tomar por su cuenta, de cualquier distrito (la «zona» del usuario ya no limita: es
+// solo informativa). Si el celular manda su ubicación (lat y lon), salen primero los más cercanos y cada uno trae `distancia_m`;
+// sin ubicación, por antigüedad. Con ubicación el orden lo hace la base (una consulta sobre los ids, paginada), nunca en memoria.
 async function disponiblesParaAuditor(auditorId, consulta = {}) {
   const pag = normalizarPaginacion(consulta);
   const vacio = { data: [], pagination: infoPaginas(pag, 0) };
   if (!(await autoasignacionPermitida())) return vacio;
   const auditor = await prisma.usuario.findFirst({ where: { id_usuario: auditorId, rol: 'AUDITOR', estado: 'ACTIVO' } });
   if (!auditor) { const error = new Error('El auditor indicado no existe o está inactivo'); error.statusCode = 400; throw error; }
-  const zona = filtroDeZona(auditor.departamento);
-  if (!zona) return vacio;
   const where = {
     estado: 'PENDIENTE', autoasignable: true,
-    AND: [zona, ...(consulta.q ? [buscarEnExpediente(consulta.q)] : [])],
     ...(consulta.tipo ? { tipo_credito: consulta.tipo } : {}),
+    ...(consulta.q ? buscarEnExpediente(consulta.q) : {}),
   };
-  const [data, total] = await Promise.all([
-    prisma.expediente.findMany({ where, select: expedienteSelect, orderBy: [{ fecha_creacion: 'asc' }, { id_expediente: 'asc' }], skip: (pag.page - 1) * pag.limit, take: pag.limit }),
-    prisma.expediente.count({ where }),
-  ]);
-  return { data: serialize(data), pagination: infoPaginas(pag, total) };
+  const conUbicacion = Number.isFinite(consulta.lat) && Number.isFinite(consulta.lon);
+  const total = await prisma.expediente.count({ where });
+  let filas;
+  if (conUbicacion) {
+    filas = await expedientesPorCercania(consulta, pag);
+  } else {
+    filas = await prisma.expediente.findMany({ where, select: expedienteSelect, orderBy: [{ fecha_creacion: 'asc' }, { id_expediente: 'asc' }], skip: (pag.page - 1) * pag.limit, take: pag.limit });
+  }
+  const data = serialize(filas).map((e) => (conUbicacion && e.latitud != null && e.longitud != null
+    ? { ...e, distancia_m: Math.round(haversineMeters(consulta.lat, consulta.lon, Number(e.latitud), Number(e.longitud))) } : e));
+  return { data, pagination: infoPaginas(pag, total) };
+}
+
+// Ordena por distancia aproximada (plano local: grados de latitud y de longitud corregida por el coseno) en la base y devuelve solo
+// la página pedida. Los expedientes sin coordenadas van al final. Esta consulta cruda no pasa por el filtro de empresa de Prisma: se
+// filtra aquí por la empresa del contexto, y la lectura de las filas (findMany) vuelve a filtrar por empresa.
+async function expedientesPorCercania({ lat, lon, tipo, q }, pag) {
+  const empresaId = empresaActual();
+  if (!empresaId) { const error = new Error('Falta la empresa de la sesión'); error.statusCode = 403; throw error; }
+  const escapar = (t) => '%' + String(t).replace(/[\\%_]/g, (c) => '\\' + c) + '%';
+  const busqueda = q ? Prisma.sql`AND (nombres_cliente LIKE ${escapar(q)} OR codigo_expediente LIKE ${escapar(q)} OR numero_documento_cliente LIKE ${escapar(q)} OR distrito LIKE ${escapar(q)})` : Prisma.empty;
+  const tipoSql = tipo ? Prisma.sql`AND tipo_credito = ${tipo}` : Prisma.empty;
+  const k = Math.cos((lat * Math.PI) / 180);
+  const ids = await prisma.$queryRaw(Prisma.sql`
+    SELECT id_expediente FROM expedientes
+    WHERE empresa_id = ${empresaId} AND estado = 'PENDIENTE' AND autoasignable = 1 ${tipoSql} ${busqueda}
+    ORDER BY (latitud IS NULL OR longitud IS NULL), POW(latitud - ${lat}, 2) + POW((longitud - ${lon}) * ${k}, 2), id_expediente
+    LIMIT ${pag.limit} OFFSET ${(pag.page - 1) * pag.limit}`);
+  const orden = ids.map((f) => Number(f.id_expediente));
+  if (!orden.length) return [];
+  const filas = await prisma.expediente.findMany({ where: { id_expediente: { in: orden } }, select: expedienteSelect });
+  return orden.map((id) => filas.find((f) => f.id_expediente === id)).filter(Boolean);
 }
 
 // Auto-asignación: el propio auditor "toma" un expediente pendiente de su muestra,
@@ -110,11 +123,6 @@ async function autoAsignar(auditorId, idExpediente) {
   if (!expediente.autoasignable) {
     const error = new Error('Este expediente lo asigna un supervisor: no está disponible para tomarlo por tu cuenta.');
     error.statusCode = 403; error.code = 'NOT_SELF_ASSIGNABLE'; throw error;
-  }
-
-  if (!zonaIncluye(auditor.departamento, expediente)) {
-    const error = new Error(`Este expediente está en ${ubicacionDe(expediente)} y tú operas en ${auditor.departamento}. Solo puedes tomar expedientes de tu propia zona.`);
-    error.statusCode = 422; error.code = 'GEOGRAPHIC_MISMATCH'; throw error;
   }
 
   const asignacion = await prisma.$transaction(async tx => {
