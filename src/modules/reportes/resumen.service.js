@@ -115,17 +115,29 @@ async function obtenerResumen() {
   };
 }
 
-// Asignaciones creadas por día, semana o mes para el gráfico del Resumen. `hasta` y `desfase` (minutos que el navegador está detrás de UTC,
-// 300 en Perú) hacen que los días sean los del usuario y no los de UTC. Un solo GROUP BY por día; las semanas y los meses se arman en memoria.
-async function actividadAsignaciones({ periodo = 'diario', hasta, desfase = 0 } = {}) {
+// Series que dibuja el gráfico del Resumen, una por tarjeta: qué se cuenta y por qué fecha. Los nombres de tabla y columna son constantes del
+// código (la petición solo elige la clave, que valida el esquema), nunca texto del usuario. Cada una tiene su índice (empresa_id, [resultado,] fecha).
+const SERIES = {
+  expedientes: { tabla: Prisma.raw('expedientes'), fecha: Prisma.raw('fecha_creacion'), filtro: Prisma.empty },
+  asignaciones: { tabla: Prisma.raw('asignaciones_auditoria'), fecha: Prisma.raw('fecha_asignacion'), filtro: Prisma.empty },
+  visitas: { tabla: Prisma.raw('visitas_auditoria'), fecha: Prisma.raw('fecha_hora_checkin'), filtro: Prisma.empty },
+  observados: { tabla: Prisma.raw('visitas_auditoria'), fecha: Prisma.raw('fecha_hora_checkin'), filtro: Prisma.sql`AND resultado = 'OBSERVADO'` },
+};
+
+// Lo que se registró por día, semana o mes en la serie elegida (expedientes cargados, asignaciones hechas, visitas, visitas observadas).
+// `hasta` y `desfase` (minutos que el navegador está detrás de UTC, 300 en Perú) hacen que los días sean los del usuario y no los de UTC.
+// Un solo GROUP BY por día sobre una ventana acotada (7 días, 8 semanas o 6 meses); las semanas y los meses se arman en memoria.
+async function actividad({ metrica = 'asignaciones', periodo = 'diario', hasta, desfase = 0 } = {}) {
   const empresaId = empresaDeLaPeticion();
+  const serie = SERIES[metrica];
+  if (!serie) { const error = new Error('Serie desconocida'); error.statusCode = 400; throw error; }
   const fin = hasta || aIso(new Date(Date.now() - desfase * 60000));
   const cubetas = cubetasDe(periodo, fin);
   const inicioUtc = new Date(aFecha(cubetas[0].inicio).getTime() + desfase * 60000);
   const finUtc = new Date(aFecha(fin).getTime() + 24 * 60 * 60 * 1000 + desfase * 60000);
-  const filas = await prisma.$queryRaw(Prisma.sql`SELECT DATE_FORMAT(DATE_SUB(fecha_asignacion, INTERVAL ${desfase} MINUTE), '%Y-%m-%d') AS d, COUNT(*) AS n FROM asignaciones_auditoria WHERE empresa_id = ${empresaId} AND fecha_asignacion >= ${inicioUtc} AND fecha_asignacion < ${finUtc} GROUP BY d`);
+  const filas = await prisma.$queryRaw(Prisma.sql`SELECT DATE_FORMAT(DATE_SUB(${serie.fecha}, INTERVAL ${desfase} MINUTE), '%Y-%m-%d') AS d, COUNT(*) AS n FROM ${serie.tabla} WHERE empresa_id = ${empresaId} ${serie.filtro} AND ${serie.fecha} >= ${inicioUtc} AND ${serie.fecha} < ${finUtc} GROUP BY d`);
   const puntos = agruparPorCubeta(cubetas, new Map(filas.map((f) => [f.d, Number(f.n)])));
-  return { periodo, desde: cubetas[0].inicio, hasta: fin, total: puntos.reduce((s, p) => s + p.total, 0), puntos };
+  return { metrica, periodo, desde: cubetas[0].inicio, hasta: fin, total: puntos.reduce((s, p) => s + p.total, 0), puntos };
 }
 
-export default { obtenerResumen, actividadAsignaciones };
+export default { obtenerResumen, actividad };

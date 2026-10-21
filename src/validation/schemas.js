@@ -173,8 +173,9 @@ export const empresaUpdateBody = z.object({
   prefijo: z.string().trim().max(8).optional(), configuracion: reglasEmpresa.optional(), marca: marcaEmpresa.optional(),
 }).strict().refine((d) => Object.keys(d).length > 0, 'Debe enviar al menos un campo');
 
-// Gráfico de asignaciones del Resumen: período (7 días / 8 semanas / 6 meses), último día y desfase horario del navegador.
-export const actividadAsignacionesQuery = z.object({
+// Gráfico del Resumen: qué serie dibuja (la tarjeta elegida), período (7 días / 8 semanas / 6 meses), último día y desfase horario del navegador.
+export const actividadQuery = z.object({
+  metrica: z.enum(['expedientes', 'asignaciones', 'visitas', 'observados']).optional(),
   periodo: z.enum(['diario', 'semanal', 'mensual']).optional(),
   hasta: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   desfase: z.coerce.number().int().min(-840).max(840).optional(),
