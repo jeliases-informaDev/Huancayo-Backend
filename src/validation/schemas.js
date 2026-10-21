@@ -56,6 +56,8 @@ export const disponiblesQuery = z.object({
   limit: z.coerce.number().int().min(1).max(200).optional(),
   q: z.string().trim().max(100).optional(),
   tipo: z.enum(['CONSUMO', 'OTROS']).optional(),
+  // Ubicación del celular: ordena «Disponibles» del más cercano al más lejano.
+  lat: z.coerce.number().min(-90).max(90).optional(), lon: z.coerce.number().min(-180).max(180).optional(),
 }).strict();
 // Puntos de clientes para el mapa del supervisor: por zona y con tope de seguridad (devuelve `truncado` si hay más).
 export const mapaQuery = z.object({
