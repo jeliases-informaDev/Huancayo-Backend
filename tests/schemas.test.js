@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   loginBody, userCreateBody, userUpdateBody, listQuery, visitasListQuery,
   expedienteCreateBody, asignacionCreateBody, asignacionBulkBody,
-  cuestionarioSchema, ubicacionBody, evidenciaPresignBody, visitaCreateBody,
+  cuestionarioSchema, ubicacionBody, evidenciaPresignBody, visitaCreateBody, actividadQuery,
 } from '../src/validation/schemas.js';
 
 describe('loginBody', () => {
@@ -172,5 +172,26 @@ describe('visitaCreateBody — payload completo de cierre de visita', () => {
     const otros = Array.from({ length: 10 }, () => ({ nombre: 'X' }));
     assert.equal(visitaCreateBody.safeParse({ ...base, otros_clientes_domicilio: otros }).success, true);
     assert.equal(visitaCreateBody.safeParse({ ...base, otros_clientes_domicilio: [...otros, { nombre: 'Y' }] }).success, false);
+  });
+});
+
+describe('actividadQuery (gráfico del Resumen)', () => {
+  test('sin nada es válido: el servidor usa asignaciones, 7 días y hoy', () => {
+    assert.equal(actividadQuery.safeParse({}).success, true);
+  });
+  test('acepta cada serie de las tarjetas', () => {
+    for (const metrica of ['expedientes', 'asignaciones', 'visitas', 'observados']) {
+      assert.equal(actividadQuery.safeParse({ metrica, periodo: 'semanal', hasta: '2026-10-21', desfase: '300' }).success, true, metrica);
+    }
+  });
+  test('rechaza una serie desconocida o con SQL (la serie elige la tabla)', () => {
+    assert.equal(actividadQuery.safeParse({ metrica: 'usuarios' }).success, false);
+    assert.equal(actividadQuery.safeParse({ metrica: 'visitas; DROP TABLE usuarios' }).success, false);
+  });
+  test('rechaza período, fecha o desfase fuera de rango y campos extra', () => {
+    assert.equal(actividadQuery.safeParse({ periodo: 'anual' }).success, false);
+    assert.equal(actividadQuery.safeParse({ hasta: '21/10/2026' }).success, false);
+    assert.equal(actividadQuery.safeParse({ desfase: 9999 }).success, false);
+    assert.equal(actividadQuery.safeParse({ empresa_id: 'otra' }).success, false);
   });
 });
