@@ -26,6 +26,7 @@ function mapUsuario(usuario) {
     mfa_confirmado: usuario.mfa_habilitado,
     nombres: usuario.nombres || '', apellidos: usuario.apellidos || '',
     email: usuario.email || '', sede: usuario.sede || '', departamento: usuario.departamento || '',
+    ultimo_acceso: usuario.ultimo_acceso || null, // el panel lo muestra en Usuarios («Nunca» si aún no entró)
   };
 }
 
