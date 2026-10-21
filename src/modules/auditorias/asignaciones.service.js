@@ -4,6 +4,7 @@ import { normalizarPaginacion, infoPaginas, ordenarPorPrioridad, paginaDe, busca
 import { Prisma } from '../../generated/prisma/index.js';
 import { empresaActual } from '#core/tenant/contexto.js';
 import { haversineMeters } from '#core/security/geofence.js';
+import { invalidarPuntos } from './eventos-campo.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -49,6 +50,7 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId =
     prisma.asignacionAuditoria.create({ data: { id_expediente, id_usuario_auditor, prioridad: prioridad || 'MEDIA', origen: 'SUPERVISOR', asignado_por: actorId } }),
     prisma.expediente.update({ where: { id_expediente }, data: { estado: 'ASIGNADO' } }),
   ]);
+  invalidarPuntos(); // los avisos de llegada/salida del auditor deben ver ya la nueva asignación
   return serialize(asignacion);
 }
 
@@ -137,6 +139,7 @@ async function autoAsignar(auditorId, idExpediente) {
     }
     return tx.asignacionAuditoria.create({ data: { id_expediente: idExpediente, id_usuario_auditor: auditorId, prioridad: 'MEDIA', origen: 'AUTOASIGNADA', asignado_por: auditorId } });
   });
+  invalidarPuntos(); // los avisos de llegada/salida del auditor deben ver ya la nueva asignación
   return serialize(asignacion);
 }
 
@@ -294,6 +297,7 @@ async function cancelar(id) {
     }
   }
 
+  invalidarPuntos();
   return {
     ...serialize(asignacion),
     _auditDiff: { entidad: 'AsignacionAuditoria', entidad_id: id, valor_anterior: auditSnapshotAsignacion(actual), valor_nuevo: auditSnapshotAsignacion(asignacion) },
