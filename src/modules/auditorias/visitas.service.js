@@ -3,7 +3,7 @@ import storageService from '#modules/sistema/storage.service.js';
 import { env } from '#core/config/env.js';
 import { haversineMeters } from '#core/security/geofence.js';
 import { puntoDeReferencia, conUbicacionNegocio } from '#modules/expedientes/ubicaciones.js';
-import { registrarEventosDeCampo } from './eventos-campo.js';
+import { registrarEventosDeCampo, invalidarPuntos } from './eventos-campo.js';
 import { estadoDeMovimiento } from '#modules/usuarios/movimiento.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { logger } from '#core/config/logger.js';
@@ -224,6 +224,7 @@ async function crearVisita(auditorId, payload) {
     await tx.asignacionAuditoria.update({ where: { id_asignacion: asignacion.id_asignacion }, data: { estado: 'FINALIZADA', fecha_fin: serverNow } });
     return created;
   });
+  invalidarPuntos(); // la asignación pasó a FINALIZADA: los avisos de llegada/salida deben releerla ya
   return { ...serialize(visita), _alertas: alertas };
 }
 
@@ -283,6 +284,29 @@ async function obtenerArchivoEvidencia(idEvidencia) {
   return { bytes: await storageService.readEvidence(evidencia.object_key), tipo: evidencia.tipo };
 }
 
+// Últimos puntos reales (no simulados) de cada auditor en la última hora, para calcular cómo se mueve. Se leen de la base UNA vez (al
+// primer punto tras arrancar el servidor) y desde ahí se mantienen en memoria: antes cada posición volvía a leer hasta 59 filas.
+const MOV_VENTANA_MS = 60 * 60 * 1000;
+const MOV_MAX_PUNTOS = 59;
+const MOV_MAX_AUDITORES = 5000;
+const memoriaMov = new Map(); // id del auditor → [{ latitud, longitud, fecha: Date }] (del más antiguo al más reciente)
+async function puntosPrevios(usuarioId, ahora) {
+  let lista = memoriaMov.get(usuarioId);
+  if (!lista) {
+    const filas = await prisma.trackingUbicacion.findMany({
+      where: { id_usuario: usuarioId, simulada: false, registrado_en: { gte: new Date(ahora.getTime() - MOV_VENTANA_MS) } },
+      orderBy: { registrado_en: 'desc' }, take: MOV_MAX_PUNTOS, select: { latitud: true, longitud: true, registrado_en: true },
+    });
+    lista = filas.reverse().map((p) => ({ latitud: Number(p.latitud), longitud: Number(p.longitud), fecha: p.registrado_en }));
+  }
+  const corte = ahora.getTime() - MOV_VENTANA_MS;
+  return lista.filter((p) => p.fecha.getTime() >= corte).slice(-MOV_MAX_PUNTOS);
+}
+function recordarPunto(usuarioId, previos, punto) {
+  if (memoriaMov.size >= MOV_MAX_AUDITORES) memoriaMov.clear();
+  memoriaMov.set(usuarioId, punto ? [...previos, punto].slice(-MOV_MAX_PUNTOS) : previos);
+}
+
 async function actualizarUbicacionEnVivo(usuarioId, payload) {
   const latitud = Number(payload.latitud); const longitud = Number(payload.longitud);
   if (!Number.isFinite(latitud) || !Number.isFinite(longitud) || Math.abs(latitud) > 90 || Math.abs(longitud) > 180) {
@@ -295,11 +319,9 @@ async function actualizarUbicacionEnVivo(usuarioId, payload) {
   const ahora = new Date();
   // Cómo se mueve (a pie, vehículo, detenido…): se calcula aquí, con los últimos puntos de ESTE auditor, y se guarda en su registro;
   // así la lista en vivo del supervisor no tiene que releer los puntos de todos los auditores en cada refresco.
-  const previos = await prisma.trackingUbicacion.findMany({
-    where: { id_usuario: usuarioId, simulada: false, registrado_en: { gte: new Date(ahora.getTime() - 60 * 60 * 1000) } },
-    orderBy: { registrado_en: 'desc' }, take: 59, select: { latitud: true, longitud: true, registrado_en: true },
-  });
-  const serie = [...previos.reverse().map((p) => ({ latitud: Number(p.latitud), longitud: Number(p.longitud), fecha: p.registrado_en })), ...(simulada ? [] : [{ latitud, longitud, fecha: ahora }])];
+  const previos = await puntosPrevios(usuarioId, ahora);
+  const actual = simulada ? null : { latitud, longitud, fecha: ahora };
+  const serie = [...previos, ...(actual ? [actual] : [])];
   const mov = estadoDeMovimiento(serie, ahora.getTime());
   const [usuario] = await prisma.$transaction([
     prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud, ubicacion_en: ahora, ubicacion_precision: precision, ubicacion_simulada: simulada, bateria_porcentaje: bateria, bateria_cargando: cargando, mov_estado: mov.estado, mov_desde: mov.desde ? new Date(mov.desde) : null, mov_velocidad: mov.velocidad_kmh, mov_modo: mov.modo }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } }),
@@ -307,6 +329,7 @@ async function actualizarUbicacionEnVivo(usuarioId, payload) {
     // en el mapa de supervisión, tal como pide el flujo (Fase 2/Fase 6).
     prisma.trackingUbicacion.create({ data: { id_usuario: usuarioId, latitud, longitud, precision_metros: precision, simulada, registrado_en: ahora } }),
   ]);
+  recordarPunto(usuarioId, previos, actual);
   // Avisos de llegada/salida: un fallo aquí nunca debe impedir que la posición quede registrada.
   let eventos = [];
   try { eventos = await registrarEventosDeCampo(usuarioId, { latitud, longitud, precision, simulada }); } catch (error) { logger.warn({ err: error.message }, 'eventos_campo_fallo'); }

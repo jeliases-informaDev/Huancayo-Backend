@@ -18,17 +18,35 @@ function filaParaPanel(e) {
 }
 const incluir = { usuario: { select: { username: true, nombres: true, apellidos: true } }, expediente: { select: { codigo_expediente: true, nombres_cliente: true, direccion_domicilio: true, distrito: true } } };
 
+// Los puntos de los casos de un auditor (domicilios y negocios con coordenadas) casi no cambian entre una posición y la siguiente, y
+// leerlos de la base en cada una (con sus bloques JSON) era lo más caro de cada posición. Se guardan en memoria por auditor durante
+// 60 s y se descartan al instante cuando cambian sus asignaciones o se registra una visita (invalidarPuntos).
+const PUNTOS_TTL_MS = 60_000;
+const PUNTOS_MAX_AUDITORES = 5000;
+const cachePuntos = new Map(); // id del auditor → { en, dia, puntos }
+export function invalidarPuntos() { cachePuntos.clear(); }
+
+async function puntosDelAuditor(usuarioId, desde) {
+  const hit = cachePuntos.get(usuarioId);
+  const ahora = Date.now();
+  if (hit && ahora - hit.en < PUNTOS_TTL_MS && hit.dia === desde.getTime()) return hit.puntos;
+  const asignaciones = await prisma.asignacionAuditoria.findMany({
+    where: { id_usuario_auditor: usuarioId, OR: [{ estado: 'ACTIVA' }, { estado: 'FINALIZADA', fecha_fin: { gte: desde } }] },
+    select: { estado: true, expediente: { select: { id_expediente: true, tipo_credito: true, direccion_domicilio: true, distrito: true, latitud: true, longitud: true, ubicacion_origen: true, datos_negocio: true } } },
+  });
+  const puntos = asignaciones.flatMap((a) => puntosDeCaso(a.expediente, { soloSalida: a.estado !== 'ACTIVA' }));
+  if (cachePuntos.size >= PUNTOS_MAX_AUDITORES) { for (const [k, v] of cachePuntos) if (ahora - v.en >= PUNTOS_TTL_MS) cachePuntos.delete(k); if (cachePuntos.size >= PUNTOS_MAX_AUDITORES) cachePuntos.clear(); }
+  cachePuntos.set(usuarioId, { en: ahora, dia: desde.getTime(), puntos });
+  return puntos;
+}
+
 // Compara la posición con los casos del auditor, guarda los avisos nuevos y los devuelve listos para el panel.
 // Las asignaciones ya cerradas hoy solo pueden producir la SALIDA (el auditor terminó la visita y se retira).
 export async function registrarEventosDeCampo(usuarioId, { latitud, longitud, precision = null, simulada = false }) {
   const radio = (await reglasEmpresa()).geocerca_radio_m;
   if (simulada || (precision !== null && precision > radio)) return [];
   const desde = inicioDelDia();
-  const asignaciones = await prisma.asignacionAuditoria.findMany({
-    where: { id_usuario_auditor: usuarioId, OR: [{ estado: 'ACTIVA' }, { estado: 'FINALIZADA', fecha_fin: { gte: desde } }] },
-    select: { estado: true, expediente: { select: { id_expediente: true, tipo_credito: true, direccion_domicilio: true, distrito: true, latitud: true, longitud: true, ubicacion_origen: true, datos_negocio: true } } },
-  });
-  const puntos = asignaciones.flatMap((a) => puntosDeCaso(a.expediente, { soloSalida: a.estado !== 'ACTIVA' }));
+  const puntos = await puntosDelAuditor(usuarioId, desde);
   if (!puntos.length) return [];
   const previos = await prisma.eventoCampo.findMany({
     where: { id_usuario: usuarioId, registrado_en: { gte: desde }, id_expediente: { in: [...new Set(puntos.map((p) => p.id_expediente))] } },

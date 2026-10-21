@@ -6,7 +6,11 @@ import { sinEmpresa } from '#core/tenant/contexto.js';
 export function auditMiddleware(req, res, next) {
   if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) return next();
   const startedAt = Date.now();
+  // La posición en vivo del celular llega cada ~10 s por auditor: guardarla también aquí llenaba la tabla de auditoría (millones de filas
+  // por día con cientos de auditores) sin aportar nada, porque cada punto ya queda en tracking_ubicacion. Solo se audita si falla.
+  const esPosicion = req.method === 'PATCH' && req.originalUrl.split('?')[0] === '/api/visitas/ubicacion';
   res.on('finish', () => {
+    if (esPosicion && res.statusCode < 400) return;
     const clientIp = String(req.ip || '').replace(/^::ffff:/, '').slice(0, 45) || null;
     const loginActor = req.originalUrl.startsWith('/api/auth/login')
       ? String(req.body?.username || '').trim().toLowerCase().slice(0, 50)
