@@ -14,4 +14,8 @@ async function resumen(_req, res, next) {
   try { res.json({ data: await resumenService.obtenerResumen() }); } catch (error) { next(error); }
 }
 
-export default { wordVisita, resumen };
+async function actividadAsignaciones(req, res, next) {
+  try { res.json({ data: await resumenService.actividadAsignaciones(req.validated?.query || {}) }); } catch (error) { next(error); }
+}
+
+export default { wordVisita, resumen, actividadAsignaciones };
