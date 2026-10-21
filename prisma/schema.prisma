@@ -298,6 +298,7 @@ model AsignacionAuditoria {
   @@index([id_usuario_auditor])
   @@index([id_expediente])
   @@index([empresa_id, estado, id_usuario_auditor]) // «mi muestra», carga por auditor y mapa del supervisor
+  @@index([empresa_id, fecha_asignacion]) // asignaciones por día del Resumen
   @@map("asignaciones_auditoria")
 }
 
@@ -355,6 +356,7 @@ model VisitaAuditoria {
   @@index([id_expediente])
   @@index([id_usuario_auditor, fecha_hora_checkin])
   @@index([empresa_id, fecha_creacion])
+  @@index([empresa_id, fecha_hora_checkin]) // visitas por día y distritos del Resumen
   @@map("visitas_auditoria")
 }
 

@@ -1,5 +1,8 @@
 import prisma from '#core/config/prisma.js';
+import { Prisma } from '../../generated/prisma/index.js';
+import { empresaActual } from '#core/tenant/contexto.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
+import { cubetasDe, agruparPorCubeta, aFecha, aIso } from './actividad.js';
 
 // Resumen operativo para la pantalla de inicio del panel: avance de la muestra, resultados de las
 // visitas, actividad reciente, carga por auditor y la cola de visitas que conviene revisar primero.
@@ -24,20 +27,28 @@ function motivosDeRevision(v, geocercaM) {
   return motivos;
 }
 
+function empresaDeLaPeticion() {
+  const empresaId = empresaActual();
+  if (!empresaId) { const error = new Error('Falta la empresa de la sesión'); error.statusCode = 403; throw error; }
+  return empresaId;
+}
+
 async function obtenerResumen() {
+  const empresaId = empresaDeLaPeticion(); // las consultas crudas no pasan por el filtro de empresa de Prisma: se filtra aquí
   const geocercaM = (await reglasEmpresa()).geocerca_radio_m; // regla de la empresa de la petición
   const desde = new Date();
   desde.setDate(desde.getDate() - (DIAS_ACTIVIDAD - 1));
   desde.setHours(0, 0, 0, 0);
   const hace30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-  const [porEstado, porResultado, tipos, activas, auditores, recientes, cargaActiva, visitas30, ultimas] = await Promise.all([
+  const [porEstado, porResultado, tipos, activas, auditores, recientes, cargaActiva, visitas30, ultimas, distritos] = await Promise.all([
     prisma.expediente.groupBy({ by: ['estado'], _count: { _all: true } }),
     prisma.visitaAuditoria.groupBy({ by: ['resultado'], _count: { _all: true } }),
     prisma.expediente.groupBy({ by: ['tipo_credito'], _count: { _all: true } }),
     prisma.asignacionAuditoria.count({ where: { estado: 'ACTIVA' } }),
     prisma.usuario.findMany({ where: { rol: 'AUDITOR', estado: 'ACTIVO' }, select: { id_usuario: true, nombres: true, apellidos: true, username: true, departamento: true } }),
-    prisma.visitaAuditoria.findMany({ where: { fecha_hora_checkin: { gte: desde } }, select: { fecha_hora_checkin: true } }),
+    // Visitas por día contadas en la base (antes se traían todas las filas de 14 días y se contaban en memoria).
+    prisma.$queryRaw(Prisma.sql`SELECT DATE_FORMAT(fecha_hora_checkin, '%Y-%m-%d') AS d, COUNT(*) AS n FROM visitas_auditoria WHERE empresa_id = ${empresaId} AND fecha_hora_checkin >= ${desde} GROUP BY d`),
     prisma.asignacionAuditoria.groupBy({ by: ['id_usuario_auditor'], where: { estado: 'ACTIVA' }, _count: { _all: true } }),
     prisma.visitaAuditoria.groupBy({ by: ['id_usuario_auditor'], where: { fecha_hora_checkin: { gte: hace30 } }, _count: { _all: true } }),
     prisma.visitaAuditoria.findMany({
@@ -49,6 +60,8 @@ async function obtenerResumen() {
         evidencias: { select: { id_evidencia: true } },
       },
     }),
+    // Distritos con más visitas en los últimos 30 días.
+    prisma.$queryRaw(Prisma.sql`SELECT e.distrito AS distrito, COUNT(*) AS n FROM visitas_auditoria v JOIN expedientes e ON e.id_expediente = v.id_expediente WHERE v.empresa_id = ${empresaId} AND v.fecha_hora_checkin >= ${hace30} AND e.distrito IS NOT NULL AND e.distrito <> '' GROUP BY e.distrito ORDER BY n DESC LIMIT 4`),
   ]);
 
   // Actividad por día (rellena los días sin visitas con 0 para que el gráfico no tenga huecos)
@@ -58,10 +71,8 @@ async function obtenerResumen() {
     d.setDate(desde.getDate() + i);
     porDia.set(d.toISOString().slice(0, 10), 0);
   }
-  for (const v of recientes) {
-    const clave = new Date(v.fecha_hora_checkin).toISOString().slice(0, 10);
-    if (porDia.has(clave)) porDia.set(clave, porDia.get(clave) + 1);
-  }
+  for (const f of recientes) if (porDia.has(f.d)) porDia.set(f.d, Number(f.n));
+  const ultimosSiete = [...porDia.values()].slice(-7).reduce((s, n) => s + n, 0);
 
   const cargaPorAuditor = Object.fromEntries(cargaActiva.map((c) => [c.id_usuario_auditor, c._count._all]));
   const visitasPorAuditor = Object.fromEntries(visitas30.map((c) => [c.id_usuario_auditor, c._count._all]));
@@ -90,7 +101,9 @@ async function obtenerResumen() {
       total: porResultado.reduce((s, f) => s + f._count._all, 0),
       por_resultado: { CONFORME: resultados.CONFORME || 0, OBSERVADO: resultados.OBSERVADO || 0, NO_UBICADO: resultados.NO_UBICADO || 0, RECHAZADO: resultados.RECHAZADO || 0 },
       actividad: [...porDia.entries()].map(([dia, total]) => ({ dia, total })),
+      recientes: ultimosSiete, // visitas de los últimos 7 días
     },
+    distritos_visitados: distritos.map((f) => ({ distrito: f.distrito, visitas: Number(f.n) })),
     auditores: auditores
       .map((a) => ({
         id: a.id_usuario, nombre: `${a.nombres || ''} ${a.apellidos || ''}`.trim() || a.username, usuario: a.username, zona: a.departamento,
@@ -102,4 +115,17 @@ async function obtenerResumen() {
   };
 }
 
-export default { obtenerResumen };
+// Asignaciones creadas por día, semana o mes para el gráfico del Resumen. `hasta` y `desfase` (minutos que el navegador está detrás de UTC,
+// 300 en Perú) hacen que los días sean los del usuario y no los de UTC. Un solo GROUP BY por día; las semanas y los meses se arman en memoria.
+async function actividadAsignaciones({ periodo = 'diario', hasta, desfase = 0 } = {}) {
+  const empresaId = empresaDeLaPeticion();
+  const fin = hasta || aIso(new Date(Date.now() - desfase * 60000));
+  const cubetas = cubetasDe(periodo, fin);
+  const inicioUtc = new Date(aFecha(cubetas[0].inicio).getTime() + desfase * 60000);
+  const finUtc = new Date(aFecha(fin).getTime() + 24 * 60 * 60 * 1000 + desfase * 60000);
+  const filas = await prisma.$queryRaw(Prisma.sql`SELECT DATE_FORMAT(DATE_SUB(fecha_asignacion, INTERVAL ${desfase} MINUTE), '%Y-%m-%d') AS d, COUNT(*) AS n FROM asignaciones_auditoria WHERE empresa_id = ${empresaId} AND fecha_asignacion >= ${inicioUtc} AND fecha_asignacion < ${finUtc} GROUP BY d`);
+  const puntos = agruparPorCubeta(cubetas, new Map(filas.map((f) => [f.d, Number(f.n)])));
+  return { periodo, desde: cubetas[0].inicio, hasta: fin, total: puntos.reduce((s, p) => s + p.total, 0), puntos };
+}
+
+export default { obtenerResumen, actividadAsignaciones };
