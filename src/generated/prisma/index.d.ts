@@ -11013,6 +11013,9 @@ export namespace Prisma {
     prioridad: string | null
     origen: string | null
     asignado_por: string | null
+    motivo_fin: string | null
+    fin_por: string | null
+    nota_fin: string | null
   }
 
   export type AsignacionAuditoriaMaxAggregateOutputType = {
@@ -11026,6 +11029,9 @@ export namespace Prisma {
     prioridad: string | null
     origen: string | null
     asignado_por: string | null
+    motivo_fin: string | null
+    fin_por: string | null
+    nota_fin: string | null
   }
 
   export type AsignacionAuditoriaCountAggregateOutputType = {
@@ -11039,6 +11045,9 @@ export namespace Prisma {
     prioridad: number
     origen: number
     asignado_por: number
+    motivo_fin: number
+    fin_por: number
+    nota_fin: number
     _all: number
   }
 
@@ -11064,6 +11073,9 @@ export namespace Prisma {
     prioridad?: true
     origen?: true
     asignado_por?: true
+    motivo_fin?: true
+    fin_por?: true
+    nota_fin?: true
   }
 
   export type AsignacionAuditoriaMaxAggregateInputType = {
@@ -11077,6 +11089,9 @@ export namespace Prisma {
     prioridad?: true
     origen?: true
     asignado_por?: true
+    motivo_fin?: true
+    fin_por?: true
+    nota_fin?: true
   }
 
   export type AsignacionAuditoriaCountAggregateInputType = {
@@ -11090,6 +11105,9 @@ export namespace Prisma {
     prioridad?: true
     origen?: true
     asignado_por?: true
+    motivo_fin?: true
+    fin_por?: true
+    nota_fin?: true
     _all?: true
   }
 
@@ -11190,6 +11208,9 @@ export namespace Prisma {
     prioridad: string
     origen: string
     asignado_por: string | null
+    motivo_fin: string | null
+    fin_por: string | null
+    nota_fin: string | null
     _count: AsignacionAuditoriaCountAggregateOutputType | null
     _avg: AsignacionAuditoriaAvgAggregateOutputType | null
     _sum: AsignacionAuditoriaSumAggregateOutputType | null
@@ -11222,6 +11243,9 @@ export namespace Prisma {
     prioridad?: boolean
     origen?: boolean
     asignado_por?: boolean
+    motivo_fin?: boolean
+    fin_por?: boolean
+    nota_fin?: boolean
     expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
     auditor?: boolean | UsuarioDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["asignacionAuditoria"]>
@@ -11239,9 +11263,12 @@ export namespace Prisma {
     prioridad?: boolean
     origen?: boolean
     asignado_por?: boolean
+    motivo_fin?: boolean
+    fin_por?: boolean
+    nota_fin?: boolean
   }
 
-  export type AsignacionAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_asignacion" | "empresa_id" | "id_expediente" | "id_usuario_auditor" | "fecha_asignacion" | "fecha_fin" | "estado" | "prioridad" | "origen" | "asignado_por", ExtArgs["result"]["asignacionAuditoria"]>
+  export type AsignacionAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_asignacion" | "empresa_id" | "id_expediente" | "id_usuario_auditor" | "fecha_asignacion" | "fecha_fin" | "estado" | "prioridad" | "origen" | "asignado_por" | "motivo_fin" | "fin_por" | "nota_fin", ExtArgs["result"]["asignacionAuditoria"]>
   export type AsignacionAuditoriaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
     auditor?: boolean | UsuarioDefaultArgs<ExtArgs>
@@ -11264,6 +11291,9 @@ export namespace Prisma {
       prioridad: string
       origen: string
       asignado_por: string | null
+      motivo_fin: string | null
+      fin_por: string | null
+      nota_fin: string | null
     }, ExtArgs["result"]["asignacionAuditoria"]>
     composites: {}
   }
@@ -11645,6 +11675,9 @@ export namespace Prisma {
     readonly prioridad: FieldRef<"AsignacionAuditoria", 'String'>
     readonly origen: FieldRef<"AsignacionAuditoria", 'String'>
     readonly asignado_por: FieldRef<"AsignacionAuditoria", 'String'>
+    readonly motivo_fin: FieldRef<"AsignacionAuditoria", 'String'>
+    readonly fin_por: FieldRef<"AsignacionAuditoria", 'String'>
+    readonly nota_fin: FieldRef<"AsignacionAuditoria", 'String'>
   }
     
 
@@ -17708,7 +17741,10 @@ export namespace Prisma {
     estado: 'estado',
     prioridad: 'prioridad',
     origen: 'origen',
-    asignado_por: 'asignado_por'
+    asignado_por: 'asignado_por',
+    motivo_fin: 'motivo_fin',
+    fin_por: 'fin_por',
+    nota_fin: 'nota_fin'
   };
 
   export type AsignacionAuditoriaScalarFieldEnum = (typeof AsignacionAuditoriaScalarFieldEnum)[keyof typeof AsignacionAuditoriaScalarFieldEnum]
@@ -17999,7 +18035,10 @@ export namespace Prisma {
     estado: 'estado',
     prioridad: 'prioridad',
     origen: 'origen',
-    asignado_por: 'asignado_por'
+    asignado_por: 'asignado_por',
+    motivo_fin: 'motivo_fin',
+    fin_por: 'fin_por',
+    nota_fin: 'nota_fin'
   };
 
   export type AsignacionAuditoriaOrderByRelevanceFieldEnum = (typeof AsignacionAuditoriaOrderByRelevanceFieldEnum)[keyof typeof AsignacionAuditoriaOrderByRelevanceFieldEnum]
@@ -19097,6 +19136,9 @@ export namespace Prisma {
     prioridad?: StringFilter<"AsignacionAuditoria"> | string
     origen?: StringFilter<"AsignacionAuditoria"> | string
     asignado_por?: StringNullableFilter<"AsignacionAuditoria"> | string | null
+    motivo_fin?: StringNullableFilter<"AsignacionAuditoria"> | string | null
+    fin_por?: StringNullableFilter<"AsignacionAuditoria"> | string | null
+    nota_fin?: StringNullableFilter<"AsignacionAuditoria"> | string | null
     expediente?: XOR<ExpedienteScalarRelationFilter, ExpedienteWhereInput>
     auditor?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
   }
@@ -19112,6 +19154,9 @@ export namespace Prisma {
     prioridad?: SortOrder
     origen?: SortOrder
     asignado_por?: SortOrderInput | SortOrder
+    motivo_fin?: SortOrderInput | SortOrder
+    fin_por?: SortOrderInput | SortOrder
+    nota_fin?: SortOrderInput | SortOrder
     expediente?: ExpedienteOrderByWithRelationInput
     auditor?: UsuarioOrderByWithRelationInput
     _relevance?: AsignacionAuditoriaOrderByRelevanceInput
@@ -19131,6 +19176,9 @@ export namespace Prisma {
     prioridad?: StringFilter<"AsignacionAuditoria"> | string
     origen?: StringFilter<"AsignacionAuditoria"> | string
     asignado_por?: StringNullableFilter<"AsignacionAuditoria"> | string | null
+    motivo_fin?: StringNullableFilter<"AsignacionAuditoria"> | string | null
+    fin_por?: StringNullableFilter<"AsignacionAuditoria"> | string | null
+    nota_fin?: StringNullableFilter<"AsignacionAuditoria"> | string | null
     expediente?: XOR<ExpedienteScalarRelationFilter, ExpedienteWhereInput>
     auditor?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
   }, "id_asignacion">
@@ -19146,6 +19194,9 @@ export namespace Prisma {
     prioridad?: SortOrder
     origen?: SortOrder
     asignado_por?: SortOrderInput | SortOrder
+    motivo_fin?: SortOrderInput | SortOrder
+    fin_por?: SortOrderInput | SortOrder
+    nota_fin?: SortOrderInput | SortOrder
     _count?: AsignacionAuditoriaCountOrderByAggregateInput
     _avg?: AsignacionAuditoriaAvgOrderByAggregateInput
     _max?: AsignacionAuditoriaMaxOrderByAggregateInput
@@ -19167,6 +19218,9 @@ export namespace Prisma {
     prioridad?: StringWithAggregatesFilter<"AsignacionAuditoria"> | string
     origen?: StringWithAggregatesFilter<"AsignacionAuditoria"> | string
     asignado_por?: StringNullableWithAggregatesFilter<"AsignacionAuditoria"> | string | null
+    motivo_fin?: StringNullableWithAggregatesFilter<"AsignacionAuditoria"> | string | null
+    fin_por?: StringNullableWithAggregatesFilter<"AsignacionAuditoria"> | string | null
+    nota_fin?: StringNullableWithAggregatesFilter<"AsignacionAuditoria"> | string | null
   }
 
   export type VisitaAuditoriaWhereInput = {
@@ -20884,6 +20938,9 @@ export namespace Prisma {
     prioridad?: string
     origen?: string
     asignado_por?: string | null
+    motivo_fin?: string | null
+    fin_por?: string | null
+    nota_fin?: string | null
     expediente: ExpedienteCreateNestedOneWithoutAsignacionesInput
     auditor: UsuarioCreateNestedOneWithoutAsignacionesInput
   }
@@ -20899,6 +20956,9 @@ export namespace Prisma {
     prioridad?: string
     origen?: string
     asignado_por?: string | null
+    motivo_fin?: string | null
+    fin_por?: string | null
+    nota_fin?: string | null
   }
 
   export type AsignacionAuditoriaUpdateInput = {
@@ -20909,6 +20969,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
     expediente?: ExpedienteUpdateOneRequiredWithoutAsignacionesNestedInput
     auditor?: UsuarioUpdateOneRequiredWithoutAsignacionesNestedInput
   }
@@ -20924,6 +20987,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AsignacionAuditoriaCreateManyInput = {
@@ -20937,6 +21003,9 @@ export namespace Prisma {
     prioridad?: string
     origen?: string
     asignado_por?: string | null
+    motivo_fin?: string | null
+    fin_por?: string | null
+    nota_fin?: string | null
   }
 
   export type AsignacionAuditoriaUpdateManyMutationInput = {
@@ -20947,6 +21016,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AsignacionAuditoriaUncheckedUpdateManyInput = {
@@ -20960,6 +21032,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type VisitaAuditoriaCreateInput = {
@@ -22779,6 +22854,9 @@ export namespace Prisma {
     prioridad?: SortOrder
     origen?: SortOrder
     asignado_por?: SortOrder
+    motivo_fin?: SortOrder
+    fin_por?: SortOrder
+    nota_fin?: SortOrder
   }
 
   export type AsignacionAuditoriaAvgOrderByAggregateInput = {
@@ -22797,6 +22875,9 @@ export namespace Prisma {
     prioridad?: SortOrder
     origen?: SortOrder
     asignado_por?: SortOrder
+    motivo_fin?: SortOrder
+    fin_por?: SortOrder
+    nota_fin?: SortOrder
   }
 
   export type AsignacionAuditoriaMinOrderByAggregateInput = {
@@ -22810,6 +22891,9 @@ export namespace Prisma {
     prioridad?: SortOrder
     origen?: SortOrder
     asignado_por?: SortOrder
+    motivo_fin?: SortOrder
+    fin_por?: SortOrder
+    nota_fin?: SortOrder
   }
 
   export type AsignacionAuditoriaSumOrderByAggregateInput = {
@@ -24321,6 +24405,9 @@ export namespace Prisma {
     prioridad?: string
     origen?: string
     asignado_por?: string | null
+    motivo_fin?: string | null
+    fin_por?: string | null
+    nota_fin?: string | null
     expediente: ExpedienteCreateNestedOneWithoutAsignacionesInput
   }
 
@@ -24334,6 +24421,9 @@ export namespace Prisma {
     prioridad?: string
     origen?: string
     asignado_por?: string | null
+    motivo_fin?: string | null
+    fin_por?: string | null
+    nota_fin?: string | null
   }
 
   export type AsignacionAuditoriaCreateOrConnectWithoutAuditorInput = {
@@ -24585,6 +24675,9 @@ export namespace Prisma {
     prioridad?: StringFilter<"AsignacionAuditoria"> | string
     origen?: StringFilter<"AsignacionAuditoria"> | string
     asignado_por?: StringNullableFilter<"AsignacionAuditoria"> | string | null
+    motivo_fin?: StringNullableFilter<"AsignacionAuditoria"> | string | null
+    fin_por?: StringNullableFilter<"AsignacionAuditoria"> | string | null
+    nota_fin?: StringNullableFilter<"AsignacionAuditoria"> | string | null
   }
 
   export type VisitaAuditoriaUpsertWithWhereUniqueWithoutAuditorInput = {
@@ -25544,6 +25637,9 @@ export namespace Prisma {
     prioridad?: string
     origen?: string
     asignado_por?: string | null
+    motivo_fin?: string | null
+    fin_por?: string | null
+    nota_fin?: string | null
     auditor: UsuarioCreateNestedOneWithoutAsignacionesInput
   }
 
@@ -25557,6 +25653,9 @@ export namespace Prisma {
     prioridad?: string
     origen?: string
     asignado_por?: string | null
+    motivo_fin?: string | null
+    fin_por?: string | null
+    nota_fin?: string | null
   }
 
   export type AsignacionAuditoriaCreateOrConnectWithoutExpedienteInput = {
@@ -27220,6 +27319,9 @@ export namespace Prisma {
     prioridad?: string
     origen?: string
     asignado_por?: string | null
+    motivo_fin?: string | null
+    fin_por?: string | null
+    nota_fin?: string | null
   }
 
   export type VisitaAuditoriaCreateManyAuditorInput = {
@@ -27309,6 +27411,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
     expediente?: ExpedienteUpdateOneRequiredWithoutAsignacionesNestedInput
   }
 
@@ -27322,6 +27427,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorInput = {
@@ -27334,6 +27442,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type VisitaAuditoriaUpdateWithoutAuditorInput = {
@@ -27584,6 +27695,9 @@ export namespace Prisma {
     prioridad?: string
     origen?: string
     asignado_por?: string | null
+    motivo_fin?: string | null
+    fin_por?: string | null
+    nota_fin?: string | null
   }
 
   export type VisitaAuditoriaCreateManyExpedienteInput = {
@@ -27653,6 +27767,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
     auditor?: UsuarioUpdateOneRequiredWithoutAsignacionesNestedInput
   }
 
@@ -27666,6 +27783,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AsignacionAuditoriaUncheckedUpdateManyWithoutExpedienteInput = {
@@ -27678,6 +27798,9 @@ export namespace Prisma {
     prioridad?: StringFieldUpdateOperationsInput | string
     origen?: StringFieldUpdateOperationsInput | string
     asignado_por?: NullableStringFieldUpdateOperationsInput | string | null
+    motivo_fin?: NullableStringFieldUpdateOperationsInput | string | null
+    fin_por?: NullableStringFieldUpdateOperationsInput | string | null
+    nota_fin?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type VisitaAuditoriaUpdateWithoutExpedienteInput = {

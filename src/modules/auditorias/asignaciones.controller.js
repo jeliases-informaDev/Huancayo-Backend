@@ -1,5 +1,5 @@
 import asignacionesService from './asignaciones.service.js';
-import { fijarAutoasignacion as fijarAjuste } from '#modules/sistema/configuracion.service.js';
+import { fijarAutoasignacion as fijarAjuste, fijarTopeCasos } from '#modules/sistema/configuracion.service.js';
 
 function notifyRoles(req, event, data) {
   const io = req.app.get('io');
@@ -59,6 +59,25 @@ async function fijarAutoasignacion(req, res, next) {
     res.json({ data: await asignacionesService.resumenPorOrigen() });
   } catch (error) { next(error); }
 }
+// Solo el administrador: cuántos casos abiertos puede tener un asesor cuando los toma por su cuenta (0 = sin tope). Queda en el registro de auditoría.
+async function fijarTope(req, res, next) {
+  try {
+    const { anterior, nuevo } = await fijarTopeCasos(req.body.maximo, req.user.id);
+    req.auditContext = { entidad: 'ConfiguracionSistema', entidad_id: 'tope_casos_activos', valor_anterior: { maximo: anterior }, valor_nuevo: { maximo: nuevo } };
+    res.json({ data: await asignacionesService.resumenPorOrigen() });
+  } catch (error) { next(error); }
+}
+// Quita casos a un asesor (se enfermó, se retiró…) y los devuelve a «Disponibles» o los pasa a otro asesor. Avisa a los dos por tiempo real
+// para que su app recargue la muestra.
+async function quitarCasos(req, res, next) {
+  try {
+    const { _auditDiff, ...data } = await asignacionesService.quitarCasos({ ...req.body, actorId: req.user.id });
+    req.auditContext = _auditDiff;
+    notifyRoles(req, 'muestra_actualizada', { id_usuario_auditor: req.body.id_usuario_auditor });
+    if (req.body.id_usuario_destino) notifyRoles(req, 'muestra_actualizada', { id_usuario_auditor: req.body.id_usuario_destino });
+    res.json({ data });
+  } catch (error) { next(error); }
+}
 // Solo el administrador: deja tomables por los auditores de su zona todos los pendientes que hoy solo asigna un supervisor.
 async function liberarPendientes(req, res, next) {
   try {
@@ -69,10 +88,10 @@ async function liberarPendientes(req, res, next) {
 }
 async function cancelar(req, res, next) {
   try {
-    const { _auditDiff, ...data } = await asignacionesService.cancelar(req.validated.params.id);
+    const { _auditDiff, ...data } = await asignacionesService.cancelar(req.validated.params.id, req.user.id);
     req.auditContext = _auditDiff;
     res.json({ data });
   } catch (error) { next(error); }
 }
 
-export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, resumenOrigen, fijarAutoasignacion, liberarPendientes, carga, mapa, versionMia };
+export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, quitarCasos, resumenOrigen, fijarAutoasignacion, fijarTope, liberarPendientes, carga, mapa, versionMia };

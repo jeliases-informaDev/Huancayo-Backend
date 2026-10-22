@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MOTIVOS_QUITAR, DESTINOS_QUITAR } from '../modules/auditorias/casos.core.js';
 
 const cleanString = max => z.string().trim().min(1).max(max);
 const optionalString = max => z.string().trim().max(max).optional();
@@ -56,7 +57,7 @@ export const disponiblesQuery = z.object({
   limit: z.coerce.number().int().min(1).max(200).optional(),
   q: z.string().trim().max(100).optional(),
   tipo: z.enum(['CONSUMO', 'OTROS']).optional(),
-  // Ubicación del celular: ordena «Disponibles» del más cercano al más lejano.
+  // Ubicación del celular: las apps anteriores todavía la mandan. «Disponibles» ya no depende de dónde esté el auditor, así que se acepta y se ignora.
   lat: z.coerce.number().min(-90).max(90).optional(), lon: z.coerce.number().min(-180).max(180).optional(),
 }).strict();
 // Puntos de clientes para el mapa del supervisor: por zona y con tope de seguridad (devuelve `truncado` si hay más).
@@ -160,6 +161,23 @@ export const ubicacionBody = z.object({
 export const jornadaBody = z.object({ accion: z.enum(['INICIAR', 'TERMINAR']) }).strict();
 
 export const autoasignacionBody = z.object({ activa: z.boolean() }).strict();
+
+// Tope de casos abiertos por asesor al tomarlos por su cuenta (0 = sin tope).
+export const topeCasosBody = z.object({ maximo: z.number().int().min(0).max(1000) }).strict();
+
+// Quitar casos a un asesor (se enfermó, se retiró…): todos los activos o solo los elegidos, y a dónde van — a «Disponibles» o a otro asesor.
+export const quitarCasosBody = z.object({
+  id_usuario_auditor: z.string().uuid(),
+  id_asignaciones: z.array(z.coerce.number().int().positive()).min(1).max(500).optional(),
+  motivo: z.enum(MOTIVOS_QUITAR),
+  nota: z.string().trim().max(200).optional(),
+  destino: z.enum(DESTINOS_QUITAR),
+  id_usuario_destino: z.string().uuid().optional(),
+}).strict().superRefine((d, ctx) => {
+  if (d.destino === 'ASESOR' && !d.id_usuario_destino) ctx.addIssue({ code: 'custom', path: ['id_usuario_destino'], message: 'Elige a qué asesor pasan los casos' });
+  if (d.destino === 'DISPONIBLES' && d.id_usuario_destino) ctx.addIssue({ code: 'custom', path: ['id_usuario_destino'], message: 'Con destino «Disponibles» no se elige asesor' });
+  if (d.destino === 'ASESOR' && d.id_usuario_destino === d.id_usuario_auditor) ctx.addIssue({ code: 'custom', path: ['id_usuario_destino'], message: 'El asesor que recibe tiene que ser otro' });
+});
 
 // --- Modo pruebas: borrar empleados y limpiar datos (solo el administrador, con el modo encendido) ---
 export const modoPruebasBody = z.object({ activo: z.boolean() }).strict();

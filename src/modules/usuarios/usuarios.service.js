@@ -131,7 +131,7 @@ async function actualizar(id, datos, actorId) {
   // "asignados" a alguien que ya no puede iniciar sesión ni visitarlos: se liberan
   // para que el Auditor de Oficina los reasigne a otra persona.
   if (datos.estado === 'INACTIVO' && actual.estado !== 'INACTIVO') {
-    await asignacionesService.cancelarTodasDeAuditor(id);
+    await asignacionesService.cancelarTodasDeAuditor(id, actorId);
   }
   return {
     ...mapUsuario(usuario),

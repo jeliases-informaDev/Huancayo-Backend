@@ -4,7 +4,7 @@ import { authMiddleware } from '#modules/auth/auth.middleware.js';
 import { roleMiddleware } from '#core/middlewares/role.middleware.js';
 import { OPERATIONAL_MANAGERS, ADMIN_ROLES, ROLES } from '#core/security/roles.js';
 import { validate } from '#core/middlewares/validate.middleware.js';
-import { idParams, listQuery, asignacionCreateBody, asignacionBulkBody, autoasignacionBody, miasQuery, disponiblesQuery, mapaQuery } from '../../validation/schemas.js';
+import { idParams, listQuery, asignacionCreateBody, asignacionBulkBody, autoasignacionBody, topeCasosBody, quitarCasosBody, miasQuery, disponiblesQuery, mapaQuery } from '../../validation/schemas.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -21,6 +21,8 @@ router.get('/carga', controller.carga);
 router.get('/mapa', validate({ query: mapaQuery }), controller.mapa);
 router.put('/autoasignacion', roleMiddleware(ADMIN_ROLES), validate({ body: autoasignacionBody }), controller.fijarAutoasignacion);
 router.post('/liberar', roleMiddleware(ADMIN_ROLES), controller.liberarPendientes);
+router.put('/tope-casos', roleMiddleware(ADMIN_ROLES), validate({ body: topeCasosBody }), controller.fijarTope);
+router.post('/quitar', validate({ body: quitarCasosBody }), controller.quitarCasos);
 router.post('/', validate({ body: asignacionCreateBody }), controller.crear);
 router.post('/masivo', validate({ body: asignacionBulkBody }), controller.crearMasivo);
 router.post('/:id/cancelar', validate({ params: idParams }), controller.cancelar);

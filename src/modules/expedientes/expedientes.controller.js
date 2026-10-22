@@ -69,12 +69,12 @@ async function importar(req, res, next) {
     const archivoSha256 = await sha256Archivo(ruta);
     const { simular, autoasignable } = req.validated?.query || {};
     const resultado = await expedientesService.importador.iniciarImportacion({
-      ruta, actorId: req.user.id, archivo: req.file.originalname, archivoSha256, simular: simular === 'true', autoasignable: autoasignable === 'true',
+      ruta, actorId: req.user.id, archivo: req.file.originalname, archivoSha256, simular: simular === 'true', autoasignable: autoasignable !== 'false',
     });
     delegado = true; // desde aquí el servicio borra el archivo al terminar
     req.auditContext = {
       entidad: 'ImportacionMasiva', entidad_id: resultado.id_importacion, valor_anterior: null,
-      valor_nuevo: { archivo: req.file.originalname, archivo_sha256: archivoSha256, simulacion: resultado.simulacion, autoasignable: autoasignable === 'true' },
+      valor_nuevo: { archivo: req.file.originalname, archivo_sha256: archivoSha256, simulacion: resultado.simulacion, autoasignable: autoasignable !== 'false' },
     };
     res.status(202).json({ data: resultado });
   } catch (error) {

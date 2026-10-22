@@ -280,7 +280,10 @@ exports.Prisma.AsignacionAuditoriaScalarFieldEnum = {
   estado: 'estado',
   prioridad: 'prioridad',
   origen: 'origen',
-  asignado_por: 'asignado_por'
+  asignado_por: 'asignado_por',
+  motivo_fin: 'motivo_fin',
+  fin_por: 'fin_por',
+  nota_fin: 'nota_fin'
 };
 
 exports.Prisma.VisitaAuditoriaScalarFieldEnum = {
@@ -511,7 +514,10 @@ exports.Prisma.AsignacionAuditoriaOrderByRelevanceFieldEnum = {
   estado: 'estado',
   prioridad: 'prioridad',
   origen: 'origen',
-  asignado_por: 'asignado_por'
+  asignado_por: 'asignado_por',
+  motivo_fin: 'motivo_fin',
+  fin_por: 'fin_por',
+  nota_fin: 'nota_fin'
 };
 
 exports.Prisma.VisitaAuditoriaOrderByRelevanceFieldEnum = {

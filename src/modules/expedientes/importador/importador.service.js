@@ -338,7 +338,7 @@ async function ejecutar(ctx, ruta) {
  * Registra la importación y la procesa en segundo plano. Responde de inmediato.
  * El archivo (ruta) pasa a ser responsabilidad de este módulo: se borra al terminar.
  */
-async function iniciarImportacion({ ruta, actorId, archivo, archivoSha256, simular = false, autoasignable = false }) {
+async function iniciarImportacion({ ruta, actorId, archivo, archivoSha256, simular = false, autoasignable = true }) {
   if (importacionEnCurso) {
     throw Object.assign(new Error('Ya hay una importación en curso. Espera a que termine para iniciar otra.'), { statusCode: 409, code: 'IMPORT_IN_PROGRESS' });
   }
