@@ -139,7 +139,8 @@ async function readEvidence(key) {
   return buffer;
 }
 
-// Borra una evidencia. Solo para mantenimiento y para la prueba de almacenamiento (scripts/probar-almacenamiento.js): el sistema nunca
+// Borra una evidencia. Solo para mantenimiento, para la prueba de almacenamiento (scripts/probar-almacenamiento.js) y para el modo pruebas
+// (borrar un empleado o limpiar los datos cargados, con confirmación y solo si la empresa lo encendió): fuera de eso el sistema nunca
 // borra evidencias de visitas.
 async function borrarEvidencia(key) {
   if (typeof key !== 'string' || key.includes('..')) {

@@ -30,6 +30,7 @@ import reportesRoutes from '#modules/reportes/reportes.routes.js';
 import seguridadRoutes from '#modules/sistema/seguridad.routes.js';
 import empresasRoutes from '#modules/empresas/empresas.routes.js';
 import terminosRoutes from '#modules/terminos/terminos.routes.js';
+import limpiezaRoutes from '#modules/limpieza/limpieza.routes.js';
 import { sinEmpresa } from '#core/tenant/contexto.js';
 import { iniciarGeocodificacion } from '#modules/geocodificacion/geocodificacion.worker.js';
 import { iniciarRetencionTracking } from '#modules/auditorias/tracking.retencion.js';
@@ -121,6 +122,8 @@ app.use(globalLimiter);
 app.use('/api/auth/login', createAuthLimiter());
 app.use('/api/auth/mfa/verify', createAuthLimiter());
 app.use('/api/auth/mfa/enroll', createAuthLimiter());
+// Borrar empleados y limpiar datos: solo cuentan los intentos que fallan (contraseña o confirmación equivocadas), como en el login.
+app.use('/api/limpieza', createAuthLimiter());
 // El upload de evidencias va como cuerpo binario crudo (ver visitas.routes.js); el resto usa JSON.
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/visitas/evidencias/upload/')) return next();
@@ -162,6 +165,7 @@ app.use('/api/reportes', reportesRoutes);
 app.use('/api/seguridad', seguridadRoutes);
 app.use('/api/empresas', empresasRoutes);
 app.use('/api/terminos', terminosRoutes);
+app.use('/api/limpieza', limpiezaRoutes);
 
 // Manejo de errores
 app.use(notFoundHandler);

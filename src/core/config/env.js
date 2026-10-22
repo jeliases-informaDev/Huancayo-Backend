@@ -67,6 +67,10 @@ const schema = z.object({
   // Días que se conservan los puntos GPS de tracking_ubicacion (el recorrido de un día se puede ver mientras exista). 0 = no depurar.
   TRACKING_RETENCION_DIAS: z.coerce.number().int().min(0).max(3650).default(90),
   ACCOUNT_LOCK_MINUTES: z.coerce.number().int().min(5).max(1440).default(15),
+  // Modo pruebas (borrar empleados y limpiar datos cargados): cuánto trabaja cada llamada antes de devolver el control (el panel repite hasta
+  // terminar) y cuántas filas se borran por lote. Los valores por defecto sirven en producción; las pruebas los bajan para forzar varias llamadas.
+  LIMPIEZA_PRESUPUESTO_MS: z.coerce.number().int().min(20).max(60000).default(20000),
+  LIMPIEZA_LOTE: z.coerce.number().int().min(1).max(5000).default(1000),
   // Almacenamiento local de evidencias (fase 1 — sin credenciales cloud todavía).
   EVIDENCIAS_DIR: z.string().default('./storage/evidencias'),
   // Dónde se guardan las fotos: disco local (desarrollo/demo) o un bucket compatible con S3 (Oracle Object Storage en Sulotec).

@@ -4,7 +4,7 @@ import prisma from '#core/config/prisma.js';
 import { env } from '#core/config/env.js';
 import { empresaActual } from '#core/tenant/contexto.js';
 
-export const CLAVES = Object.freeze({ AUTOASIGNACION: 'autoasignacion' });
+export const CLAVES = Object.freeze({ AUTOASIGNACION: 'autoasignacion', MODO_PRUEBAS: 'modo_pruebas' });
 const TTL_MS = 10_000; // el valor se relee cada 10 s: un cambio en el panel llega a todos los procesos del servidor casi al instante
 const cache = new Map();
 
@@ -22,12 +22,16 @@ async function leerBool(clave) {
 }
 
 export const autoasignacionPermitida = () => leerBool(CLAVES.AUTOASIGNACION);
+// Modo pruebas: mientras esté apagado (lo normal) no se puede borrar ningún empleado ni limpiar datos. Cada empresa lo enciende o apaga.
+export const modoPruebasActivo = () => leerBool(CLAVES.MODO_PRUEBAS);
 
 // Devuelve el valor anterior y el nuevo, para dejarlos en el registro de auditoría.
-export async function fijarAutoasignacion(activa, actorId) {
-  const anterior = await autoasignacionPermitida();
-  const cambiadas = await prisma.configuracionSistema.updateMany({ where: { clave: CLAVES.AUTOASIGNACION }, data: { valor: String(activa), actualizado_por: actorId } });
-  if (!cambiadas.count) await prisma.configuracionSistema.create({ data: { clave: CLAVES.AUTOASIGNACION, valor: String(activa), actualizado_por: actorId } });
-  cache.set(claveCache(CLAVES.AUTOASIGNACION), { valor: activa, en: Date.now() });
+async function fijarBool(clave, activa, actorId) {
+  const anterior = await leerBool(clave);
+  const cambiadas = await prisma.configuracionSistema.updateMany({ where: { clave }, data: { valor: String(activa), actualizado_por: actorId } });
+  if (!cambiadas.count) await prisma.configuracionSistema.create({ data: { clave, valor: String(activa), actualizado_por: actorId } });
+  cache.set(claveCache(clave), { valor: activa, en: Date.now() });
   return { anterior, nuevo: activa };
 }
+export const fijarAutoasignacion = (activa, actorId) => fijarBool(CLAVES.AUTOASIGNACION, activa, actorId);
+export const fijarModoPruebas = (activa, actorId) => fijarBool(CLAVES.MODO_PRUEBAS, activa, actorId);
