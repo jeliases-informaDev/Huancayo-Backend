@@ -161,6 +161,14 @@ export const jornadaBody = z.object({ accion: z.enum(['INICIAR', 'TERMINAR']) })
 
 export const autoasignacionBody = z.object({ activa: z.boolean() }).strict();
 
+// --- Modo pruebas: borrar empleados y limpiar datos (solo el administrador, con el modo encendido) ---
+export const modoPruebasBody = z.object({ activo: z.boolean() }).strict();
+export const limpiezaDatosQuery = z.object({ alcance: z.enum(['campo', 'todo']) }).strict();
+// `confirmar` (la palabra BORRAR) y `clave` (la contraseña de quien borra) los revisa el servidor; aquí solo se acota su forma.
+export const limpiezaDatosBody = z.object({ alcance: z.enum(['campo', 'todo']), confirmar: z.string().max(40), clave: z.string().min(1).max(128) }).strict();
+export const limpiezaUsuarioBody = z.object({ confirmar: z.string().max(60) }).strict();
+export const limpiezaEmpleadosBody = z.object({ confirmar: z.string().max(40), clave: z.string().min(1).max(128) }).strict();
+
 // --- Empresas (solo el administrador universal) ---
 const reglasEmpresa = z.object({ geocerca_radio_m: z.coerce.number().int().optional(), precision_maxima_m: z.coerce.number().int().optional(), formatos_importacion: z.array(z.enum(['CORE_262', 'SIMPLE'])).min(1).max(10).optional() }).strict();
 const marcaEmpresa = z.object({ nombre: z.string().max(80).optional(), producto: z.string().max(80).optional(), color: z.string().max(7).optional(), logo_url: z.string().max(500).optional() }).strict();
