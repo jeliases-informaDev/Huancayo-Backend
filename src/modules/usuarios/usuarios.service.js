@@ -135,7 +135,8 @@ async function actualizar(id, datos, actorId) {
   }
   return {
     ...mapUsuario(usuario),
-    _auditDiff: { entidad: 'Usuario', entidad_id: id, valor_anterior: auditSnapshot(actual), valor_nuevo: auditSnapshot(usuario) },
+    // clave_cambiada: queda anotado que se cambió la contraseña (nunca la contraseña) para que el registro de seguridad lo distinga de una edición común.
+    _auditDiff: { entidad: 'Usuario', entidad_id: id, valor_anterior: auditSnapshot(actual), valor_nuevo: { ...auditSnapshot(usuario), ...(datos.password ? { clave_cambiada: true } : {}) } },
   };
 }
 
