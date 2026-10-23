@@ -1,4 +1,6 @@
+import { once } from 'node:events';
 import visitasService from './visitas.service.js';
+import { logger } from '#core/config/logger.js';
 import { env } from '#core/config/env.js';
 import { autoasignacionPermitida } from '#modules/sistema/configuracion.service.js';
 import { publica as empresaPublica } from '#modules/empresas/empresas.service.js';
@@ -42,6 +44,27 @@ async function crear(req, res, next) {
 async function listar(req, res, next) {
   try { res.json(await visitasService.listar(req.validated.query)); } catch (error) { next(error); }
 }
+// Descarga de las visitas filtradas en CSV. Se escribe por lotes y se respeta el ritmo del cliente (si la conexión va lenta se espera a que se vacíe el
+// búfer en vez de acumular filas en memoria). Queda anotada en el registro de seguridad: quién la hizo, con qué filtros y cuántas filas.
+async function exportar(req, res, next) {
+  const q = req.validated.query;
+  let cortado = false;
+  res.on('close', () => { if (!res.writableFinished) cortado = true; });
+  try {
+    const dia = new Date().toISOString().slice(0, 10);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="visitas-${dia}.csv"`);
+    const escribir = async (texto) => { if (!res.write(texto)) await once(res, 'drain'); };
+    const { filas } = await visitasService.exportarCsv(q, { escribir, cancelado: () => cortado });
+    req.auditContext = { entidad: 'VisitaAuditoria', entidad_id: null, valor_anterior: null, valor_nuevo: { filtros: q, filas, completo: !cortado } };
+    res.end();
+  } catch (error) {
+    if (!res.headersSent) { res.removeHeader('Content-Disposition'); return next(error); }
+    // Ya se empezó a enviar el archivo: no se puede cambiar la respuesta; se corta la descarga y queda el motivo en el log del servidor.
+    logger.error({ err: error, requestId: req.id }, 'exportacion_visitas_fallo');
+    res.destroy(error);
+  }
+}
 async function obtener(req, res, next) {
   try { res.json({ data: await visitasService.obtener(Number(req.params.id)) }); } catch (error) { next(error); }
 }
@@ -82,4 +105,4 @@ async function config(_req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { presignEvidencia, subirEvidencia, crear, listar, obtener, archivoEvidencia, ubicacion, jornada, config };
+export default { presignEvidencia, subirEvidencia, crear, listar, exportar, obtener, archivoEvidencia, ubicacion, jornada, config };

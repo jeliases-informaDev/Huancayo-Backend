@@ -117,6 +117,8 @@ const REGLAS = [
     `Limpió datos de prueba${c.nuevo?.alcance ? ` (${c.nuevo.alcance === 'todo' ? 'todo lo cargado' : 'solo la actividad de campo'})` : ''}`)),
   regla('POST', `/api/limpieza/usuarios/${UUID}`, (c) => def('BORRADO', 'BORRADO_USUARIO', 'CRITICO', `Borró por completo la cuenta de ${usuario(c)}`, { tipo: 'Usuario', id: c.m[1] })),
   regla('POST', '/api/limpieza/empleados', () => def('BORRADO', 'BORRADO_EMPLEADOS', 'CRITICO', 'Borró a todos los asesores y supervisores')),
+  regla('POST', '/api/limpieza/demo/visitas', (c) => def('CONFIGURACION', 'DEMO_CARGAR', 'AVISO', `Cargó visitas de demostración${c.nuevo?.creadas != null ? ` (${num(c.nuevo.creadas)} nuevas)` : ''}`)),
+  regla('DELETE', '/api/limpieza/demo/visitas', (c) => def('BORRADO', 'DEMO_QUITAR', 'AVISO', `Quitó las visitas de demostración${c.anterior?.visitas != null ? ` (${num(c.anterior.visitas)} visitas)` : ''}`)),
 
   // ---------------------------------------------------------------- Consultas de datos sensibles (solo lecturas que se auditan)
   regla('GET', `/api/expedientes/${ID}`, (c) => def('CONSULTA', 'CONSULTA_EXPEDIENTE', 'INFO', `Consultó ${expediente(c)}`, { tipo: 'Expediente', id: c.m[1] })),
@@ -124,6 +126,7 @@ const REGLAS = [
   regla('GET', `/api/reportes/visita/${ID}/word`, (c) => def('CONSULTA', 'CONSULTA_FICHA_WORD', 'AVISO', `Descargó la ficha en Word de la visita n.º ${c.m[1]}`, { tipo: 'VisitaAuditoria', id: c.m[1] })),
   regla('GET', `/api/usuarios/${UUID}/tracking`, (c) => def('CONSULTA', 'CONSULTA_RECORRIDO', 'INFO', `Consultó el recorrido de ${usuario(c)}`, { tipo: 'Usuario', id: c.m[1] })),
   regla('GET', '/api/seguridad/exportar', () => def('CONSULTA', 'SEGURIDAD_EXPORTAR', 'AVISO', 'Exportó el registro de auditoría')),
+  regla('GET', '/api/visitas/exportar', (c) => def('CONSULTA', 'VISITAS_EXPORTAR', 'AVISO', c.estado === 400 ? 'Intentó exportar la lista de visitas (se rechazó con filtros no válidos)' : `Exportó la lista de visitas${c.nuevo?.filas != null ? ` (${num(c.nuevo.filas)} ${Number(c.nuevo.filas) === 1 ? 'fila' : 'filas'})` : ''}`)),
 ];
 
 const sinRuta = (metodo, ruta) => def('OTRO', 'OTRO', 'INFO', `${metodo} ${ruta}`);

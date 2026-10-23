@@ -5,7 +5,7 @@ import { authMiddleware } from '#modules/auth/auth.middleware.js';
 import { roleMiddleware } from '#core/middlewares/role.middleware.js';
 import { FIELD_ROLES, OPERATIONAL_MANAGERS } from '#core/security/roles.js';
 import { validate } from '#core/middlewares/validate.middleware.js';
-import { idParams, evidenciaParams, visitasListQuery, evidenciaPresignBody, visitaCreateBody, ubicacionBody, jornadaBody } from '../../validation/schemas.js';
+import { idParams, evidenciaParams, visitasListQuery, visitasExportarQuery, evidenciaPresignBody, visitaCreateBody, ubicacionBody, jornadaBody } from '../../validation/schemas.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -18,6 +18,7 @@ router.get('/config', roleMiddleware(FIELD_ROLES), controller.config);
 // no queden atrapadas por el roleMiddleware(FIELD_ROLES) de '/evidencias'.
 router.get('/evidencias/:idEvidencia/archivo', roleMiddleware(OPERATIONAL_MANAGERS), validate({ params: evidenciaParams }), controller.archivoEvidencia);
 router.get('/', roleMiddleware(OPERATIONAL_MANAGERS), validate({ query: visitasListQuery }), controller.listar);
+router.get('/exportar', roleMiddleware(OPERATIONAL_MANAGERS), validate({ query: visitasExportarQuery }), controller.exportar);
 router.get('/:id', roleMiddleware(OPERATIONAL_MANAGERS), validate({ params: idParams }), controller.obtener);
 
 // Campo (Auditor / Supervisor en campo)

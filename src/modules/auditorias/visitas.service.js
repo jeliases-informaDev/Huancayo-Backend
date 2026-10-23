@@ -8,6 +8,8 @@ import { estadoDeMovimiento } from '#modules/usuarios/movimiento.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { logger } from '#core/config/logger.js';
 import { cierreAlReiniciar, textoZona, zonaDeJornada } from './jornada.core.js';
+import { conteosPorResultado, construirDonde, filaVisitaCsv, COLUMNAS_CSV } from './visitas.filtros.js';
+import { filaCsv } from '#modules/sistema/seguridad.filtros.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -229,24 +231,52 @@ async function crearVisita(auditorId, payload) {
   return { ...serialize(visita), _alertas: alertas };
 }
 
-async function listar({ page = 1, limit = 25, estado, id_usuario_auditor, resultado, tipo_credito, con_alertas } = {}) {
-  const where = {
-    ...(estado ? { estado } : {}),
-    ...(id_usuario_auditor ? { id_usuario_auditor } : {}),
-    ...(resultado ? { resultado } : {}),
-    ...(tipo_credito ? { expediente: { tipo_credito } } : {}),
-    ...(con_alertas === 'true' ? { OR: [{ mock_location: true }, { device_integrity_ok: false }, { resultado: { in: ['OBSERVADO', 'RECHAZADO'] } }] } : {}),
-  };
-  const [data, total] = await Promise.all([
+// Lo más reciente primero. El id desempata las visitas del mismo instante, así las páginas no repiten ni saltan filas.
+const ORDEN_LISTA = [{ fecha_hora_checkin: 'desc' }, { id_visita: 'desc' }];
+const AUDITOR_RESUMEN = { id_usuario: true, username: true, nombres: true, apellidos: true };
+
+// Lista paginada con los filtros de la pantalla Visitas (resultado y ficha de uno o varios, fechas del usuario, auditor, alertas y búsqueda). Además de la
+// página trae cuántas visitas habría de cada resultado con los DEMÁS filtros puestos: son los números que acompañan a cada opción de «Resultado».
+async function listar(consulta = {}) {
+  const { page = 1, limit = 25 } = consulta;
+  const where = construirDonde(consulta);
+  const [data, total, porResultado] = await Promise.all([
     prisma.visitaAuditoria.findMany({
-      where, orderBy: { fecha_creacion: 'desc' }, skip: (page - 1) * limit, take: limit,
-      // Listado liviano: sin los bloques JSON del expediente, el snapshot ni la firma.
+      where, orderBy: ORDEN_LISTA, skip: (page - 1) * limit, take: limit,
+      // Listado liviano: sin los bloques JSON del expediente, el snapshot ni la firma; de las fotos solo se necesita saber cuántas hay.
       omit: { expediente_snapshot: true, firma_evidencia: true, conformidad_financiera: true },
-      include: { expediente: { select: EXPEDIENTE_RESUMEN }, auditor: { select: { id_usuario: true, username: true, nombres: true, apellidos: true } }, evidencias: true },
+      include: { expediente: { select: EXPEDIENTE_RESUMEN }, auditor: { select: AUDITOR_RESUMEN }, evidencias: { select: { id_evidencia: true } } },
     }),
     prisma.visitaAuditoria.count({ where }),
+    prisma.visitaAuditoria.groupBy({ by: ['resultado'], where: construirDonde(consulta, { sinResultado: true }), _count: { _all: true } }),
   ]);
-  return { data: serialize(data), pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
+  return { data: serialize(data), pagination: { page, limit, total, pages: Math.ceil(total / limit) }, conteos: conteosPorResultado(porResultado) };
+}
+
+// Exporta a CSV las visitas que cumplen los filtros, por lotes con cursor (fecha, id), sin cargarlas todas en memoria y sin tope de filas. `escribir(texto)`
+// devuelve una promesa que se resuelve cuando se puede seguir escribiendo; `cancelado()` avisa si el cliente cortó la descarga.
+async function exportarCsv(consulta, { escribir, cancelado = () => false, lote = 500 }) {
+  const base = construirDonde(consulta);
+  const desfase = consulta.desfase || 0;
+  const radioM = (await reglasEmpresa()).geocerca_radio_m;
+  await escribir('\uFEFF' + filaCsv(COLUMNAS_CSV));
+  let cursor = null; let filas = 0;
+  for (;;) {
+    if (cancelado()) break;
+    const where = cursor ? { AND: [base, { OR: [{ fecha_hora_checkin: { lt: cursor.fecha } }, { fecha_hora_checkin: cursor.fecha, id_visita: { lt: cursor.id } }] }] } : base;
+    const pagina = await prisma.visitaAuditoria.findMany({
+      where, orderBy: ORDEN_LISTA, take: lote,
+      omit: { expediente_snapshot: true, firma_evidencia: true, conformidad_financiera: true },
+      include: { expediente: { select: { ...EXPEDIENTE_RESUMEN, oficina: true } }, auditor: { select: AUDITOR_RESUMEN }, evidencias: { select: { id_evidencia: true } } },
+    });
+    if (!pagina.length) break;
+    await escribir(pagina.map((v) => filaVisitaCsv(v, { desfase, radioM })).join(''));
+    filas += pagina.length;
+    const ultima = pagina[pagina.length - 1];
+    cursor = { fecha: ultima.fecha_hora_checkin, id: ultima.id_visita };
+    if (pagina.length < lote) break;
+  }
+  return { filas };
 }
 
 async function obtener(id) {
@@ -378,4 +408,5 @@ async function registrarJornada(usuarioId, accion, cuerpo = {}) {
   };
 }
 
-export default { presignEvidencia, recibirEvidencia, crearVisita, listar, obtener, obtenerArchivoEvidencia, actualizarUbicacionEnVivo, registrarJornada };
+export { snapshotExpediente };
+export default { presignEvidencia, recibirEvidencia, crearVisita, listar, exportarCsv, obtener, obtenerArchivoEvidencia, actualizarUbicacionEnVivo, registrarJornada };

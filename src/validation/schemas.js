@@ -82,15 +82,29 @@ export const importacionesQuery = z.object({
 }).strict();
 
 // Filtros del modulo de evidencias/fichas (panel de Administrador/Supervisor).
+// Uno o varios valores separados por comas («CONFORME,OBSERVADO»): llega como lista, sin repetidos y solo con valores permitidos.
+const listaPermitida = (valores) => z.string().trim().min(1).max(80)
+  .transform((texto) => [...new Set(texto.split(',').map((x) => x.trim()).filter(Boolean))])
+  .refine((lista) => lista.length > 0 && lista.every((x) => valores.includes(x)), { message: 'Valor no permitido' });
+const diaIso = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine((s) => { const d = new Date(`${s}T00:00:00Z`); return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s; }, { message: 'Fecha no válida' });
+// Filtros de la lista de visitas (y de su exportación): los días son del usuario y `desfase` son los minutos que su navegador está detrás de UTC.
+const visitasFiltros = {
+  estado: z.string().trim().max(30).optional(),
+  id_usuario_auditor: z.string().uuid().optional(),
+  resultado: listaPermitida(['CONFORME', 'OBSERVADO', 'NO_UBICADO', 'RECHAZADO']).optional(),
+  tipo_credito: listaPermitida(['CONSUMO', 'OTROS']).optional(),
+  con_alertas: z.enum(['true', 'false']).optional(),
+  desde: diaIso.optional(),
+  hasta: diaIso.optional(),
+  desfase: z.coerce.number().int().min(-840).max(840).optional(),
+  q: z.string().trim().min(2).max(100).optional(),
+};
 export const visitasListQuery = z.object({
   page: z.coerce.number().int().min(1).max(100000).optional(),
   limit: z.coerce.number().int().min(1).max(1000).optional(),
-  estado: z.string().trim().max(30).optional(),
-  id_usuario_auditor: z.string().uuid().optional(),
-  resultado: z.enum(['CONFORME', 'OBSERVADO', 'NO_UBICADO', 'RECHAZADO']).optional(),
-  tipo_credito: z.enum(['CONSUMO', 'OTROS']).optional(),
-  con_alertas: z.enum(['true', 'false']).optional(),
+  ...visitasFiltros,
 }).strict();
+export const visitasExportarQuery = z.object({ ...visitasFiltros }).strict();
 
 // --- Expedientes ---
 export const expedienteCreateBody = z.object({
