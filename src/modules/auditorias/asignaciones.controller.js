@@ -46,7 +46,10 @@ async function carga(_req, res, next) {
   try { res.json({ data: await asignacionesService.cargaPorAuditor() }); } catch (error) { next(error); }
 }
 async function mapa(req, res, next) {
-  try { res.json(await asignacionesService.puntosParaMapa(req.validated?.query || {})); } catch (error) { next(error); }
+  try {
+    const { visitados_desde: visitadosDesde, ...filtros } = req.validated?.query || {};
+    res.json(await asignacionesService.puntosParaMapa({ ...filtros, visitadosDesde }));
+  } catch (error) { next(error); }
 }
 async function resumenOrigen(_req, res, next) {
   try { res.json({ data: await asignacionesService.resumenPorOrigen() }); } catch (error) { next(error); }

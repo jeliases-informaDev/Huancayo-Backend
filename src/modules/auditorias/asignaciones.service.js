@@ -193,28 +193,35 @@ async function cargaPorAuditor() {
 
 // Puntos de clientes con caso activo para el mapa del supervisor: filtrados por zona en el servidor, con tope de seguridad y la lista de zonas
 // (departamento/provincia/distrito con su cantidad) para armar los filtros aunque la respuesta venga truncada.
-let cacheZonas = { hasta: 0, valor: null };
+// La lista de zonas se guarda 30 s POR EMPRESA (una sola para todas mostraba a una empresa los distritos y cantidades de otra).
+const cacheZonas = new Map(); // id de la empresa → { hasta, valor }
 async function zonasDelMapa() {
-  if (cacheZonas.valor && Date.now() < cacheZonas.hasta) return cacheZonas.valor;
+  const empresaId = empresaActual();
+  const hit = cacheZonas.get(empresaId);
+  if (hit && Date.now() < hit.hasta) return hit.valor;
   const filas = await prisma.expediente.groupBy({
     by: ['departamento', 'provincia', 'distrito'], _count: { _all: true },
     where: { latitud: { not: null }, longitud: { not: null }, asignaciones: { some: { estado: 'ACTIVA' } } },
   });
   const valor = filas.map((z) => ({ departamento: z.departamento, provincia: z.provincia, distrito: z.distrito, n: z._count._all }));
-  cacheZonas = { hasta: Date.now() + 30_000, valor };
+  if (cacheZonas.size >= 500) cacheZonas.clear();
+  cacheZonas.set(empresaId, { hasta: Date.now() + 30_000, valor });
   return valor;
 }
-async function puntosParaMapa({ departamento, provincia, distrito, auditor, q, limite = 5000 } = {}) {
+// `visitadosDesde` (fecha y hora): además de los casos activos trae los que se visitaron desde ese momento (asignación FINALIZADA al registrar la
+// visita), para ver en el mapa lo ya visitado hoy. Son pocos (las visitas de un día) y salen por el índice (empresa, estado, fecha de fin).
+async function puntosParaMapa({ departamento, provincia, distrito, auditor, q, visitadosDesde, limite = 5000 } = {}) {
   const expediente = {
     latitud: { not: null }, longitud: { not: null },
     ...(departamento ? { departamento } : {}), ...(provincia ? { provincia } : {}), ...(distrito ? { distrito } : {}),
     ...(q ? buscarEnExpediente(q) : {}),
   };
-  const where = { estado: 'ACTIVA', ...(auditor ? { id_usuario_auditor: auditor } : {}), expediente };
+  const estados = visitadosDesde ? { OR: [{ estado: 'ACTIVA' }, { estado: 'FINALIZADA', fecha_fin: { gte: new Date(visitadosDesde) } }] } : { estado: 'ACTIVA' };
+  const where = { ...estados, ...(auditor ? { id_usuario_auditor: auditor } : {}), expediente };
   const [filas, total, zonas] = await Promise.all([
     prisma.asignacionAuditoria.findMany({
       where, orderBy: { id_asignacion: 'asc' }, take: limite + 1,
-      select: { id_asignacion: true, id_usuario_auditor: true, prioridad: true, expediente: { select: expedienteSelect }, auditor: { select: { id_usuario: true, username: true, nombres: true, apellidos: true } } },
+      select: { id_asignacion: true, id_usuario_auditor: true, prioridad: true, estado: true, fecha_fin: true, expediente: { select: expedienteSelect }, auditor: { select: { id_usuario: true, username: true, nombres: true, apellidos: true } } },
     }),
     prisma.asignacionAuditoria.count({ where }),
     q ? Promise.resolve(null) : zonasDelMapa(),
