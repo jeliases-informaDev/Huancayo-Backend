@@ -44,13 +44,14 @@ export async function cargarVisitasDemo({ actorId }) {
   if (!auditores.length) throw falla(409, 'SIN_AUDITORES', 'Crea al menos un asesor (en Usuarios) para que las visitas de ejemplo tengan quién las hizo.');
   const existentes = new Set((await prisma.expediente.findMany({ where: dondeExpedientesDemo(), select: { codigo_expediente: true } })).map((e) => e.codigo_expediente));
   const ahoraMs = Date.now();
+  const empresa = empresaActual();
   const total = { creadas: 0, omitidas: 0, fotos: 0 };
 
   for (const [indice, caso] of CASOS.entries()) {
     const datos = datosDeExpediente(caso);
     if (existentes.has(datos.codigo_expediente)) { total.omitidas += 1; continue; }
     const auditor = auditores[caso.auditor % auditores.length];
-    const visita = datosDeVisita(caso, ahoraMs, datos);
+    const visita = datosDeVisita(caso, ahoraMs, datos, empresa);
     const expediente = await prisma.expediente.create({ data: { ...datos, estado: 'VISITADO', fecha_creacion: new Date(visita.fecha_hora_checkin.getTime() - 3 * 24 * 60 * 60 * 1000) } });
     try {
       const asignacion = await prisma.asignacionAuditoria.create({

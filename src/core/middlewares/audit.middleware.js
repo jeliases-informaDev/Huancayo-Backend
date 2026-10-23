@@ -78,7 +78,8 @@ export function auditMiddleware(req, res, next) {
       device_id: (req.get('x-device-id') || '').slice(0, 150) || null,
       accion: clase.accion, categoria: clase.categoria, severidad: clase.severidad,
       plataforma: req.get('x-client-platform') === 'mobile' ? 'MOVIL' : 'WEB',
-      con_cambios: diff.valor_anterior !== undefined || diff.valor_nuevo !== undefined,
+      // Una consulta que deja detalle (los filtros y el número de filas de una exportación) no es un cambio de datos: no sale en «Solo cambios de datos».
+      con_cambios: clase.categoria !== 'CONSULTA' && (diff.valor_anterior !== undefined || diff.valor_nuevo !== undefined),
       entidad: diff.entidad || clase.ref?.tipo || null, entidad_id: idEntidad ? idEntidad.slice(0, 64) : null,
       valor_anterior: diff.valor_anterior ?? undefined, valor_nuevo: diff.valor_nuevo ?? undefined,
     } })).catch(error => logger.error({ err: error, requestId: req.id }, 'security_audit_persistence_failed'));

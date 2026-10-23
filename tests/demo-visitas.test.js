@@ -4,6 +4,8 @@ import { haversineMeters } from '../src/core/security/geofence.js';
 import { CASOS, PREFIJO_CODIGO, PREFIJO_SINCRONIZACION, datosDeExpediente, datosDeVisita, distribucion, domicilioDe, fechaDeVisita, puntoDeVisita, respuestasDeCuestionario } from '../src/modules/limpieza/demo.core.js';
 import { fotoDemo } from '../src/modules/limpieza/demo.fotos.js';
 
+const EMPRESA_A = '216bd472-029a-44ab-83fa-93889a0187fd';
+
 test('el conjunto de ejemplo son 24 visitas: 13 conformes, 4 observadas, 2 no ubicadas y 5 rechazadas', () => {
   const d = distribucion();
   assert.equal(d.total, 24);
@@ -28,9 +30,18 @@ test('códigos y documentos son únicos y llevan la marca de demostración', () 
   assert.equal(new Set(datos.map((d) => d.numero_documento_cliente)).size, 24);
   assert.ok(datos.every((d) => d.codigo_expediente.startsWith(PREFIJO_CODIGO) && /^\d{8}$/.test(d.numero_documento_cliente) && /^9\d{8}$/.test(d.telefono_cliente)));
   assert.ok(datos.every((d) => d.latitud < -11.9 && d.latitud > -12.2 && d.longitud < -76.9 && d.longitud > -77.2), 'todos en Lima');
-  const visitas = CASOS.map((c) => datosDeVisita(c, Date.now(), domicilioDe(c)));
+  const visitas = CASOS.map((c) => datosDeVisita(c, Date.now(), domicilioDe(c), EMPRESA_A));
   assert.ok(visitas.every((v) => v.client_sync_id.startsWith(PREFIJO_SINCRONIZACION)));
   assert.equal(new Set(visitas.map((v) => v.client_sync_id)).size, 24);
+});
+
+// client_sync_id es único en TODA la base: si dos empresas cargaran la demostración con las mismas marcas, la segunda chocaría (error 502 al cargar).
+test('dos empresas distintas nunca comparten client_sync_id al cargar la demostración, y cada marca cabe en el campo', () => {
+  const de = (empresa) => CASOS.map((c) => datosDeVisita(c, Date.now(), domicilioDe(c), empresa).client_sync_id);
+  const a = de(EMPRESA_A); const b = de('7c9e6679-7425-40de-944b-e07fc1f90ae7');
+  assert.equal(new Set([...a, ...b]).size, 48);
+  assert.deepEqual(de(EMPRESA_A), a, 'para la misma empresa la marca es siempre la misma (así «ya existe» se reconoce)');
+  assert.ok([...a, ...b].every((id) => id.length <= 100 && id.startsWith(PREFIJO_SINCRONIZACION) && id.includes('-')));
 });
 
 test('lo que el sistema real no deja pasar no aparece como conforme: dentro de la geocerca, GPS real y dispositivo íntegro', () => {
@@ -60,7 +71,7 @@ test('la fecha de la visita sigue el reloj de Lima y nunca cae en el futuro', ()
 
 test('la ficha de cada visita sale completa y coherente con su ficha y su resultado', () => {
   for (const c of CASOS) {
-    const e = datosDeExpediente(c); const v = datosDeVisita(c, Date.now(), e);
+    const e = datosDeExpediente(c); const v = datosDeVisita(c, Date.now(), e, EMPRESA_A);
     assert.equal(v.plantilla, c.ficha === 'OTROS' ? 'MYPE_V1' : 'CONSUMO_V1');
     assert.equal(v.estado, 'CERRADA'); assert.equal(v.mock_location, Boolean(c.gpsSimulado)); assert.equal(v.device_integrity_ok, c.dispositivoIntegro !== false);
     assert.equal(v.distancia_domicilio_m, c.metros);

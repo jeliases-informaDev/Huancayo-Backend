@@ -1,6 +1,6 @@
 // Visitas de demostración: 24 visitas ficticias (13 conformes, 4 observadas, 2 no ubicadas y 5 rechazadas) para ver las pantallas con información sin esperar a
 // que los asesores salgan a campo. Los nombres, documentos y direcciones son inventados. Todo lo que se crea lleva una marca (código DEMO-LIM-… en el
-// expediente y client_sync_id demo-… en la visita) para poder quitarlo después sin tocar nada real. Piezas puras, sin base de datos, para probarlas solas.
+// expediente y client_sync_id demo-<empresa>-… en la visita) para poder quitarlo después sin tocar nada real. Piezas puras, sin base de datos, para probarlas solas.
 
 export const PREFIJO_CODIGO = 'DEMO-LIM-';
 export const PREFIJO_SINCRONIZACION = 'demo-';
@@ -105,13 +105,14 @@ export function respuestasDeCuestionario(n, resultado) {
   };
 }
 
-// Lo que se guarda de la visita (sin ids, que pone quien la crea). `domicilio` es el punto del expediente.
-export function datosDeVisita(caso, ahoraMs, domicilio) {
+// Lo que se guarda de la visita (sin ids, que pone quien la crea). `domicilio` es el punto del expediente. `empresaId` va dentro de la marca porque
+// client_sync_id es único en TODA la base (no por empresa): sin él, la segunda empresa que cargara la demostración chocaría con la primera.
+export function datosDeVisita(caso, ahoraMs, domicilio, empresaId) {
   const punto = puntoDeVisita(domicilio.latitud, domicilio.longitud, caso.metros);
   const checkin = fechaDeVisita(ahoraMs, caso.hace);
   const llego = ['CONFORME', 'OBSERVADO'].includes(caso.resultado);
   return {
-    client_sync_id: `${PREFIJO_SINCRONIZACION}${caso.n}`,
+    client_sync_id: `${PREFIJO_SINCRONIZACION}${empresaId}-${caso.n}`,
     fecha_hora_checkin: checkin, fecha_hora_checkout: new Date(checkin.getTime() + (18 + (caso.n % 20)) * 60_000), server_received_at: new Date(checkin.getTime() + 25 * 60_000),
     latitud: punto.latitud, longitud: punto.longitud, precision_metros: caso.precision, distancia_domicilio_m: caso.metros, ubicacion_visitada: 'DOMICILIO', direccion_visitada: domicilio.direccion,
     mock_location: Boolean(caso.gpsSimulado), device_integrity_ok: caso.dispositivoIntegro !== false, device_id: `demo-equipo-${caso.auditor}`,
