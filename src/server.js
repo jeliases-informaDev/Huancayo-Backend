@@ -34,6 +34,7 @@ import limpiezaRoutes from '#modules/limpieza/limpieza.routes.js';
 import { sinEmpresa } from '#core/tenant/contexto.js';
 import { iniciarGeocodificacion } from '#modules/geocodificacion/geocodificacion.worker.js';
 import { iniciarRetencionTracking } from '#modules/auditorias/tracking.retencion.js';
+import { iniciarRetencionAuditoria } from '#modules/sistema/seguridad.retencion.js';
 
 // ============================================================================
 // 3. CONFIGURACIÓN DE EXPRESS Y MIDDLEWARES GLOBALES
@@ -178,6 +179,7 @@ const server = app.listen(env.PORT, () => {
   // Una carga que quedó "procesando" por un reinicio del servidor no va a terminar nunca: se marca.
   sinEmpresa(() => importador.marcarInterrumpidas()).catch(() => {});
   iniciarRetencionTracking();
+  iniciarRetencionAuditoria();
   iniciarGeocodificacion(); // apagado salvo GEOCODING_WORKER_ENABLED=true (enviar direcciones a un proveedor externo requiere autorización del banco)
   if (env.NODE_ENV === 'development') process.stdout.write(`http://localhost:${env.PORT}\n`);
   else logger.info({ port: env.PORT }, 'server_started');

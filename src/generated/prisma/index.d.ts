@@ -14449,6 +14449,11 @@ export namespace Prisma {
     mock_location: boolean | null
     entidad: string | null
     entidad_id: string | null
+    accion: string | null
+    categoria: string | null
+    severidad: string | null
+    plataforma: string | null
+    con_cambios: boolean | null
   }
 
   export type AuditoriaSeguridadMaxAggregateOutputType = {
@@ -14469,6 +14474,11 @@ export namespace Prisma {
     mock_location: boolean | null
     entidad: string | null
     entidad_id: string | null
+    accion: string | null
+    categoria: string | null
+    severidad: string | null
+    plataforma: string | null
+    con_cambios: boolean | null
   }
 
   export type AuditoriaSeguridadCountAggregateOutputType = {
@@ -14491,6 +14501,11 @@ export namespace Prisma {
     entidad_id: number
     valor_anterior: number
     valor_nuevo: number
+    accion: number
+    categoria: number
+    severidad: number
+    plataforma: number
+    con_cambios: number
     _all: number
   }
 
@@ -14521,6 +14536,11 @@ export namespace Prisma {
     mock_location?: true
     entidad?: true
     entidad_id?: true
+    accion?: true
+    categoria?: true
+    severidad?: true
+    plataforma?: true
+    con_cambios?: true
   }
 
   export type AuditoriaSeguridadMaxAggregateInputType = {
@@ -14541,6 +14561,11 @@ export namespace Prisma {
     mock_location?: true
     entidad?: true
     entidad_id?: true
+    accion?: true
+    categoria?: true
+    severidad?: true
+    plataforma?: true
+    con_cambios?: true
   }
 
   export type AuditoriaSeguridadCountAggregateInputType = {
@@ -14563,6 +14588,11 @@ export namespace Prisma {
     entidad_id?: true
     valor_anterior?: true
     valor_nuevo?: true
+    accion?: true
+    categoria?: true
+    severidad?: true
+    plataforma?: true
+    con_cambios?: true
     _all?: true
   }
 
@@ -14672,6 +14702,11 @@ export namespace Prisma {
     entidad_id: string | null
     valor_anterior: JsonValue | null
     valor_nuevo: JsonValue | null
+    accion: string | null
+    categoria: string | null
+    severidad: string | null
+    plataforma: string | null
+    con_cambios: boolean
     _count: AuditoriaSeguridadCountAggregateOutputType | null
     _avg: AuditoriaSeguridadAvgAggregateOutputType | null
     _sum: AuditoriaSeguridadSumAggregateOutputType | null
@@ -14713,6 +14748,11 @@ export namespace Prisma {
     entidad_id?: boolean
     valor_anterior?: boolean
     valor_nuevo?: boolean
+    accion?: boolean
+    categoria?: boolean
+    severidad?: boolean
+    plataforma?: boolean
+    con_cambios?: boolean
   }, ExtArgs["result"]["auditoriaSeguridad"]>
 
 
@@ -14737,9 +14777,14 @@ export namespace Prisma {
     entidad_id?: boolean
     valor_anterior?: boolean
     valor_nuevo?: boolean
+    accion?: boolean
+    categoria?: boolean
+    severidad?: boolean
+    plataforma?: boolean
+    con_cambios?: boolean
   }
 
-  export type AuditoriaSeguridadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_auditoria" | "empresa_id" | "fecha" | "request_id" | "actor_id" | "actor" | "rol" | "metodo" | "ruta" | "estado_http" | "ip_address" | "ip_hash" | "user_agent" | "device_id" | "mock_location" | "entidad" | "entidad_id" | "valor_anterior" | "valor_nuevo", ExtArgs["result"]["auditoriaSeguridad"]>
+  export type AuditoriaSeguridadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_auditoria" | "empresa_id" | "fecha" | "request_id" | "actor_id" | "actor" | "rol" | "metodo" | "ruta" | "estado_http" | "ip_address" | "ip_hash" | "user_agent" | "device_id" | "mock_location" | "entidad" | "entidad_id" | "valor_anterior" | "valor_nuevo" | "accion" | "categoria" | "severidad" | "plataforma" | "con_cambios", ExtArgs["result"]["auditoriaSeguridad"]>
 
   export type $AuditoriaSeguridadPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AuditoriaSeguridad"
@@ -14764,6 +14809,11 @@ export namespace Prisma {
       entidad_id: string | null
       valor_anterior: Prisma.JsonValue | null
       valor_nuevo: Prisma.JsonValue | null
+      accion: string | null
+      categoria: string | null
+      severidad: string | null
+      plataforma: string | null
+      con_cambios: boolean
     }, ExtArgs["result"]["auditoriaSeguridad"]>
     composites: {}
   }
@@ -15152,6 +15202,11 @@ export namespace Prisma {
     readonly entidad_id: FieldRef<"AuditoriaSeguridad", 'String'>
     readonly valor_anterior: FieldRef<"AuditoriaSeguridad", 'Json'>
     readonly valor_nuevo: FieldRef<"AuditoriaSeguridad", 'Json'>
+    readonly accion: FieldRef<"AuditoriaSeguridad", 'String'>
+    readonly categoria: FieldRef<"AuditoriaSeguridad", 'String'>
+    readonly severidad: FieldRef<"AuditoriaSeguridad", 'String'>
+    readonly plataforma: FieldRef<"AuditoriaSeguridad", 'String'>
+    readonly con_cambios: FieldRef<"AuditoriaSeguridad", 'Boolean'>
   }
     
 
@@ -17826,7 +17881,12 @@ export namespace Prisma {
     entidad: 'entidad',
     entidad_id: 'entidad_id',
     valor_anterior: 'valor_anterior',
-    valor_nuevo: 'valor_nuevo'
+    valor_nuevo: 'valor_nuevo',
+    accion: 'accion',
+    categoria: 'categoria',
+    severidad: 'severidad',
+    plataforma: 'plataforma',
+    con_cambios: 'con_cambios'
   };
 
   export type AuditoriaSeguridadScalarFieldEnum = (typeof AuditoriaSeguridadScalarFieldEnum)[keyof typeof AuditoriaSeguridadScalarFieldEnum]
@@ -18091,7 +18151,11 @@ export namespace Prisma {
     user_agent: 'user_agent',
     device_id: 'device_id',
     entidad: 'entidad',
-    entidad_id: 'entidad_id'
+    entidad_id: 'entidad_id',
+    accion: 'accion',
+    categoria: 'categoria',
+    severidad: 'severidad',
+    plataforma: 'plataforma'
   };
 
   export type AuditoriaSeguridadOrderByRelevanceFieldEnum = (typeof AuditoriaSeguridadOrderByRelevanceFieldEnum)[keyof typeof AuditoriaSeguridadOrderByRelevanceFieldEnum]
@@ -19544,6 +19608,11 @@ export namespace Prisma {
     entidad_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     valor_anterior?: JsonNullableFilter<"AuditoriaSeguridad">
     valor_nuevo?: JsonNullableFilter<"AuditoriaSeguridad">
+    accion?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    categoria?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    severidad?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    plataforma?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    con_cambios?: BoolFilter<"AuditoriaSeguridad"> | boolean
   }
 
   export type AuditoriaSeguridadOrderByWithRelationInput = {
@@ -19566,6 +19635,11 @@ export namespace Prisma {
     entidad_id?: SortOrderInput | SortOrder
     valor_anterior?: SortOrderInput | SortOrder
     valor_nuevo?: SortOrderInput | SortOrder
+    accion?: SortOrderInput | SortOrder
+    categoria?: SortOrderInput | SortOrder
+    severidad?: SortOrderInput | SortOrder
+    plataforma?: SortOrderInput | SortOrder
+    con_cambios?: SortOrder
     _relevance?: AuditoriaSeguridadOrderByRelevanceInput
   }
 
@@ -19592,6 +19666,11 @@ export namespace Prisma {
     entidad_id?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     valor_anterior?: JsonNullableFilter<"AuditoriaSeguridad">
     valor_nuevo?: JsonNullableFilter<"AuditoriaSeguridad">
+    accion?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    categoria?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    severidad?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    plataforma?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    con_cambios?: BoolFilter<"AuditoriaSeguridad"> | boolean
   }, "id_auditoria">
 
   export type AuditoriaSeguridadOrderByWithAggregationInput = {
@@ -19614,6 +19693,11 @@ export namespace Prisma {
     entidad_id?: SortOrderInput | SortOrder
     valor_anterior?: SortOrderInput | SortOrder
     valor_nuevo?: SortOrderInput | SortOrder
+    accion?: SortOrderInput | SortOrder
+    categoria?: SortOrderInput | SortOrder
+    severidad?: SortOrderInput | SortOrder
+    plataforma?: SortOrderInput | SortOrder
+    con_cambios?: SortOrder
     _count?: AuditoriaSeguridadCountOrderByAggregateInput
     _avg?: AuditoriaSeguridadAvgOrderByAggregateInput
     _max?: AuditoriaSeguridadMaxOrderByAggregateInput
@@ -19644,6 +19728,11 @@ export namespace Prisma {
     entidad_id?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
     valor_anterior?: JsonNullableWithAggregatesFilter<"AuditoriaSeguridad">
     valor_nuevo?: JsonNullableWithAggregatesFilter<"AuditoriaSeguridad">
+    accion?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
+    categoria?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
+    severidad?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
+    plataforma?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
+    con_cambios?: BoolWithAggregatesFilter<"AuditoriaSeguridad"> | boolean
   }
 
   export type ImportacionMasivaWhereInput = {
@@ -21412,6 +21501,11 @@ export namespace Prisma {
     entidad_id?: string | null
     valor_anterior?: NullableJsonNullValueInput | InputJsonValue
     valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
+    accion?: string | null
+    categoria?: string | null
+    severidad?: string | null
+    plataforma?: string | null
+    con_cambios?: boolean
   }
 
   export type AuditoriaSeguridadUncheckedCreateInput = {
@@ -21434,6 +21528,11 @@ export namespace Prisma {
     entidad_id?: string | null
     valor_anterior?: NullableJsonNullValueInput | InputJsonValue
     valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
+    accion?: string | null
+    categoria?: string | null
+    severidad?: string | null
+    plataforma?: string | null
+    con_cambios?: boolean
   }
 
   export type AuditoriaSeguridadUpdateInput = {
@@ -21456,6 +21555,11 @@ export namespace Prisma {
     entidad_id?: NullableStringFieldUpdateOperationsInput | string | null
     valor_anterior?: NullableJsonNullValueInput | InputJsonValue
     valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
+    accion?: NullableStringFieldUpdateOperationsInput | string | null
+    categoria?: NullableStringFieldUpdateOperationsInput | string | null
+    severidad?: NullableStringFieldUpdateOperationsInput | string | null
+    plataforma?: NullableStringFieldUpdateOperationsInput | string | null
+    con_cambios?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type AuditoriaSeguridadUncheckedUpdateInput = {
@@ -21478,6 +21582,11 @@ export namespace Prisma {
     entidad_id?: NullableStringFieldUpdateOperationsInput | string | null
     valor_anterior?: NullableJsonNullValueInput | InputJsonValue
     valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
+    accion?: NullableStringFieldUpdateOperationsInput | string | null
+    categoria?: NullableStringFieldUpdateOperationsInput | string | null
+    severidad?: NullableStringFieldUpdateOperationsInput | string | null
+    plataforma?: NullableStringFieldUpdateOperationsInput | string | null
+    con_cambios?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type AuditoriaSeguridadCreateManyInput = {
@@ -21500,6 +21609,11 @@ export namespace Prisma {
     entidad_id?: string | null
     valor_anterior?: NullableJsonNullValueInput | InputJsonValue
     valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
+    accion?: string | null
+    categoria?: string | null
+    severidad?: string | null
+    plataforma?: string | null
+    con_cambios?: boolean
   }
 
   export type AuditoriaSeguridadUpdateManyMutationInput = {
@@ -21522,6 +21636,11 @@ export namespace Prisma {
     entidad_id?: NullableStringFieldUpdateOperationsInput | string | null
     valor_anterior?: NullableJsonNullValueInput | InputJsonValue
     valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
+    accion?: NullableStringFieldUpdateOperationsInput | string | null
+    categoria?: NullableStringFieldUpdateOperationsInput | string | null
+    severidad?: NullableStringFieldUpdateOperationsInput | string | null
+    plataforma?: NullableStringFieldUpdateOperationsInput | string | null
+    con_cambios?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type AuditoriaSeguridadUncheckedUpdateManyInput = {
@@ -21544,6 +21663,11 @@ export namespace Prisma {
     entidad_id?: NullableStringFieldUpdateOperationsInput | string | null
     valor_anterior?: NullableJsonNullValueInput | InputJsonValue
     valor_nuevo?: NullableJsonNullValueInput | InputJsonValue
+    accion?: NullableStringFieldUpdateOperationsInput | string | null
+    categoria?: NullableStringFieldUpdateOperationsInput | string | null
+    severidad?: NullableStringFieldUpdateOperationsInput | string | null
+    plataforma?: NullableStringFieldUpdateOperationsInput | string | null
+    con_cambios?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ImportacionMasivaCreateInput = {
@@ -23139,6 +23263,11 @@ export namespace Prisma {
     entidad_id?: SortOrder
     valor_anterior?: SortOrder
     valor_nuevo?: SortOrder
+    accion?: SortOrder
+    categoria?: SortOrder
+    severidad?: SortOrder
+    plataforma?: SortOrder
+    con_cambios?: SortOrder
   }
 
   export type AuditoriaSeguridadAvgOrderByAggregateInput = {
@@ -23163,6 +23292,11 @@ export namespace Prisma {
     mock_location?: SortOrder
     entidad?: SortOrder
     entidad_id?: SortOrder
+    accion?: SortOrder
+    categoria?: SortOrder
+    severidad?: SortOrder
+    plataforma?: SortOrder
+    con_cambios?: SortOrder
   }
 
   export type AuditoriaSeguridadMinOrderByAggregateInput = {
@@ -23183,6 +23317,11 @@ export namespace Prisma {
     mock_location?: SortOrder
     entidad?: SortOrder
     entidad_id?: SortOrder
+    accion?: SortOrder
+    categoria?: SortOrder
+    severidad?: SortOrder
+    plataforma?: SortOrder
+    con_cambios?: SortOrder
   }
 
   export type AuditoriaSeguridadSumOrderByAggregateInput = {

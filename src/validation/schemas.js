@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { MOTIVOS_QUITAR, DESTINOS_QUITAR } from '../modules/auditorias/casos.core.js';
+import { CATEGORIAS, SEVERIDADES, RESULTADOS } from '../modules/sistema/seguridad.catalogo.js';
 
 const cleanString = max => z.string().trim().min(1).max(max);
 const optionalString = max => z.string().trim().max(max).optional();
@@ -161,6 +162,40 @@ export const ubicacionBody = z.object({
 export const jornadaBody = z.object({ accion: z.enum(['INICIAR', 'TERMINAR']) }).strict();
 
 export const autoasignacionBody = z.object({ activa: z.boolean() }).strict();
+
+// --- Seguridad: registro de auditoría ---
+// Fechas: AAAA-MM-DD (el día completo en UTC) o una fecha y hora ISO.
+const fechaFiltro = z.string().trim().max(40).refine((v) => !Number.isNaN(Date.parse(v)), 'Fecha no válida');
+const filtrosAuditoria = {
+  q: z.string().trim().max(100).optional(),
+  actor: z.string().trim().max(50).optional(),
+  ruta: z.string().trim().max(100).optional(), // la versión anterior filtraba por ruta
+  categoria: z.enum(Object.keys(CATEGORIAS)).optional(),
+  accion: z.string().regex(/^[A-Z_]{3,40}$/).optional(),
+  severidad: z.enum(SEVERIDADES).optional(),
+  resultado: z.enum(RESULTADOS).optional(),
+  solo_cambios: z.enum(['true', 'false']).optional(),
+  entidad: z.string().trim().max(50).optional(),
+  entidad_id: z.string().trim().max(64).optional(),
+  desde: fechaFiltro.optional(),
+  hasta: fechaFiltro.optional(),
+};
+export const auditoriaQuery = z.object({
+  ...filtrosAuditoria,
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  page: z.coerce.number().int().min(1).max(100000).optional(), // las páginas por número son de la versión anterior: ahora se usa `cursor`
+  cursor: z.string().max(200).optional(),
+  contar: z.enum(['true', 'false']).optional(),
+}).strict();
+// La exportación exige un rango de fechas (así nunca es un volcado sin límite) de hasta un año.
+export const exportarAuditoriaQuery = z.object({ ...filtrosAuditoria, desde: fechaFiltro, hasta: fechaFiltro }).strict().superRefine((d, ctx) => {
+  const dias = (Date.parse(d.hasta) - Date.parse(d.desde)) / 86_400_000;
+  if (dias < 0) ctx.addIssue({ code: 'custom', path: ['hasta'], message: 'La fecha final no puede ser anterior a la inicial' });
+  else if (dias > 366) ctx.addIssue({ code: 'custom', path: ['hasta'], message: 'El rango máximo para exportar es de un año' });
+});
+// `fresco=true` se salta la caché de 30 s (el botón «Actualizar» de la pantalla).
+export const metricasSeguridadQuery = z.object({ ventana: z.enum(['24h', '7d', '30d']).optional(), fresco: z.enum(['true', 'false']).optional() }).strict();
+export const alertasSeguridadQuery = z.object({ fresco: z.enum(['true', 'false']).optional() }).strict();
 
 // Tope de casos abiertos por asesor al tomarlos por su cuenta (0 = sin tope).
 export const topeCasosBody = z.object({ maximo: z.number().int().min(0).max(1000) }).strict();

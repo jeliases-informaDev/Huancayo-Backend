@@ -4,8 +4,13 @@ import { generateSecret, generateURI, verify } from 'otplib';
 import prisma from '#core/config/prisma.js';
 import { env } from '#core/config/env.js';
 import { decryptSecret, encryptSecret } from '#core/security/crypto.js';
+import { normalizeRole } from '#core/security/roles.js';
 
 const jwtOptions = { algorithms: ['HS256'], issuer: env.JWT_ISSUER, audience: env.JWT_AUDIENCE };
+
+// Un rechazo de verificación lleva la cuenta a la que iba dirigido (`actor`), para que el registro de seguridad lo atribuya a esa persona y empresa.
+const actorDe = (u) => ({ id: u.id_usuario, username: u.username, rol: normalizeRole(u.rol), empresa_id: u.empresa_id || null });
+const rechazo = (mensaje, statusCode, usuario) => Object.assign(new Error(mensaje), { statusCode, ...(usuario ? { actor: actorDe(usuario) } : {}) });
 
 export function createChallenge(usuario, clientPlatform = 'web') {
   return jwt.sign({ type: 'mfa_challenge', clientPlatform }, env.JWT_SECRET, {
@@ -38,7 +43,7 @@ export async function setupEnrollment(challengeToken) {
 
 export async function confirmEnrollment(challengeToken, code) {
   const { usuario, clientPlatform } = await enrollmentUser(challengeToken);
-  await confirm(usuario.id_usuario, code);
+  try { await confirm(usuario.id_usuario, code); } catch (error) { error.actor = actorDe(usuario); throw error; }
   const updatedUser = await prisma.usuario.findUnique({ where: { id_usuario: usuario.id_usuario } });
   return { usuario: updatedUser, clientPlatform };
 }
@@ -51,16 +56,16 @@ export async function verifyChallenge(challengeToken, code) {
     throw Object.assign(new Error('Desafío MFA inválido'), { statusCode: 401 });
   }
   const result = await verify({ secret: decryptSecret(usuario.mfa_secreto), token: code, epochTolerance: 30 });
-  if (!result.valid) throw Object.assign(new Error('Código de verificación inválido'), { statusCode: 401 });
+  if (!result.valid) throw rechazo('Código de verificación inválido', 401, usuario);
   const usedAt = new Date(result.epoch * 1000);
   if (usuario.mfa_ultimo_uso && usuario.mfa_ultimo_uso >= usedAt) {
-    throw Object.assign(new Error('El código ya fue utilizado'), { statusCode: 401 });
+    throw rechazo('El código ya fue utilizado', 401, usuario);
   }
   const updated = await prisma.usuario.updateMany({
     where: { id_usuario: usuario.id_usuario, OR: [{ mfa_ultimo_uso: null }, { mfa_ultimo_uso: { lt: usedAt } }] },
     data: { mfa_ultimo_uso: usedAt },
   });
-  if (updated.count !== 1) throw Object.assign(new Error('El código ya fue utilizado'), { statusCode: 401 });
+  if (updated.count !== 1) throw rechazo('El código ya fue utilizado', 401, usuario);
   return { usuario, clientPlatform: decoded.clientPlatform === 'mobile' ? 'mobile' : 'web' };
 }
 
