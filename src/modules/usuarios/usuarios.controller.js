@@ -52,7 +52,10 @@ async function ubicacionesActivas(_req, res, next) {
 async function tracking(req, res, next) {
   try { res.json({ data: await usuariosService.trackingDeUsuario(req.validated.params.id, req.validated.query.fecha) }); } catch (error) { next(error); }
 }
+async function jornadas(req, res, next) {
+  try { res.json(await usuariosService.jornadasDe(req.validated.params.id, req.validated.query)); } catch (error) { next(error); }
+}
 async function eventos(req, res, next) {
   try { res.json({ data: await listarEventos(req.validated.query.fecha) }); } catch (error) { next(error); }
 }
-export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking, eventos };
+export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking, eventos, jornadas };

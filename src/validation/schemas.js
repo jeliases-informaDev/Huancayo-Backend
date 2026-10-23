@@ -159,7 +159,19 @@ export const ubicacionBody = z.object({
   cargando: z.boolean().optional(),
 }).strict();
 
-export const jornadaBody = z.object({ accion: z.enum(['INICIAR', 'TERMINAR']) }).strict();
+// Al iniciar la jornada la app manda la posición del celular en ese momento y, si el celular puede averiguarlo, el distrito, la provincia y el departamento:
+// esa es la zona de trabajo. Todo es opcional (las apps anteriores solo mandan la acción).
+const nombreDeZona = z.string().trim().max(100).optional();
+export const jornadaBody = z.object({
+  accion: z.enum(['INICIAR', 'TERMINAR']),
+  latitud: z.coerce.number().min(-90).max(90).optional(),
+  longitud: z.coerce.number().min(-180).max(180).optional(),
+  precision: z.coerce.number().nonnegative().max(100_000).optional(),
+  simulada: z.boolean().optional(), // el celular avisa si el GPS es simulado (Fake GPS)
+  distrito: nombreDeZona, provincia: nombreDeZona, departamento: nombreDeZona,
+}).strict().refine((d) => (d.latitud === undefined) === (d.longitud === undefined), { message: 'La latitud y la longitud van juntas', path: ['longitud'] });
+// Historial de jornadas de un usuario: por páginas, con el cursor de la última que se vio.
+export const jornadasQuery = z.object({ limit: z.coerce.number().int().min(1).max(100).optional(), cursor: z.string().max(200).optional() }).strict();
 
 export const autoasignacionBody = z.object({ activa: z.boolean() }).strict();
 

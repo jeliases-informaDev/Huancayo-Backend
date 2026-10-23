@@ -7,6 +7,7 @@ import { registrarEventosDeCampo, invalidarPuntos } from './eventos-campo.js';
 import { estadoDeMovimiento } from '#modules/usuarios/movimiento.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { logger } from '#core/config/logger.js';
+import { cierreAlReiniciar, textoZona, zonaDeJornada } from './jornada.core.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -336,13 +337,45 @@ async function actualizarUbicacionEnVivo(usuarioId, payload) {
   return serialize({ ...usuario, precision, simulada, bateria, cargando, actualizado_en: ahora, fecha: ahora, eventos });
 }
 
-// Jornada de campo: INICIAR / TERMINAR. Queda en el usuario y en el registro de auditoría (cada llamada a la API se registra).
-async function registrarJornada(usuarioId, accion) {
+// Jornada de campo: INICIAR / TERMINAR. Cada inicio queda en el historial (`jornadas_campo`) con la posición del celular en ese momento y la zona (distrito,
+// provincia y departamento) que averiguó la app; la zona de trabajo del usuario es la de su última jornada. Una jornada que sigue abierta cuando se inicia otra
+// se cierra aparte (ver cierreAlReiniciar). Cada llamada además queda en el registro de seguridad.
+const SELECCION_JORNADA = { id_usuario: true, username: true, nombres: true, apellidos: true, jornada_inicio: true, jornada_fin: true, zona_distrito: true, zona_provincia: true, zona_departamento: true, zona_en: true };
+const abiertas = (usuarioId) => ({ id_usuario: usuarioId, fin: null, cierre: null });
+
+async function registrarJornada(usuarioId, accion, cuerpo = {}) {
   const ahora = new Date();
-  const data = accion === 'INICIAR' ? { jornada_inicio: ahora, jornada_fin: null } : { jornada_fin: ahora };
-  const u = await prisma.usuario.update({ where: { id_usuario: usuarioId }, data, select: { id_usuario: true, username: true, nombres: true, apellidos: true, jornada_inicio: true, jornada_fin: true } });
+  const zona = zonaDeJornada(cuerpo);
+  const { usuario, idJornada } = await prisma.$transaction(async (tx) => {
+    let id = null;
+    if (accion === 'INICIAR') {
+      for (const previa of await tx.jornadaCampo.findMany({ where: abiertas(usuarioId), orderBy: { inicio: 'desc' }, take: 5, select: { id_jornada: true, inicio: true } })) {
+        await tx.jornadaCampo.update({ where: { id_jornada: previa.id_jornada }, data: cierreAlReiniciar({ inicio: previa.inicio, ahora }) });
+      }
+      const nueva = await tx.jornadaCampo.create({ data: {
+        id_usuario: usuarioId, inicio: ahora, latitud: zona.latitud, longitud: zona.longitud, precision_metros: zona.precision_metros, simulada: zona.simulada,
+        distrito: zona.distrito, provincia: zona.provincia, departamento: zona.departamento,
+      } });
+      id = nueva.id_jornada;
+    } else {
+      // La más reciente se cierra normal; si hubiera otras abiertas (no debería), quedan sin cierre.
+      const [reciente, ...otras] = await tx.jornadaCampo.findMany({ where: abiertas(usuarioId), orderBy: { inicio: 'desc' }, take: 5, select: { id_jornada: true } });
+      if (reciente) { await tx.jornadaCampo.update({ where: { id_jornada: reciente.id_jornada }, data: { fin: ahora, cierre: 'NORMAL' } }); id = reciente.id_jornada; }
+      if (otras.length) await tx.jornadaCampo.updateMany({ where: { id_jornada: { in: otras.map((o) => o.id_jornada) } }, data: { cierre: 'SIN_CIERRE' } });
+    }
+    const data = accion === 'INICIAR'
+      ? { jornada_inicio: ahora, jornada_fin: null, ...(zona.actualizaZona ? { zona_distrito: zona.distrito, zona_provincia: zona.provincia, zona_departamento: zona.departamento, zona_en: ahora } : {}) }
+      : { jornada_fin: ahora };
+    return { usuario: await tx.usuario.update({ where: { id_usuario: usuarioId }, data, select: SELECCION_JORNADA }), idJornada: id };
+  });
+  const u = usuario;
   const enJornada = Boolean(u.jornada_inicio) && (!u.jornada_fin || u.jornada_fin < u.jornada_inicio);
-  return serialize({ id_usuario: u.id_usuario, username: u.username, nombres: u.nombres, apellidos: u.apellidos, en_jornada: enJornada, jornada_inicio: u.jornada_inicio, jornada_fin: u.jornada_fin });
+  const zonaTexto = u.zona_en ? textoZona({ distrito: u.zona_distrito, provincia: u.zona_provincia, departamento: u.zona_departamento }) || null : null;
+  return {
+    ...serialize({ id_usuario: u.id_usuario, username: u.username, nombres: u.nombres, apellidos: u.apellidos, en_jornada: enJornada, jornada_inicio: u.jornada_inicio, jornada_fin: u.jornada_fin, zona: zonaTexto, id_jornada: idJornada }),
+    // Lo que queda en el registro de seguridad: la acción y, al iniciar, la zona (sin coordenadas: eso ya está en el historial de la jornada).
+    _auditDiff: { entidad: 'JornadaCampo', entidad_id: idJornada, valor_anterior: null, valor_nuevo: { accion, ...(accion === 'INICIAR' ? { zona: zona.texto || null, con_posicion: zona.tienePosicion, simulada: zona.simulada } : {}) } },
+  };
 }
 
 export default { presignEvidencia, recibirEvidencia, crearVisita, listar, obtener, obtenerArchivoEvidencia, actualizarUbicacionEnVivo, registrarJornada };

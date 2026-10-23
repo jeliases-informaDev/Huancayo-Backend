@@ -120,22 +120,23 @@ async function bloqueoDeBorrado(usuario, actorId) {
 }
 
 const resumenUsuario = (u) => ({ id: u.id_usuario, username: u.username, nombre: `${u.nombres || ''} ${u.apellidos || ''}`.trim() || u.username, rol: u.rol, estado: u.estado });
-const CLAVES_USUARIO = ['visitas', 'fotos', 'asignaciones', 'ubicaciones', 'avisos_campo', 'dispositivos', 'terminos'];
+const CLAVES_USUARIO = ['visitas', 'fotos', 'asignaciones', 'ubicaciones', 'avisos_campo', 'jornadas', 'dispositivos', 'terminos'];
 
 export async function vistaPreviaUsuario({ id, actorId }) {
   await exigirModoPruebas();
   const usuario = await usuarioDeLaEmpresa(id);
-  const [visitas, fotos, asignaciones, ubicaciones, avisos, dispositivos, terminos, bloqueo] = await Promise.all([
+  const [visitas, fotos, asignaciones, ubicaciones, avisos, jornadas, dispositivos, terminos, bloqueo] = await Promise.all([
     prisma.visitaAuditoria.count({ where: { id_usuario_auditor: id } }),
     prisma.evidencia.count({ where: { visita: { id_usuario_auditor: id } } }),
     prisma.asignacionAuditoria.count({ where: { id_usuario_auditor: id } }),
     prisma.trackingUbicacion.count({ where: { id_usuario: id } }),
     prisma.eventoCampo.count({ where: { id_usuario: id } }),
+    prisma.jornadaCampo.count({ where: { id_usuario: id } }),
     prisma.dispositivoAutorizado.count({ where: { id_usuario: id } }),
     prisma.aceptacionTerminos.count({ where: { usuario_id: id } }),
     bloqueoDeBorrado(usuario, actorId),
   ]);
-  return { usuario: resumenUsuario(usuario), conteos: { visitas, fotos, asignaciones, ubicaciones, avisos_campo: avisos, dispositivos, terminos }, bloqueo };
+  return { usuario: resumenUsuario(usuario), conteos: { visitas, fotos, asignaciones, ubicaciones, avisos_campo: avisos, jornadas, dispositivos, terminos }, bloqueo };
 }
 
 // Borra todo lo que cuelga de un usuario y, si no queda nada, al usuario mismo. Devuelve true si el usuario ya no existe y false si se acabó
@@ -148,6 +149,7 @@ async function borrarRastroYUsuario({ id, presupuesto, lote, borrado, estado }) 
     contar: (n) => { borrado.asignaciones += n; }, despues: (filas) => reajustarEstados(idsDeExpedientes(filas)),
   }))) return false;
   if (!(await borrarFilas({ modelo: 'trackingUbicacion', id: 'id_tracking', where: { id_usuario: id }, lote, presupuesto, contar: (n) => { borrado.ubicaciones += n; } }))) return false;
+  if (!(await borrarFilas({ modelo: 'jornadaCampo', id: 'id_jornada', where: { id_usuario: id }, lote, presupuesto, contar: (n) => { borrado.jornadas += n; } }))) return false;
   borrado.dispositivos += (await prisma.dispositivoAutorizado.deleteMany({ where: { id_usuario: id } })).count;
   borrado.terminos += (await prisma.aceptacionTerminos.deleteMany({ where: { usuario_id: id } })).count;
   try { await prisma.usuario.delete({ where: { id_usuario: id } }); return true; } catch (error) {
@@ -187,7 +189,7 @@ const SELECCION_USUARIO = { id_usuario: true, username: true, nombres: true, ape
 export async function vistaPreviaEmpleados() {
   await exigirModoPruebas();
   const enAlcance = { rol: { in: ROLES_EMPLEADO } };
-  const [total, porRol, lista, quedan, visitas, fotos, asignaciones, ubicaciones, avisos] = await Promise.all([
+  const [total, porRol, lista, quedan, visitas, fotos, asignaciones, ubicaciones, avisos, jornadas] = await Promise.all([
     prisma.usuario.count({ where: enAlcance }),
     prisma.usuario.groupBy({ by: ['rol'], where: enAlcance, _count: { _all: true } }),
     prisma.usuario.findMany({ where: enAlcance, select: SELECCION_USUARIO, orderBy: [{ rol: 'asc' }, { username: 'asc' }], take: MAX_LISTA }),
@@ -197,11 +199,12 @@ export async function vistaPreviaEmpleados() {
     prisma.asignacionAuditoria.count({ where: { auditor: enAlcance } }),
     prisma.trackingUbicacion.count({ where: { usuario: enAlcance } }),
     prisma.eventoCampo.count({ where: { usuario: enAlcance } }),
+    prisma.jornadaCampo.count({ where: { usuario: enAlcance } }),
   ]);
   return {
     total, por_rol: Object.fromEntries(porRol.map((r) => [r.rol, r._count._all])),
     usuarios: lista.map(resumenUsuario), mostrando: lista.length, quedan: quedan.map(resumenUsuario),
-    conteos: { visitas, fotos, asignaciones, ubicaciones, avisos_campo: avisos },
+    conteos: { visitas, fotos, asignaciones, ubicaciones, avisos_campo: avisos, jornadas },
   };
 }
 
@@ -234,17 +237,17 @@ export async function borrarEmpleados({ actorId, confirmar, clave }) {
 
 // ---------------------------------------------------------------- limpiar los datos cargados
 
-const CLAVES_DATOS = ['visitas', 'fotos', 'asignaciones', 'ubicaciones', 'avisos_campo', 'expedientes', 'cargas_excel', 'expedientes_a_pendiente'];
+const CLAVES_DATOS = ['visitas', 'fotos', 'asignaciones', 'ubicaciones', 'avisos_campo', 'jornadas', 'expedientes', 'cargas_excel', 'expedientes_a_pendiente'];
 
 export async function vistaPreviaDatos(alcance) {
   await exigirModoPruebas();
   const todo = alcance === 'todo';
-  const [visitas, fotos, asignaciones, ubicaciones, avisos, expedientes, cargas, aPendiente] = await Promise.all([
-    prisma.visitaAuditoria.count(), prisma.evidencia.count(), prisma.asignacionAuditoria.count(), prisma.trackingUbicacion.count(), prisma.eventoCampo.count(),
+  const [visitas, fotos, asignaciones, ubicaciones, avisos, jornadas, expedientes, cargas, aPendiente] = await Promise.all([
+    prisma.visitaAuditoria.count(), prisma.evidencia.count(), prisma.asignacionAuditoria.count(), prisma.trackingUbicacion.count(), prisma.eventoCampo.count(), prisma.jornadaCampo.count(),
     todo ? prisma.expediente.count() : 0, todo ? prisma.importacionMasiva.count() : 0,
     todo ? 0 : prisma.expediente.count({ where: { estado: { in: ['ASIGNADO', 'VISITADO'] } } }),
   ]);
-  return { alcance, conteos: { visitas, fotos, asignaciones, ubicaciones, avisos_campo: avisos, ...(todo ? { expedientes, cargas_excel: cargas } : { expedientes_a_pendiente: aPendiente }) } };
+  return { alcance, conteos: { visitas, fotos, asignaciones, ubicaciones, avisos_campo: avisos, jornadas, ...(todo ? { expedientes, cargas_excel: cargas } : { expedientes_a_pendiente: aPendiente }) } };
 }
 
 // Los casos que se conservan vuelven a Pendiente (siguen en la base, otra vez asignables).
@@ -259,7 +262,7 @@ async function reiniciarExpedientes({ lote, presupuesto, borrado }) {
 }
 
 // El mapa en vivo y la jornada de cada auditor también se vacían (son la «última ubicación» guardada en la cuenta).
-const sinUbicacion = { latitud: null, longitud: null, ubicacion_en: null, ubicacion_precision: null, ubicacion_simulada: false, bateria_porcentaje: null, bateria_cargando: false, mov_estado: null, mov_desde: null, mov_velocidad: null, mov_modo: null, jornada_inicio: null, jornada_fin: null };
+const sinUbicacion = { latitud: null, longitud: null, ubicacion_en: null, ubicacion_precision: null, ubicacion_simulada: false, bateria_porcentaje: null, bateria_cargando: false, mov_estado: null, mov_desde: null, mov_velocidad: null, mov_modo: null, jornada_inicio: null, jornada_fin: null, zona_distrito: null, zona_provincia: null, zona_departamento: null, zona_en: null };
 
 export async function limpiarDatos({ alcance, actorId, confirmar, clave }) {
   await exigirModoPruebas();
@@ -277,6 +280,7 @@ export async function limpiarDatos({ alcance, actorId, confirmar, clave }) {
     if (!(await borrarFilas({ modelo: 'eventoCampo', id: 'id_evento', lote, presupuesto, contar: (n) => { borrado.avisos_campo += n; } }))) break paso;
     if (!(await borrarFilas({ modelo: 'asignacionAuditoria', id: 'id_asignacion', lote, presupuesto, contar: (n) => { borrado.asignaciones += n; } }))) break paso;
     if (!(await borrarFilas({ modelo: 'trackingUbicacion', id: 'id_tracking', lote, presupuesto, contar: (n) => { borrado.ubicaciones += n; } }))) break paso;
+    if (!(await borrarFilas({ modelo: 'jornadaCampo', id: 'id_jornada', lote, presupuesto, contar: (n) => { borrado.jornadas += n; } }))) break paso;
     if (alcance === 'todo') {
       if (!(await borrarFilas({ modelo: 'expediente', id: 'id_expediente', lote: Math.min(lote, 500), presupuesto, contar: (n) => { borrado.expedientes += n; } }))) break paso;
       if (!(await borrarFilas({ modelo: 'importacionMasiva', id: 'id_importacion', lote, presupuesto, contar: (n) => { borrado.cargas_excel += n; } }))) break paso;

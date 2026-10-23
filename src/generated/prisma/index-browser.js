@@ -168,7 +168,27 @@ exports.Prisma.UsuarioScalarFieldEnum = {
   mov_velocidad: 'mov_velocidad',
   mov_modo: 'mov_modo',
   jornada_inicio: 'jornada_inicio',
-  jornada_fin: 'jornada_fin'
+  jornada_fin: 'jornada_fin',
+  zona_distrito: 'zona_distrito',
+  zona_provincia: 'zona_provincia',
+  zona_departamento: 'zona_departamento',
+  zona_en: 'zona_en'
+};
+
+exports.Prisma.JornadaCampoScalarFieldEnum = {
+  id_jornada: 'id_jornada',
+  empresa_id: 'empresa_id',
+  id_usuario: 'id_usuario',
+  inicio: 'inicio',
+  fin: 'fin',
+  cierre: 'cierre',
+  latitud: 'latitud',
+  longitud: 'longitud',
+  precision_metros: 'precision_metros',
+  simulada: 'simulada',
+  departamento: 'departamento',
+  provincia: 'provincia',
+  distrito: 'distrito'
 };
 
 exports.Prisma.TrackingUbicacionScalarFieldEnum = {
@@ -451,7 +471,19 @@ exports.Prisma.UsuarioOrderByRelevanceFieldEnum = {
   estado: 'estado',
   mfa_secreto: 'mfa_secreto',
   mov_estado: 'mov_estado',
-  mov_modo: 'mov_modo'
+  mov_modo: 'mov_modo',
+  zona_distrito: 'zona_distrito',
+  zona_provincia: 'zona_provincia',
+  zona_departamento: 'zona_departamento'
+};
+
+exports.Prisma.JornadaCampoOrderByRelevanceFieldEnum = {
+  empresa_id: 'empresa_id',
+  id_usuario: 'id_usuario',
+  cierre: 'cierre',
+  departamento: 'departamento',
+  provincia: 'provincia',
+  distrito: 'distrito'
 };
 
 exports.Prisma.TrackingUbicacionOrderByRelevanceFieldEnum = {
@@ -609,6 +641,7 @@ exports.TipoDocumento = exports.$Enums.TipoDocumento = {
 exports.Prisma.ModelName = {
   Empresa: 'Empresa',
   Usuario: 'Usuario',
+  JornadaCampo: 'JornadaCampo',
   TrackingUbicacion: 'TrackingUbicacion',
   EventoCampo: 'EventoCampo',
   ConfiguracionSistema: 'ConfiguracionSistema',

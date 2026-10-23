@@ -66,7 +66,9 @@ async function ubicacion(req, res, next) {
 
 async function jornada(req, res, next) {
   try {
-    const data = await visitasService.registrarJornada(req.user.id, req.body.accion);
+    const { accion, ...zona } = req.body;
+    const { _auditDiff, ...data } = await visitasService.registrarJornada(req.user.id, accion, zona);
+    req.auditContext = _auditDiff;
     notifyRoles(req, 'jornada_actualizada', data);
     res.json({ data });
   } catch (error) { next(error); }

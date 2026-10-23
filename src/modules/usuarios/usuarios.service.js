@@ -5,6 +5,7 @@ import { ALL_ROLES, FIELD_ROLES, ROLES, normalizeRole } from '#core/security/rol
 import { empresaActual, sinEmpresa } from '#core/tenant/contexto.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
 import asignacionesService from '#modules/auditorias/asignaciones.service.js';
+import { codificarCursorJornada, decodificarCursorJornada, duracionMin, textoZona } from '#modules/auditorias/jornada.core.js';
 import { publica as empresaPublica, usuarioConPrefijo } from '#modules/empresas/empresas.service.js';
 
 // Dentro de una empresa el nombre de usuario lleva su abreviatura fija (arq.jorge); el universal de Sulotec no tiene empresa ni prefijo.
@@ -14,6 +15,12 @@ async function usernameDeEmpresa(empresaId, username) {
   if (completo.length > 50) throw Object.assign(new Error('El nombre de usuario, con la abreviatura de la empresa, supera los 50 caracteres'), { statusCode: 400, code: 'USERNAME_LARGO' });
   return completo;
 }
+
+// Zona de trabajo: la de su última jornada (null si nunca inició una o su app no mandó posición). `texto` queda null si la posición no trajo nombres.
+const zonaDeUsuario = (u) => (u.zona_en ? {
+  texto: textoZona({ distrito: u.zona_distrito, provincia: u.zona_provincia, departamento: u.zona_departamento }) || null,
+  distrito: u.zona_distrito || null, provincia: u.zona_provincia || null, departamento: u.zona_departamento || null, en: u.zona_en,
+} : null);
 
 function mapUsuario(usuario) {
   const globallyRequired = env.REQUIRE_MFA === 'true'
@@ -25,7 +32,7 @@ function mapUsuario(usuario) {
     mfa_habilitado: usuario.mfa_habilitado || usuario.mfa_requerido || globallyRequired,
     mfa_confirmado: usuario.mfa_habilitado,
     nombres: usuario.nombres || '', apellidos: usuario.apellidos || '',
-    email: usuario.email || '', sede: usuario.sede || '', departamento: usuario.departamento || '',
+    email: usuario.email || '', sede: usuario.sede || '', departamento: usuario.departamento || '', zona: zonaDeUsuario(usuario),
     ultimo_acceso: usuario.ultimo_acceso || null, // el panel lo muestra en Usuarios («Nunca» si aún no entró)
   };
 }
@@ -63,9 +70,9 @@ async function listarAuditores() {
   const usuarios = await prisma.usuario.findMany({
     where: { rol: { in: FIELD_ROLES }, estado: 'ACTIVO' },
     orderBy: { nombres: 'asc' },
-    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, departamento: true },
+    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, departamento: true, zona_distrito: true, zona_provincia: true, zona_departamento: true, zona_en: true },
   });
-  return usuarios.map(u => ({ id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '', rol: normalizeRole(u.rol), departamento: u.departamento || null }));
+  return usuarios.map(u => ({ id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '', rol: normalizeRole(u.rol), departamento: u.departamento || null, zona: zonaDeUsuario(u) }));
 }
 
 async function crear(datos) {
@@ -211,4 +218,32 @@ async function trackingDeUsuario(id, fecha) {
   }));
 }
 
-export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, trackingDeUsuario };
+// Historial de jornadas de un usuario, de la más reciente a la más antigua, por páginas con cursor (nunca se carga todo el historial). Cada fila trae cuándo
+// empezó y terminó, cuánto duró y la zona desde la que salió; `total` es el número real de jornadas.
+async function jornadasDe(id, { limit = 30, cursor } = {}) {
+  const usuario = await prisma.usuario.findFirst({ where: { id_usuario: id }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true } });
+  if (!usuario) { const error = new Error('Usuario no encontrado'); error.statusCode = 404; throw error; }
+  const desde = cursor ? decodificarCursorJornada(cursor) : null;
+  if (cursor && !desde) { const error = new Error('La posición de la lista no es válida: vuelve a cargarla.'); error.statusCode = 400; error.code = 'CURSOR_INVALIDO'; throw error; }
+  const where = { id_usuario: id, ...(desde ? { OR: [{ inicio: { lt: desde.inicio } }, { inicio: desde.inicio, id_jornada: { lt: desde.id } }] } : {}) };
+  const [filas, total] = await Promise.all([
+    prisma.jornadaCampo.findMany({ where, orderBy: [{ inicio: 'desc' }, { id_jornada: 'desc' }], take: limit + 1 }),
+    prisma.jornadaCampo.count({ where: { id_usuario: id } }),
+  ]);
+  const hayMas = filas.length > limit;
+  const pagina = hayMas ? filas.slice(0, limit) : filas;
+  const ultima = pagina[pagina.length - 1];
+  return {
+    usuario: { id: usuario.id_usuario, username: usuario.username, nombre: `${usuario.nombres || ''} ${usuario.apellidos || ''}`.trim() || usuario.username, rol: normalizeRole(usuario.rol) },
+    data: pagina.map((f) => ({
+      id: f.id_jornada, inicio: f.inicio, fin: f.fin, cierre: f.cierre, en_curso: !f.fin && !f.cierre, duracion_min: duracionMin(f),
+      zona: textoZona(f) || null, departamento: f.departamento, provincia: f.provincia, distrito: f.distrito,
+      latitud: f.latitud == null ? null : Number(f.latitud), longitud: f.longitud == null ? null : Number(f.longitud),
+      precision_metros: f.precision_metros == null ? null : Number(f.precision_metros), simulada: f.simulada,
+    })),
+    siguiente: hayMas && ultima ? codificarCursorJornada(ultima.inicio, ultima.id_jornada) : null,
+    total,
+  };
+}
+
+export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, trackingDeUsuario, jornadasDe };
