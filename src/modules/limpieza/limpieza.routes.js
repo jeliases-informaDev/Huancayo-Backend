@@ -17,5 +17,9 @@ router.get('/usuarios/:id/vista-previa', validate({ params: uuidParams }), contr
 router.post('/usuarios/:id', validate({ params: uuidParams, body: limpiezaUsuarioBody }), controller.borrarUsuario);
 router.get('/empleados/vista-previa', controller.vistaPreviaEmpleados);
 router.post('/empleados', validate({ body: limpiezaEmpleadosBody }), controller.borrarEmpleados);
+// Datos de demostración (con el modo pruebas encendido): cuántos hay, cargar 24 visitas de ejemplo y quitar lo marcado como ejemplo.
+router.get('/demo', controller.estadoDemo);
+router.post('/demo/visitas', controller.cargarDemo);
+router.delete('/demo/visitas', controller.quitarDemo);
 
 export default router;

@@ -1,4 +1,5 @@
 import * as service from './limpieza.service.js';
+import * as demo from './demo.service.js';
 
 async function estado(_req, res, next) {
   try { res.json({ data: await service.estadoModoPruebas() }); } catch (error) { next(error); }
@@ -49,4 +50,23 @@ async function borrarEmpleados(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { estado, fijarModoPruebas, vistaPreviaDatos, limpiarDatos, vistaPreviaUsuario, borrarUsuario, vistaPreviaEmpleados, borrarEmpleados };
+// Datos de demostración: cuántos hay, cargarlos y quitarlos. Quedan en el registro de seguridad con lo que se creó o se quitó.
+async function estadoDemo(_req, res, next) {
+  try { res.json({ data: await demo.estadoDemo() }); } catch (error) { next(error); }
+}
+async function cargarDemo(req, res, next) {
+  try {
+    const data = await demo.cargarVisitasDemo({ actorId: req.user.id });
+    req.auditContext = { entidad: 'Demostracion', entidad_id: 'visitas', valor_anterior: null, valor_nuevo: data };
+    res.json({ data });
+  } catch (error) { next(error); }
+}
+async function quitarDemo(req, res, next) {
+  try {
+    const data = await demo.quitarVisitasDemo();
+    req.auditContext = { entidad: 'Demostracion', entidad_id: 'visitas', valor_anterior: data, valor_nuevo: null };
+    res.json({ data });
+  } catch (error) { next(error); }
+}
+
+export default { estadoDemo, cargarDemo, quitarDemo, estado, fijarModoPruebas, vistaPreviaDatos, limpiarDatos, vistaPreviaUsuario, borrarUsuario, vistaPreviaEmpleados, borrarEmpleados };
