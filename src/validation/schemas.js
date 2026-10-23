@@ -13,7 +13,10 @@ export const evidenciaParams = z.object({ idEvidencia: z.string().uuid() }).stri
 export const loginBody = z.object({ username: cleanString(50), password: z.string().min(1).max(128) }).strict();
 // Inicio con la cuenta Sulotec: código de autorización + verificador PKCE + dirección de retorno (debe ser la del panel).
 export const ssoBody = z.object({ code: z.string().min(10).max(4096), codeVerifier: z.string().min(43).max(128), redirectUri: z.string().url().max(300) }).strict();
-export const plantillaQuery = z.object({ formato: z.enum(['CORE_262', 'SIMPLE']).default('CORE_262') }).strict();
+// `tipo` solo cambia las filas de ejemplo de la plantilla SIMPLE (Modelo Consumo / Modelo MYPE); la base del core se distingue por el nombre de la hoja.
+export const plantillaQuery = z.object({ formato: z.enum(['CORE_262', 'SIMPLE']).default('CORE_262'), tipo: z.enum(['CONSUMO', 'OTROS']).optional() }).strict();
+// Asesores ya cargados en los expedientes (sugerencias al crear un expediente a mano).
+export const asesoresQuery = z.object({ q: z.string().trim().max(100).optional(), limit: z.coerce.number().int().min(1).max(200).optional() }).strict();
 export const mfaVerifyBody = z.object({ challengeToken: z.string().min(20).max(4096), code: z.string().regex(/^\d{6}$/) }).strict();
 export const mfaChallengeBody = z.object({ challengeToken: z.string().min(20).max(4096) }).strict();
 export const mfaCodeBody = z.object({ code: z.string().regex(/^\d{6}$/) }).strict();

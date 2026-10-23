@@ -163,7 +163,8 @@ function accesoFila(fila, usadas) {
 const huella = (objeto) => crypto.createHash('sha256').update(JSON.stringify(objeto)).digest('hex');
 
 /**
- * @returns {{ expediente?: object, advertencias: string[], error?: string }}
+ * @returns {{ expediente?: object, advertencias: string[], error?: string, errores?: {campo: string, problema: string, corregir: string}[] }}
+ *   `error` es el texto corrido de siempre; `errores` trae lo mismo separado por problema para mostrarlo en tabla.
  */
 export function mapearFilaCore(fila, { hoja }) {
   const usadas = new Set();
@@ -174,15 +175,23 @@ export function mapearFilaCore(fila, { hoja }) {
   const nombre = texto(v('cnomcliente'), 200);
   const documento = deducirDocumento(v('DocIde'));
   const asesor = texto(v('nombreAsesorActual'), 150) || texto(v('nombreAsesorOrigen'), 150);
+  // Cada dato obligatorio que falta es un problema aparte: dice el campo, qué pasa y qué corregir (lo que se muestra en «Qué debes corregir»).
   const faltantes = [];
-  if (!codigo) faltantes.push('ccodctacre (N° de crédito)');
-  if (!nombre) faltantes.push('cnomcliente');
-  if (!documento.numero) faltantes.push('DocIde');
-  if (!asesor) faltantes.push('nombreAsesorActual');
-  if (faltantes.length) return { advertencias, error: `Faltan datos obligatorios: ${faltantes.join(', ')}` };
+  const errores = [];
+  const falta = (columna, campo, problema, corregir) => { faltantes.push(columna); errores.push({ campo, problema, corregir }); };
+  if (!codigo) falta('ccodctacre (N° de crédito)', 'Crédito', 'Crédito vacío', 'Completa el número de crédito (columna ccodctacre).');
+  if (!nombre) falta('cnomcliente', 'Cliente', 'Nombre del cliente vacío', 'Completa el nombre del cliente (columna cnomcliente).');
+  if (!documento.numero) falta('DocIde', 'Documento', 'Documento vacío', 'Completa el documento del cliente (columna DocIde).');
+  if (!asesor) falta('nombreAsesorActual', 'Asesor', 'Asesor vacío', 'Completa el asesor (columna nombreAsesorActual o nombreAsesorOrigen).');
+  if (faltantes.length) return { advertencias, error: `Faltan datos obligatorios: ${faltantes.join(', ')}`, errores };
 
   const tipoCredito = deducirTipoCredito(hoja, v('cDesCortaTipCre'));
-  if (!tipoCredito) return { advertencias, error: 'No se pudo determinar el tipo de crédito (la hoja debe llamarse OTROS o CONSUMO).' };
+  if (!tipoCredito) {
+    return {
+      advertencias, error: 'No se pudo determinar el tipo de crédito (la hoja debe llamarse OTROS o CONSUMO).',
+      errores: [{ campo: 'Tipo', problema: 'No se pudo determinar el tipo de crédito', corregir: 'Pon la fila en una hoja llamada OTROS (MYPE) o CONSUMO.' }],
+    };
+  }
 
   const referenciaOriginal = texto(v('cRefDomCli'));
   const coordenadas = extraerCoordenadas(referenciaOriginal);

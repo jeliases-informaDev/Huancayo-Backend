@@ -162,6 +162,15 @@ describe('importador — formato core (MYPE, 262 columnas)', () => {
     assert.match(mapearFilaCore(filaBase({ cDesCortaTipCre: 'NULL' }), { hoja: 'Hoja1' }).error, /tipo de crédito/);
   });
 
+  test('cada problema de una fila sale separado, con su campo y qué corregir (lo que se muestra en «Qué debes corregir»)', () => {
+    const r = mapearFilaCore(filaBase({ ccodctacre: 'NULL', cnomcliente: '', nombreAsesorActual: 'NULL', nombreAsesorOrigen: 'NULL' }), { hoja: 'OTROS' });
+    assert.deepEqual(r.errores.map((e) => [e.campo, e.problema]), [['Crédito', 'Crédito vacío'], ['Cliente', 'Nombre del cliente vacío'], ['Asesor', 'Asesor vacío']]);
+    assert.ok(r.errores.every((e) => /^Completa /.test(e.corregir) && /columna/.test(e.corregir)), 'dice qué columna del archivo completar');
+    const sinTipo = mapearFilaCore(filaBase({ cDesCortaTipCre: 'NULL' }), { hoja: 'Hoja1' });
+    assert.deepEqual(sinTipo.errores, [{ campo: 'Tipo', problema: 'No se pudo determinar el tipo de crédito', corregir: 'Pon la fila en una hoja llamada OTROS (MYPE) o CONSUMO.' }]);
+    assert.equal(mapearFilaCore(filaBase(), { hoja: 'OTROS' }).errores, undefined, 'una fila buena no trae errores');
+  });
+
   test('la huella cambia cuando cambia un dato y se mantiene si no', () => {
     const a = mapearFilaCore(filaBase(), { hoja: 'OTROS' }).huella;
     const b = mapearFilaCore(filaBase(), { hoja: 'OTROS' }).huella;

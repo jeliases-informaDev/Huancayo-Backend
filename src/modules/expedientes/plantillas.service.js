@@ -31,7 +31,8 @@ function ajustarEncabezado(ws) {
   ws.views = [{ state: 'frozen', ySplit: 1 }];
 }
 
-export async function generarPlantilla(formato, { ejemplos = 3 } = {}) {
+// `tipo` (CONSUMO u OTROS) solo cambia el tipo de las filas de ejemplo de la plantilla SIMPLE: Modelo Consumo y Modelo MYPE.
+export async function generarPlantilla(formato, { ejemplos = 3, tipo } = {}) {
   const wb = new ExcelJS.Workbook();
   wb.creator = 'Auditoria de Visitas';
   if (formato === 'CORE_262') {
@@ -47,18 +48,21 @@ export async function generarPlantilla(formato, { ejemplos = 3 } = {}) {
       'Ubicación del domicilio: escribe las coordenadas dentro de cRefDomCli, por ejemplo "Ref: -11.933000,-77.054000 FRENTE AL PARQUE". Lo mismo en RefEmp_1 y RefEmp_2 para los locales del negocio.',
       'Fechas en formato dd-mm-aaaa. Montos con punto decimal. Evaluación: sufijo 1 = evaluación anterior, sufijo 2 = reevaluación (la más reciente).',
       'Las 3 filas de ejemplo son datos inventados: bórralas antes de cargar tu base. Si el N° de crédito ya existe se actualiza; si ya fue auditado no se modifica.',
+      'Todo o nada: si alguna fila trae un error no se guarda ninguna (ni las válidas). El reporte dice la fila del archivo, el campo y qué corregir; corrige y vuelve a cargar.',
       'Al cargar el archivo, el sistema primero lo revisa completo sin guardar nada y te muestra el reporte; después decides si importarlo.',
     ]);
   } else if (formato === 'SIMPLE') {
     const ws = wb.addWorksheet('Expedientes');
     ws.addRow([...COLUMNAS_SIMPLE]);
-    EJEMPLOS_SIMPLE.slice(0, ejemplos).forEach((f) => ws.addRow(f));
+    const tipoEjemplo = tipo === 'OTROS' ? 'MYPE' : tipo === 'CONSUMO' ? 'CONSUMO' : null;
+    EJEMPLOS_SIMPLE.slice(0, ejemplos).forEach((f) => ws.addRow(tipoEjemplo ? f.map((celda, i) => (i === 1 ? tipoEjemplo : celda)) : f));
     ajustarEncabezado(ws);
     COLUMNAS_SIMPLE.forEach((c, i) => { ws.getColumn(i + 1).width = Math.max(14, c.length + 2); });
     hojaInstrucciones(wb, [
       'Plantilla SIMPLE: una fila por expediente con los datos mínimos para la visita.',
-      'Obligatorias: codigo_expediente, tipo_credito (OTROS = MYPE, CONSUMO), numero_documento_cliente, nombres_cliente, asesor_responsable.',
-      'tipo_documento_cliente: DNI, CE, PASAPORTE o RUC. moneda: PEN o USD. latitud y longitud en grados decimales (ej. -11.9332 y -77.0541); si no las tienes, déjalas vacías.',
+      'Obligatorias: codigo_expediente (número de crédito), tipo_credito (CONSUMO o MYPE), numero_documento_cliente, nombres_cliente, asesor_responsable.',
+      'tipo_documento_cliente: DNI, CE, PASAPORTE o RUC (si lo dejas vacío se deduce del largo del documento). moneda: PEN o USD. latitud y longitud en grados decimales (ej. -11.9332 y -77.0541), las dos juntas; si no las tienes, déjalas vacías.',
+      'Todo o nada: si alguna fila trae un error no se guarda ninguna (ni las válidas). El reporte dice la fila del archivo, el campo y qué corregir; corrige y vuelve a cargar.',
       'Las 3 filas de ejemplo son datos inventados: bórralas antes de cargar tu base. Si el código ya existe se actualiza; si ya fue auditado no se modifica.',
       'Al cargar el archivo, el sistema primero lo revisa completo sin guardar nada y te muestra el reporte; después decides si importarlo.',
     ]);

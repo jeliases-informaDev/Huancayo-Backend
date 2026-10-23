@@ -87,6 +87,7 @@ const REGLAS = [
   // ---------------------------------------------------------------- Expedientes
   regla('POST', '/api/expedientes/importar', (c) => def('EXPEDIENTES', 'EXPEDIENTE_IMPORTAR', 'INFO',
     c.nuevo?.simulacion ? 'Revisó un Excel de expedientes (sin guardar)' : 'Cargó un Excel de expedientes')),
+  regla('GET', '/api/expedientes/importaciones/[0-9a-fA-F-]{36}/reporte-errores', () => def('CONSULTA', 'EXPEDIENTE_REPORTE_ERRORES', 'INFO', 'Descargó el reporte de errores de una carga de Excel')),
   regla('POST', '/api/expedientes/importaciones/[0-9a-fA-F-]{36}/liberar', () => def('EXPEDIENTES', 'EXPEDIENTE_LIBERAR', 'INFO', 'Dejó disponibles los casos de una carga de Excel')),
   regla('POST', '/api/expedientes/geocodificacion/(?:procesar|reencolar)', () => def('EXPEDIENTES', 'EXPEDIENTE_UBICACION', 'INFO', 'Procesó direcciones de expedientes')),
   regla('POST', `/api/expedientes/${ID}/(?:geocodificar|aceptar-ubicacion)`, (c) => def('EXPEDIENTES', 'EXPEDIENTE_UBICACION', 'INFO', `Fijó la ubicación de ${expediente(c)}`, { tipo: 'Expediente', id: c.m[1] })),
