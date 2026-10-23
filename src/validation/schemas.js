@@ -68,6 +68,7 @@ export const mapaQuery = z.object({
   distrito: z.string().trim().max(100).optional(),
   auditor: z.string().uuid().optional(),
   q: z.string().trim().min(2).max(100).optional(),
+  visitados_desde: z.string().datetime().optional(), // trae también los casos visitados desde ese momento (el panel manda el inicio de su día)
   limite: z.coerce.number().int().min(1).max(10000).optional(),
 }).strict();
 export const geocodificarQuery = z.object({ limite: z.coerce.number().int().min(1).max(20).optional() }).strict();

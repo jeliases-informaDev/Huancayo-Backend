@@ -336,6 +336,7 @@ model AsignacionAuditoria {
   @@index([id_expediente])
   @@index([empresa_id, estado, id_usuario_auditor]) // «mi muestra», carga por auditor y mapa del supervisor
   @@index([empresa_id, fecha_asignacion]) // asignaciones por día del Resumen
+  @@index([empresa_id, estado, fecha_fin]) // casos visitados hoy en el mapa de Seguimiento (sin recorrer todo el historial de finalizadas)
   @@map("asignaciones_auditoria")
 }
 
