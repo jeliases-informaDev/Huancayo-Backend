@@ -27,7 +27,9 @@ async function login(req, res) {
     const { username, password } = req.body;
 
     const deviceId = req.get('x-device-id') || null;
-    const resultado = await authService.login(username, password, req.get('x-client-platform'), deviceId);
+    const ctx = {};
+    const resultado = await authService.login(username, password, req.get('x-client-platform'), deviceId, ctx);
+    if (ctx.actor) req.auditActor = ctx.actor; // el registro de seguridad atribuye el intento (exitoso o no) a esta cuenta
 
     if (!resultado.success) {
       const status = ERROR_STATUS_MAP[resultado.code] || 500;
@@ -62,6 +64,7 @@ function ssoConfig(_req, res) {
 async function sso(req, res, next) {
   try {
     const resultado = await authService.loginSso(req.body);
+    req.auditActor = resultado.user;
     res.json({ token: resultado.token, user: resultado.user });
   } catch (error) { next(error); }
 }
@@ -69,8 +72,9 @@ async function sso(req, res, next) {
 async function verifyMfa(req, res, next) {
   try {
     const resultado = await authService.verifyMfa(req.body.challengeToken, req.body.code);
+    req.auditActor = resultado.user;
     res.json({ token: resultado.token, user: resultado.user });
-  } catch (error) { next(error); }
+  } catch (error) { if (error.actor) req.auditActor = error.actor; next(error); }
 }
 
 async function setupMfaEnrollment(req, res, next) {
@@ -80,8 +84,9 @@ async function setupMfaEnrollment(req, res, next) {
 async function confirmMfaEnrollment(req, res, next) {
   try {
     const resultado = await authService.confirmMfaEnrollment(req.body.challengeToken, req.body.code);
+    req.auditActor = resultado.user;
     res.json({ token: resultado.token, user: resultado.user });
-  } catch (error) { next(error); }
+  } catch (error) { if (error.actor) req.auditActor = error.actor; next(error); }
 }
 
 async function setupMfa(req, res, next) {

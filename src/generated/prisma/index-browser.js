@@ -356,7 +356,12 @@ exports.Prisma.AuditoriaSeguridadScalarFieldEnum = {
   entidad: 'entidad',
   entidad_id: 'entidad_id',
   valor_anterior: 'valor_anterior',
-  valor_nuevo: 'valor_nuevo'
+  valor_nuevo: 'valor_nuevo',
+  accion: 'accion',
+  categoria: 'categoria',
+  severidad: 'severidad',
+  plataforma: 'plataforma',
+  con_cambios: 'con_cambios'
 };
 
 exports.Prisma.ImportacionMasivaScalarFieldEnum = {
@@ -561,7 +566,11 @@ exports.Prisma.AuditoriaSeguridadOrderByRelevanceFieldEnum = {
   user_agent: 'user_agent',
   device_id: 'device_id',
   entidad: 'entidad',
-  entidad_id: 'entidad_id'
+  entidad_id: 'entidad_id',
+  accion: 'accion',
+  categoria: 'categoria',
+  severidad: 'severidad',
+  plataforma: 'plataforma'
 };
 
 exports.Prisma.ImportacionMasivaOrderByRelevanceFieldEnum = {

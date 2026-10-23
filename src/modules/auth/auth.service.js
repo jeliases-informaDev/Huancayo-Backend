@@ -73,13 +73,16 @@ async function enforceDeviceBinding(usuario, deviceId) {
   await prisma.dispositivoAutorizado.update({ where: { id_dispositivo: existing.id_dispositivo }, data: { ultimo_uso: new Date() } });
 }
 
-async function login(username, password, clientPlatform, deviceId) {
-  return sinEmpresa(() => loginDentro(username, password, clientPlatform, deviceId));
+// `ctx.actor` queda con la cuenta a la que se intentó entrar (si existe), aunque el intento falle: el registro de seguridad lo usa para saber de qué
+// empresa y de qué usuario es cada acceso fallido.
+async function login(username, password, clientPlatform, deviceId, ctx = {}) {
+  return sinEmpresa(() => loginDentro(username, password, clientPlatform, deviceId, ctx));
 }
-async function loginDentro(username, password, clientPlatform, deviceId) {
+async function loginDentro(username, password, clientPlatform, deviceId, ctx) {
   try {
     const normalizedUsername = String(username || '').trim().toLowerCase();
     const usuario = await prisma.usuario.findUnique({ where: { username: normalizedUsername } });
+    if (usuario) ctx.actor = mapearUsuario(usuario);
     // Comparación dummy para reducir diferencias temporales que faciliten enumeración de usuarios.
     const fallbackHash = '$2b$10$C6UzMDM.H6dfI/f/IKcEe.5Y8R6f0QqM6V7CqY2Y5nJzP9D1r7G7K';
     const validPassword = await bcrypt.compare(password, usuario?.password_hash || fallbackHash);

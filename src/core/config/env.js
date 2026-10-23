@@ -69,6 +69,8 @@ const schema = z.object({
   INITIAL_UNIVERSAL_PASSWORD: z.string().max(128).optional(),
   // Días que se conservan los puntos GPS de tracking_ubicacion (el recorrido de un día se puede ver mientras exista). 0 = no depurar.
   TRACKING_RETENCION_DIAS: z.coerce.number().int().min(0).max(3650).default(90),
+  // Días que se conserva el registro de seguridad (quién hizo qué). Pasado ese tiempo se depura por lotes, en segundo plano. 0 = no depurar nunca.
+  AUDITORIA_RETENCION_DIAS: z.coerce.number().int().min(0).max(36500).default(1095),
   ACCOUNT_LOCK_MINUTES: z.coerce.number().int().min(5).max(1440).default(15),
   // Modo pruebas (borrar empleados y limpiar datos cargados): cuánto trabaja cada llamada antes de devolver el control (el panel repite hasta
   // terminar) y cuántas filas se borran por lote. Los valores por defecto sirven en producción; las pruebas los bajan para forzar varias llamadas.

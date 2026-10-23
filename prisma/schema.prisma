@@ -414,9 +414,21 @@ model AuditoriaSeguridad {
   valor_anterior Json?
   valor_nuevo    Json?
 
+  // Clasificación del evento (ver sistema/seguridad.catalogo.js): se guarda al registrarlo para poder filtrar con índices.
+  // accion: p. ej. ACCESO_FALLIDO o USUARIO_CAMBIAR_ROL; categoria: ACCESO, USUARIOS, ASIGNACIONES…; severidad: INFO, AVISO o CRITICO.
+  accion         String? @db.VarChar(40)
+  categoria      String? @db.VarChar(16)
+  severidad      String? @db.VarChar(8)
+  plataforma     String? @db.VarChar(8) // WEB o MOVIL
+  con_cambios    Boolean @default(false) // el evento trae el valor anterior o el nuevo
+
   @@index([fecha])
   @@index([actor_id, fecha])
   @@index([empresa_id, fecha])
+  @@index([empresa_id, categoria, fecha]) // filtro por categoría del registro
+  @@index([empresa_id, severidad, fecha]) // «Requiere atención» y filtro por gravedad
+  @@index([empresa_id, actor, fecha]) // actividad de una persona (también las que intentaron entrar y no tienen cuenta)
+  @@index([empresa_id, entidad_id]) // historial de una cuenta o de un expediente
   @@map("auditoria_seguridad")
 }
 
