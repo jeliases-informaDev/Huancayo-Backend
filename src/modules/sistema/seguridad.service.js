@@ -190,7 +190,7 @@ async function calcularAlertas() {
     lista.push({
       id: 'gps-falso', tipo: 'GPS_SIMULADO', severidad: 'AVISO',
       titulo: `${gpsFalso === 1 ? '1 visita' : `${gpsFalso} visitas`} con ubicación simulada en los últimos 7 días`,
-      detalle: 'El celular avisó que la posición no era real (GPS falso).', enlace: '/visitas',
+      detalle: 'El celular avisó que la posición no era real (GPS falso).', enlace: '/visitas?alertas=1',
     });
   }
   const peso = { CRITICO: 0, AVISO: 1, INFO: 2 };

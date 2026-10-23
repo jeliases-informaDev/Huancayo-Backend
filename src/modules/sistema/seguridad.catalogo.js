@@ -17,7 +17,12 @@ const casos = (n) => `${num(n)} ${Number(n) === 1 ? 'caso' : 'casos'}`;
 
 // @usuario del que habla el evento: el nombre que se resolvió en la base o, si no, el que quedó en el cambio guardado.
 const usuario = (c) => c.objetivo || ((c.nuevo?.username || c.anterior?.username) ? `@${c.nuevo?.username || c.anterior?.username}` : 'un usuario');
-const expediente = (c) => c.objetivo || 'un expediente';
+// El expediente del que habla el evento: el que se resolvió en la base o, si ya no existe (se eliminó), el código que quedó en el cambio guardado.
+const expediente = (c) => {
+  if (c.objetivo) return c.objetivo;
+  const codigo = c.nuevo?.codigo_expediente || c.anterior?.codigo_expediente;
+  return codigo ? `el expediente ${codigo}` : 'un expediente';
+};
 
 const ID = '(\\d+)';
 const UUID = '([0-9a-fA-F-]{36})';

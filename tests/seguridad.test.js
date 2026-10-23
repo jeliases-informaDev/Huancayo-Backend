@@ -75,6 +75,8 @@ test('el nombre de quien recibe la acción entra en el texto; sin él, una frase
   assert.equal(clasificar({ metodo: 'DELETE', ruta: `/api/usuarios/${U}` }).titulo, 'Eliminó la cuenta de un usuario');
   assert.equal(clasificar({ metodo: 'GET', ruta: '/api/expedientes/45', objetivo: 'el expediente CR-45' }).titulo, 'Consultó el expediente CR-45');
   assert.equal(clasificar({ metodo: 'GET', ruta: '/api/expedientes/45' }).titulo, 'Consultó un expediente');
+  // un expediente ya eliminado se nombra por el código que quedó en el cambio guardado
+  assert.equal(clasificar({ metodo: 'DELETE', ruta: '/api/expedientes/45', anterior: { codigo_expediente: 'CR-45' }, nuevo: null }).titulo, 'Eliminó el expediente CR-45');
 });
 
 test('lo que no está en el catálogo no se esconde: queda como «Otros» con su método y ruta', () => {
