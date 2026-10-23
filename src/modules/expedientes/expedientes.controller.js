@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import expedientesService from './expedientes.service.js';
 import { generarPlantilla } from './plantillas.service.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
+import { filaCsv } from '#modules/sistema/seguridad.filtros.js';
 
 function sha256Archivo(ruta) {
   return new Promise((resolve, reject) => {
@@ -86,12 +87,13 @@ async function importar(req, res, next) {
 // Plantilla de Excel del formato pedido, solo si la empresa lo acepta.
 async function plantilla(req, res, next) {
   try {
-    const formato = req.validated.query.formato;
+    const { formato, tipo } = req.validated.query;
     const permitidos = (await reglasEmpresa()).formatos_importacion || [];
     if (!permitidos.includes(formato)) return res.status(403).json({ error: 'Tu empresa no acepta este formato de importación', code: 'FORMATO_NO_PERMITIDO' });
-    const archivo = await generarPlantilla(formato);
+    const archivo = await generarPlantilla(formato, { tipo });
+    const sufijo = formato === 'SIMPLE' && tipo ? `-${tipo === 'OTROS' ? 'mype' : 'consumo'}` : '';
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="plantilla-expedientes-${formato.toLowerCase()}.xlsx"`);
+    res.setHeader('Content-Disposition', `attachment; filename="plantilla-expedientes-${formato.toLowerCase()}${sufijo}.xlsx"`);
     res.send(archivo);
   } catch (error) { next(error); }
 }
@@ -103,6 +105,20 @@ async function obtenerImportacion(req, res, next) {
   try { res.json({ data: await expedientesService.importador.obtenerImportacion(req.validated.params.id) }); } catch (error) { next(error); }
 }
 
+// Reporte de errores de una carga en CSV (con BOM para Excel): una línea por problema, con la fila del archivo, el campo y qué corregir.
+async function reporteErrores(req, res, next) {
+  try {
+    const r = await expedientesService.importador.reporteDeErrores(req.validated.params.id);
+    const nombre = r.archivo.replace(/\.[^.]+$/, '').replace(/[^A-Za-z0-9._-]+/g, '_').slice(0, 60) || 'carga';
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="errores-${nombre}.csv"`);
+    res.send(`﻿${filaCsv(r.columnas)}${r.filas.map(filaCsv).join('')}${r.nota ? filaCsv([r.nota]) : ''}`);
+  } catch (error) { next(error); }
+}
+async function asesores(req, res, next) {
+  try { res.json({ data: await expedientesService.asesores(req.validated.query) }); } catch (error) { next(error); }
+}
+
 async function liberarImportacion(req, res, next) {
   try {
     const data = await expedientesService.importador.liberarImportacion(req.validated.params.id);
@@ -111,4 +127,4 @@ async function liberarImportacion(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, geoResumen, geoProcesar, geoReencolar, geoUno, aceptarUbicacionSugerida, eliminar, importar, plantilla, listarImportaciones, obtenerImportacion, liberarImportacion };
+export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, geoResumen, geoProcesar, geoReencolar, geoUno, aceptarUbicacionSugerida, eliminar, importar, plantilla, listarImportaciones, obtenerImportacion, reporteErrores, asesores, liberarImportacion };

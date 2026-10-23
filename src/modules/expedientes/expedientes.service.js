@@ -151,6 +151,15 @@ async function eliminar(id) {
 }
 
 
+// Asesores que ya aparecen en los expedientes, de más a menos casos: sugerencias para el alta a mano (el asesor es el del crédito, no un usuario del sistema).
+async function asesores({ q, limit = 50 } = {}) {
+  const filas = await prisma.expediente.groupBy({
+    by: ['asesor_responsable'], where: q ? { asesor_responsable: { contains: q } } : {}, _count: { _all: true },
+    orderBy: [{ _count: { asesor_responsable: 'desc' } }, { asesor_responsable: 'asc' }], take: limit,
+  });
+  return filas.map((f) => f.asesor_responsable);
+}
+
 // --- Dirección y geocodificación (panel) ---
 const geoResumen = () => geocodificacion.resumenGeocodificacion();
 const geoProcesar = ({ limite } = {}) => geocodificacion.geocodificarPendientes({ limit: limite }).then((r) => ({ ...r, activa: geocodificacion.geocodificacionActiva() }));
@@ -161,4 +170,4 @@ async function aceptarUbicacionSugerida(id, actorId) {
   return { ...serialize(despues), _auditDiff: { entidad: 'Expediente', entidad_id: id, valor_anterior: auditSnapshotExpediente(antes), valor_nuevo: auditSnapshotExpediente(despues) } };
 }
 
-export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, eliminar, importador, geoResumen, geoProcesar, geoReencolar, geoUno, aceptarUbicacionSugerida };
+export default { listar, obtener, crear, actualizar, fijarUbicacionNegocio, eliminar, asesores, importador, geoResumen, geoProcesar, geoReencolar, geoUno, aceptarUbicacionSugerida };

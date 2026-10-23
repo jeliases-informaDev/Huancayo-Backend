@@ -27,6 +27,18 @@ test('la plantilla SIMPLE trae las columnas del formato simple con las obligator
   await assert.rejects(() => generarPlantilla('OTRO'), /desconocido/);
 });
 
+test('el Modelo Consumo y el Modelo MYPE de la plantilla SIMPLE solo cambian el tipo de las filas de ejemplo', async () => {
+  const tipos = async (tipo) => {
+    const ws = (await leer(await generarPlantilla('SIMPLE', { tipo }))).getWorksheet('Expedientes');
+    return [2, 3, 4].map((n) => String(ws.getRow(n).getCell(2).value));
+  };
+  assert.deepEqual(await tipos('CONSUMO'), ['CONSUMO', 'CONSUMO', 'CONSUMO']);
+  assert.deepEqual(await tipos('OTROS'), ['MYPE', 'MYPE', 'MYPE']);
+  assert.deepEqual(await tipos(undefined), ['OTROS', 'CONSUMO', 'OTROS'], 'sin tipo quedan los ejemplos mezclados de siempre');
+  const wb = await leer(await generarPlantilla('SIMPLE', { tipo: 'OTROS' }));
+  assert.deepEqual(encabezados(wb.getWorksheet('Expedientes')), [...COLUMNAS_SIMPLE], 'las columnas son las mismas');
+});
+
 test('las filas de ejemplo son completas: ninguna columna vacía, el importador las acepta sin errores ni avisos', () => {
   for (let i = 0; i < 12; i += 1) {
     const fila = construirFilaCore(i, { hoy: '2026-10-18' });

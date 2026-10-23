@@ -5,7 +5,7 @@ import { roleMiddleware } from '#core/middlewares/role.middleware.js';
 import { OPERATIONAL_MANAGERS } from '#core/security/roles.js';
 import { validate } from '#core/middlewares/validate.middleware.js';
 import upload from '#core/middlewares/upload.middleware.js';
-import { idParams, uuidParams, listQuery, importacionesQuery, importarQuery, expedienteCreateBody, expedienteUpdateBody, negocioParams, negocioUbicacionBody, geocodificarQuery, plantillaQuery } from '../../validation/schemas.js';
+import { idParams, uuidParams, listQuery, importacionesQuery, importarQuery, expedienteCreateBody, expedienteUpdateBody, negocioParams, negocioUbicacionBody, geocodificarQuery, plantillaQuery, asesoresQuery } from '../../validation/schemas.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -19,6 +19,8 @@ router.get('/', validate({ query: listQuery }), controller.listar);
 router.get('/plantilla', validate({ query: plantillaQuery }), controller.plantilla);
 router.get('/importaciones', validate({ query: importacionesQuery }), controller.listarImportaciones);
 router.get('/importaciones/:id', validate({ params: uuidParams }), controller.obtenerImportacion);
+router.get('/importaciones/:id/reporte-errores', validate({ params: uuidParams }), controller.reporteErrores);
+router.get('/asesores', validate({ query: asesoresQuery }), controller.asesores);
 router.post('/importaciones/:id/liberar', validate({ params: uuidParams }), controller.liberarImportacion);
 // Dirección y mapa: calidad de las direcciones, cola de geocodificación y aceptación de la ubicación sugerida. Antes de '/:id'.
 router.get('/geocodificacion/resumen', controller.geoResumen);
