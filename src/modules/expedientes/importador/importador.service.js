@@ -41,11 +41,14 @@ export const MAX_ERRORES_DETALLE = 2000;
 const MAX_DETALLE = 500;
 const MAX_CAMBIOS_POR_EXPEDIENTE = 150;
 // Mientras corre, el estado sigue siendo PROCESANDO (los clientes que consultan el avance esperan a que deje de serlo). En qué va se dice aparte, en `fase`:
-// REVISANDO (mirando todo el archivo antes de guardar) o GUARDANDO. Vive en memoria, igual que «solo una carga a la vez».
+// REVISANDO (mirando todo el archivo antes de guardar) o GUARDANDO. Vive en memoria.
 const ENCURSO = ['PROCESANDO'];
 
-let importacionEnCurso = null;
-let faseEnCurso = null;
+// Una carga a la vez POR EMPRESA (dos cargas de la misma empresa se pisarían), pero empresas distintas cargan a la vez; y como cada carga lee y escribe
+// por lotes, el servidor atiende como máximo MAX_SIMULTANEAS al mismo tiempo para no ahogarse. empresa → { id de la importación, fase }.
+const MAX_SIMULTANEAS = 3;
+const enCurso = new Map();
+const ponerFase = (empresaId, fase) => { const e = enCurso.get(empresaId); if (e) e.fase = fase; };
 
 // ---------- utilidades ----------
 function aplanar(valor, ruta = '', salida = {}) {
@@ -343,7 +346,7 @@ async function ejecutar(ctx, ruta) {
     if (!ctx.simular) {
       // TODO O NADA. Primero se revisa el archivo completo sin escribir nada (con su propio contexto, en modo «simular»). Si hay una sola fila con
       // error, o no hay filas, no se guarda nada: la importación queda BLOQUEADA y con la lista de lo que hay que corregir.
-      faseEnCurso = 'REVISANDO';
+      ponerFase(ctx.empresaId, 'REVISANDO');
       const prueba = crearCtx({ ...ctx, simular: true });
       actual = prueba;
       await leerArchivo(prueba, ruta);
@@ -354,7 +357,7 @@ async function ejecutar(ctx, ruta) {
         return;
       }
       actual = ctx;
-      faseEnCurso = 'GUARDANDO';
+      ponerFase(ctx.empresaId, 'GUARDANDO');
     }
     await leerArchivo(ctx, ruta);
     if (!ctx.procesadas) { ctx.errores += 1; ctx.registrar(SIN_FILAS); }
@@ -366,7 +369,7 @@ async function ejecutar(ctx, ruta) {
     // El archivo trae datos personales de clientes: no debe quedar en el disco del servidor.
     await fs.rm(ruta, { force: true }).catch(() => {});
     if (!ctx.simular) await superarValidaciones(ctx).catch(() => {});
-    importacionEnCurso = null; faseEnCurso = null;
+    enCurso.delete(ctx.empresaId);
   }
 }
 
@@ -385,9 +388,20 @@ async function superarValidaciones(ctx) {
  * El archivo (ruta) pasa a ser responsabilidad de este módulo: se borra al terminar.
  */
 async function iniciarImportacion({ ruta, actorId, archivo, archivoSha256, simular = false, autoasignable = true }) {
-  if (importacionEnCurso) {
+  const empresaId = empresaActual();
+  if (enCurso.has(empresaId)) {
     throw Object.assign(new Error('Ya hay una importación en curso. Espera a que termine para iniciar otra.'), { statusCode: 409, code: 'IMPORT_IN_PROGRESS' });
   }
+  if (enCurso.size >= MAX_SIMULTANEAS) {
+    throw Object.assign(new Error('El servidor está procesando otras cargas. Vuelve a intentarlo en un momento.'), { statusCode: 429, code: 'IMPORT_BUSY' });
+  }
+  enCurso.set(empresaId, { id: null, fase: 'REVISANDO' }); // se reserva el lugar antes de esperar a la base de datos: dos pedidos a la vez no pasan los dos
+  try {
+    return await arrancar({ empresaId, ruta, actorId, archivo, archivoSha256, simular, autoasignable });
+  } catch (error) { enCurso.delete(empresaId); throw error; }
+}
+
+async function arrancar({ empresaId, ruta, actorId, archivo, archivoSha256, simular, autoasignable }) {
   const repetido = archivoSha256
     ? await prisma.importacionMasiva.findFirst({
         where: { archivo_sha256: archivoSha256, estado: 'COMPLETADO', tipo: TIPO_REAL }, orderBy: { fecha_creacion: 'desc' },
@@ -397,12 +411,10 @@ async function iniciarImportacion({ ruta, actorId, archivo, archivoSha256, simul
   const importacion = await prisma.importacionMasiva.create({
     data: { tipo: simular ? TIPO_SIMULACION : TIPO_REAL, estado: 'PROCESANDO', archivo, ruta_temporal: '', actor_id: actorId, fecha_inicio: new Date(), archivo_sha256: archivoSha256 || null },
   });
-  importacionEnCurso = importacion.id_importacion;
-  faseEnCurso = 'REVISANDO';
+  enCurso.set(empresaId, { id: importacion.id_importacion, fase: 'REVISANDO' });
   const ctx = crearCtx({ idImportacion: importacion.id_importacion, actorId, archivo, simular, autoasignable, formatosPermitidos: (await reglasEmpresa()).formatos_importacion });
-  ctx.archivoSha256 = archivoSha256 || null;
-  const empresaId = empresaActual();
-  conEmpresa(empresaId, () => ejecutar(ctx, ruta)).catch(() => { importacionEnCurso = null; faseEnCurso = null; });
+  ctx.archivoSha256 = archivoSha256 || null; ctx.empresaId = empresaId;
+  conEmpresa(empresaId, () => ejecutar(ctx, ruta)).catch(() => { enCurso.delete(empresaId); });
   return { id_importacion: importacion.id_importacion, estado: 'PROCESANDO', simulacion: simular, archivo_repetido: repetido };
 }
 
@@ -461,7 +473,7 @@ async function obtenerImportacion(id) {
   const detalle = Array.isArray(importacion.detalle_error) ? importacion.detalle_error : [];
   const listadas = filasListadas(detalle);
   return {
-    ...resto, simulacion, actor, resultado: resultadoDeCarga({ simulacion, ...importacion }), fase: importacionEnCurso === id ? faseEnCurso : null,
+    ...resto, simulacion, actor, resultado: resultadoDeCarga({ simulacion, ...importacion }), fase: enCurso.get(empresaActual())?.id === id ? enCurso.get(empresaActual()).fase : null,
     // Si hay más filas con error que líneas guardadas, la pantalla y el reporte lo dicen.
     errores_listados: listadas, errores_truncados: importacion.errores > listadas && detalle.some((d) => d.resultado === 'ERROR' && d.fila != null),
   };
