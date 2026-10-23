@@ -35,6 +35,14 @@ const ZONAS = [
   { distrito: 'CHILCA', provincia: 'HUANCAYO', departamento: 'JUNIN', oficina: 'AG. HUANCAYO SUR', codOficina: '102', lat: -12.0860, lon: -75.2060, vias: ['AV. 9 DE DICIEMBRE', 'JR. LEONCIO PRADO', 'AV. LOS PROCERES'] },
   { distrito: 'HUANCAYO', provincia: 'HUANCAYO', departamento: 'JUNIN', oficina: 'OF. PRINCIPAL', codOficina: '100', lat: -12.0650, lon: -75.2100, vias: ['CALLE REAL', 'JR. ANCASH', 'AV. GIRALDEZ'] },
 ];
+// Zonas que no entran en la rotación de las muestras generales (así esas muestras no cambian): se piden con `opciones.zona`. Sirven para que los
+// probadores tengan casos cerca de donde trabajan. lat/lon es el centro del distrito y `dispersion` el ancho en grados en que se reparten los domicilios
+// (0,01° ≈ 1,1 km: ±550 m alrededor del centro, dentro del distrito).
+export const ZONAS_ESPECIALES = Object.freeze({
+  LINCE: { distrito: 'LINCE', provincia: 'LIMA', departamento: 'LIMA', oficina: 'AG. ARENALES', codOficina: '308', lat: -12.0840, lon: -77.0335, dispersion: 0.01, vias: ['AV. ARENALES', 'AV. PETIT THOUARS', 'AV. CANEVARO', 'AV. CESAR VALLEJO', 'AV. IQUITOS', 'AV. RISSO', 'JR. MANUEL CANDAMO', 'AV. TRINIDAD MORAN'] },
+});
+const zonaDe = (i, opciones) => ZONAS_ESPECIALES[String(opciones.zona || '').toUpperCase()] || ZONAS[i % ZONAS.length];
+
 const ASESORES = [['LRIVAS', 'RIVAS/LAUREANO,LORENA MEDALI'], ['PCRUZF', 'CRUZ/FERNANDEZ,EVELYN PAMELA'], ['JTORRES', 'TORRES/VILCA,JORGE LUIS'], ['MCHAVEZ', 'CHAVEZ/ROMERO,MARIA DEL PILAR'], ['AQUISPE', 'QUISPE/HUAMAN,ANDRES'], ['DSOTO', 'SOTO/PAREDES,DIANA CAROLINA']];
 const ENTIDADES = [['CAJA MUNICIPAL DE AHORRO Y CREDITO HUANCAYO', 'PEQ.EMP'], ['BANCO DE CREDITO DEL PERU', 'MICROEMPRESAS'], ['MIBANCO', 'PEQ.EMP'], ['FINANCIERA CONFIANZA', 'CONSUMO NO REV'], ['CAJA AREQUIPA', 'MICROEMPRESAS'], ['COMPARTAMOS FINANCIERA', 'PEQ.EMP'], ['BANCO PICHINCHA', 'CONSUMO REVOLVENTE']];
 
@@ -53,7 +61,7 @@ export function construirFilaCore(i, opciones = {}) {
   const entre = (a, b) => a + Math.floor(rnd() * (b - a + 1));
   const n = i + 1;
   const hoy = opciones.hoy ? new Date(opciones.hoy) : new Date();
-  const zona = ZONAS[i % ZONAS.length];
+  const zona = zonaDe(i, opciones);
   const giro = GIROS[i % GIROS.length];
   const [codAsesor, asesor] = ASESORES[i % ASESORES.length];
   const [codAsesorOrigen, asesorOrigen] = ASESORES[(i + 2) % ASESORES.length];
@@ -72,7 +80,8 @@ export function construirFilaCore(i, opciones = {}) {
   const saldo = monto * (1 - pagadas / cuotas);
   const atraso = i % 5 === 0 ? entre(8, 60) : 0;
   const refinanciado = i % 11 === 0;
-  const lat = zona.lat + (rnd() - 0.5) * 0.02; const lon = zona.lon + (rnd() - 0.5) * 0.02;
+  const ancho = zona.dispersion ?? 0.02;
+  const lat = zona.lat + (rnd() - 0.5) * ancho; const lon = zona.lon + (rnd() - 0.5) * ancho;
   const numero = 100 + entre(0, 1800);
   const via = elegir(zona.vias); const via2 = elegir(zona.vias);
   const celular = `9${String(10000000 + ((i * 7919 + 1234567) % 89999999)).padStart(8, '0')}`;
@@ -203,6 +212,33 @@ export function construirFilaCore(i, opciones = {}) {
     } else { set(`cnomifiConyu${e}`, '-'); set(`ccalempdesConyu${e}`, '-'); set(`cdestipcreConyu${e}`, '-'); set(`nsaldoConyu${e}`, '0.00'); }
   }
   return v;
+}
+
+// Fila del formato SIMPLE (créditos de consumo, sin los 262 datos del core) con datos inventados, en la zona pedida. `i` empieza en 0; los códigos
+// (CR-<ZONA>-0001…) no chocan con los de las muestras generales.
+export function construirFilaSimple(i, opciones = {}) {
+  const zona = zonaDe(i, opciones);
+  const rnd = azar((opciones.semilla ?? 20261023) + i * 6151);
+  const elegir = (lista) => lista[Math.floor(rnd() * lista.length)];
+  const entre = (a, b) => a + Math.floor(rnd() * (b - a + 1));
+  const [, asesor] = ASESORES[(i * 3 + 1) % ASESORES.length];
+  const ancho = zona.dispersion ?? 0.02;
+  const lat = zona.lat + (rnd() - 0.5) * ancho; const lon = zona.lon + (rnd() - 0.5) * ancho;
+  const nombre = `${elegir(APELLIDOS)} ${elegir(APELLIDOS)}, ${NOMBRES[(i * 7 + 2) % NOMBRES.length]}`;
+  return {
+    codigo_expediente: `CR-${String(opciones.zona || zona.distrito).toUpperCase().replace(/[^A-Z]/g, '')}-${String(i + 1).padStart(4, '0')}`,
+    tipo_credito: 'CONSUMO',
+    numero_documento_cliente: String(30000000 + ((i * 3571093 + 4242421) % 60000000)).padStart(8, '0'),
+    nombres_cliente: nombre,
+    asesor_responsable: asesor,
+    tipo_documento_cliente: 'DNI',
+    oficina: zona.oficina,
+    telefono_cliente: `9${String(20000000 + ((i * 8101 + 3141592) % 79999999)).padStart(8, '0')}`,
+    direccion_domicilio: `${elegir(zona.vias)} ${entre(100, 1900)} ${i % 3 === 0 ? `DPTO. ${entre(1, 9)}0${entre(1, 5)}` : i % 3 === 1 ? `INT. ${entre(1, 8)}` : `PISO ${entre(1, 4)}`}`,
+    distrito: zona.distrito, provincia: zona.provincia, departamento: zona.departamento,
+    latitud: Number(lat.toFixed(6)), longitud: Number(lon.toFixed(6)),
+    monto_desembolso: 1500 + entre(0, 22) * 500, moneda: 'PEN',
+  };
 }
 
 // Fila como arreglo en el orden de las 262 columnas (para escribir el Excel).
