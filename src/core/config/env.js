@@ -60,6 +60,9 @@ const schema = z.object({
   // Interruptor de «Disponibles / Tomar este caso»: con false el auditor ya no puede tomar casos por su cuenta y solo trabaja los que
   // le asigna un supervisor. Encendido por defecto; además, cada carga de Excel decide si sus casos son tomables (autoasignable).
   PERMITIR_AUTOASIGNACION: z.enum(['true', 'false']).default('true'),
+  // Tope de casos abiertos que un asesor puede tener cuando los toma por su cuenta («Disponibles»). 0 = sin tope. El administrador lo cambia
+  // desde el panel (Asignaciones); este valor solo rige mientras nadie lo haya tocado. Un supervisor puede asignar más allá del tope.
+  TOPE_CASOS_ACTIVOS: z.coerce.number().int().min(0).max(1000).default(30),
   // Primera empresa (se crea si no existe ninguna) y, opcionalmente, el administrador universal de Sulotec.
   EMPRESA_INICIAL_NOMBRE: z.string().trim().min(2).max(150).default('Caja Huancayo'),
   INITIAL_UNIVERSAL_USERNAME: z.string().trim().max(50).optional(),

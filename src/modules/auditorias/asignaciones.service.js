@@ -1,10 +1,10 @@
 import prisma from '#core/config/prisma.js';
-import { autoasignacionPermitida } from '#modules/sistema/configuracion.service.js';
+import { autoasignacionPermitida, topeCasosActivos } from '#modules/sistema/configuracion.service.js';
 import { normalizarPaginacion, infoPaginas, ordenarPorPrioridad, paginaDe, buscarEnExpediente } from './asignaciones.paginacion.js';
 import { Prisma } from '../../generated/prisma/index.js';
 import { empresaActual } from '#core/tenant/contexto.js';
-import { haversineMeters } from '#core/security/geofence.js';
 import { invalidarPuntos } from './eventos-campo.js';
+import { LOTE_QUITAR, mensajeTope, topeAlcanzado, cupoRestante, trozos } from './casos.core.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -54,9 +54,19 @@ async function crear({ id_expediente, id_usuario_auditor, prioridad }, actorId =
   return serialize(asignacion);
 }
 
-// Expedientes PENDIENTE que un auditor puede tomar por su cuenta, de cualquier distrito (la «zona» del usuario ya no limita: es
-// solo informativa). Si el celular manda su ubicación (lat y lon), salen primero los más cercanos y cada uno trae `distancia_m`;
-// sin ubicación, por antigüedad. Con ubicación el orden lo hace la base (una consulta sobre los ids, paginada), nunca en memoria.
+// Cuántos casos abiertos tiene un asesor y cuántos puede tener cuando los toma por su cuenta (maximo 0 = sin tope; cupo null = sin límite).
+async function estadoTope(auditorId) {
+  const [maximo, abiertos] = await Promise.all([
+    topeCasosActivos(),
+    prisma.asignacionAuditoria.count({ where: { id_usuario_auditor: auditorId, estado: 'ACTIVA' } }),
+  ]);
+  return { maximo, abiertos, cupo: cupoRestante({ abiertos, tope: maximo }) };
+}
+
+// Expedientes PENDIENTE que un auditor puede tomar por su cuenta, de cualquier distrito: ni la zona del usuario ni el lugar donde esté ahora
+// lo limitan. Salen del más antiguo al más nuevo (un orden estable que el índice entrega ya ordenado, aunque haya cientos de miles) y se
+// buscan por cliente, crédito, documento o distrito. Las apps anteriores todavía mandan su ubicación (lat y lon): se ignora. `tope` le dice a la
+// app cuántos casos abiertos tiene el asesor y cuántos puede tener, para avisarle antes de que el servidor rechace uno más.
 async function disponiblesParaAuditor(auditorId, consulta = {}) {
   const pag = normalizarPaginacion(consulta);
   const vacio = { data: [], pagination: infoPaginas(pag, 0) };
@@ -68,38 +78,12 @@ async function disponiblesParaAuditor(auditorId, consulta = {}) {
     ...(consulta.tipo ? { tipo_credito: consulta.tipo } : {}),
     ...(consulta.q ? buscarEnExpediente(consulta.q) : {}),
   };
-  const conUbicacion = Number.isFinite(consulta.lat) && Number.isFinite(consulta.lon);
-  const total = await prisma.expediente.count({ where });
-  let filas;
-  if (conUbicacion) {
-    filas = await expedientesPorCercania(consulta, pag);
-  } else {
-    filas = await prisma.expediente.findMany({ where, select: expedienteSelect, orderBy: [{ fecha_creacion: 'asc' }, { id_expediente: 'asc' }], skip: (pag.page - 1) * pag.limit, take: pag.limit });
-  }
-  const data = serialize(filas).map((e) => (conUbicacion && e.latitud != null && e.longitud != null
-    ? { ...e, distancia_m: Math.round(haversineMeters(consulta.lat, consulta.lon, Number(e.latitud), Number(e.longitud))) } : e));
-  return { data, pagination: infoPaginas(pag, total) };
-}
-
-// Ordena por distancia aproximada (plano local: grados de latitud y de longitud corregida por el coseno) en la base y devuelve solo
-// la página pedida. Los expedientes sin coordenadas van al final. Esta consulta cruda no pasa por el filtro de empresa de Prisma: se
-// filtra aquí por la empresa del contexto, y la lectura de las filas (findMany) vuelve a filtrar por empresa.
-async function expedientesPorCercania({ lat, lon, tipo, q }, pag) {
-  const empresaId = empresaActual();
-  if (!empresaId) { const error = new Error('Falta la empresa de la sesión'); error.statusCode = 403; throw error; }
-  const escapar = (t) => '%' + String(t).replace(/[\\%_]/g, (c) => '\\' + c) + '%';
-  const busqueda = q ? Prisma.sql`AND (nombres_cliente LIKE ${escapar(q)} OR codigo_expediente LIKE ${escapar(q)} OR numero_documento_cliente LIKE ${escapar(q)} OR distrito LIKE ${escapar(q)})` : Prisma.empty;
-  const tipoSql = tipo ? Prisma.sql`AND tipo_credito = ${tipo}` : Prisma.empty;
-  const k = Math.cos((lat * Math.PI) / 180);
-  const ids = await prisma.$queryRaw(Prisma.sql`
-    SELECT id_expediente FROM expedientes
-    WHERE empresa_id = ${empresaId} AND estado = 'PENDIENTE' AND autoasignable = 1 ${tipoSql} ${busqueda}
-    ORDER BY (latitud IS NULL OR longitud IS NULL), POW(latitud - ${lat}, 2) + POW((longitud - ${lon}) * ${k}, 2), id_expediente
-    LIMIT ${pag.limit} OFFSET ${(pag.page - 1) * pag.limit}`);
-  const orden = ids.map((f) => Number(f.id_expediente));
-  if (!orden.length) return [];
-  const filas = await prisma.expediente.findMany({ where: { id_expediente: { in: orden } }, select: expedienteSelect });
-  return orden.map((id) => filas.find((f) => f.id_expediente === id)).filter(Boolean);
+  const [total, filas, tope] = await Promise.all([
+    prisma.expediente.count({ where }),
+    prisma.expediente.findMany({ where, select: expedienteSelect, orderBy: [{ fecha_creacion: 'asc' }, { id_expediente: 'asc' }], skip: (pag.page - 1) * pag.limit, take: pag.limit }),
+    estadoTope(auditorId),
+  ]);
+  return { data: serialize(filas), pagination: infoPaginas(pag, total), tope };
 }
 
 // Auto-asignación: el propio auditor "toma" un expediente pendiente de su muestra,
@@ -127,7 +111,18 @@ async function autoAsignar(auditorId, idExpediente) {
     error.statusCode = 403; error.code = 'NOT_SELF_ASSIGNABLE'; throw error;
   }
 
+  const maximo = await topeCasosActivos();
   const asignacion = await prisma.$transaction(async tx => {
+    // Tope de casos abiertos: se bloquea la fila del asesor mientras se cuenta y se toma, así dos «Tomar» seguidos (o desde dos celulares) no pueden
+    // pasarse del tope. El bloqueo dura lo que la transacción y solo detiene a ese mismo asesor.
+    if (maximo > 0) {
+      await tx.$queryRaw`SELECT id_usuario FROM usuarios WHERE id_usuario = ${auditorId} FOR UPDATE`;
+      const abiertos = await tx.asignacionAuditoria.count({ where: { id_usuario_auditor: auditorId, estado: 'ACTIVA' } });
+      if (topeAlcanzado({ abiertos, tope: maximo })) {
+        const error = new Error(mensajeTope({ abiertos, tope: maximo }));
+        error.statusCode = 409; error.code = 'TOPE_CASOS'; throw error;
+      }
+    }
     const reclamo = await tx.expediente.updateMany({
       where: { id_expediente: idExpediente, estado: 'PENDIENTE' },
       data: { estado: 'ASIGNADO' },
@@ -172,11 +167,12 @@ async function misAsignaciones(auditorId, consulta = {}) {
   const where = { ...base, ...(consulta.prioridad ? { prioridad: consulta.prioridad } : {}), ...(Object.keys(filtroExpediente).length ? { expediente: filtroExpediente } : {}) };
   const filas = ordenarPorPrioridad(await prisma.asignacionAuditoria.findMany({ where, select: { id_asignacion: true, prioridad: true }, orderBy: [{ fecha_asignacion: 'asc' }, { id_asignacion: 'asc' }] }));
   const ids = paginaDe(filas, pag).map((f) => f.id_asignacion);
-  const [datos, porPrioridad, porTipo, version] = await Promise.all([
+  const [datos, porPrioridad, porTipo, version, maximo] = await Promise.all([
     ids.length ? prisma.asignacionAuditoria.findMany({ where: { id_asignacion: { in: ids } }, include: { expediente: { select: consulta.ligero === 'true' ? expedienteLigeroSelect : expedienteMuestraSelect } } }) : [],
     prisma.asignacionAuditoria.groupBy({ by: ['prioridad'], where: base, _count: { _all: true } }),
     prisma.expediente.groupBy({ by: ['tipo_credito'], where: { asignaciones: { some: base } }, _count: { _all: true } }),
     versionMuestra(auditorId),
+    topeCasosActivos(),
   ]);
   const posicion = new Map(ids.map((id, i) => [id, i]));
   datos.sort((a, b) => posicion.get(a.id_asignacion) - posicion.get(b.id_asignacion));
@@ -186,7 +182,7 @@ async function misAsignaciones(auditorId, consulta = {}) {
     ALTA: cuenta(porPrioridad, 'prioridad', 'ALTA'), MEDIA: cuenta(porPrioridad, 'prioridad', 'MEDIA'), BAJA: cuenta(porPrioridad, 'prioridad', 'BAJA'),
     CONSUMO: cuenta(porTipo, 'tipo_credito', 'CONSUMO'), OTROS: cuenta(porTipo, 'tipo_credito', 'OTROS'),
   };
-  return { data: serialize(datos), pagination: infoPaginas(pag, filas.length), resumen, version };
+  return { data: serialize(datos), pagination: infoPaginas(pag, filas.length), resumen, version, tope: { maximo, abiertos: resumen.total, cupo: cupoRestante({ abiertos: resumen.total, tope: maximo }) } };
 }
 
 // Casos activos de cada auditor (para la carga en el panel): un conteo en la base, no una lista cortada.
@@ -263,7 +259,7 @@ async function resumenPorOrigen() {
   const pendientes = await prisma.expediente.groupBy({ by: ['autoasignable'], where: { estado: 'PENDIENTE' }, _count: { _all: true } });
   const contar = (valor) => pendientes.find((p) => p.autoasignable === valor)?._count._all || 0;
   return {
-    autoasignacion_activa: await autoasignacionPermitida(), total, autoasignadas, porcentaje: total ? Math.round((autoasignadas / total) * 100) : 0, auditores,
+    autoasignacion_activa: await autoasignacionPermitida(), tope_casos: await topeCasosActivos(), total, autoasignadas, porcentaje: total ? Math.round((autoasignadas / total) * 100) : 0, auditores,
     pendientes_tomables: contar(true), pendientes_reservados: contar(false),
   };
 }
@@ -279,11 +275,11 @@ function auditSnapshotAsignacion(a) {
   return { id_expediente: a.id_expediente, id_usuario_auditor: a.id_usuario_auditor, estado: a.estado, prioridad: a.prioridad };
 }
 
-async function cancelar(id) {
+async function cancelar(id, actorId = null) {
   const actual = await prisma.asignacionAuditoria.findUnique({ where: { id_asignacion: id } });
   if (!actual) { const error = new Error('Asignación no encontrada'); error.statusCode = 404; throw error; }
 
-  const asignacion = await prisma.asignacionAuditoria.update({ where: { id_asignacion: id }, data: { estado: 'CANCELADA', fecha_fin: new Date() } });
+  const asignacion = await prisma.asignacionAuditoria.update({ where: { id_asignacion: id }, data: { estado: 'CANCELADA', fecha_fin: new Date(), motivo_fin: 'CANCELADA', fin_por: actorId } });
 
   // Sin esto, el cliente quedaba "asignado" para siempre y desaparecía de la lista
   // de pendientes sin que nadie pudiera volver a asignarlo. Solo se libera si el
@@ -304,12 +300,80 @@ async function cancelar(id) {
   };
 }
 
-// Usado al desactivar una cuenta de auditor: sus clientes en curso no deben quedar
-// colgados de alguien que ya no puede iniciar sesión a atenderlos.
-async function cancelarTodasDeAuditor(auditorId) {
-  const activas = await prisma.asignacionAuditoria.findMany({ where: { id_usuario_auditor: auditorId, estado: 'ACTIVA' } });
-  for (const a of activas) await cancelar(a.id_asignacion);
-  return activas.length;
+// Quita casos a un asesor (se enfermó, se retiró, pasa a otro trabajo…). Sin `id_asignaciones` se le quitan todos los casos activos. Los casos van a
+// «Disponibles» (quedan pendientes y cualquier asesor puede tomarlos) o pasan directo a otro asesor. Las asignaciones quitadas no se borran: quedan
+// CANCELADAS con el motivo, quién las quitó y cuándo, así se sabe quién tuvo cada caso. Va por lotes de LOTE_QUITAR y cada lote es una transacción,
+// con las filas bloqueadas mientras se cambian: aguanta cualquier cantidad sin sentencias gigantes y dos personas quitando a la vez no se pisan.
+async function quitarCasos({ id_usuario_auditor: auditorId, id_asignaciones: pedidas, motivo, nota, destino = 'DISPONIBLES', id_usuario_destino: destinoId, actorId = null }) {
+  const empresaId = empresaActual();
+  if (!empresaId) { const error = new Error('Falta la empresa de la sesión'); error.statusCode = 403; throw error; }
+  // Se puede quitar casos a una cuenta ya dada de baja (el caso más común: se retiró), por eso no se pide que esté activa.
+  const origen = await prisma.usuario.findFirst({ where: { id_usuario: auditorId }, select: { id_usuario: true, username: true, nombres: true, apellidos: true } });
+  if (!origen) { const error = new Error('El asesor indicado no existe'); error.statusCode = 404; throw error; }
+  let receptor = null;
+  if (destino === 'ASESOR') {
+    receptor = await prisma.usuario.findFirst({ where: { id_usuario: destinoId, rol: 'AUDITOR', estado: 'ACTIVO' }, select: { id_usuario: true, username: true, nombres: true, apellidos: true } });
+    if (!receptor) { const error = new Error('El asesor que recibe los casos no existe o está inactivo'); error.statusCode = 400; throw error; }
+    if (receptor.id_usuario === origen.id_usuario) { const error = new Error('El asesor que recibe tiene que ser otro'); error.statusCode = 400; throw error; }
+  }
+
+  const fin = new Date();
+  const abiertosAntes = await prisma.asignacionAuditoria.count({ where: { id_usuario_auditor: auditorId, estado: 'ACTIVA' } });
+  const lotes = pedidas ? trozos([...new Set(pedidas)], LOTE_QUITAR) : Array.from({ length: Math.ceil(abiertosAntes / LOTE_QUITAR) + 1 }, () => null);
+  const total = { quitadas: 0, devueltas: 0, reasignadas: 0, sin_cambio: 0 };
+  for (const ids of lotes) {
+    const r = await prisma.$transaction((tx) => quitarLote(tx, { empresaId, auditorId, ids, motivo, nota, fin, destino, destinoId, actorId }), { timeout: 20000 });
+    if (!r.quitadas) { if (ids) continue; break; } // sin pedido concreto, un lote vacío significa que ya no quedan casos activos
+    for (const k of Object.keys(total)) total[k] += r[k];
+  }
+  invalidarPuntos(); // los avisos de llegada/salida de los asesores deben ver ya el cambio
+  const nombre = (u) => [u?.nombres, u?.apellidos].filter(Boolean).join(' ') || u?.username || null;
+  return {
+    ...total, abiertos_antes: abiertosAntes, motivo, destino, de: nombre(origen), a: receptor ? nombre(receptor) : null,
+    _auditDiff: {
+      entidad: 'Usuario', entidad_id: auditorId,
+      valor_anterior: { casos_activos: abiertosAntes },
+      valor_nuevo: { accion: 'QUITAR_CASOS', motivo, nota: nota || null, destino, id_usuario_destino: receptor?.id_usuario || null, solo_elegidos: Boolean(pedidas), ...total },
+    },
+  };
 }
 
-export default { crear, crearMasivo, misAsignaciones, versionMuestra, cargaPorAuditor, puntosParaMapa, listar, cancelar, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen, liberarPendientes };
+// Un lote de quitarCasos, dentro de la transacción `tx`. Las consultas crudas no pasan por el filtro de empresa de Prisma: se filtra aquí por la
+// empresa de la sesión. Devuelve cuántas asignaciones se quitaron y qué pasó con sus expedientes.
+async function quitarLote(tx, { empresaId, auditorId, ids, motivo, nota, fin, destino, destinoId, actorId }) {
+  const filtroIds = ids ? Prisma.sql`AND id_asignacion IN (${Prisma.join(ids)})` : Prisma.empty;
+  const filas = await tx.$queryRaw(Prisma.sql`
+    SELECT id_asignacion, id_expediente, prioridad FROM asignaciones_auditoria
+    WHERE empresa_id = ${empresaId} AND id_usuario_auditor = ${auditorId} AND estado = 'ACTIVA' ${filtroIds}
+    ORDER BY id_asignacion LIMIT ${LOTE_QUITAR} FOR UPDATE`);
+  const vacio = { quitadas: 0, devueltas: 0, reasignadas: 0, sin_cambio: 0 };
+  if (!filas.length) return vacio;
+  const idsAsignacion = filas.map((f) => Number(f.id_asignacion));
+  await tx.asignacionAuditoria.updateMany({
+    where: { id_asignacion: { in: idsAsignacion } },
+    data: { estado: 'CANCELADA', fecha_fin: fin, motivo_fin: motivo, fin_por: actorId, nota_fin: nota || null },
+  });
+  // Un expediente que aún tenga otra asignación activa (un duplicado de antes) se queda como está; y uno ya visitado o cerrado no vuelve a pendiente.
+  const idsExpediente = filas.map((f) => Number(f.id_expediente));
+  const conOtra = new Set((await tx.asignacionAuditoria.findMany({ where: { id_expediente: { in: idsExpediente }, estado: 'ACTIVA' }, select: { id_expediente: true } })).map((x) => x.id_expediente));
+  const libres = filas.filter((f) => !conOtra.has(Number(f.id_expediente)));
+  const idsLibres = libres.map((f) => Number(f.id_expediente));
+  let devueltas = 0; let reasignadas = 0;
+  if (destino === 'ASESOR') {
+    const vigentes = new Set((await tx.expediente.findMany({ where: { id_expediente: { in: idsLibres }, estado: 'ASIGNADO' }, select: { id_expediente: true } })).map((x) => x.id_expediente));
+    const nuevas = libres.filter((f) => vigentes.has(Number(f.id_expediente))).map((f) => ({ id_expediente: Number(f.id_expediente), id_usuario_auditor: destinoId, prioridad: f.prioridad, origen: 'SUPERVISOR', asignado_por: actorId }));
+    if (nuevas.length) reasignadas = (await tx.asignacionAuditoria.createMany({ data: nuevas })).count;
+  } else if (idsLibres.length) {
+    devueltas = (await tx.expediente.updateMany({ where: { id_expediente: { in: idsLibres }, estado: 'ASIGNADO' }, data: { estado: 'PENDIENTE', autoasignable: true } })).count;
+  }
+  return { quitadas: idsAsignacion.length, devueltas, reasignadas, sin_cambio: idsAsignacion.length - devueltas - reasignadas };
+}
+
+// Usado al desactivar una cuenta: sus clientes en curso no deben quedar colgados de alguien que ya no puede iniciar sesión a atenderlos.
+// Vuelven a «Disponibles». Es una operación por lotes, no una vuelta por caso.
+async function cancelarTodasDeAuditor(auditorId, actorId = null) {
+  const r = await quitarCasos({ id_usuario_auditor: auditorId, motivo: 'DESACTIVADO', destino: 'DISPONIBLES', actorId });
+  return r.quitadas;
+}
+
+export default { crear, crearMasivo, misAsignaciones, versionMuestra, cargaPorAuditor, puntosParaMapa, listar, cancelar, quitarCasos, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen, liberarPendientes };
