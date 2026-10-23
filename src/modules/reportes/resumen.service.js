@@ -3,6 +3,7 @@ import { Prisma } from '../../generated/prisma/index.js';
 import { empresaActual } from '#core/tenant/contexto.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { cubetasDe, agruparPorCubeta, aFecha, aIso } from './actividad.js';
+import { MAX_DISTRITOS, formaDistritos } from './distritos.js';
 import { textoZona } from '#modules/auditorias/jornada.core.js';
 
 // Resumen operativo para la pantalla de inicio del panel: avance de la muestra, resultados de las
@@ -34,6 +35,26 @@ function empresaDeLaPeticion() {
   return empresaId;
 }
 
+// Visitas hechas y casos asignados desde `desde`, por distrito del expediente, en una sola consulta: cada mitad agrupa por distrito (pocas filas) y la suma de
+// afuera las junta. MySQL agrupa sin distinguir mayúsculas ni tildes, así «Lince» y «LINCE» cuentan como uno. Las asignaciones canceladas (casos que se
+// quitaron) no cuentan, y un caso asignado dos veces en la ventana cuenta una sola vez. Es una consulta cruda: la empresa se filtra a mano.
+const consultaDistritos = (empresaId, desde) => prisma.$queryRaw(Prisma.sql`
+  SELECT t.distrito AS distrito, CAST(SUM(t.visitas) AS UNSIGNED) AS n_visitas, CAST(SUM(t.asignados) AS UNSIGNED) AS n_asignados
+  FROM (
+    SELECT e.distrito AS distrito, COUNT(*) AS visitas, 0 AS asignados
+    FROM visitas_auditoria v JOIN expedientes e ON e.id_expediente = v.id_expediente
+    WHERE v.empresa_id = ${empresaId} AND e.empresa_id = ${empresaId} AND v.fecha_hora_checkin >= ${desde} AND e.distrito IS NOT NULL AND e.distrito <> ''
+    GROUP BY e.distrito
+    UNION ALL
+    SELECT e.distrito, 0, COUNT(DISTINCT a.id_expediente)
+    FROM asignaciones_auditoria a JOIN expedientes e ON e.id_expediente = a.id_expediente
+    WHERE a.empresa_id = ${empresaId} AND e.empresa_id = ${empresaId} AND a.fecha_asignacion >= ${desde} AND a.estado <> 'CANCELADA' AND e.distrito IS NOT NULL AND e.distrito <> ''
+    GROUP BY e.distrito
+  ) t
+  GROUP BY t.distrito
+  ORDER BY n_visitas DESC, n_asignados DESC, t.distrito ASC
+  LIMIT ${Prisma.raw(String(MAX_DISTRITOS))}`);
+
 async function obtenerResumen() {
   const empresaId = empresaDeLaPeticion(); // las consultas crudas no pasan por el filtro de empresa de Prisma: se filtra aquí
   const geocercaM = (await reglasEmpresa()).geocerca_radio_m; // regla de la empresa de la petición
@@ -61,8 +82,8 @@ async function obtenerResumen() {
         evidencias: { select: { id_evidencia: true } },
       },
     }),
-    // Distritos con más visitas en los últimos 30 días.
-    prisma.$queryRaw(Prisma.sql`SELECT e.distrito AS distrito, COUNT(*) AS n FROM visitas_auditoria v JOIN expedientes e ON e.id_expediente = v.id_expediente WHERE v.empresa_id = ${empresaId} AND v.fecha_hora_checkin >= ${hace30} AND e.distrito IS NOT NULL AND e.distrito <> '' GROUP BY e.distrito ORDER BY n DESC LIMIT 4`),
+    // A dónde van los asesores: distritos con más visitas y casos asignados en los últimos 30 días.
+    consultaDistritos(empresaId, hace30),
   ]);
 
   // Actividad por día (rellena los días sin visitas con 0 para que el gráfico no tenga huecos)
@@ -104,7 +125,7 @@ async function obtenerResumen() {
       actividad: [...porDia.entries()].map(([dia, total]) => ({ dia, total })),
       recientes: ultimosSiete, // visitas de los últimos 7 días
     },
-    distritos_visitados: distritos.map((f) => ({ distrito: f.distrito, visitas: Number(f.n) })),
+    ...formaDistritos(distritos.map((f) => ({ distrito: f.distrito, visitas: f.n_visitas, asignados: f.n_asignados }))),
     auditores: auditores
       .map((a) => ({
         id: a.id_usuario, nombre: `${a.nombres || ''} ${a.apellidos || ''}`.trim() || a.username, usuario: a.username, zona: (a.zona_en && textoZona({ distrito: a.zona_distrito, provincia: a.zona_provincia, departamento: a.zona_departamento })) || a.departamento,
