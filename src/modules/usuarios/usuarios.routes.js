@@ -4,7 +4,7 @@ import { authMiddleware } from "#modules/auth/auth.middleware.js";
 import { roleMiddleware } from "#core/middlewares/role.middleware.js";
 import { ADMIN_ROLES, OPERATIONAL_MANAGERS } from "#core/security/roles.js";
 import { validate } from "#core/middlewares/validate.middleware.js";
-import { userCreateBody, userUpdateBody, uuidParams, trackingQuery } from "../../validation/schemas.js";
+import { userCreateBody, userUpdateBody, uuidParams, trackingQuery, jornadasQuery } from "../../validation/schemas.js";
 
 const router = Router();
 
@@ -14,6 +14,8 @@ router.use(authMiddleware);
 router.get("/ubicaciones", roleMiddleware(OPERATIONAL_MANAGERS), usuariosController.ubicacionesActivas);
 // Avisos de llegada y salida del día (?fecha=AAAA-MM-DD, hoy por defecto).
 router.get("/eventos", roleMiddleware(OPERATIONAL_MANAGERS), validate({ query: trackingQuery }), usuariosController.eventos);
+// Historial de jornadas de campo de un auditor (cuándo salió y desde qué zona), por páginas.
+router.get("/:id/jornadas", roleMiddleware(OPERATIONAL_MANAGERS), validate({ params: uuidParams, query: jornadasQuery }), usuariosController.jornadas);
 router.get("/:id/tracking", roleMiddleware(OPERATIONAL_MANAGERS), validate({ params: uuidParams, query: trackingQuery }), usuariosController.tracking);
 // Lista minima de auditores de campo activos (para el selector de "Asignar a" y los
 // filtros de Visitas). No expone estado de cuenta, MFA ni el resto de campos de

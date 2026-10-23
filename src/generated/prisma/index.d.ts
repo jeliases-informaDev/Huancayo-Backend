@@ -26,9 +26,14 @@ export type Empresa = $Result.DefaultSelection<Prisma.$EmpresaPayload>
  */
 export type Usuario = $Result.DefaultSelection<Prisma.$UsuarioPayload>
 /**
- * Model TrackingUbicacion
+ * Model JornadaCampo
  * Historial de posiciones GPS del personal de campo (Supervisor/Auditor) — permite
  * reconstruir la ruta recorrida en el mapa de supervisión (Fase 2/Fase 6 del flujo).
+ */
+export type JornadaCampo = $Result.DefaultSelection<Prisma.$JornadaCampoPayload>
+/**
+ * Model TrackingUbicacion
+ * 
  */
 export type TrackingUbicacion = $Result.DefaultSelection<Prisma.$TrackingUbicacionPayload>
 /**
@@ -261,6 +266,16 @@ export class PrismaClient<
     * ```
     */
   get usuario(): Prisma.UsuarioDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.jornadaCampo`: Exposes CRUD operations for the **JornadaCampo** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more JornadaCampos
+    * const jornadaCampos = await prisma.jornadaCampo.findMany()
+    * ```
+    */
+  get jornadaCampo(): Prisma.JornadaCampoDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.trackingUbicacion`: Exposes CRUD operations for the **TrackingUbicacion** model.
@@ -830,6 +845,7 @@ export namespace Prisma {
   export const ModelName: {
     Empresa: 'Empresa',
     Usuario: 'Usuario',
+    JornadaCampo: 'JornadaCampo',
     TrackingUbicacion: 'TrackingUbicacion',
     EventoCampo: 'EventoCampo',
     ConfiguracionSistema: 'ConfiguracionSistema',
@@ -857,7 +873,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "empresa" | "usuario" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva" | "aceptacionTerminos"
+      modelProps: "empresa" | "usuario" | "jornadaCampo" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva" | "aceptacionTerminos"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -990,6 +1006,72 @@ export namespace Prisma {
           count: {
             args: Prisma.UsuarioCountArgs<ExtArgs>
             result: $Utils.Optional<UsuarioCountAggregateOutputType> | number
+          }
+        }
+      }
+      JornadaCampo: {
+        payload: Prisma.$JornadaCampoPayload<ExtArgs>
+        fields: Prisma.JornadaCampoFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.JornadaCampoFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JornadaCampoPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.JornadaCampoFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JornadaCampoPayload>
+          }
+          findFirst: {
+            args: Prisma.JornadaCampoFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JornadaCampoPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.JornadaCampoFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JornadaCampoPayload>
+          }
+          findMany: {
+            args: Prisma.JornadaCampoFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JornadaCampoPayload>[]
+          }
+          create: {
+            args: Prisma.JornadaCampoCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JornadaCampoPayload>
+          }
+          createMany: {
+            args: Prisma.JornadaCampoCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.JornadaCampoDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JornadaCampoPayload>
+          }
+          update: {
+            args: Prisma.JornadaCampoUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JornadaCampoPayload>
+          }
+          deleteMany: {
+            args: Prisma.JornadaCampoDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.JornadaCampoUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.JornadaCampoUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$JornadaCampoPayload>
+          }
+          aggregate: {
+            args: Prisma.JornadaCampoAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJornadaCampo>
+          }
+          groupBy: {
+            args: Prisma.JornadaCampoGroupByArgs<ExtArgs>
+            result: $Utils.Optional<JornadaCampoGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.JornadaCampoCountArgs<ExtArgs>
+            result: $Utils.Optional<JornadaCampoCountAggregateOutputType> | number
           }
         }
       }
@@ -1910,6 +1992,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     empresa?: EmpresaOmit
     usuario?: UsuarioOmit
+    jornadaCampo?: JornadaCampoOmit
     trackingUbicacion?: TrackingUbicacionOmit
     eventoCampo?: EventoCampoOmit
     configuracionSistema?: ConfiguracionSistemaOmit
@@ -2008,6 +2091,7 @@ export namespace Prisma {
     trackings: number
     eventosCampo: number
     aceptacionesTerminos: number
+    jornadas: number
   }
 
   export type UsuarioCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2017,6 +2101,7 @@ export namespace Prisma {
     trackings?: boolean | UsuarioCountOutputTypeCountTrackingsArgs
     eventosCampo?: boolean | UsuarioCountOutputTypeCountEventosCampoArgs
     aceptacionesTerminos?: boolean | UsuarioCountOutputTypeCountAceptacionesTerminosArgs
+    jornadas?: boolean | UsuarioCountOutputTypeCountJornadasArgs
   }
 
   // Custom InputTypes
@@ -2070,6 +2155,13 @@ export namespace Prisma {
    */
   export type UsuarioCountOutputTypeCountAceptacionesTerminosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AceptacionTerminosWhereInput
+  }
+
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeCountJornadasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JornadaCampoWhereInput
   }
 
 
@@ -3168,6 +3260,10 @@ export namespace Prisma {
     mov_modo: string | null
     jornada_inicio: Date | null
     jornada_fin: Date | null
+    zona_distrito: string | null
+    zona_provincia: string | null
+    zona_departamento: string | null
+    zona_en: Date | null
   }
 
   export type UsuarioMaxAggregateOutputType = {
@@ -3206,6 +3302,10 @@ export namespace Prisma {
     mov_modo: string | null
     jornada_inicio: Date | null
     jornada_fin: Date | null
+    zona_distrito: string | null
+    zona_provincia: string | null
+    zona_departamento: string | null
+    zona_en: Date | null
   }
 
   export type UsuarioCountAggregateOutputType = {
@@ -3244,6 +3344,10 @@ export namespace Prisma {
     mov_modo: number
     jornada_inicio: number
     jornada_fin: number
+    zona_distrito: number
+    zona_provincia: number
+    zona_departamento: number
+    zona_en: number
     _all: number
   }
 
@@ -3304,6 +3408,10 @@ export namespace Prisma {
     mov_modo?: true
     jornada_inicio?: true
     jornada_fin?: true
+    zona_distrito?: true
+    zona_provincia?: true
+    zona_departamento?: true
+    zona_en?: true
   }
 
   export type UsuarioMaxAggregateInputType = {
@@ -3342,6 +3450,10 @@ export namespace Prisma {
     mov_modo?: true
     jornada_inicio?: true
     jornada_fin?: true
+    zona_distrito?: true
+    zona_provincia?: true
+    zona_departamento?: true
+    zona_en?: true
   }
 
   export type UsuarioCountAggregateInputType = {
@@ -3380,6 +3492,10 @@ export namespace Prisma {
     mov_modo?: true
     jornada_inicio?: true
     jornada_fin?: true
+    zona_distrito?: true
+    zona_provincia?: true
+    zona_departamento?: true
+    zona_en?: true
     _all?: true
   }
 
@@ -3505,6 +3621,10 @@ export namespace Prisma {
     mov_modo: string | null
     jornada_inicio: Date | null
     jornada_fin: Date | null
+    zona_distrito: string | null
+    zona_provincia: string | null
+    zona_departamento: string | null
+    zona_en: Date | null
     _count: UsuarioCountAggregateOutputType | null
     _avg: UsuarioAvgAggregateOutputType | null
     _sum: UsuarioSumAggregateOutputType | null
@@ -3562,12 +3682,17 @@ export namespace Prisma {
     mov_modo?: boolean
     jornada_inicio?: boolean
     jornada_fin?: boolean
+    zona_distrito?: boolean
+    zona_provincia?: boolean
+    zona_departamento?: boolean
+    zona_en?: boolean
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
     dispositivos?: boolean | Usuario$dispositivosArgs<ExtArgs>
     trackings?: boolean | Usuario$trackingsArgs<ExtArgs>
     eventosCampo?: boolean | Usuario$eventosCampoArgs<ExtArgs>
     aceptacionesTerminos?: boolean | Usuario$aceptacionesTerminosArgs<ExtArgs>
+    jornadas?: boolean | Usuario$jornadasArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["usuario"]>
 
@@ -3609,9 +3734,13 @@ export namespace Prisma {
     mov_modo?: boolean
     jornada_inicio?: boolean
     jornada_fin?: boolean
+    zona_distrito?: boolean
+    zona_provincia?: boolean
+    zona_departamento?: boolean
+    zona_en?: boolean
   }
 
-  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "empresa_id" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud" | "ubicacion_en" | "ubicacion_precision" | "ubicacion_simulada" | "bateria_porcentaje" | "bateria_cargando" | "mov_estado" | "mov_desde" | "mov_velocidad" | "mov_modo" | "jornada_inicio" | "jornada_fin", ExtArgs["result"]["usuario"]>
+  export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_usuario" | "empresa_id" | "username" | "nombres" | "apellidos" | "email" | "sede" | "departamento" | "password_hash" | "rol" | "estado" | "fecha_creacion" | "mfa_habilitado" | "mfa_requerido" | "mfa_exento" | "mfa_secreto" | "mfa_ultimo_uso" | "token_version" | "intentos_fallidos" | "bloqueado_hasta" | "ultimo_acceso" | "password_cambio" | "latitud" | "longitud" | "ubicacion_en" | "ubicacion_precision" | "ubicacion_simulada" | "bateria_porcentaje" | "bateria_cargando" | "mov_estado" | "mov_desde" | "mov_velocidad" | "mov_modo" | "jornada_inicio" | "jornada_fin" | "zona_distrito" | "zona_provincia" | "zona_departamento" | "zona_en", ExtArgs["result"]["usuario"]>
   export type UsuarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Usuario$asignacionesArgs<ExtArgs>
     visitas?: boolean | Usuario$visitasArgs<ExtArgs>
@@ -3619,6 +3748,7 @@ export namespace Prisma {
     trackings?: boolean | Usuario$trackingsArgs<ExtArgs>
     eventosCampo?: boolean | Usuario$eventosCampoArgs<ExtArgs>
     aceptacionesTerminos?: boolean | Usuario$aceptacionesTerminosArgs<ExtArgs>
+    jornadas?: boolean | Usuario$jornadasArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -3631,6 +3761,7 @@ export namespace Prisma {
       trackings: Prisma.$TrackingUbicacionPayload<ExtArgs>[]
       eventosCampo: Prisma.$EventoCampoPayload<ExtArgs>[]
       aceptacionesTerminos: Prisma.$AceptacionTerminosPayload<ExtArgs>[]
+      jornadas: Prisma.$JornadaCampoPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id_usuario: string
@@ -3668,6 +3799,10 @@ export namespace Prisma {
       mov_modo: string | null
       jornada_inicio: Date | null
       jornada_fin: Date | null
+      zona_distrito: string | null
+      zona_provincia: string | null
+      zona_departamento: string | null
+      zona_en: Date | null
     }, ExtArgs["result"]["usuario"]>
     composites: {}
   }
@@ -4014,6 +4149,7 @@ export namespace Prisma {
     trackings<T extends Usuario$trackingsArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$trackingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackingUbicacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     eventosCampo<T extends Usuario$eventosCampoArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$eventosCampoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventoCampoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     aceptacionesTerminos<T extends Usuario$aceptacionesTerminosArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$aceptacionesTerminosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AceptacionTerminosPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jornadas<T extends Usuario$jornadasArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$jornadasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4078,6 +4214,10 @@ export namespace Prisma {
     readonly mov_modo: FieldRef<"Usuario", 'String'>
     readonly jornada_inicio: FieldRef<"Usuario", 'DateTime'>
     readonly jornada_fin: FieldRef<"Usuario", 'DateTime'>
+    readonly zona_distrito: FieldRef<"Usuario", 'String'>
+    readonly zona_provincia: FieldRef<"Usuario", 'String'>
+    readonly zona_departamento: FieldRef<"Usuario", 'String'>
+    readonly zona_en: FieldRef<"Usuario", 'DateTime'>
   }
     
 
@@ -4570,6 +4710,30 @@ export namespace Prisma {
   }
 
   /**
+   * Usuario.jornadas
+   */
+  export type Usuario$jornadasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    where?: JornadaCampoWhereInput
+    orderBy?: JornadaCampoOrderByWithRelationInput | JornadaCampoOrderByWithRelationInput[]
+    cursor?: JornadaCampoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JornadaCampoScalarFieldEnum | JornadaCampoScalarFieldEnum[]
+  }
+
+  /**
    * Usuario without action
    */
   export type UsuarioDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4585,6 +4749,1074 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UsuarioInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model JornadaCampo
+   */
+
+  export type AggregateJornadaCampo = {
+    _count: JornadaCampoCountAggregateOutputType | null
+    _avg: JornadaCampoAvgAggregateOutputType | null
+    _sum: JornadaCampoSumAggregateOutputType | null
+    _min: JornadaCampoMinAggregateOutputType | null
+    _max: JornadaCampoMaxAggregateOutputType | null
+  }
+
+  export type JornadaCampoAvgAggregateOutputType = {
+    id_jornada: number | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    precision_metros: Decimal | null
+  }
+
+  export type JornadaCampoSumAggregateOutputType = {
+    id_jornada: number | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    precision_metros: Decimal | null
+  }
+
+  export type JornadaCampoMinAggregateOutputType = {
+    id_jornada: number | null
+    empresa_id: string | null
+    id_usuario: string | null
+    inicio: Date | null
+    fin: Date | null
+    cierre: string | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    precision_metros: Decimal | null
+    simulada: boolean | null
+    departamento: string | null
+    provincia: string | null
+    distrito: string | null
+  }
+
+  export type JornadaCampoMaxAggregateOutputType = {
+    id_jornada: number | null
+    empresa_id: string | null
+    id_usuario: string | null
+    inicio: Date | null
+    fin: Date | null
+    cierre: string | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    precision_metros: Decimal | null
+    simulada: boolean | null
+    departamento: string | null
+    provincia: string | null
+    distrito: string | null
+  }
+
+  export type JornadaCampoCountAggregateOutputType = {
+    id_jornada: number
+    empresa_id: number
+    id_usuario: number
+    inicio: number
+    fin: number
+    cierre: number
+    latitud: number
+    longitud: number
+    precision_metros: number
+    simulada: number
+    departamento: number
+    provincia: number
+    distrito: number
+    _all: number
+  }
+
+
+  export type JornadaCampoAvgAggregateInputType = {
+    id_jornada?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+  }
+
+  export type JornadaCampoSumAggregateInputType = {
+    id_jornada?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+  }
+
+  export type JornadaCampoMinAggregateInputType = {
+    id_jornada?: true
+    empresa_id?: true
+    id_usuario?: true
+    inicio?: true
+    fin?: true
+    cierre?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+    simulada?: true
+    departamento?: true
+    provincia?: true
+    distrito?: true
+  }
+
+  export type JornadaCampoMaxAggregateInputType = {
+    id_jornada?: true
+    empresa_id?: true
+    id_usuario?: true
+    inicio?: true
+    fin?: true
+    cierre?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+    simulada?: true
+    departamento?: true
+    provincia?: true
+    distrito?: true
+  }
+
+  export type JornadaCampoCountAggregateInputType = {
+    id_jornada?: true
+    empresa_id?: true
+    id_usuario?: true
+    inicio?: true
+    fin?: true
+    cierre?: true
+    latitud?: true
+    longitud?: true
+    precision_metros?: true
+    simulada?: true
+    departamento?: true
+    provincia?: true
+    distrito?: true
+    _all?: true
+  }
+
+  export type JornadaCampoAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JornadaCampo to aggregate.
+     */
+    where?: JornadaCampoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JornadaCampos to fetch.
+     */
+    orderBy?: JornadaCampoOrderByWithRelationInput | JornadaCampoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: JornadaCampoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JornadaCampos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JornadaCampos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned JornadaCampos
+    **/
+    _count?: true | JornadaCampoCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: JornadaCampoAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: JornadaCampoSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: JornadaCampoMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: JornadaCampoMaxAggregateInputType
+  }
+
+  export type GetJornadaCampoAggregateType<T extends JornadaCampoAggregateArgs> = {
+        [P in keyof T & keyof AggregateJornadaCampo]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJornadaCampo[P]>
+      : GetScalarType<T[P], AggregateJornadaCampo[P]>
+  }
+
+
+
+
+  export type JornadaCampoGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JornadaCampoWhereInput
+    orderBy?: JornadaCampoOrderByWithAggregationInput | JornadaCampoOrderByWithAggregationInput[]
+    by: JornadaCampoScalarFieldEnum[] | JornadaCampoScalarFieldEnum
+    having?: JornadaCampoScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: JornadaCampoCountAggregateInputType | true
+    _avg?: JornadaCampoAvgAggregateInputType
+    _sum?: JornadaCampoSumAggregateInputType
+    _min?: JornadaCampoMinAggregateInputType
+    _max?: JornadaCampoMaxAggregateInputType
+  }
+
+  export type JornadaCampoGroupByOutputType = {
+    id_jornada: number
+    empresa_id: string
+    id_usuario: string
+    inicio: Date
+    fin: Date | null
+    cierre: string | null
+    latitud: Decimal | null
+    longitud: Decimal | null
+    precision_metros: Decimal | null
+    simulada: boolean
+    departamento: string | null
+    provincia: string | null
+    distrito: string | null
+    _count: JornadaCampoCountAggregateOutputType | null
+    _avg: JornadaCampoAvgAggregateOutputType | null
+    _sum: JornadaCampoSumAggregateOutputType | null
+    _min: JornadaCampoMinAggregateOutputType | null
+    _max: JornadaCampoMaxAggregateOutputType | null
+  }
+
+  type GetJornadaCampoGroupByPayload<T extends JornadaCampoGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<JornadaCampoGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof JornadaCampoGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], JornadaCampoGroupByOutputType[P]>
+            : GetScalarType<T[P], JornadaCampoGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type JornadaCampoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id_jornada?: boolean
+    empresa_id?: boolean
+    id_usuario?: boolean
+    inicio?: boolean
+    fin?: boolean
+    cierre?: boolean
+    latitud?: boolean
+    longitud?: boolean
+    precision_metros?: boolean
+    simulada?: boolean
+    departamento?: boolean
+    provincia?: boolean
+    distrito?: boolean
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["jornadaCampo"]>
+
+
+
+  export type JornadaCampoSelectScalar = {
+    id_jornada?: boolean
+    empresa_id?: boolean
+    id_usuario?: boolean
+    inicio?: boolean
+    fin?: boolean
+    cierre?: boolean
+    latitud?: boolean
+    longitud?: boolean
+    precision_metros?: boolean
+    simulada?: boolean
+    departamento?: boolean
+    provincia?: boolean
+    distrito?: boolean
+  }
+
+  export type JornadaCampoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_jornada" | "empresa_id" | "id_usuario" | "inicio" | "fin" | "cierre" | "latitud" | "longitud" | "precision_metros" | "simulada" | "departamento" | "provincia" | "distrito", ExtArgs["result"]["jornadaCampo"]>
+  export type JornadaCampoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
+  }
+
+  export type $JornadaCampoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "JornadaCampo"
+    objects: {
+      usuario: Prisma.$UsuarioPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id_jornada: number
+      empresa_id: string
+      id_usuario: string
+      inicio: Date
+      fin: Date | null
+      cierre: string | null
+      latitud: Prisma.Decimal | null
+      longitud: Prisma.Decimal | null
+      precision_metros: Prisma.Decimal | null
+      simulada: boolean
+      departamento: string | null
+      provincia: string | null
+      distrito: string | null
+    }, ExtArgs["result"]["jornadaCampo"]>
+    composites: {}
+  }
+
+  type JornadaCampoGetPayload<S extends boolean | null | undefined | JornadaCampoDefaultArgs> = $Result.GetResult<Prisma.$JornadaCampoPayload, S>
+
+  type JornadaCampoCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<JornadaCampoFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: JornadaCampoCountAggregateInputType | true
+    }
+
+  export interface JornadaCampoDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['JornadaCampo'], meta: { name: 'JornadaCampo' } }
+    /**
+     * Find zero or one JornadaCampo that matches the filter.
+     * @param {JornadaCampoFindUniqueArgs} args - Arguments to find a JornadaCampo
+     * @example
+     * // Get one JornadaCampo
+     * const jornadaCampo = await prisma.jornadaCampo.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends JornadaCampoFindUniqueArgs>(args: SelectSubset<T, JornadaCampoFindUniqueArgs<ExtArgs>>): Prisma__JornadaCampoClient<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one JornadaCampo that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {JornadaCampoFindUniqueOrThrowArgs} args - Arguments to find a JornadaCampo
+     * @example
+     * // Get one JornadaCampo
+     * const jornadaCampo = await prisma.jornadaCampo.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends JornadaCampoFindUniqueOrThrowArgs>(args: SelectSubset<T, JornadaCampoFindUniqueOrThrowArgs<ExtArgs>>): Prisma__JornadaCampoClient<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JornadaCampo that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JornadaCampoFindFirstArgs} args - Arguments to find a JornadaCampo
+     * @example
+     * // Get one JornadaCampo
+     * const jornadaCampo = await prisma.jornadaCampo.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends JornadaCampoFindFirstArgs>(args?: SelectSubset<T, JornadaCampoFindFirstArgs<ExtArgs>>): Prisma__JornadaCampoClient<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first JornadaCampo that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JornadaCampoFindFirstOrThrowArgs} args - Arguments to find a JornadaCampo
+     * @example
+     * // Get one JornadaCampo
+     * const jornadaCampo = await prisma.jornadaCampo.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends JornadaCampoFindFirstOrThrowArgs>(args?: SelectSubset<T, JornadaCampoFindFirstOrThrowArgs<ExtArgs>>): Prisma__JornadaCampoClient<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more JornadaCampos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JornadaCampoFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all JornadaCampos
+     * const jornadaCampos = await prisma.jornadaCampo.findMany()
+     * 
+     * // Get first 10 JornadaCampos
+     * const jornadaCampos = await prisma.jornadaCampo.findMany({ take: 10 })
+     * 
+     * // Only select the `id_jornada`
+     * const jornadaCampoWithId_jornadaOnly = await prisma.jornadaCampo.findMany({ select: { id_jornada: true } })
+     * 
+     */
+    findMany<T extends JornadaCampoFindManyArgs>(args?: SelectSubset<T, JornadaCampoFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a JornadaCampo.
+     * @param {JornadaCampoCreateArgs} args - Arguments to create a JornadaCampo.
+     * @example
+     * // Create one JornadaCampo
+     * const JornadaCampo = await prisma.jornadaCampo.create({
+     *   data: {
+     *     // ... data to create a JornadaCampo
+     *   }
+     * })
+     * 
+     */
+    create<T extends JornadaCampoCreateArgs>(args: SelectSubset<T, JornadaCampoCreateArgs<ExtArgs>>): Prisma__JornadaCampoClient<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many JornadaCampos.
+     * @param {JornadaCampoCreateManyArgs} args - Arguments to create many JornadaCampos.
+     * @example
+     * // Create many JornadaCampos
+     * const jornadaCampo = await prisma.jornadaCampo.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends JornadaCampoCreateManyArgs>(args?: SelectSubset<T, JornadaCampoCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a JornadaCampo.
+     * @param {JornadaCampoDeleteArgs} args - Arguments to delete one JornadaCampo.
+     * @example
+     * // Delete one JornadaCampo
+     * const JornadaCampo = await prisma.jornadaCampo.delete({
+     *   where: {
+     *     // ... filter to delete one JornadaCampo
+     *   }
+     * })
+     * 
+     */
+    delete<T extends JornadaCampoDeleteArgs>(args: SelectSubset<T, JornadaCampoDeleteArgs<ExtArgs>>): Prisma__JornadaCampoClient<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one JornadaCampo.
+     * @param {JornadaCampoUpdateArgs} args - Arguments to update one JornadaCampo.
+     * @example
+     * // Update one JornadaCampo
+     * const jornadaCampo = await prisma.jornadaCampo.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends JornadaCampoUpdateArgs>(args: SelectSubset<T, JornadaCampoUpdateArgs<ExtArgs>>): Prisma__JornadaCampoClient<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more JornadaCampos.
+     * @param {JornadaCampoDeleteManyArgs} args - Arguments to filter JornadaCampos to delete.
+     * @example
+     * // Delete a few JornadaCampos
+     * const { count } = await prisma.jornadaCampo.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends JornadaCampoDeleteManyArgs>(args?: SelectSubset<T, JornadaCampoDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more JornadaCampos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JornadaCampoUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many JornadaCampos
+     * const jornadaCampo = await prisma.jornadaCampo.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends JornadaCampoUpdateManyArgs>(args: SelectSubset<T, JornadaCampoUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one JornadaCampo.
+     * @param {JornadaCampoUpsertArgs} args - Arguments to update or create a JornadaCampo.
+     * @example
+     * // Update or create a JornadaCampo
+     * const jornadaCampo = await prisma.jornadaCampo.upsert({
+     *   create: {
+     *     // ... data to create a JornadaCampo
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the JornadaCampo we want to update
+     *   }
+     * })
+     */
+    upsert<T extends JornadaCampoUpsertArgs>(args: SelectSubset<T, JornadaCampoUpsertArgs<ExtArgs>>): Prisma__JornadaCampoClient<$Result.GetResult<Prisma.$JornadaCampoPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of JornadaCampos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JornadaCampoCountArgs} args - Arguments to filter JornadaCampos to count.
+     * @example
+     * // Count the number of JornadaCampos
+     * const count = await prisma.jornadaCampo.count({
+     *   where: {
+     *     // ... the filter for the JornadaCampos we want to count
+     *   }
+     * })
+    **/
+    count<T extends JornadaCampoCountArgs>(
+      args?: Subset<T, JornadaCampoCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], JornadaCampoCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a JornadaCampo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JornadaCampoAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends JornadaCampoAggregateArgs>(args: Subset<T, JornadaCampoAggregateArgs>): Prisma.PrismaPromise<GetJornadaCampoAggregateType<T>>
+
+    /**
+     * Group by JornadaCampo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {JornadaCampoGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends JornadaCampoGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: JornadaCampoGroupByArgs['orderBy'] }
+        : { orderBy?: JornadaCampoGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, JornadaCampoGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJornadaCampoGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the JornadaCampo model
+   */
+  readonly fields: JornadaCampoFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for JornadaCampo.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__JornadaCampoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the JornadaCampo model
+   */
+  interface JornadaCampoFieldRefs {
+    readonly id_jornada: FieldRef<"JornadaCampo", 'Int'>
+    readonly empresa_id: FieldRef<"JornadaCampo", 'String'>
+    readonly id_usuario: FieldRef<"JornadaCampo", 'String'>
+    readonly inicio: FieldRef<"JornadaCampo", 'DateTime'>
+    readonly fin: FieldRef<"JornadaCampo", 'DateTime'>
+    readonly cierre: FieldRef<"JornadaCampo", 'String'>
+    readonly latitud: FieldRef<"JornadaCampo", 'Decimal'>
+    readonly longitud: FieldRef<"JornadaCampo", 'Decimal'>
+    readonly precision_metros: FieldRef<"JornadaCampo", 'Decimal'>
+    readonly simulada: FieldRef<"JornadaCampo", 'Boolean'>
+    readonly departamento: FieldRef<"JornadaCampo", 'String'>
+    readonly provincia: FieldRef<"JornadaCampo", 'String'>
+    readonly distrito: FieldRef<"JornadaCampo", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * JornadaCampo findUnique
+   */
+  export type JornadaCampoFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which JornadaCampo to fetch.
+     */
+    where: JornadaCampoWhereUniqueInput
+  }
+
+  /**
+   * JornadaCampo findUniqueOrThrow
+   */
+  export type JornadaCampoFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which JornadaCampo to fetch.
+     */
+    where: JornadaCampoWhereUniqueInput
+  }
+
+  /**
+   * JornadaCampo findFirst
+   */
+  export type JornadaCampoFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which JornadaCampo to fetch.
+     */
+    where?: JornadaCampoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JornadaCampos to fetch.
+     */
+    orderBy?: JornadaCampoOrderByWithRelationInput | JornadaCampoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JornadaCampos.
+     */
+    cursor?: JornadaCampoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JornadaCampos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JornadaCampos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JornadaCampos.
+     */
+    distinct?: JornadaCampoScalarFieldEnum | JornadaCampoScalarFieldEnum[]
+  }
+
+  /**
+   * JornadaCampo findFirstOrThrow
+   */
+  export type JornadaCampoFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which JornadaCampo to fetch.
+     */
+    where?: JornadaCampoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JornadaCampos to fetch.
+     */
+    orderBy?: JornadaCampoOrderByWithRelationInput | JornadaCampoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for JornadaCampos.
+     */
+    cursor?: JornadaCampoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JornadaCampos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JornadaCampos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JornadaCampos.
+     */
+    distinct?: JornadaCampoScalarFieldEnum | JornadaCampoScalarFieldEnum[]
+  }
+
+  /**
+   * JornadaCampo findMany
+   */
+  export type JornadaCampoFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    /**
+     * Filter, which JornadaCampos to fetch.
+     */
+    where?: JornadaCampoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of JornadaCampos to fetch.
+     */
+    orderBy?: JornadaCampoOrderByWithRelationInput | JornadaCampoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing JornadaCampos.
+     */
+    cursor?: JornadaCampoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` JornadaCampos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` JornadaCampos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of JornadaCampos.
+     */
+    distinct?: JornadaCampoScalarFieldEnum | JornadaCampoScalarFieldEnum[]
+  }
+
+  /**
+   * JornadaCampo create
+   */
+  export type JornadaCampoCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    /**
+     * The data needed to create a JornadaCampo.
+     */
+    data: XOR<JornadaCampoCreateInput, JornadaCampoUncheckedCreateInput>
+  }
+
+  /**
+   * JornadaCampo createMany
+   */
+  export type JornadaCampoCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many JornadaCampos.
+     */
+    data: JornadaCampoCreateManyInput | JornadaCampoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * JornadaCampo update
+   */
+  export type JornadaCampoUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    /**
+     * The data needed to update a JornadaCampo.
+     */
+    data: XOR<JornadaCampoUpdateInput, JornadaCampoUncheckedUpdateInput>
+    /**
+     * Choose, which JornadaCampo to update.
+     */
+    where: JornadaCampoWhereUniqueInput
+  }
+
+  /**
+   * JornadaCampo updateMany
+   */
+  export type JornadaCampoUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update JornadaCampos.
+     */
+    data: XOR<JornadaCampoUpdateManyMutationInput, JornadaCampoUncheckedUpdateManyInput>
+    /**
+     * Filter which JornadaCampos to update
+     */
+    where?: JornadaCampoWhereInput
+    /**
+     * Limit how many JornadaCampos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * JornadaCampo upsert
+   */
+  export type JornadaCampoUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    /**
+     * The filter to search for the JornadaCampo to update in case it exists.
+     */
+    where: JornadaCampoWhereUniqueInput
+    /**
+     * In case the JornadaCampo found by the `where` argument doesn't exist, create a new JornadaCampo with this data.
+     */
+    create: XOR<JornadaCampoCreateInput, JornadaCampoUncheckedCreateInput>
+    /**
+     * In case the JornadaCampo was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<JornadaCampoUpdateInput, JornadaCampoUncheckedUpdateInput>
+  }
+
+  /**
+   * JornadaCampo delete
+   */
+  export type JornadaCampoDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
+    /**
+     * Filter which JornadaCampo to delete.
+     */
+    where: JornadaCampoWhereUniqueInput
+  }
+
+  /**
+   * JornadaCampo deleteMany
+   */
+  export type JornadaCampoDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which JornadaCampos to delete
+     */
+    where?: JornadaCampoWhereInput
+    /**
+     * Limit how many JornadaCampos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * JornadaCampo without action
+   */
+  export type JornadaCampoDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the JornadaCampo
+     */
+    select?: JornadaCampoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the JornadaCampo
+     */
+    omit?: JornadaCampoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JornadaCampoInclude<ExtArgs> | null
   }
 
 
@@ -17663,10 +18895,33 @@ export namespace Prisma {
     mov_velocidad: 'mov_velocidad',
     mov_modo: 'mov_modo',
     jornada_inicio: 'jornada_inicio',
-    jornada_fin: 'jornada_fin'
+    jornada_fin: 'jornada_fin',
+    zona_distrito: 'zona_distrito',
+    zona_provincia: 'zona_provincia',
+    zona_departamento: 'zona_departamento',
+    zona_en: 'zona_en'
   };
 
   export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]
+
+
+  export const JornadaCampoScalarFieldEnum: {
+    id_jornada: 'id_jornada',
+    empresa_id: 'empresa_id',
+    id_usuario: 'id_usuario',
+    inicio: 'inicio',
+    fin: 'fin',
+    cierre: 'cierre',
+    latitud: 'latitud',
+    longitud: 'longitud',
+    precision_metros: 'precision_metros',
+    simulada: 'simulada',
+    departamento: 'departamento',
+    provincia: 'provincia',
+    distrito: 'distrito'
+  };
+
+  export type JornadaCampoScalarFieldEnum = (typeof JornadaCampoScalarFieldEnum)[keyof typeof JornadaCampoScalarFieldEnum]
 
 
   export const TrackingUbicacionScalarFieldEnum: {
@@ -18006,10 +19261,25 @@ export namespace Prisma {
     estado: 'estado',
     mfa_secreto: 'mfa_secreto',
     mov_estado: 'mov_estado',
-    mov_modo: 'mov_modo'
+    mov_modo: 'mov_modo',
+    zona_distrito: 'zona_distrito',
+    zona_provincia: 'zona_provincia',
+    zona_departamento: 'zona_departamento'
   };
 
   export type UsuarioOrderByRelevanceFieldEnum = (typeof UsuarioOrderByRelevanceFieldEnum)[keyof typeof UsuarioOrderByRelevanceFieldEnum]
+
+
+  export const JornadaCampoOrderByRelevanceFieldEnum: {
+    empresa_id: 'empresa_id',
+    id_usuario: 'id_usuario',
+    cierre: 'cierre',
+    departamento: 'departamento',
+    provincia: 'provincia',
+    distrito: 'distrito'
+  };
+
+  export type JornadaCampoOrderByRelevanceFieldEnum = (typeof JornadaCampoOrderByRelevanceFieldEnum)[keyof typeof JornadaCampoOrderByRelevanceFieldEnum]
 
 
   export const TrackingUbicacionOrderByRelevanceFieldEnum: {
@@ -18391,12 +19661,17 @@ export namespace Prisma {
     mov_modo?: StringNullableFilter<"Usuario"> | string | null
     jornada_inicio?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     jornada_fin?: DateTimeNullableFilter<"Usuario"> | Date | string | null
+    zona_distrito?: StringNullableFilter<"Usuario"> | string | null
+    zona_provincia?: StringNullableFilter<"Usuario"> | string | null
+    zona_departamento?: StringNullableFilter<"Usuario"> | string | null
+    zona_en?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     dispositivos?: DispositivoAutorizadoListRelationFilter
     trackings?: TrackingUbicacionListRelationFilter
     eventosCampo?: EventoCampoListRelationFilter
     aceptacionesTerminos?: AceptacionTerminosListRelationFilter
+    jornadas?: JornadaCampoListRelationFilter
   }
 
   export type UsuarioOrderByWithRelationInput = {
@@ -18435,12 +19710,17 @@ export namespace Prisma {
     mov_modo?: SortOrderInput | SortOrder
     jornada_inicio?: SortOrderInput | SortOrder
     jornada_fin?: SortOrderInput | SortOrder
+    zona_distrito?: SortOrderInput | SortOrder
+    zona_provincia?: SortOrderInput | SortOrder
+    zona_departamento?: SortOrderInput | SortOrder
+    zona_en?: SortOrderInput | SortOrder
     asignaciones?: AsignacionAuditoriaOrderByRelationAggregateInput
     visitas?: VisitaAuditoriaOrderByRelationAggregateInput
     dispositivos?: DispositivoAutorizadoOrderByRelationAggregateInput
     trackings?: TrackingUbicacionOrderByRelationAggregateInput
     eventosCampo?: EventoCampoOrderByRelationAggregateInput
     aceptacionesTerminos?: AceptacionTerminosOrderByRelationAggregateInput
+    jornadas?: JornadaCampoOrderByRelationAggregateInput
     _relevance?: UsuarioOrderByRelevanceInput
   }
 
@@ -18483,12 +19763,17 @@ export namespace Prisma {
     mov_modo?: StringNullableFilter<"Usuario"> | string | null
     jornada_inicio?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     jornada_fin?: DateTimeNullableFilter<"Usuario"> | Date | string | null
+    zona_distrito?: StringNullableFilter<"Usuario"> | string | null
+    zona_provincia?: StringNullableFilter<"Usuario"> | string | null
+    zona_departamento?: StringNullableFilter<"Usuario"> | string | null
+    zona_en?: DateTimeNullableFilter<"Usuario"> | Date | string | null
     asignaciones?: AsignacionAuditoriaListRelationFilter
     visitas?: VisitaAuditoriaListRelationFilter
     dispositivos?: DispositivoAutorizadoListRelationFilter
     trackings?: TrackingUbicacionListRelationFilter
     eventosCampo?: EventoCampoListRelationFilter
     aceptacionesTerminos?: AceptacionTerminosListRelationFilter
+    jornadas?: JornadaCampoListRelationFilter
   }, "id_usuario" | "username">
 
   export type UsuarioOrderByWithAggregationInput = {
@@ -18527,6 +19812,10 @@ export namespace Prisma {
     mov_modo?: SortOrderInput | SortOrder
     jornada_inicio?: SortOrderInput | SortOrder
     jornada_fin?: SortOrderInput | SortOrder
+    zona_distrito?: SortOrderInput | SortOrder
+    zona_provincia?: SortOrderInput | SortOrder
+    zona_departamento?: SortOrderInput | SortOrder
+    zona_en?: SortOrderInput | SortOrder
     _count?: UsuarioCountOrderByAggregateInput
     _avg?: UsuarioAvgOrderByAggregateInput
     _max?: UsuarioMaxOrderByAggregateInput
@@ -18573,6 +19862,108 @@ export namespace Prisma {
     mov_modo?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
     jornada_inicio?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
     jornada_fin?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
+    zona_distrito?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
+    zona_provincia?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
+    zona_departamento?: StringNullableWithAggregatesFilter<"Usuario"> | string | null
+    zona_en?: DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
+  }
+
+  export type JornadaCampoWhereInput = {
+    AND?: JornadaCampoWhereInput | JornadaCampoWhereInput[]
+    OR?: JornadaCampoWhereInput[]
+    NOT?: JornadaCampoWhereInput | JornadaCampoWhereInput[]
+    id_jornada?: IntFilter<"JornadaCampo"> | number
+    empresa_id?: StringFilter<"JornadaCampo"> | string
+    id_usuario?: StringFilter<"JornadaCampo"> | string
+    inicio?: DateTimeFilter<"JornadaCampo"> | Date | string
+    fin?: DateTimeNullableFilter<"JornadaCampo"> | Date | string | null
+    cierre?: StringNullableFilter<"JornadaCampo"> | string | null
+    latitud?: DecimalNullableFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    longitud?: DecimalNullableFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: DecimalNullableFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFilter<"JornadaCampo"> | boolean
+    departamento?: StringNullableFilter<"JornadaCampo"> | string | null
+    provincia?: StringNullableFilter<"JornadaCampo"> | string | null
+    distrito?: StringNullableFilter<"JornadaCampo"> | string | null
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }
+
+  export type JornadaCampoOrderByWithRelationInput = {
+    id_jornada?: SortOrder
+    empresa_id?: SortOrder
+    id_usuario?: SortOrder
+    inicio?: SortOrder
+    fin?: SortOrderInput | SortOrder
+    cierre?: SortOrderInput | SortOrder
+    latitud?: SortOrderInput | SortOrder
+    longitud?: SortOrderInput | SortOrder
+    precision_metros?: SortOrderInput | SortOrder
+    simulada?: SortOrder
+    departamento?: SortOrderInput | SortOrder
+    provincia?: SortOrderInput | SortOrder
+    distrito?: SortOrderInput | SortOrder
+    usuario?: UsuarioOrderByWithRelationInput
+    _relevance?: JornadaCampoOrderByRelevanceInput
+  }
+
+  export type JornadaCampoWhereUniqueInput = Prisma.AtLeast<{
+    id_jornada?: number
+    AND?: JornadaCampoWhereInput | JornadaCampoWhereInput[]
+    OR?: JornadaCampoWhereInput[]
+    NOT?: JornadaCampoWhereInput | JornadaCampoWhereInput[]
+    empresa_id?: StringFilter<"JornadaCampo"> | string
+    id_usuario?: StringFilter<"JornadaCampo"> | string
+    inicio?: DateTimeFilter<"JornadaCampo"> | Date | string
+    fin?: DateTimeNullableFilter<"JornadaCampo"> | Date | string | null
+    cierre?: StringNullableFilter<"JornadaCampo"> | string | null
+    latitud?: DecimalNullableFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    longitud?: DecimalNullableFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: DecimalNullableFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFilter<"JornadaCampo"> | boolean
+    departamento?: StringNullableFilter<"JornadaCampo"> | string | null
+    provincia?: StringNullableFilter<"JornadaCampo"> | string | null
+    distrito?: StringNullableFilter<"JornadaCampo"> | string | null
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
+  }, "id_jornada">
+
+  export type JornadaCampoOrderByWithAggregationInput = {
+    id_jornada?: SortOrder
+    empresa_id?: SortOrder
+    id_usuario?: SortOrder
+    inicio?: SortOrder
+    fin?: SortOrderInput | SortOrder
+    cierre?: SortOrderInput | SortOrder
+    latitud?: SortOrderInput | SortOrder
+    longitud?: SortOrderInput | SortOrder
+    precision_metros?: SortOrderInput | SortOrder
+    simulada?: SortOrder
+    departamento?: SortOrderInput | SortOrder
+    provincia?: SortOrderInput | SortOrder
+    distrito?: SortOrderInput | SortOrder
+    _count?: JornadaCampoCountOrderByAggregateInput
+    _avg?: JornadaCampoAvgOrderByAggregateInput
+    _max?: JornadaCampoMaxOrderByAggregateInput
+    _min?: JornadaCampoMinOrderByAggregateInput
+    _sum?: JornadaCampoSumOrderByAggregateInput
+  }
+
+  export type JornadaCampoScalarWhereWithAggregatesInput = {
+    AND?: JornadaCampoScalarWhereWithAggregatesInput | JornadaCampoScalarWhereWithAggregatesInput[]
+    OR?: JornadaCampoScalarWhereWithAggregatesInput[]
+    NOT?: JornadaCampoScalarWhereWithAggregatesInput | JornadaCampoScalarWhereWithAggregatesInput[]
+    id_jornada?: IntWithAggregatesFilter<"JornadaCampo"> | number
+    empresa_id?: StringWithAggregatesFilter<"JornadaCampo"> | string
+    id_usuario?: StringWithAggregatesFilter<"JornadaCampo"> | string
+    inicio?: DateTimeWithAggregatesFilter<"JornadaCampo"> | Date | string
+    fin?: DateTimeNullableWithAggregatesFilter<"JornadaCampo"> | Date | string | null
+    cierre?: StringNullableWithAggregatesFilter<"JornadaCampo"> | string | null
+    latitud?: DecimalNullableWithAggregatesFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    longitud?: DecimalNullableWithAggregatesFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: DecimalNullableWithAggregatesFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolWithAggregatesFilter<"JornadaCampo"> | boolean
+    departamento?: StringNullableWithAggregatesFilter<"JornadaCampo"> | string | null
+    provincia?: StringNullableWithAggregatesFilter<"JornadaCampo"> | string | null
+    distrito?: StringNullableWithAggregatesFilter<"JornadaCampo"> | string | null
   }
 
   export type TrackingUbicacionWhereInput = {
@@ -20064,12 +21455,17 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateInput = {
@@ -20108,12 +21504,17 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUpdateInput = {
@@ -20152,12 +21553,17 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateInput = {
@@ -20196,12 +21602,17 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateManyInput = {
@@ -20240,6 +21651,10 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
   }
 
   export type UsuarioUpdateManyMutationInput = {
@@ -20278,6 +21693,10 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UsuarioUncheckedUpdateManyInput = {
@@ -20316,6 +21735,118 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type JornadaCampoCreateInput = {
+    empresa_id: string
+    inicio?: Date | string
+    fin?: Date | string | null
+    cierre?: string | null
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
+    departamento?: string | null
+    provincia?: string | null
+    distrito?: string | null
+    usuario: UsuarioCreateNestedOneWithoutJornadasInput
+  }
+
+  export type JornadaCampoUncheckedCreateInput = {
+    id_jornada?: number
+    empresa_id: string
+    id_usuario: string
+    inicio?: Date | string
+    fin?: Date | string | null
+    cierre?: string | null
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
+    departamento?: string | null
+    provincia?: string | null
+    distrito?: string | null
+  }
+
+  export type JornadaCampoUpdateInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cierre?: NullableStringFieldUpdateOperationsInput | string | null
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    usuario?: UsuarioUpdateOneRequiredWithoutJornadasNestedInput
+  }
+
+  export type JornadaCampoUncheckedUpdateInput = {
+    id_jornada?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cierre?: NullableStringFieldUpdateOperationsInput | string | null
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    distrito?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type JornadaCampoCreateManyInput = {
+    id_jornada?: number
+    empresa_id: string
+    id_usuario: string
+    inicio?: Date | string
+    fin?: Date | string | null
+    cierre?: string | null
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
+    departamento?: string | null
+    provincia?: string | null
+    distrito?: string | null
+  }
+
+  export type JornadaCampoUpdateManyMutationInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cierre?: NullableStringFieldUpdateOperationsInput | string | null
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    distrito?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type JornadaCampoUncheckedUpdateManyInput = {
+    id_jornada?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cierre?: NullableStringFieldUpdateOperationsInput | string | null
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    distrito?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TrackingUbicacionCreateInput = {
@@ -22178,6 +23709,12 @@ export namespace Prisma {
     none?: AceptacionTerminosWhereInput
   }
 
+  export type JornadaCampoListRelationFilter = {
+    every?: JornadaCampoWhereInput
+    some?: JornadaCampoWhereInput
+    none?: JornadaCampoWhereInput
+  }
+
   export type AsignacionAuditoriaOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -22199,6 +23736,10 @@ export namespace Prisma {
   }
 
   export type AceptacionTerminosOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JornadaCampoOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -22244,6 +23785,10 @@ export namespace Prisma {
     mov_modo?: SortOrder
     jornada_inicio?: SortOrder
     jornada_fin?: SortOrder
+    zona_distrito?: SortOrder
+    zona_provincia?: SortOrder
+    zona_departamento?: SortOrder
+    zona_en?: SortOrder
   }
 
   export type UsuarioAvgOrderByAggregateInput = {
@@ -22292,6 +23837,10 @@ export namespace Prisma {
     mov_modo?: SortOrder
     jornada_inicio?: SortOrder
     jornada_fin?: SortOrder
+    zona_distrito?: SortOrder
+    zona_provincia?: SortOrder
+    zona_departamento?: SortOrder
+    zona_en?: SortOrder
   }
 
   export type UsuarioMinOrderByAggregateInput = {
@@ -22330,6 +23879,10 @@ export namespace Prisma {
     mov_modo?: SortOrder
     jornada_inicio?: SortOrder
     jornada_fin?: SortOrder
+    zona_distrito?: SortOrder
+    zona_provincia?: SortOrder
+    zona_departamento?: SortOrder
+    zona_en?: SortOrder
   }
 
   export type UsuarioSumOrderByAggregateInput = {
@@ -22412,6 +23965,79 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type UsuarioScalarRelationFilter = {
+    is?: UsuarioWhereInput
+    isNot?: UsuarioWhereInput
+  }
+
+  export type JornadaCampoOrderByRelevanceInput = {
+    fields: JornadaCampoOrderByRelevanceFieldEnum | JornadaCampoOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type JornadaCampoCountOrderByAggregateInput = {
+    id_jornada?: SortOrder
+    empresa_id?: SortOrder
+    id_usuario?: SortOrder
+    inicio?: SortOrder
+    fin?: SortOrder
+    cierre?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+    simulada?: SortOrder
+    departamento?: SortOrder
+    provincia?: SortOrder
+    distrito?: SortOrder
+  }
+
+  export type JornadaCampoAvgOrderByAggregateInput = {
+    id_jornada?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+  }
+
+  export type JornadaCampoMaxOrderByAggregateInput = {
+    id_jornada?: SortOrder
+    empresa_id?: SortOrder
+    id_usuario?: SortOrder
+    inicio?: SortOrder
+    fin?: SortOrder
+    cierre?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+    simulada?: SortOrder
+    departamento?: SortOrder
+    provincia?: SortOrder
+    distrito?: SortOrder
+  }
+
+  export type JornadaCampoMinOrderByAggregateInput = {
+    id_jornada?: SortOrder
+    empresa_id?: SortOrder
+    id_usuario?: SortOrder
+    inicio?: SortOrder
+    fin?: SortOrder
+    cierre?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+    simulada?: SortOrder
+    departamento?: SortOrder
+    provincia?: SortOrder
+    distrito?: SortOrder
+  }
+
+  export type JornadaCampoSumOrderByAggregateInput = {
+    id_jornada?: SortOrder
+    latitud?: SortOrder
+    longitud?: SortOrder
+    precision_metros?: SortOrder
+  }
+
   export type BigIntFilter<$PrismaModel = never> = {
     equals?: bigint | number | BigIntFieldRefInput<$PrismaModel>
     in?: bigint[] | number[]
@@ -22432,11 +24058,6 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
-  }
-
-  export type UsuarioScalarRelationFilter = {
-    is?: UsuarioWhereInput
-    isNot?: UsuarioWhereInput
   }
 
   export type TrackingUbicacionOrderByRelevanceInput = {
@@ -23523,6 +25144,13 @@ export namespace Prisma {
     connect?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
   }
 
+  export type JornadaCampoCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<JornadaCampoCreateWithoutUsuarioInput, JornadaCampoUncheckedCreateWithoutUsuarioInput> | JornadaCampoCreateWithoutUsuarioInput[] | JornadaCampoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: JornadaCampoCreateOrConnectWithoutUsuarioInput | JornadaCampoCreateOrConnectWithoutUsuarioInput[]
+    createMany?: JornadaCampoCreateManyUsuarioInputEnvelope
+    connect?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutAuditorInput, AsignacionAuditoriaUncheckedCreateWithoutAuditorInput> | AsignacionAuditoriaCreateWithoutAuditorInput[] | AsignacionAuditoriaUncheckedCreateWithoutAuditorInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutAuditorInput | AsignacionAuditoriaCreateOrConnectWithoutAuditorInput[]
@@ -23563,6 +25191,13 @@ export namespace Prisma {
     connectOrCreate?: AceptacionTerminosCreateOrConnectWithoutUsuarioInput | AceptacionTerminosCreateOrConnectWithoutUsuarioInput[]
     createMany?: AceptacionTerminosCreateManyUsuarioInputEnvelope
     connect?: AceptacionTerminosWhereUniqueInput | AceptacionTerminosWhereUniqueInput[]
+  }
+
+  export type JornadaCampoUncheckedCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<JornadaCampoCreateWithoutUsuarioInput, JornadaCampoUncheckedCreateWithoutUsuarioInput> | JornadaCampoCreateWithoutUsuarioInput[] | JornadaCampoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: JornadaCampoCreateOrConnectWithoutUsuarioInput | JornadaCampoCreateOrConnectWithoutUsuarioInput[]
+    createMany?: JornadaCampoCreateManyUsuarioInputEnvelope
+    connect?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -23681,6 +25316,20 @@ export namespace Prisma {
     deleteMany?: AceptacionTerminosScalarWhereInput | AceptacionTerminosScalarWhereInput[]
   }
 
+  export type JornadaCampoUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<JornadaCampoCreateWithoutUsuarioInput, JornadaCampoUncheckedCreateWithoutUsuarioInput> | JornadaCampoCreateWithoutUsuarioInput[] | JornadaCampoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: JornadaCampoCreateOrConnectWithoutUsuarioInput | JornadaCampoCreateOrConnectWithoutUsuarioInput[]
+    upsert?: JornadaCampoUpsertWithWhereUniqueWithoutUsuarioInput | JornadaCampoUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: JornadaCampoCreateManyUsuarioInputEnvelope
+    set?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
+    disconnect?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
+    delete?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
+    connect?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
+    update?: JornadaCampoUpdateWithWhereUniqueWithoutUsuarioInput | JornadaCampoUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: JornadaCampoUpdateManyWithWhereWithoutUsuarioInput | JornadaCampoUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: JornadaCampoScalarWhereInput | JornadaCampoScalarWhereInput[]
+  }
+
   export type AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput = {
     create?: XOR<AsignacionAuditoriaCreateWithoutAuditorInput, AsignacionAuditoriaUncheckedCreateWithoutAuditorInput> | AsignacionAuditoriaCreateWithoutAuditorInput[] | AsignacionAuditoriaUncheckedCreateWithoutAuditorInput[]
     connectOrCreate?: AsignacionAuditoriaCreateOrConnectWithoutAuditorInput | AsignacionAuditoriaCreateOrConnectWithoutAuditorInput[]
@@ -23763,6 +25412,34 @@ export namespace Prisma {
     update?: AceptacionTerminosUpdateWithWhereUniqueWithoutUsuarioInput | AceptacionTerminosUpdateWithWhereUniqueWithoutUsuarioInput[]
     updateMany?: AceptacionTerminosUpdateManyWithWhereWithoutUsuarioInput | AceptacionTerminosUpdateManyWithWhereWithoutUsuarioInput[]
     deleteMany?: AceptacionTerminosScalarWhereInput | AceptacionTerminosScalarWhereInput[]
+  }
+
+  export type JornadaCampoUncheckedUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<JornadaCampoCreateWithoutUsuarioInput, JornadaCampoUncheckedCreateWithoutUsuarioInput> | JornadaCampoCreateWithoutUsuarioInput[] | JornadaCampoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: JornadaCampoCreateOrConnectWithoutUsuarioInput | JornadaCampoCreateOrConnectWithoutUsuarioInput[]
+    upsert?: JornadaCampoUpsertWithWhereUniqueWithoutUsuarioInput | JornadaCampoUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: JornadaCampoCreateManyUsuarioInputEnvelope
+    set?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
+    disconnect?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
+    delete?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
+    connect?: JornadaCampoWhereUniqueInput | JornadaCampoWhereUniqueInput[]
+    update?: JornadaCampoUpdateWithWhereUniqueWithoutUsuarioInput | JornadaCampoUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: JornadaCampoUpdateManyWithWhereWithoutUsuarioInput | JornadaCampoUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: JornadaCampoScalarWhereInput | JornadaCampoScalarWhereInput[]
+  }
+
+  export type UsuarioCreateNestedOneWithoutJornadasInput = {
+    create?: XOR<UsuarioCreateWithoutJornadasInput, UsuarioUncheckedCreateWithoutJornadasInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutJornadasInput
+    connect?: UsuarioWhereUniqueInput
+  }
+
+  export type UsuarioUpdateOneRequiredWithoutJornadasNestedInput = {
+    create?: XOR<UsuarioCreateWithoutJornadasInput, UsuarioUncheckedCreateWithoutJornadasInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutJornadasInput
+    upsert?: UsuarioUpsertWithoutJornadasInput
+    connect?: UsuarioWhereUniqueInput
+    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutJornadasInput, UsuarioUpdateWithoutJornadasInput>, UsuarioUncheckedUpdateWithoutJornadasInput>
   }
 
   export type UsuarioCreateNestedOneWithoutTrackingsInput = {
@@ -24784,6 +26461,45 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type JornadaCampoCreateWithoutUsuarioInput = {
+    empresa_id: string
+    inicio?: Date | string
+    fin?: Date | string | null
+    cierre?: string | null
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
+    departamento?: string | null
+    provincia?: string | null
+    distrito?: string | null
+  }
+
+  export type JornadaCampoUncheckedCreateWithoutUsuarioInput = {
+    id_jornada?: number
+    empresa_id: string
+    inicio?: Date | string
+    fin?: Date | string | null
+    cierre?: string | null
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
+    departamento?: string | null
+    provincia?: string | null
+    distrito?: string | null
+  }
+
+  export type JornadaCampoCreateOrConnectWithoutUsuarioInput = {
+    where: JornadaCampoWhereUniqueInput
+    create: XOR<JornadaCampoCreateWithoutUsuarioInput, JornadaCampoUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type JornadaCampoCreateManyUsuarioInputEnvelope = {
+    data: JornadaCampoCreateManyUsuarioInput | JornadaCampoCreateManyUsuarioInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AsignacionAuditoriaUpsertWithWhereUniqueWithoutAuditorInput = {
     where: AsignacionAuditoriaWhereUniqueInput
     update: XOR<AsignacionAuditoriaUpdateWithoutAuditorInput, AsignacionAuditoriaUncheckedUpdateWithoutAuditorInput>
@@ -24998,6 +26714,249 @@ export namespace Prisma {
     fecha?: DateTimeFilter<"AceptacionTerminos"> | Date | string
   }
 
+  export type JornadaCampoUpsertWithWhereUniqueWithoutUsuarioInput = {
+    where: JornadaCampoWhereUniqueInput
+    update: XOR<JornadaCampoUpdateWithoutUsuarioInput, JornadaCampoUncheckedUpdateWithoutUsuarioInput>
+    create: XOR<JornadaCampoCreateWithoutUsuarioInput, JornadaCampoUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type JornadaCampoUpdateWithWhereUniqueWithoutUsuarioInput = {
+    where: JornadaCampoWhereUniqueInput
+    data: XOR<JornadaCampoUpdateWithoutUsuarioInput, JornadaCampoUncheckedUpdateWithoutUsuarioInput>
+  }
+
+  export type JornadaCampoUpdateManyWithWhereWithoutUsuarioInput = {
+    where: JornadaCampoScalarWhereInput
+    data: XOR<JornadaCampoUpdateManyMutationInput, JornadaCampoUncheckedUpdateManyWithoutUsuarioInput>
+  }
+
+  export type JornadaCampoScalarWhereInput = {
+    AND?: JornadaCampoScalarWhereInput | JornadaCampoScalarWhereInput[]
+    OR?: JornadaCampoScalarWhereInput[]
+    NOT?: JornadaCampoScalarWhereInput | JornadaCampoScalarWhereInput[]
+    id_jornada?: IntFilter<"JornadaCampo"> | number
+    empresa_id?: StringFilter<"JornadaCampo"> | string
+    id_usuario?: StringFilter<"JornadaCampo"> | string
+    inicio?: DateTimeFilter<"JornadaCampo"> | Date | string
+    fin?: DateTimeNullableFilter<"JornadaCampo"> | Date | string | null
+    cierre?: StringNullableFilter<"JornadaCampo"> | string | null
+    latitud?: DecimalNullableFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    longitud?: DecimalNullableFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: DecimalNullableFilter<"JornadaCampo"> | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFilter<"JornadaCampo"> | boolean
+    departamento?: StringNullableFilter<"JornadaCampo"> | string | null
+    provincia?: StringNullableFilter<"JornadaCampo"> | string | null
+    distrito?: StringNullableFilter<"JornadaCampo"> | string | null
+  }
+
+  export type UsuarioCreateWithoutJornadasInput = {
+    id_usuario?: string
+    empresa_id?: string | null
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    departamento?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
+    asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
+    visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
+    dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioUncheckedCreateWithoutJornadasInput = {
+    id_usuario?: string
+    empresa_id?: string | null
+    username: string
+    nombres?: string | null
+    apellidos?: string | null
+    email?: string | null
+    sede?: string | null
+    departamento?: string | null
+    password_hash: string
+    rol: string
+    estado?: string
+    fecha_creacion?: Date | string
+    mfa_habilitado?: boolean
+    mfa_requerido?: boolean
+    mfa_exento?: boolean
+    mfa_secreto?: string | null
+    mfa_ultimo_uso?: Date | string | null
+    token_version?: number
+    intentos_fallidos?: number
+    bloqueado_hasta?: Date | string | null
+    ultimo_acceso?: Date | string | null
+    password_cambio?: Date | string
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: Date | string | null
+    ubicacion_precision?: Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: boolean
+    bateria_porcentaje?: number | null
+    bateria_cargando?: boolean
+    mov_estado?: string | null
+    mov_desde?: Date | string | null
+    mov_velocidad?: Decimal | DecimalJsLike | number | string | null
+    mov_modo?: string | null
+    jornada_inicio?: Date | string | null
+    jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
+    asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
+    visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
+    dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
+    trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
+    eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioCreateOrConnectWithoutJornadasInput = {
+    where: UsuarioWhereUniqueInput
+    create: XOR<UsuarioCreateWithoutJornadasInput, UsuarioUncheckedCreateWithoutJornadasInput>
+  }
+
+  export type UsuarioUpsertWithoutJornadasInput = {
+    update: XOR<UsuarioUpdateWithoutJornadasInput, UsuarioUncheckedUpdateWithoutJornadasInput>
+    create: XOR<UsuarioCreateWithoutJornadasInput, UsuarioUncheckedCreateWithoutJornadasInput>
+    where?: UsuarioWhereInput
+  }
+
+  export type UsuarioUpdateToOneWithWhereWithoutJornadasInput = {
+    where?: UsuarioWhereInput
+    data: XOR<UsuarioUpdateWithoutJornadasInput, UsuarioUncheckedUpdateWithoutJornadasInput>
+  }
+
+  export type UsuarioUpdateWithoutJornadasInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
+    visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
+    dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
+  }
+
+  export type UsuarioUncheckedUpdateWithoutJornadasInput = {
+    id_usuario?: StringFieldUpdateOperationsInput | string
+    empresa_id?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: StringFieldUpdateOperationsInput | string
+    nombres?: NullableStringFieldUpdateOperationsInput | string | null
+    apellidos?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    sede?: NullableStringFieldUpdateOperationsInput | string | null
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    password_hash?: StringFieldUpdateOperationsInput | string
+    rol?: StringFieldUpdateOperationsInput | string
+    estado?: StringFieldUpdateOperationsInput | string
+    fecha_creacion?: DateTimeFieldUpdateOperationsInput | Date | string
+    mfa_habilitado?: BoolFieldUpdateOperationsInput | boolean
+    mfa_requerido?: BoolFieldUpdateOperationsInput | boolean
+    mfa_exento?: BoolFieldUpdateOperationsInput | boolean
+    mfa_secreto?: NullableStringFieldUpdateOperationsInput | string | null
+    mfa_ultimo_uso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    token_version?: IntFieldUpdateOperationsInput | number
+    intentos_fallidos?: IntFieldUpdateOperationsInput | number
+    bloqueado_hasta?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimo_acceso?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password_cambio?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ubicacion_precision?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ubicacion_simulada?: BoolFieldUpdateOperationsInput | boolean
+    bateria_porcentaje?: NullableIntFieldUpdateOperationsInput | number | null
+    bateria_cargando?: BoolFieldUpdateOperationsInput | boolean
+    mov_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    mov_desde?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    mov_velocidad?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
+    jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
+    visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
+    dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
+    trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
+    eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
+    aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
+  }
+
   export type UsuarioCreateWithoutTrackingsInput = {
     id_usuario?: string
     empresa_id?: string | null
@@ -25034,11 +26993,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutTrackingsInput = {
@@ -25077,11 +27041,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutTrackingsInput = {
@@ -25136,11 +27105,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutTrackingsInput = {
@@ -25179,11 +27153,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateWithoutEventosCampoInput = {
@@ -25222,11 +27201,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutEventosCampoInput = {
@@ -25265,11 +27249,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutEventosCampoInput = {
@@ -25424,11 +27413,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutEventosCampoInput = {
@@ -25467,11 +27461,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type ExpedienteUpsertWithoutEventosCampoInput = {
@@ -25616,11 +27615,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutDispositivosInput = {
@@ -25659,11 +27663,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutDispositivosInput = {
@@ -25718,11 +27727,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutDispositivosInput = {
@@ -25761,11 +27775,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type AsignacionAuditoriaCreateWithoutExpedienteInput = {
@@ -26376,11 +28395,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutAsignacionesInput = {
@@ -26419,11 +28443,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutAsignacionesInput = {
@@ -26584,11 +28613,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutAsignacionesInput = {
@@ -26627,11 +28661,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type ExpedienteCreateWithoutVisitasInput = {
@@ -26770,11 +28809,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutVisitasInput = {
@@ -26813,11 +28857,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutVisitasInput = {
@@ -27012,11 +29061,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutVisitasInput = {
@@ -27055,11 +29109,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
     aceptacionesTerminos?: AceptacionTerminosUncheckedUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type EvidenciaUpsertWithWhereUniqueWithoutVisitaInput = {
@@ -27296,11 +29355,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutAceptacionesTerminosInput = {
@@ -27339,11 +29403,16 @@ export namespace Prisma {
     mov_modo?: string | null
     jornada_inicio?: Date | string | null
     jornada_fin?: Date | string | null
+    zona_distrito?: string | null
+    zona_provincia?: string | null
+    zona_departamento?: string | null
+    zona_en?: Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     visitas?: VisitaAuditoriaUncheckedCreateNestedManyWithoutAuditorInput
     dispositivos?: DispositivoAutorizadoUncheckedCreateNestedManyWithoutUsuarioInput
     trackings?: TrackingUbicacionUncheckedCreateNestedManyWithoutUsuarioInput
     eventosCampo?: EventoCampoUncheckedCreateNestedManyWithoutUsuarioInput
+    jornadas?: JornadaCampoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutAceptacionesTerminosInput = {
@@ -27398,11 +29467,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutAceptacionesTerminosInput = {
@@ -27441,11 +29515,16 @@ export namespace Prisma {
     mov_modo?: NullableStringFieldUpdateOperationsInput | string | null
     jornada_inicio?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     jornada_fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    zona_distrito?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    zona_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     asignaciones?: AsignacionAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     visitas?: VisitaAuditoriaUncheckedUpdateManyWithoutAuditorNestedInput
     dispositivos?: DispositivoAutorizadoUncheckedUpdateManyWithoutUsuarioNestedInput
     trackings?: TrackingUbicacionUncheckedUpdateManyWithoutUsuarioNestedInput
     eventosCampo?: EventoCampoUncheckedUpdateManyWithoutUsuarioNestedInput
+    jornadas?: JornadaCampoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type AsignacionAuditoriaCreateManyAuditorInput = {
@@ -27540,6 +29619,21 @@ export namespace Prisma {
     ip?: string | null
     user_agent?: string | null
     fecha?: Date | string
+  }
+
+  export type JornadaCampoCreateManyUsuarioInput = {
+    id_jornada?: number
+    empresa_id: string
+    inicio?: Date | string
+    fin?: Date | string | null
+    cierre?: string | null
+    latitud?: Decimal | DecimalJsLike | number | string | null
+    longitud?: Decimal | DecimalJsLike | number | string | null
+    precision_metros?: Decimal | DecimalJsLike | number | string | null
+    simulada?: boolean
+    departamento?: string | null
+    provincia?: string | null
+    distrito?: string | null
   }
 
   export type AsignacionAuditoriaUpdateWithoutAuditorInput = {
@@ -27822,6 +29916,50 @@ export namespace Prisma {
     ip?: NullableStringFieldUpdateOperationsInput | string | null
     user_agent?: NullableStringFieldUpdateOperationsInput | string | null
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JornadaCampoUpdateWithoutUsuarioInput = {
+    empresa_id?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cierre?: NullableStringFieldUpdateOperationsInput | string | null
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    distrito?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type JornadaCampoUncheckedUpdateWithoutUsuarioInput = {
+    id_jornada?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cierre?: NullableStringFieldUpdateOperationsInput | string | null
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    distrito?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type JornadaCampoUncheckedUpdateManyWithoutUsuarioInput = {
+    id_jornada?: IntFieldUpdateOperationsInput | number
+    empresa_id?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cierre?: NullableStringFieldUpdateOperationsInput | string | null
+    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    simulada?: BoolFieldUpdateOperationsInput | boolean
+    departamento?: NullableStringFieldUpdateOperationsInput | string | null
+    provincia?: NullableStringFieldUpdateOperationsInput | string | null
+    distrito?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AsignacionAuditoriaCreateManyExpedienteInput = {

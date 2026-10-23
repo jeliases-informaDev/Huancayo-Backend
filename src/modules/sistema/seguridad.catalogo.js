@@ -97,7 +97,10 @@ const REGLAS = [
 
   // ---------------------------------------------------------------- Visitas (campo)
   regla('POST', '/api/visitas', () => def('VISITAS', 'VISITA_ENVIAR', 'INFO', 'Envió una visita')),
-  regla('POST', '/api/visitas/jornada', () => def('VISITAS', 'VISITA_JORNADA', 'INFO', 'Registró su jornada de campo')),
+  regla('POST', '/api/visitas/jornada', (c) => def('VISITAS', 'VISITA_JORNADA', 'INFO',
+    c.nuevo?.accion === 'TERMINAR' ? 'Terminó su jornada de campo'
+      : c.nuevo?.accion === 'INICIAR' ? `Inició su jornada de campo${c.nuevo.zona ? ` en ${c.nuevo.zona}` : ''}${c.nuevo.simulada ? ' (con GPS simulado)' : ''}`
+      : 'Registró su jornada de campo')),
   regla('POST', '/api/visitas/evidencias/presign', () => def('VISITAS', 'VISITA_FOTO', 'INFO', 'Preparó la subida de una foto de evidencia')),
   regla('PUT', '/api/visitas/evidencias/upload/[^/]+', () => def('VISITAS', 'VISITA_FOTO', 'INFO', 'Subió una foto de evidencia')),
   regla('PATCH', '/api/visitas/ubicacion', () => def('VISITAS', 'VISITA_UBICACION', 'INFO', 'No se pudo guardar su ubicación')),

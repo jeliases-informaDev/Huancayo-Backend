@@ -3,6 +3,7 @@ import { Prisma } from '../../generated/prisma/index.js';
 import { empresaActual } from '#core/tenant/contexto.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { cubetasDe, agruparPorCubeta, aFecha, aIso } from './actividad.js';
+import { textoZona } from '#modules/auditorias/jornada.core.js';
 
 // Resumen operativo para la pantalla de inicio del panel: avance de la muestra, resultados de las
 // visitas, actividad reciente, carga por auditor y la cola de visitas que conviene revisar primero.
@@ -46,7 +47,7 @@ async function obtenerResumen() {
     prisma.visitaAuditoria.groupBy({ by: ['resultado'], _count: { _all: true } }),
     prisma.expediente.groupBy({ by: ['tipo_credito'], _count: { _all: true } }),
     prisma.asignacionAuditoria.count({ where: { estado: 'ACTIVA' } }),
-    prisma.usuario.findMany({ where: { rol: 'AUDITOR', estado: 'ACTIVO' }, select: { id_usuario: true, nombres: true, apellidos: true, username: true, departamento: true } }),
+    prisma.usuario.findMany({ where: { rol: 'AUDITOR', estado: 'ACTIVO' }, select: { id_usuario: true, nombres: true, apellidos: true, username: true, departamento: true, zona_distrito: true, zona_provincia: true, zona_departamento: true, zona_en: true } }),
     // Visitas por día contadas en la base (antes se traían todas las filas de 14 días y se contaban en memoria).
     prisma.$queryRaw(Prisma.sql`SELECT DATE_FORMAT(fecha_hora_checkin, '%Y-%m-%d') AS d, COUNT(*) AS n FROM visitas_auditoria WHERE empresa_id = ${empresaId} AND fecha_hora_checkin >= ${desde} GROUP BY d`),
     prisma.asignacionAuditoria.groupBy({ by: ['id_usuario_auditor'], where: { estado: 'ACTIVA' }, _count: { _all: true } }),
@@ -106,7 +107,7 @@ async function obtenerResumen() {
     distritos_visitados: distritos.map((f) => ({ distrito: f.distrito, visitas: Number(f.n) })),
     auditores: auditores
       .map((a) => ({
-        id: a.id_usuario, nombre: `${a.nombres || ''} ${a.apellidos || ''}`.trim() || a.username, usuario: a.username, zona: a.departamento,
+        id: a.id_usuario, nombre: `${a.nombres || ''} ${a.apellidos || ''}`.trim() || a.username, usuario: a.username, zona: (a.zona_en && textoZona({ distrito: a.zona_distrito, provincia: a.zona_provincia, departamento: a.zona_departamento })) || a.departamento,
         asignadas_activas: cargaPorAuditor[a.id_usuario] || 0, visitas_30_dias: visitasPorAuditor[a.id_usuario] || 0,
       }))
       .sort((x, y) => y.asignadas_activas - x.asignadas_activas),

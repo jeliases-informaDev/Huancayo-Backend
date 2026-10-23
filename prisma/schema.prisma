@@ -86,6 +86,12 @@ model Usuario {
   // aunque la pantalla esté apagada. En jornada = jornada_inicio con jornada_fin vacío o anterior al inicio.
   jornada_inicio      DateTime?
   jornada_fin         DateTime?
+  // Zona de trabajo: dónde estaba el auditor al iniciar su última jornada (la app toma el GPS en ese momento; cada jornada queda en
+  // `jornadas_campo`). Ya no se escribe a mano: `departamento` (arriba) era la «zona habitual» de antes y solo se muestra si nunca inició una jornada.
+  zona_distrito       String?   @db.VarChar(100)
+  zona_provincia      String?   @db.VarChar(100)
+  zona_departamento   String?   @db.VarChar(100)
+  zona_en             DateTime?
 
   asignaciones AsignacionAuditoria[]
   visitas      VisitaAuditoria[]
@@ -93,6 +99,7 @@ model Usuario {
   trackings    TrackingUbicacion[]
   eventosCampo EventoCampo[]
   aceptacionesTerminos AceptacionTerminos[]
+  jornadas     JornadaCampo[]
 
   @@index([empresa_id, rol])
   @@map("usuarios")
@@ -100,6 +107,30 @@ model Usuario {
 
 /// Historial de posiciones GPS del personal de campo (Supervisor/Auditor) — permite
 /// reconstruir la ruta recorrida en el mapa de supervisión (Fase 2/Fase 6 del flujo).
+// Historial de jornadas de campo: una fila por «Iniciar jornada» de un auditor, con cuándo terminó y desde qué zona salió (la posición del celular al
+// iniciarla). La última zona también queda en el usuario para no leer esta tabla en cada lista. Una o dos filas por auditor y día: se conserva siempre.
+model JornadaCampo {
+  id_jornada       Int       @id @default(autoincrement())
+  empresa_id       String    @db.VarChar(36)
+  id_usuario       String    @db.VarChar(36)
+  inicio           DateTime  @default(now())
+  fin              DateTime?
+  cierre           String?   @db.VarChar(12) // NORMAL (la terminó el auditor), REINICIADA (inició otra el mismo día) o SIN_CIERRE (nunca la terminó)
+  latitud          Decimal?  @db.Decimal(10, 8)
+  longitud         Decimal?  @db.Decimal(11, 8)
+  precision_metros Decimal?  @db.Decimal(8, 2)
+  simulada         Boolean   @default(false) // el celular avisó que la posición venía de un GPS simulado: no cuenta como zona de trabajo
+  departamento     String?   @db.VarChar(100)
+  provincia        String?   @db.VarChar(100)
+  distrito         String?   @db.VarChar(100)
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([empresa_id, id_usuario, inicio]) // historial de un auditor, del más reciente al más antiguo
+  @@index([empresa_id, inicio])
+  @@map("jornadas_campo")
+}
+
 model TrackingUbicacion {
   id_tracking      BigInt   @id @default(autoincrement())
   empresa_id       String   @db.VarChar(36)
