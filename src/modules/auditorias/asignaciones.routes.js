@@ -4,7 +4,7 @@ import { authMiddleware } from '#modules/auth/auth.middleware.js';
 import { roleMiddleware } from '#core/middlewares/role.middleware.js';
 import { OPERATIONAL_MANAGERS, ADMIN_ROLES, ROLES } from '#core/security/roles.js';
 import { validate } from '#core/middlewares/validate.middleware.js';
-import { idParams, listQuery, asignacionCreateBody, asignacionBulkBody, autoasignacionBody, topeCasosBody, quitarCasosBody, miasQuery, disponiblesQuery, mapaQuery } from '../../validation/schemas.js';
+import { idParams, listQuery, asignacionCreateBody, asignacionBulkBody, autoasignacionBody, topeCasosBody, quitarCasosBody, miasQuery, disponiblesQuery, mapaQuery, pendientesQuery, pendientesDistritosQuery } from '../../validation/schemas.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -18,6 +18,9 @@ router.use(roleMiddleware(OPERATIONAL_MANAGERS));
 router.get('/', validate({ query: listQuery }), controller.listar);
 router.get('/resumen-origen', controller.resumenOrigen);
 router.get('/carga', controller.carga);
+// Columna «Expedientes sin asignar» de Asignaciones: por páginas, con búsqueda, tipo y distrito; y los distritos que hay con su cantidad.
+router.get('/pendientes', validate({ query: pendientesQuery }), controller.pendientes);
+router.get('/pendientes/distritos', validate({ query: pendientesDistritosQuery }), controller.pendientesDistritos);
 router.get('/mapa', validate({ query: mapaQuery }), controller.mapa);
 router.put('/autoasignacion', roleMiddleware(ADMIN_ROLES), validate({ body: autoasignacionBody }), controller.fijarAutoasignacion);
 router.post('/liberar', roleMiddleware(ADMIN_ROLES), controller.liberarPendientes);

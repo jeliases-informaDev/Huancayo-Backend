@@ -29,3 +29,12 @@ export const paginaDe = (lista, { page, limit }) => lista.slice((page - 1) * lim
 export const buscarEnExpediente = (q) => ({
   OR: [{ nombres_cliente: { contains: q } }, { codigo_expediente: { contains: q } }, { numero_documento_cliente: { contains: q } }, { distrito: { contains: q } }],
 });
+
+// Expedientes sin asignar (columna central de Asignaciones): por texto, tipo de crédito y distrito. El distrito es el que se eligió en la lista de distritos,
+// así que se compara completo (con «contains», elegir «Lima» traería también «Limatambo»).
+export const filtroPendientes = ({ q, tipo, distrito } = {}) => ({
+  estado: 'PENDIENTE',
+  ...(tipo ? { tipo_credito: tipo } : {}),
+  ...(distrito ? { distrito } : {}),
+  ...(q ? buscarEnExpediente(q) : {}),
+});

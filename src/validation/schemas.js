@@ -34,6 +34,33 @@ export const userCreateBody = z.object({
 }).strict();
 export const userUpdateBody = userCreateBody.partial().refine(data => Object.keys(data).length > 0, 'Debe enviar al menos un campo');
 
+// Listas del panel (Usuarios y Asignaciones): por páginas y con la búsqueda y los filtros en el servidor.
+const paginaQuery = {
+  page: z.coerce.number().int().min(1).max(100000).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+};
+export const usuariosListQuery = z.object({
+  ...paginaQuery,
+  q: z.string().trim().max(100).optional(),
+  rol: z.enum(['ADMINISTRADOR', 'SUPERVISOR', 'AUDITOR', 'UNIVERSAL']).optional(),
+  estado: z.enum(['ACTIVO', 'INACTIVO']).optional(),
+}).strict();
+// Auditores de campo activos. Sin page ni limit (selectores de otras pantallas) devuelve la lista completa, como siempre.
+export const auditoresQuery = z.object({
+  ...paginaQuery,
+  q: z.string().trim().max(100).optional(),
+  zona: z.string().trim().max(100).optional(),
+  id: z.string().uuid().optional(), // un auditor concreto (enlaces con el auditor ya elegido)
+}).strict();
+// Expedientes sin asignar (columna central de Asignaciones) y los distritos que tienen.
+export const pendientesQuery = z.object({
+  ...paginaQuery,
+  q: z.string().trim().max(100).optional(),
+  tipo: z.enum(['CONSUMO', 'OTROS']).optional(),
+  distrito: z.string().trim().max(100).optional(),
+}).strict();
+export const pendientesDistritosQuery = z.object({ tipo: z.enum(['CONSUMO', 'OTROS']).optional() }).strict();
+
 // --- Listados ---
 export const listQuery = z.object({
   page: z.coerce.number().int().min(1).max(100000).optional(),

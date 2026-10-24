@@ -45,6 +45,12 @@ async function versionMia(req, res, next) {
 async function carga(_req, res, next) {
   try { res.json({ data: await asignacionesService.cargaPorAuditor() }); } catch (error) { next(error); }
 }
+async function pendientes(req, res, next) {
+  try { res.json(await asignacionesService.pendientesParaAsignar(req.validated?.query || {})); } catch (error) { next(error); }
+}
+async function pendientesDistritos(req, res, next) {
+  try { res.json(await asignacionesService.distritosPendientes(req.validated?.query || {})); } catch (error) { next(error); }
+}
 async function mapa(req, res, next) {
   try {
     const { visitados_desde: visitadosDesde, ...filtros } = req.validated?.query || {};
@@ -97,4 +103,4 @@ async function cancelar(req, res, next) {
   } catch (error) { next(error); }
 }
 
-export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, quitarCasos, resumenOrigen, fijarAutoasignacion, fijarTope, liberarPendientes, carga, mapa, versionMia };
+export default { crear, crearMasivo, misAsignaciones, disponibles, autoAsignar, listar, cancelar, quitarCasos, resumenOrigen, fijarAutoasignacion, fijarTope, liberarPendientes, carga, pendientes, pendientesDistritos, mapa, versionMia };

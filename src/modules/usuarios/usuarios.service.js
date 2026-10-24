@@ -7,6 +7,8 @@ import { env, mfaExemptUsernames } from '#core/config/env.js';
 import asignacionesService from '#modules/auditorias/asignaciones.service.js';
 import { codificarCursorJornada, decodificarCursorJornada, duracionMin, textoZona } from '#modules/auditorias/jornada.core.js';
 import { publica as empresaPublica, usuarioConPrefijo } from '#modules/empresas/empresas.service.js';
+import { infoPaginas } from '#modules/auditorias/asignaciones.paginacion.js';
+import { paginaDeUsuarios, filtroUsuarios, filtroAuditores, juntarZonas } from './usuarios.filtros.js';
 
 // Dentro de una empresa el nombre de usuario lleva su abreviatura fija (arq.jorge); el universal de Sulotec no tiene empresa ni prefijo.
 async function usernameDeEmpresa(empresaId, username) {
@@ -53,26 +55,54 @@ function assertRole(role) {
   }
 }
 
-async function listar() {
-  // Tope defensivo: hoy son unas pocas decenas de cuentas de personal, pero la
-  // consulta no debe quedar sin límite si la planilla de usuarios crece.
-  const usuarios = await prisma.usuario.findMany({
-    orderBy: { fecha_creacion: 'asc' }, take: 1000,
-    // Si ya aceptó la versión vigente de los términos (desde la app o el panel), para que el administrador lo vea.
-    include: { aceptacionesTerminos: { where: { version: VERSION_TERMINOS }, select: { version: true, fecha: true, plataforma: true }, take: 1 } },
-  });
-  return usuarios.map((u) => ({ ...mapUsuario(u), terminos: u.aceptacionesTerminos?.[0] || null }));
+// Usuarios de la empresa por páginas (pantalla Usuarios): la búsqueda, el rol y el estado se resuelven en la base y la respuesta dice cuántos hay en total.
+// Del más antiguo al más nuevo, con el id como desempate para que dos páginas nunca repitan ni pierdan a nadie.
+async function listar(consulta = {}) {
+  const pag = paginaDeUsuarios(consulta);
+  const where = filtroUsuarios(consulta);
+  const [usuarios, total] = await Promise.all([
+    prisma.usuario.findMany({
+      where, orderBy: [{ fecha_creacion: 'asc' }, { id_usuario: 'asc' }], skip: (pag.page - 1) * pag.limit, take: pag.limit,
+      // Si ya aceptó la versión vigente de los términos (desde la app o el panel), para que el administrador lo vea.
+      include: { aceptacionesTerminos: { where: { version: VERSION_TERMINOS }, select: { version: true, fecha: true, plataforma: true }, take: 1 } },
+    }),
+    prisma.usuario.count({ where }),
+  ]);
+  return { data: usuarios.map((u) => ({ ...mapUsuario(u), terminos: u.aceptacionesTerminos?.[0] || null })), pagination: infoPaginas(pag, total) };
 }
+
+const auditorSelect = { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, departamento: true, zona_distrito: true, zona_provincia: true, zona_departamento: true, zona_en: true };
+const aAuditor = (u) => ({ id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '', rol: normalizeRole(u.rol), departamento: u.departamento || null, zona: zonaDeUsuario(u) });
 
 // Lista acotada para que el Auditor de Oficina arme asignaciones y filtre visitas,
 // sin exponerle el resto de la gestion de cuentas (exclusiva del Administrador).
-async function listarAuditores() {
-  const usuarios = await prisma.usuario.findMany({
-    where: { rol: { in: FIELD_ROLES }, estado: 'ACTIVO' },
-    orderBy: { nombres: 'asc' },
-    select: { id_usuario: true, username: true, nombres: true, apellidos: true, rol: true, departamento: true, zona_distrito: true, zona_provincia: true, zona_departamento: true, zona_en: true },
-  });
-  return usuarios.map(u => ({ id: u.id_usuario, username: u.username, nombres: u.nombres || '', apellidos: u.apellidos || '', rol: normalizeRole(u.rol), departamento: u.departamento || null, zona: zonaDeUsuario(u) }));
+// Sin page ni limit devuelve todos (los selectores de otras pantallas); con ellos, la columna «Auditores» de Asignaciones: por páginas, con búsqueda,
+// zona y los casos activos de cada auditor (un conteo de la base solo para los de la página).
+async function listarAuditores(consulta = {}) {
+  const porPaginas = consulta.page !== undefined || consulta.limit !== undefined;
+  if (!porPaginas && !consulta.q && !consulta.zona && !consulta.id) {
+    const usuarios = await prisma.usuario.findMany({ where: filtroAuditores(), orderBy: [{ nombres: 'asc' }, { id_usuario: 'asc' }], select: auditorSelect });
+    return { data: usuarios.map(aAuditor) };
+  }
+  const pag = paginaDeUsuarios(consulta);
+  const where = filtroAuditores(consulta);
+  const [usuarios, total] = await Promise.all([
+    prisma.usuario.findMany({ where, orderBy: [{ nombres: 'asc' }, { apellidos: 'asc' }, { id_usuario: 'asc' }], skip: (pag.page - 1) * pag.limit, take: pag.limit, select: auditorSelect }),
+    prisma.usuario.count({ where }),
+  ]);
+  const activas = usuarios.length ? await prisma.asignacionAuditoria.groupBy({ by: ['id_usuario_auditor'], where: { id_usuario_auditor: { in: usuarios.map((u) => u.id_usuario) }, estado: 'ACTIVA' }, _count: { _all: true } }) : [];
+  const activos = new Map(activas.map((f) => [f.id_usuario_auditor, f._count._all]));
+  return { data: usuarios.map((u) => ({ ...aAuditor(u), activos: activos.get(u.id_usuario) || 0 })), pagination: infoPaginas(pag, total) };
+}
+
+// Zonas que tienen los auditores activos (departamento de su última jornada, o su zona habitual si nunca iniciaron una), para el filtro «Zona».
+async function zonasDeAuditores() {
+  const base = { rol: { in: [...FIELD_ROLES] }, estado: 'ACTIVO' };
+  const [conJornada, sinJornada] = await Promise.all([
+    prisma.usuario.groupBy({ by: ['zona_departamento'], where: { ...base, zona_en: { not: null }, zona_departamento: { not: null } }, _count: { _all: true } }),
+    prisma.usuario.groupBy({ by: ['departamento'], where: { ...base, zona_en: null, departamento: { not: null } }, _count: { _all: true } }),
+  ]);
+  return juntarZonas(conJornada.map((f) => [f.zona_departamento, f._count._all]), sinJornada.map((f) => [f.departamento, f._count._all]));
 }
 
 async function crear(datos) {
@@ -246,4 +276,4 @@ async function jornadasDe(id, { limit = 30, cursor } = {}) {
   };
 }
 
-export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, trackingDeUsuario, jornadasDe };
+export default { listar, listarAuditores, zonasDeAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, trackingDeUsuario, jornadasDe };
