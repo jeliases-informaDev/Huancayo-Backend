@@ -1,6 +1,19 @@
 node_modules
-# Keep environment variables out of version control
+# Keep environment variables and keys out of version control (los ejemplos .env.example si se versionan)
 .env
+.env.*
+!.env.example
+!.env.production.example
+*.env
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+
+# Salidas y carpetas de trabajo locales
+/out
+/.claude
 
 /generated/prisma
 /storage/evidencias

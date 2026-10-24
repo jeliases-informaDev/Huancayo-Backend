@@ -1,10 +1,13 @@
 // Datos de prueba para testing de punta a punta (NO usar en producción).
 // Crea usuarios (1 supervisor, 3 auditores) y expedientes de muestra (Consumo y Otros)
 // con asignaciones activas, para poder probar la app móvil sin un feed real de Caja Huancayo.
+import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import prisma from '#core/config/prisma.js';
 
-const TEST_PASSWORD = 'CajaHuancayo2026!';
+// La clave de los usuarios de prueba NO va en el codigo (el repositorio es publico): se toma de la variable TEST_PASSWORD o, si no existe,
+// se genera una al azar y se muestra una sola vez al final. Nunca la uses en una base real.
+const TEST_PASSWORD = process.env.TEST_PASSWORD || `${crypto.randomBytes(12).toString('base64url')}Aa1!`;
 
 // Nombres de usuario ligados a la persona (no numerados) para no confundir roles
 // durante la demo: cada uno deja claro a simple vista si es Auditor de Agencia
