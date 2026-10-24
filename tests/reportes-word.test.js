@@ -86,3 +86,25 @@ describe('ficha Word — MYPE', () => {
     assert.match(texto, /Antigüedad del negocio: 108 meses/);
   });
 });
+
+describe('ficha Word — tablas que no se parten', () => {
+  // Word solo mantiene una fila pegada a la siguiente si sus párrafos llevan «keepNext»: todas las filas menos la última, y el título de la sección.
+  test('cada tabla va pegada a su título y la última fila no arrastra a lo que sigue', async () => {
+    const buffer = await Packer.toBuffer(renderizarFicha({ visita: { ...visitaBase, plantilla: 'CONSUMO_V1' }, e: expedienteConsumo, plantilla: 'CONSUMO_V1', huella: 'abc' }));
+    const xml = await (await JSZip.loadAsync(buffer)).file('word/document.xml').async('string');
+    const tablas = xml.match(/<w:tbl>[\s\S]*?<\/w:tbl>/g);
+    assert.ok(tablas.length >= 8, 'se esperaban las tablas de la ficha');
+    for (const tbl of tablas) {
+      const filas = tbl.match(/<w:tr[ >][\s\S]*?<\/w:tr>/g);
+      assert.ok(filas.every((f) => f.includes('<w:cantSplit')), 'una fila no debe partirse');
+      filas.forEach((fila, i) => {
+        const parrafos = fila.match(/<w:p[ >][\s\S]*?<\/w:p>/g);
+        const pegados = parrafos.filter((pa) => pa.includes('<w:keepNext')).length;
+        assert.equal(pegados, i < filas.length - 1 ? parrafos.length : 0, `fila ${i + 1} de ${filas.length}: debe ${i < filas.length - 1 ? '' : 'no '}ir pegada a la siguiente`);
+      });
+    }
+    // el título azul de cada sección se queda con lo que sigue
+    const titulos = xml.match(/<w:p[ >](?:(?!<\/w:p>)[\s\S])*?<w:shd [^>]*w:fill="[0-9A-Fa-f]{6}"[\s\S]*?<\/w:p>/g).filter((pa) => /OTROS CLIENTES|CUESTIONARIO|ENDEUDAMIENTO/.test(pa));
+    assert.ok(titulos.length >= 3 && titulos.every((pa) => pa.includes('<w:keepNext')));
+  });
+});

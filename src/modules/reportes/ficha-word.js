@@ -43,15 +43,22 @@ const casillasNegocio = (estado) => `En funcionamiento: ${casilla(estado === 'EN
 const monedaTexto = (ev) => (ev?.moneda === 'USD' ? 'DÓLARES' : 'SOLES');
 
 // ---------- bloques de bajo nivel ----------
-function parrafo(text, { bold = false, size = FS, align, before = 0, after = 0, italics = false } = {}) {
+function parrafo(text, { bold = false, size = FS, align, before = 0, after = 0, italics = false, keepNext = false } = {}) {
   return new Paragraph({
     alignment: align,
+    keepNext: keepNext || undefined, // solo se escribe cuando es verdadero
     spacing: { before, after },
     children: [new TextRun({ text: String(text ?? ''), bold, italics, size, font: FONT })],
   });
 }
 
-function celda(contenido, { w, span, rowSpan, bold = false, fill, size = FS, align, valign = VerticalAlign.CENTER } = {}) {
+// Una celda se describe aquí y la arma tabla(): así sabe si su fila va pegada a la siguiente (todas menos la última) y la tabla entera, con su título,
+// no se parte entre dos hojas (Word la pasa completa a la hoja siguiente; si una tabla fuera más alta que la hoja, la parte igual).
+function celda(contenido, opciones = {}) {
+  return { contenido, opciones };
+}
+
+function armarCelda({ contenido, opciones: { w, span, rowSpan, bold = false, fill, size = FS, align, valign = VerticalAlign.CENTER } }, pegada) {
   const lineas = Array.isArray(contenido) ? contenido : String(contenido ?? '').split('\n');
   return new TableCell({
     width: w ? { size: w, type: WidthType.DXA } : undefined,
@@ -60,29 +67,36 @@ function celda(contenido, { w, span, rowSpan, bold = false, fill, size = FS, ali
     verticalAlign: valign,
     shading: fill ? { type: ShadingType.CLEAR, fill, color: 'auto' } : undefined,
     margins: { top: 30, bottom: 30, left: 60, right: 60 },
-    children: lineas.map((linea) => (typeof linea === 'string' ? parrafo(linea, { bold, size, align }) : linea)),
+    children: lineas.map((linea) => (typeof linea === 'string' ? parrafo(linea, { bold, size, align, keepNext: pegada }) : linea)),
   });
 }
 
+// Las tablas cortas (hasta MAX_FILAS_JUNTAS filas) se mantienen enteras; una larga, como el balance, puede partirse entre filas (una fila nunca se parte).
+const MAX_FILAS_JUNTAS = 10;
+
 function tabla(anchos, filas) {
+  const juntas = filas.length <= MAX_FILAS_JUNTAS;
   return new Table({
     width: { size: anchos.reduce((a, b) => a + b, 0), type: WidthType.DXA },
     columnWidths: anchos,
     layout: TableLayoutType.FIXED, // respeta los anchos: sin esto Word reparte las columnas y la tabla se sale de la hoja
-    rows: filas.map((celdas) => new TableRow({ cantSplit: true, children: celdas })),
+    rows: filas.map((celdas, i) => new TableRow({ cantSplit: true, children: celdas.map((c) => armarCelda(c, juntas && i < filas.length - 1)) })),
   });
 }
 
 function titulo(text) {
   return new Paragraph({
+    keepNext: true,
     spacing: { before: 140, after: 50 },
     shading: { type: ShadingType.CLEAR, fill: AZUL, color: 'auto' },
     children: [new TextRun({ text, bold: true, size: 17, font: FONT })],
   });
 }
 
-const nota = (text) => parrafo(text, { italics: true, size: 14, before: 20, after: 20 });
-const espacio = (after = 60) => parrafo('', { after });
+const nota = (text) => parrafo(text, { italics: true, size: 14, before: 20, after: 20, keepNext: true });
+const espacio = (after = 60) => parrafo('', { after, keepNext: true });
+// Párrafo de 1 punto que va después de cada tabla: no lleva keepNext, así la tabla se queda con su título pero no arrastra a la siguiente sección.
+const separador = () => new Paragraph({ spacing: { before: 0, after: 0, line: 20, lineRule: 'exact' }, run: { size: 2 }, children: [] });
 
 // Tabla de dos columnas "etiqueta/valor" lado a lado: cada fila = [izquierda, derecha].
 function tablaPares(filas) {
@@ -260,7 +274,7 @@ function seccionEndeudamiento(d) {
     d?.fecha_corte ? nota(`Situación al ${dmy(d.fecha_corte)}`) : espacio(10),
     bloque(d?.entidades || []),
   ];
-  if ((d?.entidades_conyuge || []).length) salida.push(parrafo('CÓNYUGE', { bold: true, size: 14, before: 60, after: 20 }), bloque(d.entidades_conyuge));
+  if ((d?.entidades_conyuge || []).length) salida.push(parrafo('CÓNYUGE', { bold: true, size: 14, before: 60, after: 20, keepNext: true }), bloque(d.entidades_conyuge));
   return salida;
 }
 
@@ -333,9 +347,9 @@ function seccionFirmas(visita, e) {
   const firma = visita.firma_evidencia;
   const celdaFirma = [];
   if (firma && firma.startsWith('data:image/png;base64,')) {
-    celdaFirma.push(new Paragraph({ children: [new ImageRun({ data: Buffer.from(firma.split(',')[1], 'base64'), type: 'png', transformation: { width: 170, height: 80 } })] }));
+    celdaFirma.push(new Paragraph({ keepNext: true, children: [new ImageRun({ data: Buffer.from(firma.split(',')[1], 'base64'), type: 'png', transformation: { width: 170, height: 80 } })] }));
   } else {
-    celdaFirma.push(parrafo(' '));
+    celdaFirma.push(parrafo(' ', { keepNext: true }));
   }
   const a = [3300, 1800, 5106];
   return [
@@ -408,7 +422,7 @@ function seccionIngresosConsumo(ev) {
   const a = [3200, 1800, 1200, 1800, 2206];
   return [
     titulo('DATOS DE LA EVALUACIÓN FINANCIERA'),
-    parrafo('Ingresos registrados en la evaluación.', { size: 14, after: 30 }),
+    parrafo('Ingresos registrados en la evaluación.', { size: 14, after: 30, keepNext: true }),
     tabla(a, [
       ['Descripción', 'Relación', 'Moneda', 'Monto', 'Tipo de ingreso'].map((t, i) => celda(t, { w: a[i], bold: true, fill: GRIS })),
       ...(consumo.length ? consumo : [{}]).map((x) => [val(x.descripcion), val(x.relacion), val(x.moneda), n2(x.monto), val(x.tipo_ingreso)].map((t, i) => celda(t, { w: a[i], align: i === 3 ? AlignmentType.RIGHT : undefined }))),
@@ -476,7 +490,7 @@ export function renderizarFicha({ visita, e, plantilla, empresa, importacion = n
           })],
         }),
       },
-      children: cuerpo,
+      children: cuerpo.flatMap((el) => (el instanceof Table ? [el, separador()] : [el])),
     }],
   });
 }
