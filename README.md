@@ -35,12 +35,13 @@ ya no hay archivos de despliegue para ella.
 
 ## Usuarios de prueba (creados por `seed-test-data.js`)
 
-Contraseña para todos: `CajaHuancayo2026!`
+Solo para desarrollo local. **La clave no está en el repositorio**: el script usa la variable `TEST_PASSWORD` o genera una al azar y la muestra una sola vez al terminar.
+Nunca corras este script contra una base con datos reales y, si alguna vez lo corriste, desactiva o cambia la clave de estos usuarios.
 
 | Usuario | Rol |
 |---|---|
-| `supervisor.test` | SUPERVISOR (usa la app móvil) |
-| `auditor1.test` / `auditor2.test` / `auditor3.test` | AUDITOR (app móvil) |
+| `supervisor.agencia` | SUPERVISOR (usa el panel) |
+| `auditor.ramos` / `auditor.cuba` / `auditor.huaman` | AUDITOR (app móvil) |
 
 El administrador inicial se crea con `INITIAL_ADMIN_USERNAME`/`INITIAL_ADMIN_PASSWORD`
 del `.env` (por defecto `cajahuancayo` / lo que se defina).
