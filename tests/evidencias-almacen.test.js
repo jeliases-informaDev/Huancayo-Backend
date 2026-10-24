@@ -16,3 +16,28 @@ test('la configuración del bucket exige las cinco variables y usa direcciones p
   assert.equal(c.client.requestChecksumCalculation, 'WHEN_REQUIRED');
   assert.equal(configuracionS3({ S3_BUCKET: 'b', S3_ENDPOINT: 'e', S3_REGION: 'r', S3_ACCESS_KEY_ID: 'k', S3_SECRET_ACCESS_KEY: 's', S3_FORCE_PATH_STYLE: 'false' }).client.forcePathStyle, false);
 });
+
+test('la firma de una clave de evidencia: se acepta con la llave propia y con la de sesiones (claves anteriores), y se rechaza cualquier otra cosa', async () => {
+  const { firmaDePropiedad, firmaEsValida, llavesDeFirma } = await import('../src/modules/sistema/storage.service.js');
+  const datos = { auditorId: 'aud-1', expedienteId: 77, tipo: 'FOTO_PRINCIPAL', timestamp: 1700000000000, id: '6f1c9b0e-2d3a-4c5b-8e7f-0a1b2c3d4e5f' };
+  const propia = 'p'.repeat(40), sesiones = 's'.repeat(40);
+  const conPropia = firmaDePropiedad(datos, propia), conSesiones = firmaDePropiedad(datos, sesiones);
+  assert.notEqual(conPropia, conSesiones);
+  assert.equal(conPropia.length, 24);
+  // con llave propia configurada: firma las nuevas con ella y sigue aceptando las que firmo la de sesiones
+  assert.equal(firmaEsValida(conPropia, datos, [propia, sesiones]), true);
+  assert.equal(firmaEsValida(conSesiones, datos, [propia, sesiones]), true);
+  // sin llave propia: solo la de sesiones
+  assert.equal(firmaEsValida(conSesiones, datos, [sesiones]), true);
+  assert.equal(firmaEsValida(conPropia, datos, [sesiones]), false);
+  // otra llave, otro auditor, otro expediente, otro tipo, firma corta o ausente
+  assert.equal(firmaEsValida(firmaDePropiedad(datos, 'x'.repeat(40)), datos, [propia, sesiones]), false);
+  assert.equal(firmaEsValida(conPropia, { ...datos, auditorId: 'aud-2' }, [propia, sesiones]), false);
+  assert.equal(firmaEsValida(conPropia, { ...datos, expedienteId: 78 }, [propia, sesiones]), false);
+  assert.equal(firmaEsValida(conPropia, { ...datos, tipo: 'FOTO_ADICIONAL' }, [propia, sesiones]), false);
+  assert.equal(firmaEsValida(conPropia.slice(0, 10), datos, [propia, sesiones]), false);
+  assert.equal(firmaEsValida(undefined, datos, [propia, sesiones]), false);
+  // llavesDeFirma: la propia va primero (con ella se firma) y se omite si no esta configurada
+  assert.deepEqual(llavesDeFirma({ EVIDENCIA_FIRMA_SECRET: propia, JWT_SECRET: sesiones }), [propia, sesiones]);
+  assert.deepEqual(llavesDeFirma({ JWT_SECRET: sesiones }), [sesiones]);
+});

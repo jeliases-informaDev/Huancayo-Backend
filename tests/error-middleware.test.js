@@ -35,6 +35,25 @@ describe('errorHandler', () => {
     assert.equal(res.body.error, 'Ya existe un registro con ese valor único');
   });
 
+  test('un JSON roto no devuelve el texto interno del interprete', () => {
+    const res = fakeRes();
+    const error = Object.assign(new SyntaxError("Expected property name or '}' in JSON at position 1 (line 1 column 2)"), { type: 'entity.parse.failed', statusCode: 400, status: 400 });
+    errorHandler(error, fakeReq(), res, () => {});
+    assert.equal(res.statusCode, 400);
+    assert.equal(res.body.code, 'INVALID_JSON');
+    assert.equal(res.body.error, 'El cuerpo de la petición no es un JSON válido');
+    assert.doesNotMatch(JSON.stringify(res.body), /position|column|Expected/);
+  });
+
+  test('un cuerpo demasiado grande responde 413 con un mensaje propio', () => {
+    const res = fakeRes();
+    const error = Object.assign(new Error('request entity too large'), { type: 'entity.too.large', statusCode: 413, status: 413 });
+    errorHandler(error, fakeReq(), res, () => {});
+    assert.equal(res.statusCode, 413);
+    assert.equal(res.body.code, 'PAYLOAD_TOO_LARGE');
+    assert.doesNotMatch(res.body.error, /entity/);
+  });
+
   test('un error operacional (con statusCode < 500) conserva su propio mensaje', () => {
     const res = fakeRes();
     const error = Object.assign(new Error('Expediente no encontrado'), { statusCode: 404 });
