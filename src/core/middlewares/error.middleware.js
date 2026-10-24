@@ -7,6 +7,9 @@ export function notFoundHandler(req, res) {
 
 export function errorHandler(error, req, res, _next) {
   const uploadError = error?.name === 'MulterError';
+  // Errores del lector de JSON (body-parser): el texto original trae detalles del interprete; a quien pide solo se le dice que el cuerpo no sirve.
+  const jsonRoto = error?.type === 'entity.parse.failed';
+  const cuerpoGrande = error?.type === 'entity.too.large';
   // Restricción de unicidad de Prisma (ej. username o codigo_expediente repetido) sin
   // manejo especifico rio arriba: se traduce a un 409 legible en vez de un 500 generico.
   const duplicateKeyError = error?.code === 'P2002';
@@ -30,6 +33,8 @@ export function errorHandler(error, req, res, _next) {
     payload.code = error.code;
   }
   if (notFoundError) { payload.error = 'Recurso no encontrado'; payload.code = 'NOT_FOUND'; }
+  if (jsonRoto) { payload.error = 'El cuerpo de la petición no es un JSON válido'; payload.code = 'INVALID_JSON'; }
+  if (cuerpoGrande) { payload.error = 'El cuerpo de la petición es demasiado grande'; payload.code = 'PAYLOAD_TOO_LARGE'; }
   if (duplicateKeyError) {
     const campo = Array.isArray(error.meta?.target) ? error.meta.target.join(', ') : error.meta?.target;
     payload.error = campo ? `Ya existe un registro con ese valor en: ${campo}` : 'Ya existe un registro con ese valor único';

@@ -36,11 +36,28 @@ function keyPath(key) {
   return resolved;
 }
 
-function ownershipSignature({ auditorId, expedienteId, tipo, timestamp, id }) {
-  return crypto.createHmac('sha256', env.JWT_SECRET)
+// La firma de la clave de una evidencia prueba que la emitio este servidor para ese auditor, expediente y tipo. Se firma con EVIDENCIA_FIRMA_SECRET si
+// existe (llave propia, distinta de la de las sesiones) y si no con JWT_SECRET. Al validar se aceptan las dos, para no perder las visitas que un celular
+// tenia en cola con claves firmadas antes del cambio.
+export function llavesDeFirma(entorno = env) {
+  return [entorno.EVIDENCIA_FIRMA_SECRET, entorno.JWT_SECRET].filter(Boolean);
+}
+
+export function firmaDePropiedad({ auditorId, expedienteId, tipo, timestamp, id }, llave) {
+  return crypto.createHmac('sha256', llave)
     .update([auditorId, Number(expedienteId), tipo, timestamp, id].join(':'))
     .digest('hex').slice(0, 24);
 }
+
+export function firmaEsValida(suministrada, datos, llaves = llavesDeFirma()) {
+  if (typeof suministrada !== 'string') return false;
+  return llaves.some((llave) => {
+    const esperada = firmaDePropiedad(datos, llave);
+    return suministrada.length === esperada.length && crypto.timingSafeEqual(Buffer.from(suministrada), Buffer.from(esperada));
+  });
+}
+
+const ownershipSignature = (datos) => firmaDePropiedad(datos, llavesDeFirma()[0]);
 
 // Clave de una evidencia nueva: empresa/<id de empresa>/aaaa/mm/dd/<expediente>/<tipo>-<momento>-<id>-<firma>.jpg
 export function claveEvidencia({ empresaId, expedienteId, tipo, timestamp, id, signature, extension, date }) {
@@ -52,9 +69,7 @@ function validateOwnedKey(key, auditorId, expedienteId, tipo) {
   const filename = typeof key === 'string' ? key.split('/').at(-1) : '';
   const match = filename.match(/^([A-Z_]+)-(\d+)-([0-9a-f-]{36})-([0-9a-f]{24})\.([a-z0-9]+)$/i);
   const [, keyType, timestamp, id, suppliedSignature, extension] = match || [];
-  const expectedSignature = match ? ownershipSignature({ auditorId, expedienteId, tipo: keyType, timestamp, id }) : '';
-  const validSignature = suppliedSignature && expectedSignature
-    && crypto.timingSafeEqual(Buffer.from(suppliedSignature), Buffer.from(expectedSignature));
+  const validSignature = match && firmaEsValida(suppliedSignature, { auditorId, expedienteId, tipo: keyType, timestamp, id });
   // La clave debe ser de la empresa de la petición: ni siquiera con una firma válida se toca una evidencia de otra empresa.
   const deEstaEmpresa = typeof key === 'string' && key.startsWith(`empresa/${empresaActual()}/`);
   if (!config || typeof key !== 'string' || key.includes('..') || keyType !== tipo || extension !== config.extension || !validSignature || key.length > 255 || !deEstaEmpresa) {

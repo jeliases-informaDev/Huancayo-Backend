@@ -33,6 +33,9 @@ const schema = z.object({
   DATABASE_CONNECT_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60000).optional(),
   JWT_SECRET: z.string().min(32, 'JWT_SECRET debe tener al menos 32 caracteres'),
   MFA_ENCRYPTION_KEY: z.string().min(32, 'MFA_ENCRYPTION_KEY debe tener al menos 32 caracteres'),
+  // Llave propia para firmar las claves de evidencia (fotos). Opcional: sin ella se usa JWT_SECRET, como antes. Al ponerla, las claves ya firmadas con JWT_SECRET
+  // se siguen aceptando (el celular puede tener visitas en cola), asi que se puede activar sin perder nada.
+  EVIDENCIA_FIRMA_SECRET: z.string().min(32, 'EVIDENCIA_FIRMA_SECRET debe tener al menos 32 caracteres').optional().or(z.literal('').transform(() => undefined)),
   INITIAL_ADMIN_USERNAME: z.string().trim().min(3).max(50).default('CajaHuancayo'),
   REQUIRE_MFA: z.enum(['true', 'false']).default('false'),
   // Exenciones por cuenta, nunca por rol, para no desactivar MFA a todos los administradores.
