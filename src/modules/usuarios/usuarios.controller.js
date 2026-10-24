@@ -1,11 +1,14 @@
 import usuariosService from './usuarios.service.js';
 import { listarEventos } from '#modules/auditorias/eventos-campo.js';
 
-async function listar(_req, res, next) {
-  try { res.json({ data: await usuariosService.listar() }); } catch (error) { next(error); }
+async function listar(req, res, next) {
+  try { res.json(await usuariosService.listar(req.validated?.query || {})); } catch (error) { next(error); }
 }
-async function listarAuditores(_req, res, next) {
-  try { res.json({ data: await usuariosService.listarAuditores() }); } catch (error) { next(error); }
+async function listarAuditores(req, res, next) {
+  try { res.json(await usuariosService.listarAuditores(req.validated?.query || {})); } catch (error) { next(error); }
+}
+async function zonasDeAuditores(_req, res, next) {
+  try { res.json({ data: await usuariosService.zonasDeAuditores() }); } catch (error) { next(error); }
 }
 // El rol UNIVERSAL (administrador de Sulotec) solo lo da o quita otro universal; un administrador de empresa no puede.
 function soloUniversalDaUniversal(req, res) {
@@ -58,4 +61,4 @@ async function jornadas(req, res, next) {
 async function eventos(req, res, next) {
   try { res.json({ data: await listarEventos(req.validated.query.fecha) }); } catch (error) { next(error); }
 }
-export default { listar, listarAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking, eventos, jornadas };
+export default { listar, listarAuditores, zonasDeAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking, eventos, jornadas };

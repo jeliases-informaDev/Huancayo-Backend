@@ -4,7 +4,7 @@ import { authMiddleware } from "#modules/auth/auth.middleware.js";
 import { roleMiddleware } from "#core/middlewares/role.middleware.js";
 import { ADMIN_ROLES, OPERATIONAL_MANAGERS } from "#core/security/roles.js";
 import { validate } from "#core/middlewares/validate.middleware.js";
-import { userCreateBody, userUpdateBody, uuidParams, trackingQuery, jornadasQuery } from "../../validation/schemas.js";
+import { userCreateBody, userUpdateBody, uuidParams, trackingQuery, jornadasQuery, usuariosListQuery, auditoresQuery } from "../../validation/schemas.js";
 
 const router = Router();
 
@@ -20,10 +20,12 @@ router.get("/:id/tracking", roleMiddleware(OPERATIONAL_MANAGERS), validate({ par
 // Lista minima de auditores de campo activos (para el selector de "Asignar a" y los
 // filtros de Visitas). No expone estado de cuenta, MFA ni el resto de campos de
 // gestion de usuarios, que siguen siendo exclusivos del Administrador.
-router.get("/auditores", roleMiddleware(OPERATIONAL_MANAGERS), usuariosController.listarAuditores);
+// Con page o limit es la columna «Auditores» de Asignaciones (por páginas, con búsqueda, zona y casos activos); sin ellos, la lista completa de siempre.
+router.get("/auditores", roleMiddleware(OPERATIONAL_MANAGERS), validate({ query: auditoresQuery }), usuariosController.listarAuditores);
+router.get("/auditores/zonas", roleMiddleware(OPERATIONAL_MANAGERS), usuariosController.zonasDeAuditores);
 
 router.use(roleMiddleware(ADMIN_ROLES));
-router.get("/", usuariosController.listar);
+router.get("/", validate({ query: usuariosListQuery }), usuariosController.listar);
 router.post("/", validate({ body: userCreateBody }), usuariosController.crear);
 router.put("/:id", validate({ params: uuidParams, body: userUpdateBody }), usuariosController.actualizar);
 router.patch("/:id", validate({ params: uuidParams, body: userUpdateBody }), usuariosController.actualizar);

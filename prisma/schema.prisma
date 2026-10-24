@@ -283,6 +283,7 @@ model Expediente {
   @@unique([empresa_id, codigo_expediente])
   @@index([empresa_id, estado])
   @@index([empresa_id, fecha_creacion]) // expedientes cargados por día del Resumen
+  @@index([empresa_id, estado, fecha_creacion]) // «Expedientes sin asignar» de Asignaciones por páginas: del más antiguo al más nuevo dentro de un estado, sin ordenar todos los pendientes
   @@index([empresa_id, estado, autoasignable, fecha_creacion], map: "expedientes_disponibles_idx") // lista «Disponibles» paginada: del más antiguo al más nuevo, sin importar el distrito
   @@index([asesor_responsable])
   @@index([id_importacion])

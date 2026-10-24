@@ -1,6 +1,6 @@
 import prisma from '#core/config/prisma.js';
 import { autoasignacionPermitida, topeCasosActivos } from '#modules/sistema/configuracion.service.js';
-import { normalizarPaginacion, infoPaginas, ordenarPorPrioridad, paginaDe, buscarEnExpediente } from './asignaciones.paginacion.js';
+import { normalizarPaginacion, infoPaginas, ordenarPorPrioridad, paginaDe, buscarEnExpediente, filtroPendientes } from './asignaciones.paginacion.js';
 import { Prisma } from '../../generated/prisma/index.js';
 import { empresaActual } from '#core/tenant/contexto.js';
 import { invalidarPuntos } from './eventos-campo.js';
@@ -183,6 +183,31 @@ async function misAsignaciones(auditorId, consulta = {}) {
     CONSUMO: cuenta(porTipo, 'tipo_credito', 'CONSUMO'), OTROS: cuenta(porTipo, 'tipo_credito', 'OTROS'),
   };
   return { data: serialize(datos), pagination: infoPaginas(pag, filas.length), resumen, version, tope: { maximo, abiertos: resumen.total, cupo: cupoRestante({ abiertos: resumen.total, tope: maximo }) } };
+}
+
+// Expedientes sin asignar para la pantalla Asignaciones, por páginas: del más antiguo al más nuevo (el mismo orden en que los auditores ven «Disponibles»), con el
+// id como desempate para que dos páginas nunca repitan ni pierdan un caso. Solo lo que la lista muestra (sin los bloques de la ficha).
+const pendienteSelect = { id_expediente: true, codigo_expediente: true, nombres_cliente: true, numero_documento_cliente: true, tipo_credito: true, distrito: true };
+async function pendientesParaAsignar(consulta = {}) {
+  const pag = { page: Math.max(1, consulta.page ?? 1), limit: Math.max(1, Math.min(consulta.limit ?? 25, 100)) };
+  const where = filtroPendientes(consulta);
+  const [total, filas] = await Promise.all([
+    prisma.expediente.count({ where }),
+    prisma.expediente.findMany({ where, select: pendienteSelect, orderBy: [{ fecha_creacion: 'asc' }, { id_expediente: 'asc' }], skip: (pag.page - 1) * pag.limit, take: pag.limit }),
+  ]);
+  return { data: serialize(filas), pagination: infoPaginas(pag, total) };
+}
+
+// Distritos de los expedientes sin asignar, con cuántos hay en cada uno (el filtro «Todos los distritos»). Los más cargados primero; si hubiera más de
+// MAX_DISTRITOS se avisa con `truncado` en vez de cortar en silencio.
+const MAX_DISTRITOS = 500;
+async function distritosPendientes({ tipo } = {}) {
+  const filas = await prisma.expediente.groupBy({
+    by: ['distrito'], where: { estado: 'PENDIENTE', distrito: { not: null }, ...(tipo ? { tipo_credito: tipo } : {}) }, _count: { _all: true },
+    orderBy: [{ _count: { distrito: 'desc' } }, { distrito: 'asc' }], take: MAX_DISTRITOS + 1,
+  });
+  const lista = filas.filter((f) => f.distrito && f.distrito.trim());
+  return { data: lista.slice(0, MAX_DISTRITOS).map((f) => ({ distrito: f.distrito, n: f._count._all })), truncado: lista.length > MAX_DISTRITOS };
 }
 
 // Casos activos de cada auditor (para la carga en el panel): un conteo en la base, no una lista cortada.
@@ -383,4 +408,4 @@ async function cancelarTodasDeAuditor(auditorId, actorId = null) {
   return r.quitadas;
 }
 
-export default { crear, crearMasivo, misAsignaciones, versionMuestra, cargaPorAuditor, puntosParaMapa, listar, cancelar, quitarCasos, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen, liberarPendientes };
+export default { crear, crearMasivo, misAsignaciones, versionMuestra, cargaPorAuditor, pendientesParaAsignar, distritosPendientes, puntosParaMapa, listar, cancelar, quitarCasos, cancelarTodasDeAuditor, disponiblesParaAuditor, autoAsignar, resumenPorOrigen, liberarPendientes };
