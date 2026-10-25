@@ -44,20 +44,29 @@ async function crear(req, res, next) {
 async function listar(req, res, next) {
   try { res.json(await visitasService.listar(req.validated.query)); } catch (error) { next(error); }
 }
-// Descarga de las visitas filtradas en CSV. Se escribe por lotes y se respeta el ritmo del cliente (si la conexión va lenta se espera a que se vacíe el
-// búfer en vez de acumular filas en memoria). Queda anotada en el registro de seguridad: quién la hizo, con qué filtros y cuántas filas.
+// Descarga de las visitas filtradas: Excel con formato (por defecto) o CSV. Se escribe por lotes y se respeta el ritmo del cliente (si la conexión va lenta se
+// espera a que se vacíe el búfer en vez de acumular filas en memoria). Queda anotada en el registro de seguridad: quién la hizo, con qué filtros y cuántas filas.
 async function exportar(req, res, next) {
-  const q = req.validated.query;
+  const { formato = 'xlsx', ...q } = req.validated.query;
   let cortado = false;
   res.on('close', () => { if (!res.writableFinished) cortado = true; });
   try {
     const dia = new Date().toISOString().slice(0, 10);
-    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="visitas-${dia}.csv"`);
-    const escribir = async (texto) => { if (!res.write(texto)) await once(res, 'drain'); };
-    const { filas } = await visitasService.exportarCsv(q, { escribir, cancelado: () => cortado });
-    req.auditContext = { entidad: 'VisitaAuditoria', entidad_id: null, valor_anterior: null, valor_nuevo: { filtros: q, filas, completo: !cortado } };
-    res.end();
+    let filas;
+    if (formato === 'csv') {
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="visitas-${dia}.csv"`);
+      const escribir = async (texto) => { if (!res.write(texto)) await once(res, 'drain'); };
+      ({ filas } = await visitasService.exportarCsv(q, { escribir, cancelado: () => cortado }));
+      req.auditContext = { entidad: 'VisitaAuditoria', entidad_id: null, valor_anterior: null, valor_nuevo: { filtros: q, formato, filas, completo: !cortado } };
+      res.end();
+    } else {
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="visitas-${dia}.xlsx"`);
+      // El registro de seguridad se deja listo antes de cerrar el archivo: al cerrarlo la respuesta termina y ya no se puede agregar nada.
+      const anotar = ({ filas: n }) => { req.auditContext = { entidad: 'VisitaAuditoria', entidad_id: null, valor_anterior: null, valor_nuevo: { filtros: q, formato, filas: n, completo: !cortado } }; };
+      ({ filas } = await visitasService.exportarXlsx(q, { stream: res, cancelado: () => cortado, antesDeCerrar: anotar }));
+    }
   } catch (error) {
     if (!res.headersSent) { res.removeHeader('Content-Disposition'); return next(error); }
     // Ya se empezó a enviar el archivo: no se puede cambiar la respuesta; se corta la descarga y queda el motivo en el log del servidor.

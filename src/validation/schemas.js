@@ -134,7 +134,8 @@ export const visitasListQuery = z.object({
   limit: z.coerce.number().int().min(1).max(1000).optional(),
   ...visitasFiltros,
 }).strict();
-export const visitasExportarQuery = z.object({ ...visitasFiltros }).strict();
+// `formato`: xlsx (Excel con formato, el de siempre del panel) o csv (texto plano, para quien lo procesa con otras herramientas).
+export const visitasExportarQuery = z.object({ ...visitasFiltros, formato: z.enum(['xlsx', 'csv']).optional() }).strict();
 
 // --- Expedientes ---
 export const expedienteCreateBody = z.object({
