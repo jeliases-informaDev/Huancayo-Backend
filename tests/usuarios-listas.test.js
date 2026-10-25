@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { paginaDeUsuarios, filtroTexto, filtroUsuarios, filtroAuditores, filtroZona, juntarZonas, USUARIOS_POR_PAGINA, USUARIOS_MAXIMO } from '../src/modules/usuarios/usuarios.filtros.js';
+import { paginaDeUsuarios, filtroTexto, filtroUsuarios, filtroAuditores, filtroZona, juntarZonas, ESTADO_ELIMINADO, USUARIOS_POR_PAGINA, USUARIOS_MAXIMO } from '../src/modules/usuarios/usuarios.filtros.js';
 import { filtroPendientes } from '../src/modules/auditorias/asignaciones.paginacion.js';
-import { usuariosListQuery, auditoresQuery, pendientesQuery, pendientesDistritosQuery } from '../src/validation/schemas.js';
+import { usuariosListQuery, userUpdateBody, auditoresQuery, pendientesQuery, pendientesDistritosQuery } from '../src/validation/schemas.js';
 
 test('las listas de usuarios siempre van por páginas: 25 por defecto y nunca más de 100', () => {
   assert.deepEqual(paginaDeUsuarios({}), { page: 1, limit: USUARIOS_POR_PAGINA });
@@ -23,12 +23,20 @@ test('cada palabra de la búsqueda debe aparecer en algún campo: «luis ramos»
 });
 
 test('filtro de usuarios: rol, estado y texto; el administrador también encuentra el nombre anterior del rol', () => {
-  assert.deepEqual(filtroUsuarios({}), {});
-  assert.deepEqual(filtroUsuarios({ rol: 'AUDITOR' }), { rol: 'AUDITOR' });
-  assert.deepEqual(filtroUsuarios({ rol: 'ADMINISTRADOR' }), { rol: { in: ['ADMINISTRADOR', 'ADMIN'] } });
+  const sinEliminadas = { estado: { not: 'ELIMINADO' } };
+  assert.deepEqual(filtroUsuarios({}), sinEliminadas, 'las cuentas eliminadas nunca salen en la lista');
+  assert.deepEqual(filtroUsuarios({ rol: 'AUDITOR' }), { rol: 'AUDITOR', ...sinEliminadas });
+  assert.deepEqual(filtroUsuarios({ rol: 'ADMINISTRADOR' }), { rol: { in: ['ADMINISTRADOR', 'ADMIN'] }, ...sinEliminadas });
   const f = filtroUsuarios({ q: 'ana', estado: 'INACTIVO', rol: 'SUPERVISOR' });
   assert.equal(f.estado, 'INACTIVO'); assert.equal(f.rol, 'SUPERVISOR'); assert.equal(f.AND.length, 1);
   assert.deepEqual(f.AND[0].OR.map((c) => Object.keys(c)[0]), ['username', 'nombres', 'apellidos', 'email']);
+});
+
+test('una cuenta eliminada no es un estado que se pueda pedir ni activar desde el panel, y el nombre del estado es el que usa el servidor', () => {
+  assert.equal(ESTADO_ELIMINADO, 'ELIMINADO');
+  assert.ok(!usuariosListQuery.safeParse({ estado: 'ELIMINADO' }).success, 'no se lista por estado ELIMINADO');
+  assert.ok(!userUpdateBody.safeParse({ estado: 'ELIMINADO' }).success, 'tampoco se fija con PATCH: se elimina solo con DELETE');
+  assert.ok(userUpdateBody.safeParse({ estado: 'INACTIVO' }).success);
 });
 
 test('filtro de auditores: solo auditores de campo activos; la zona es la de la última jornada o, si nunca salió, su zona habitual', () => {

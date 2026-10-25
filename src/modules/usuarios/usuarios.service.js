@@ -8,7 +8,7 @@ import asignacionesService from '#modules/auditorias/asignaciones.service.js';
 import { codificarCursorJornada, decodificarCursorJornada, duracionMin, textoZona } from '#modules/auditorias/jornada.core.js';
 import { publica as empresaPublica, usuarioConPrefijo } from '#modules/empresas/empresas.service.js';
 import { infoPaginas } from '#modules/auditorias/asignaciones.paginacion.js';
-import { paginaDeUsuarios, filtroUsuarios, filtroAuditores, juntarZonas } from './usuarios.filtros.js';
+import { paginaDeUsuarios, filtroUsuarios, filtroAuditores, juntarZonas, ESTADO_ELIMINADO } from './usuarios.filtros.js';
 
 // Dentro de una empresa el nombre de usuario lleva su abreviatura fija (arq.jorge); el universal de Sulotec no tiene empresa ni prefijo.
 async function usernameDeEmpresa(empresaId, username) {
@@ -110,8 +110,12 @@ async function crear(datos) {
   // El administrador universal de Sulotec no pertenece a ninguna empresa: se crea fuera del contexto y con empresa nula.
   const universal = normalizeRole(datos.rol) === ROLES.UNIVERSAL;
   const crearFila = (data) => (universal ? sinEmpresa(() => prisma.usuario.create({ data: { ...data, empresa_id: null } })) : prisma.usuario.create({ data }));
+  const username = await usernameDeEmpresa(universal ? null : empresaActual(), datos.username);
+  // Una cuenta eliminada no se borra: su nombre de usuario queda reservado para que el historial siga apuntando a una sola persona.
+  const reservado = await sinEmpresa(() => prisma.usuario.findFirst({ where: { username, estado: ESTADO_ELIMINADO }, select: { id_usuario: true } }));
+  if (reservado) throw Object.assign(new Error('Ese nombre de usuario perteneció a una cuenta eliminada y queda reservado para conservar su historial. Elige otro.'), { statusCode: 409, code: 'USERNAME_RESERVADO' });
   const usuario = await crearFila({
-      username: await usernameDeEmpresa(universal ? null : empresaActual(), datos.username), password_hash: await bcrypt.hash(datos.password, 12),
+      username, password_hash: await bcrypt.hash(datos.password, 12),
       nombres: datos.nombres?.trim() || null,
       apellidos: datos.apellidos?.trim() || null,
       email: datos.email?.trim().toLowerCase() || null,
@@ -130,7 +134,8 @@ async function actualizar(id, datos, actorId) {
   }
   if (datos.rol) assertRole(datos.rol);
   const actual = await prisma.usuario.findUnique({ where: { id_usuario: id } });
-  if (!actual) {
+  // Una cuenta eliminada ya no existe para el panel: no se edita ni se vuelve a activar.
+  if (!actual || actual.estado === ESTADO_ELIMINADO) {
     const error = new Error('Usuario no encontrado'); error.statusCode = 404; throw error;
   }
   const data = {
@@ -177,13 +182,20 @@ async function actualizar(id, datos, actorId) {
   };
 }
 
+// «Eliminar» NO borra nada de la base: la cuenta pasa a ELIMINADO, deja de verse en el panel, no puede entrar y su sesión y su celular se cierran. Sus visitas,
+// fotos y registros de auditoría se conservan. A diferencia de desactivar (que se ve en la lista y se puede activar), una eliminada ya no sale ni se reactiva.
 async function eliminar(id, actorId) {
   if (id === actorId) {
     const error = new Error('No puede eliminar su propia cuenta activa'); error.statusCode = 409; throw error;
   }
   const actual = await prisma.usuario.findUnique({ where: { id_usuario: id } });
-  await prisma.usuario.delete({ where: { id_usuario: id } });
-  return { _auditDiff: { entidad: 'Usuario', entidad_id: id, valor_anterior: actual ? auditSnapshot(actual) : null, valor_nuevo: null } };
+  if (!actual || actual.estado === ESTADO_ELIMINADO) {
+    const error = new Error('Usuario no encontrado'); error.statusCode = 404; throw error;
+  }
+  const usuario = await prisma.usuario.update({ where: { id_usuario: id }, data: { estado: ESTADO_ELIMINADO, token_version: { increment: 1 } } });
+  await prisma.dispositivoAutorizado.updateMany({ where: { id_usuario: id, activo: true }, data: { activo: false } });
+  await asignacionesService.cancelarTodasDeAuditor(id, actorId); // sus casos en curso vuelven a «Disponibles»
+  return { _auditDiff: { entidad: 'Usuario', entidad_id: id, valor_anterior: auditSnapshot(actual), valor_nuevo: auditSnapshot(usuario) } };
 }
 
 async function resetMfa(id) {
