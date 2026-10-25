@@ -153,6 +153,54 @@ export function descomponerDireccion(direccion, { distrito, provincia } = {}) {
   };
 }
 
+// Cómo se escribe una zona para buscarla en un mapa: los mapas tienen «Asentamiento Humano Pamplona Alta» o «Asociación de Vivienda …», no las abreviaturas
+// con que las escribe el asesor.
+export function zonaParaBuscar(urbanizacion) {
+  return String(urbanizacion || '')
+    .replace(/\bAA\.?\s?HH\.?/i, 'Asentamiento Humano')
+    .replace(/\bViv\.?(?=\s|$)/i, 'Vivienda')
+    .replace(/\bPro\s+Viv\.?(?=\s|$)/i, 'Pro Vivienda')
+    .replace(/\s+/g, ' ').trim();
+}
+
+// El nombre propio de la zona, sin el tipo («Asentamiento Humano Pamplona Alta» → «Pamplona Alta»): a veces el mapa la tiene escrita de otra forma y solo
+// coincide el nombre.
+export function nombreDeZona(zona) {
+  return String(zona || '')
+    .replace(/^(?:Asentamiento Humano|Asociaci[oó]n(?:\s+de)?(?:\s+Pro)?(?:\s+Vivienda)?|Cooperativa(?:\s+de)?(?:\s+Pro)?(?:\s+Vivienda)?|Urbanizaci[oó]n|Pueblo Joven|Residencial|Conjunto Habitacional|Centro Poblado|Barrio|Sector|Caser[ií]o|Condominio)\s+/i, '')
+    .replace(/\s+/g, ' ').trim();
+}
+
+const unirSinRepetir = (partes) => {
+  const vistos = new Set();
+  return partes.map((p) => String(p ?? '').trim()).filter((p) => { const k = p.toUpperCase(); if (!p || vistos.has(k)) return false; vistos.add(k); return true; }).join(', ');
+};
+
+// Las búsquedas que se le hacen a un mapa para ubicar una dirección, de la más precisa a la más general (se prueba la siguiente solo si la anterior no encontró nada).
+//  · Con número de puerta: calle + número + distrito (búsqueda estructurada) y, si no, el texto completo.
+//  · Con manzana y lote (AA.HH., asociaciones, urbanizaciones: no tienen número de puerta y ningún mapa llega a la puerta): se busca la ZONA con su distrito y,
+//    si hay, la calle. El resultado nunca pasa de aproximado: sirve para ver la zona y navegar hasta ella; el punto exacto lo fija el auditor en su primera visita.
+// Devuelve una lista de `{ street, city }` o `{ q }` (parámetros de Nominatim); `texto` es la misma búsqueda en una sola frase (para Mapbox).
+export function busquedasParaDireccion({ direccion, direccion_normalizada: direccionNormalizada, distrito, provincia, departamento }) {
+  const limpia = limpiarDireccion(direccion);
+  const comp = descomponerDireccion(direccion, { distrito, provincia }).componentes || {};
+  const via = [comp.tipo_via, comp.nombre_via].filter(Boolean).join(' ');
+  const ciudad = distrito || provincia || null;
+  const resto = [distrito, provincia, departamento];
+  const lista = [];
+  if (limpia.esManzanaLote) {
+    const zona = zonaParaBuscar(comp.urbanizacion);
+    if (zona) lista.push({ q: unirSinRepetir([zona, ...resto]), texto: unirSinRepetir([zona, ...resto]) });
+    const nombre = nombreDeZona(zona);
+    if (nombre && nombre.length >= 4 && nombre.toLowerCase() !== zona.toLowerCase()) lista.push({ q: unirSinRepetir([nombre, ...resto]), texto: unirSinRepetir([nombre, ...resto]) });
+    if (via) lista.push({ q: unirSinRepetir([via, ...resto]), texto: unirSinRepetir([via, ...resto]) });
+  } else {
+    if (limpia.calle && ciudad) lista.push({ street: [limpia.numero, limpia.calle].filter(Boolean).join(' '), city: ciudad, texto: unirSinRepetir([limpia.texto, ...resto]) });
+    lista.push({ q: unirSinRepetir([direccionNormalizada || limpia.texto, ...resto]), texto: unirSinRepetir([limpia.texto, ...resto]) });
+  }
+  return { limpia, busquedas: lista };
+}
+
 const ADVERTENCIA_DE = {
   SIN_NUMERO: 'DIRECCION_SIN_NUMERO', MANZANA_LOTE: 'DIRECCION_MANZANA_LOTE', SIN_TIPO_VIA: 'DIRECCION_SIN_TIPO_VIA',
   SIN_DISTRITO: 'DIRECCION_SIN_DISTRITO', DIRECCION_CORTA: 'DIRECCION_CORTA', SIN_DIRECCION: 'SIN_DIRECCION',
