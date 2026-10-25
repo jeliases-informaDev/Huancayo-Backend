@@ -85,6 +85,11 @@ export type Evidencia = $Result.DefaultSelection<Prisma.$EvidenciaPayload>
  */
 export type AuditoriaSeguridad = $Result.DefaultSelection<Prisma.$AuditoriaSeguridadPayload>
 /**
+ * Model AuditoriaSelloCabeza
+ * 
+ */
+export type AuditoriaSelloCabeza = $Result.DefaultSelection<Prisma.$AuditoriaSelloCabezaPayload>
+/**
  * Model ImportacionMasiva
  * Importación masiva de expedientes por Excel (no hay integración en vivo con Caja Huancayo todavía)
  */
@@ -376,6 +381,16 @@ export class PrismaClient<
     * ```
     */
   get auditoriaSeguridad(): Prisma.AuditoriaSeguridadDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.auditoriaSelloCabeza`: Exposes CRUD operations for the **AuditoriaSelloCabeza** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AuditoriaSelloCabezas
+    * const auditoriaSelloCabezas = await prisma.auditoriaSelloCabeza.findMany()
+    * ```
+    */
+  get auditoriaSelloCabeza(): Prisma.AuditoriaSelloCabezaDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.importacionMasiva`: Exposes CRUD operations for the **ImportacionMasiva** model.
@@ -856,6 +871,7 @@ export namespace Prisma {
     VisitaAuditoria: 'VisitaAuditoria',
     Evidencia: 'Evidencia',
     AuditoriaSeguridad: 'AuditoriaSeguridad',
+    AuditoriaSelloCabeza: 'AuditoriaSelloCabeza',
     ImportacionMasiva: 'ImportacionMasiva',
     AceptacionTerminos: 'AceptacionTerminos'
   };
@@ -873,7 +889,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "empresa" | "usuario" | "jornadaCampo" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "importacionMasiva" | "aceptacionTerminos"
+      modelProps: "empresa" | "usuario" | "jornadaCampo" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "auditoriaSelloCabeza" | "importacionMasiva" | "aceptacionTerminos"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1735,6 +1751,72 @@ export namespace Prisma {
           }
         }
       }
+      AuditoriaSelloCabeza: {
+        payload: Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>
+        fields: Prisma.AuditoriaSelloCabezaFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AuditoriaSelloCabezaFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditoriaSelloCabezaPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AuditoriaSelloCabezaFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditoriaSelloCabezaPayload>
+          }
+          findFirst: {
+            args: Prisma.AuditoriaSelloCabezaFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditoriaSelloCabezaPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AuditoriaSelloCabezaFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditoriaSelloCabezaPayload>
+          }
+          findMany: {
+            args: Prisma.AuditoriaSelloCabezaFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditoriaSelloCabezaPayload>[]
+          }
+          create: {
+            args: Prisma.AuditoriaSelloCabezaCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditoriaSelloCabezaPayload>
+          }
+          createMany: {
+            args: Prisma.AuditoriaSelloCabezaCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.AuditoriaSelloCabezaDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditoriaSelloCabezaPayload>
+          }
+          update: {
+            args: Prisma.AuditoriaSelloCabezaUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditoriaSelloCabezaPayload>
+          }
+          deleteMany: {
+            args: Prisma.AuditoriaSelloCabezaDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AuditoriaSelloCabezaUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AuditoriaSelloCabezaUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AuditoriaSelloCabezaPayload>
+          }
+          aggregate: {
+            args: Prisma.AuditoriaSelloCabezaAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAuditoriaSelloCabeza>
+          }
+          groupBy: {
+            args: Prisma.AuditoriaSelloCabezaGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AuditoriaSelloCabezaGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AuditoriaSelloCabezaCountArgs<ExtArgs>
+            result: $Utils.Optional<AuditoriaSelloCabezaCountAggregateOutputType> | number
+          }
+        }
+      }
       ImportacionMasiva: {
         payload: Prisma.$ImportacionMasivaPayload<ExtArgs>
         fields: Prisma.ImportacionMasivaFieldRefs
@@ -2003,6 +2085,7 @@ export namespace Prisma {
     visitaAuditoria?: VisitaAuditoriaOmit
     evidencia?: EvidenciaOmit
     auditoriaSeguridad?: AuditoriaSeguridadOmit
+    auditoriaSelloCabeza?: AuditoriaSelloCabezaOmit
     importacionMasiva?: ImportacionMasivaOmit
     aceptacionTerminos?: AceptacionTerminosOmit
   }
@@ -15657,10 +15740,12 @@ export namespace Prisma {
 
   export type AuditoriaSeguridadAvgAggregateOutputType = {
     estado_http: number | null
+    secuencia: number | null
   }
 
   export type AuditoriaSeguridadSumAggregateOutputType = {
     estado_http: number | null
+    secuencia: number | null
   }
 
   export type AuditoriaSeguridadMinAggregateOutputType = {
@@ -15686,6 +15771,9 @@ export namespace Prisma {
     severidad: string | null
     plataforma: string | null
     con_cambios: boolean | null
+    secuencia: number | null
+    sello_previo: string | null
+    sello: string | null
   }
 
   export type AuditoriaSeguridadMaxAggregateOutputType = {
@@ -15711,6 +15799,9 @@ export namespace Prisma {
     severidad: string | null
     plataforma: string | null
     con_cambios: boolean | null
+    secuencia: number | null
+    sello_previo: string | null
+    sello: string | null
   }
 
   export type AuditoriaSeguridadCountAggregateOutputType = {
@@ -15738,16 +15829,21 @@ export namespace Prisma {
     severidad: number
     plataforma: number
     con_cambios: number
+    secuencia: number
+    sello_previo: number
+    sello: number
     _all: number
   }
 
 
   export type AuditoriaSeguridadAvgAggregateInputType = {
     estado_http?: true
+    secuencia?: true
   }
 
   export type AuditoriaSeguridadSumAggregateInputType = {
     estado_http?: true
+    secuencia?: true
   }
 
   export type AuditoriaSeguridadMinAggregateInputType = {
@@ -15773,6 +15869,9 @@ export namespace Prisma {
     severidad?: true
     plataforma?: true
     con_cambios?: true
+    secuencia?: true
+    sello_previo?: true
+    sello?: true
   }
 
   export type AuditoriaSeguridadMaxAggregateInputType = {
@@ -15798,6 +15897,9 @@ export namespace Prisma {
     severidad?: true
     plataforma?: true
     con_cambios?: true
+    secuencia?: true
+    sello_previo?: true
+    sello?: true
   }
 
   export type AuditoriaSeguridadCountAggregateInputType = {
@@ -15825,6 +15927,9 @@ export namespace Prisma {
     severidad?: true
     plataforma?: true
     con_cambios?: true
+    secuencia?: true
+    sello_previo?: true
+    sello?: true
     _all?: true
   }
 
@@ -15939,6 +16044,9 @@ export namespace Prisma {
     severidad: string | null
     plataforma: string | null
     con_cambios: boolean
+    secuencia: number | null
+    sello_previo: string | null
+    sello: string | null
     _count: AuditoriaSeguridadCountAggregateOutputType | null
     _avg: AuditoriaSeguridadAvgAggregateOutputType | null
     _sum: AuditoriaSeguridadSumAggregateOutputType | null
@@ -15985,6 +16093,9 @@ export namespace Prisma {
     severidad?: boolean
     plataforma?: boolean
     con_cambios?: boolean
+    secuencia?: boolean
+    sello_previo?: boolean
+    sello?: boolean
   }, ExtArgs["result"]["auditoriaSeguridad"]>
 
 
@@ -16014,9 +16125,12 @@ export namespace Prisma {
     severidad?: boolean
     plataforma?: boolean
     con_cambios?: boolean
+    secuencia?: boolean
+    sello_previo?: boolean
+    sello?: boolean
   }
 
-  export type AuditoriaSeguridadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_auditoria" | "empresa_id" | "fecha" | "request_id" | "actor_id" | "actor" | "rol" | "metodo" | "ruta" | "estado_http" | "ip_address" | "ip_hash" | "user_agent" | "device_id" | "mock_location" | "entidad" | "entidad_id" | "valor_anterior" | "valor_nuevo" | "accion" | "categoria" | "severidad" | "plataforma" | "con_cambios", ExtArgs["result"]["auditoriaSeguridad"]>
+  export type AuditoriaSeguridadOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_auditoria" | "empresa_id" | "fecha" | "request_id" | "actor_id" | "actor" | "rol" | "metodo" | "ruta" | "estado_http" | "ip_address" | "ip_hash" | "user_agent" | "device_id" | "mock_location" | "entidad" | "entidad_id" | "valor_anterior" | "valor_nuevo" | "accion" | "categoria" | "severidad" | "plataforma" | "con_cambios" | "secuencia" | "sello_previo" | "sello", ExtArgs["result"]["auditoriaSeguridad"]>
 
   export type $AuditoriaSeguridadPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "AuditoriaSeguridad"
@@ -16046,6 +16160,9 @@ export namespace Prisma {
       severidad: string | null
       plataforma: string | null
       con_cambios: boolean
+      secuencia: number | null
+      sello_previo: string | null
+      sello: string | null
     }, ExtArgs["result"]["auditoriaSeguridad"]>
     composites: {}
   }
@@ -16439,6 +16556,9 @@ export namespace Prisma {
     readonly severidad: FieldRef<"AuditoriaSeguridad", 'String'>
     readonly plataforma: FieldRef<"AuditoriaSeguridad", 'String'>
     readonly con_cambios: FieldRef<"AuditoriaSeguridad", 'Boolean'>
+    readonly secuencia: FieldRef<"AuditoriaSeguridad", 'Int'>
+    readonly sello_previo: FieldRef<"AuditoriaSeguridad", 'String'>
+    readonly sello: FieldRef<"AuditoriaSeguridad", 'String'>
   }
     
 
@@ -16762,6 +16882,920 @@ export namespace Prisma {
      * Omit specific fields from the AuditoriaSeguridad
      */
     omit?: AuditoriaSeguridadOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AuditoriaSelloCabeza
+   */
+
+  export type AggregateAuditoriaSelloCabeza = {
+    _count: AuditoriaSelloCabezaCountAggregateOutputType | null
+    _avg: AuditoriaSelloCabezaAvgAggregateOutputType | null
+    _sum: AuditoriaSelloCabezaSumAggregateOutputType | null
+    _min: AuditoriaSelloCabezaMinAggregateOutputType | null
+    _max: AuditoriaSelloCabezaMaxAggregateOutputType | null
+  }
+
+  export type AuditoriaSelloCabezaAvgAggregateOutputType = {
+    id: number | null
+    secuencia: number | null
+  }
+
+  export type AuditoriaSelloCabezaSumAggregateOutputType = {
+    id: number | null
+    secuencia: number | null
+  }
+
+  export type AuditoriaSelloCabezaMinAggregateOutputType = {
+    id: number | null
+    secuencia: number | null
+    sello: string | null
+    actualizado: Date | null
+  }
+
+  export type AuditoriaSelloCabezaMaxAggregateOutputType = {
+    id: number | null
+    secuencia: number | null
+    sello: string | null
+    actualizado: Date | null
+  }
+
+  export type AuditoriaSelloCabezaCountAggregateOutputType = {
+    id: number
+    secuencia: number
+    sello: number
+    actualizado: number
+    _all: number
+  }
+
+
+  export type AuditoriaSelloCabezaAvgAggregateInputType = {
+    id?: true
+    secuencia?: true
+  }
+
+  export type AuditoriaSelloCabezaSumAggregateInputType = {
+    id?: true
+    secuencia?: true
+  }
+
+  export type AuditoriaSelloCabezaMinAggregateInputType = {
+    id?: true
+    secuencia?: true
+    sello?: true
+    actualizado?: true
+  }
+
+  export type AuditoriaSelloCabezaMaxAggregateInputType = {
+    id?: true
+    secuencia?: true
+    sello?: true
+    actualizado?: true
+  }
+
+  export type AuditoriaSelloCabezaCountAggregateInputType = {
+    id?: true
+    secuencia?: true
+    sello?: true
+    actualizado?: true
+    _all?: true
+  }
+
+  export type AuditoriaSelloCabezaAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuditoriaSelloCabeza to aggregate.
+     */
+    where?: AuditoriaSelloCabezaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditoriaSelloCabezas to fetch.
+     */
+    orderBy?: AuditoriaSelloCabezaOrderByWithRelationInput | AuditoriaSelloCabezaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AuditoriaSelloCabezaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditoriaSelloCabezas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditoriaSelloCabezas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AuditoriaSelloCabezas
+    **/
+    _count?: true | AuditoriaSelloCabezaCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AuditoriaSelloCabezaAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AuditoriaSelloCabezaSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AuditoriaSelloCabezaMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AuditoriaSelloCabezaMaxAggregateInputType
+  }
+
+  export type GetAuditoriaSelloCabezaAggregateType<T extends AuditoriaSelloCabezaAggregateArgs> = {
+        [P in keyof T & keyof AggregateAuditoriaSelloCabeza]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAuditoriaSelloCabeza[P]>
+      : GetScalarType<T[P], AggregateAuditoriaSelloCabeza[P]>
+  }
+
+
+
+
+  export type AuditoriaSelloCabezaGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AuditoriaSelloCabezaWhereInput
+    orderBy?: AuditoriaSelloCabezaOrderByWithAggregationInput | AuditoriaSelloCabezaOrderByWithAggregationInput[]
+    by: AuditoriaSelloCabezaScalarFieldEnum[] | AuditoriaSelloCabezaScalarFieldEnum
+    having?: AuditoriaSelloCabezaScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AuditoriaSelloCabezaCountAggregateInputType | true
+    _avg?: AuditoriaSelloCabezaAvgAggregateInputType
+    _sum?: AuditoriaSelloCabezaSumAggregateInputType
+    _min?: AuditoriaSelloCabezaMinAggregateInputType
+    _max?: AuditoriaSelloCabezaMaxAggregateInputType
+  }
+
+  export type AuditoriaSelloCabezaGroupByOutputType = {
+    id: number
+    secuencia: number
+    sello: string
+    actualizado: Date
+    _count: AuditoriaSelloCabezaCountAggregateOutputType | null
+    _avg: AuditoriaSelloCabezaAvgAggregateOutputType | null
+    _sum: AuditoriaSelloCabezaSumAggregateOutputType | null
+    _min: AuditoriaSelloCabezaMinAggregateOutputType | null
+    _max: AuditoriaSelloCabezaMaxAggregateOutputType | null
+  }
+
+  type GetAuditoriaSelloCabezaGroupByPayload<T extends AuditoriaSelloCabezaGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AuditoriaSelloCabezaGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AuditoriaSelloCabezaGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AuditoriaSelloCabezaGroupByOutputType[P]>
+            : GetScalarType<T[P], AuditoriaSelloCabezaGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AuditoriaSelloCabezaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    secuencia?: boolean
+    sello?: boolean
+    actualizado?: boolean
+  }, ExtArgs["result"]["auditoriaSelloCabeza"]>
+
+
+
+  export type AuditoriaSelloCabezaSelectScalar = {
+    id?: boolean
+    secuencia?: boolean
+    sello?: boolean
+    actualizado?: boolean
+  }
+
+  export type AuditoriaSelloCabezaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "secuencia" | "sello" | "actualizado", ExtArgs["result"]["auditoriaSelloCabeza"]>
+
+  export type $AuditoriaSelloCabezaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AuditoriaSelloCabeza"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      secuencia: number
+      sello: string
+      actualizado: Date
+    }, ExtArgs["result"]["auditoriaSelloCabeza"]>
+    composites: {}
+  }
+
+  type AuditoriaSelloCabezaGetPayload<S extends boolean | null | undefined | AuditoriaSelloCabezaDefaultArgs> = $Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload, S>
+
+  type AuditoriaSelloCabezaCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AuditoriaSelloCabezaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AuditoriaSelloCabezaCountAggregateInputType | true
+    }
+
+  export interface AuditoriaSelloCabezaDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AuditoriaSelloCabeza'], meta: { name: 'AuditoriaSelloCabeza' } }
+    /**
+     * Find zero or one AuditoriaSelloCabeza that matches the filter.
+     * @param {AuditoriaSelloCabezaFindUniqueArgs} args - Arguments to find a AuditoriaSelloCabeza
+     * @example
+     * // Get one AuditoriaSelloCabeza
+     * const auditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AuditoriaSelloCabezaFindUniqueArgs>(args: SelectSubset<T, AuditoriaSelloCabezaFindUniqueArgs<ExtArgs>>): Prisma__AuditoriaSelloCabezaClient<$Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AuditoriaSelloCabeza that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AuditoriaSelloCabezaFindUniqueOrThrowArgs} args - Arguments to find a AuditoriaSelloCabeza
+     * @example
+     * // Get one AuditoriaSelloCabeza
+     * const auditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AuditoriaSelloCabezaFindUniqueOrThrowArgs>(args: SelectSubset<T, AuditoriaSelloCabezaFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AuditoriaSelloCabezaClient<$Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AuditoriaSelloCabeza that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditoriaSelloCabezaFindFirstArgs} args - Arguments to find a AuditoriaSelloCabeza
+     * @example
+     * // Get one AuditoriaSelloCabeza
+     * const auditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AuditoriaSelloCabezaFindFirstArgs>(args?: SelectSubset<T, AuditoriaSelloCabezaFindFirstArgs<ExtArgs>>): Prisma__AuditoriaSelloCabezaClient<$Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AuditoriaSelloCabeza that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditoriaSelloCabezaFindFirstOrThrowArgs} args - Arguments to find a AuditoriaSelloCabeza
+     * @example
+     * // Get one AuditoriaSelloCabeza
+     * const auditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AuditoriaSelloCabezaFindFirstOrThrowArgs>(args?: SelectSubset<T, AuditoriaSelloCabezaFindFirstOrThrowArgs<ExtArgs>>): Prisma__AuditoriaSelloCabezaClient<$Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AuditoriaSelloCabezas that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditoriaSelloCabezaFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AuditoriaSelloCabezas
+     * const auditoriaSelloCabezas = await prisma.auditoriaSelloCabeza.findMany()
+     * 
+     * // Get first 10 AuditoriaSelloCabezas
+     * const auditoriaSelloCabezas = await prisma.auditoriaSelloCabeza.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const auditoriaSelloCabezaWithIdOnly = await prisma.auditoriaSelloCabeza.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AuditoriaSelloCabezaFindManyArgs>(args?: SelectSubset<T, AuditoriaSelloCabezaFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AuditoriaSelloCabeza.
+     * @param {AuditoriaSelloCabezaCreateArgs} args - Arguments to create a AuditoriaSelloCabeza.
+     * @example
+     * // Create one AuditoriaSelloCabeza
+     * const AuditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.create({
+     *   data: {
+     *     // ... data to create a AuditoriaSelloCabeza
+     *   }
+     * })
+     * 
+     */
+    create<T extends AuditoriaSelloCabezaCreateArgs>(args: SelectSubset<T, AuditoriaSelloCabezaCreateArgs<ExtArgs>>): Prisma__AuditoriaSelloCabezaClient<$Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AuditoriaSelloCabezas.
+     * @param {AuditoriaSelloCabezaCreateManyArgs} args - Arguments to create many AuditoriaSelloCabezas.
+     * @example
+     * // Create many AuditoriaSelloCabezas
+     * const auditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AuditoriaSelloCabezaCreateManyArgs>(args?: SelectSubset<T, AuditoriaSelloCabezaCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a AuditoriaSelloCabeza.
+     * @param {AuditoriaSelloCabezaDeleteArgs} args - Arguments to delete one AuditoriaSelloCabeza.
+     * @example
+     * // Delete one AuditoriaSelloCabeza
+     * const AuditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.delete({
+     *   where: {
+     *     // ... filter to delete one AuditoriaSelloCabeza
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AuditoriaSelloCabezaDeleteArgs>(args: SelectSubset<T, AuditoriaSelloCabezaDeleteArgs<ExtArgs>>): Prisma__AuditoriaSelloCabezaClient<$Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AuditoriaSelloCabeza.
+     * @param {AuditoriaSelloCabezaUpdateArgs} args - Arguments to update one AuditoriaSelloCabeza.
+     * @example
+     * // Update one AuditoriaSelloCabeza
+     * const auditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AuditoriaSelloCabezaUpdateArgs>(args: SelectSubset<T, AuditoriaSelloCabezaUpdateArgs<ExtArgs>>): Prisma__AuditoriaSelloCabezaClient<$Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AuditoriaSelloCabezas.
+     * @param {AuditoriaSelloCabezaDeleteManyArgs} args - Arguments to filter AuditoriaSelloCabezas to delete.
+     * @example
+     * // Delete a few AuditoriaSelloCabezas
+     * const { count } = await prisma.auditoriaSelloCabeza.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AuditoriaSelloCabezaDeleteManyArgs>(args?: SelectSubset<T, AuditoriaSelloCabezaDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AuditoriaSelloCabezas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditoriaSelloCabezaUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AuditoriaSelloCabezas
+     * const auditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AuditoriaSelloCabezaUpdateManyArgs>(args: SelectSubset<T, AuditoriaSelloCabezaUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AuditoriaSelloCabeza.
+     * @param {AuditoriaSelloCabezaUpsertArgs} args - Arguments to update or create a AuditoriaSelloCabeza.
+     * @example
+     * // Update or create a AuditoriaSelloCabeza
+     * const auditoriaSelloCabeza = await prisma.auditoriaSelloCabeza.upsert({
+     *   create: {
+     *     // ... data to create a AuditoriaSelloCabeza
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AuditoriaSelloCabeza we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AuditoriaSelloCabezaUpsertArgs>(args: SelectSubset<T, AuditoriaSelloCabezaUpsertArgs<ExtArgs>>): Prisma__AuditoriaSelloCabezaClient<$Result.GetResult<Prisma.$AuditoriaSelloCabezaPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AuditoriaSelloCabezas.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditoriaSelloCabezaCountArgs} args - Arguments to filter AuditoriaSelloCabezas to count.
+     * @example
+     * // Count the number of AuditoriaSelloCabezas
+     * const count = await prisma.auditoriaSelloCabeza.count({
+     *   where: {
+     *     // ... the filter for the AuditoriaSelloCabezas we want to count
+     *   }
+     * })
+    **/
+    count<T extends AuditoriaSelloCabezaCountArgs>(
+      args?: Subset<T, AuditoriaSelloCabezaCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AuditoriaSelloCabezaCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AuditoriaSelloCabeza.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditoriaSelloCabezaAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AuditoriaSelloCabezaAggregateArgs>(args: Subset<T, AuditoriaSelloCabezaAggregateArgs>): Prisma.PrismaPromise<GetAuditoriaSelloCabezaAggregateType<T>>
+
+    /**
+     * Group by AuditoriaSelloCabeza.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AuditoriaSelloCabezaGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AuditoriaSelloCabezaGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AuditoriaSelloCabezaGroupByArgs['orderBy'] }
+        : { orderBy?: AuditoriaSelloCabezaGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AuditoriaSelloCabezaGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAuditoriaSelloCabezaGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AuditoriaSelloCabeza model
+   */
+  readonly fields: AuditoriaSelloCabezaFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AuditoriaSelloCabeza.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AuditoriaSelloCabezaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AuditoriaSelloCabeza model
+   */
+  interface AuditoriaSelloCabezaFieldRefs {
+    readonly id: FieldRef<"AuditoriaSelloCabeza", 'Int'>
+    readonly secuencia: FieldRef<"AuditoriaSelloCabeza", 'Int'>
+    readonly sello: FieldRef<"AuditoriaSelloCabeza", 'String'>
+    readonly actualizado: FieldRef<"AuditoriaSelloCabeza", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AuditoriaSelloCabeza findUnique
+   */
+  export type AuditoriaSelloCabezaFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
+    /**
+     * Filter, which AuditoriaSelloCabeza to fetch.
+     */
+    where: AuditoriaSelloCabezaWhereUniqueInput
+  }
+
+  /**
+   * AuditoriaSelloCabeza findUniqueOrThrow
+   */
+  export type AuditoriaSelloCabezaFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
+    /**
+     * Filter, which AuditoriaSelloCabeza to fetch.
+     */
+    where: AuditoriaSelloCabezaWhereUniqueInput
+  }
+
+  /**
+   * AuditoriaSelloCabeza findFirst
+   */
+  export type AuditoriaSelloCabezaFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
+    /**
+     * Filter, which AuditoriaSelloCabeza to fetch.
+     */
+    where?: AuditoriaSelloCabezaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditoriaSelloCabezas to fetch.
+     */
+    orderBy?: AuditoriaSelloCabezaOrderByWithRelationInput | AuditoriaSelloCabezaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuditoriaSelloCabezas.
+     */
+    cursor?: AuditoriaSelloCabezaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditoriaSelloCabezas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditoriaSelloCabezas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuditoriaSelloCabezas.
+     */
+    distinct?: AuditoriaSelloCabezaScalarFieldEnum | AuditoriaSelloCabezaScalarFieldEnum[]
+  }
+
+  /**
+   * AuditoriaSelloCabeza findFirstOrThrow
+   */
+  export type AuditoriaSelloCabezaFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
+    /**
+     * Filter, which AuditoriaSelloCabeza to fetch.
+     */
+    where?: AuditoriaSelloCabezaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditoriaSelloCabezas to fetch.
+     */
+    orderBy?: AuditoriaSelloCabezaOrderByWithRelationInput | AuditoriaSelloCabezaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AuditoriaSelloCabezas.
+     */
+    cursor?: AuditoriaSelloCabezaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditoriaSelloCabezas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditoriaSelloCabezas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuditoriaSelloCabezas.
+     */
+    distinct?: AuditoriaSelloCabezaScalarFieldEnum | AuditoriaSelloCabezaScalarFieldEnum[]
+  }
+
+  /**
+   * AuditoriaSelloCabeza findMany
+   */
+  export type AuditoriaSelloCabezaFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
+    /**
+     * Filter, which AuditoriaSelloCabezas to fetch.
+     */
+    where?: AuditoriaSelloCabezaWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AuditoriaSelloCabezas to fetch.
+     */
+    orderBy?: AuditoriaSelloCabezaOrderByWithRelationInput | AuditoriaSelloCabezaOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AuditoriaSelloCabezas.
+     */
+    cursor?: AuditoriaSelloCabezaWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AuditoriaSelloCabezas from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AuditoriaSelloCabezas.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AuditoriaSelloCabezas.
+     */
+    distinct?: AuditoriaSelloCabezaScalarFieldEnum | AuditoriaSelloCabezaScalarFieldEnum[]
+  }
+
+  /**
+   * AuditoriaSelloCabeza create
+   */
+  export type AuditoriaSelloCabezaCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
+    /**
+     * The data needed to create a AuditoriaSelloCabeza.
+     */
+    data: XOR<AuditoriaSelloCabezaCreateInput, AuditoriaSelloCabezaUncheckedCreateInput>
+  }
+
+  /**
+   * AuditoriaSelloCabeza createMany
+   */
+  export type AuditoriaSelloCabezaCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AuditoriaSelloCabezas.
+     */
+    data: AuditoriaSelloCabezaCreateManyInput | AuditoriaSelloCabezaCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AuditoriaSelloCabeza update
+   */
+  export type AuditoriaSelloCabezaUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
+    /**
+     * The data needed to update a AuditoriaSelloCabeza.
+     */
+    data: XOR<AuditoriaSelloCabezaUpdateInput, AuditoriaSelloCabezaUncheckedUpdateInput>
+    /**
+     * Choose, which AuditoriaSelloCabeza to update.
+     */
+    where: AuditoriaSelloCabezaWhereUniqueInput
+  }
+
+  /**
+   * AuditoriaSelloCabeza updateMany
+   */
+  export type AuditoriaSelloCabezaUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AuditoriaSelloCabezas.
+     */
+    data: XOR<AuditoriaSelloCabezaUpdateManyMutationInput, AuditoriaSelloCabezaUncheckedUpdateManyInput>
+    /**
+     * Filter which AuditoriaSelloCabezas to update
+     */
+    where?: AuditoriaSelloCabezaWhereInput
+    /**
+     * Limit how many AuditoriaSelloCabezas to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AuditoriaSelloCabeza upsert
+   */
+  export type AuditoriaSelloCabezaUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
+    /**
+     * The filter to search for the AuditoriaSelloCabeza to update in case it exists.
+     */
+    where: AuditoriaSelloCabezaWhereUniqueInput
+    /**
+     * In case the AuditoriaSelloCabeza found by the `where` argument doesn't exist, create a new AuditoriaSelloCabeza with this data.
+     */
+    create: XOR<AuditoriaSelloCabezaCreateInput, AuditoriaSelloCabezaUncheckedCreateInput>
+    /**
+     * In case the AuditoriaSelloCabeza was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AuditoriaSelloCabezaUpdateInput, AuditoriaSelloCabezaUncheckedUpdateInput>
+  }
+
+  /**
+   * AuditoriaSelloCabeza delete
+   */
+  export type AuditoriaSelloCabezaDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
+    /**
+     * Filter which AuditoriaSelloCabeza to delete.
+     */
+    where: AuditoriaSelloCabezaWhereUniqueInput
+  }
+
+  /**
+   * AuditoriaSelloCabeza deleteMany
+   */
+  export type AuditoriaSelloCabezaDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AuditoriaSelloCabezas to delete
+     */
+    where?: AuditoriaSelloCabezaWhereInput
+    /**
+     * Limit how many AuditoriaSelloCabezas to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AuditoriaSelloCabeza without action
+   */
+  export type AuditoriaSelloCabezaDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AuditoriaSelloCabeza
+     */
+    select?: AuditoriaSelloCabezaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AuditoriaSelloCabeza
+     */
+    omit?: AuditoriaSelloCabezaOmit<ExtArgs> | null
   }
 
 
@@ -19141,10 +20175,23 @@ export namespace Prisma {
     categoria: 'categoria',
     severidad: 'severidad',
     plataforma: 'plataforma',
-    con_cambios: 'con_cambios'
+    con_cambios: 'con_cambios',
+    secuencia: 'secuencia',
+    sello_previo: 'sello_previo',
+    sello: 'sello'
   };
 
   export type AuditoriaSeguridadScalarFieldEnum = (typeof AuditoriaSeguridadScalarFieldEnum)[keyof typeof AuditoriaSeguridadScalarFieldEnum]
+
+
+  export const AuditoriaSelloCabezaScalarFieldEnum: {
+    id: 'id',
+    secuencia: 'secuencia',
+    sello: 'sello',
+    actualizado: 'actualizado'
+  };
+
+  export type AuditoriaSelloCabezaScalarFieldEnum = (typeof AuditoriaSelloCabezaScalarFieldEnum)[keyof typeof AuditoriaSelloCabezaScalarFieldEnum]
 
 
   export const ImportacionMasivaScalarFieldEnum: {
@@ -19425,10 +20472,19 @@ export namespace Prisma {
     accion: 'accion',
     categoria: 'categoria',
     severidad: 'severidad',
-    plataforma: 'plataforma'
+    plataforma: 'plataforma',
+    sello_previo: 'sello_previo',
+    sello: 'sello'
   };
 
   export type AuditoriaSeguridadOrderByRelevanceFieldEnum = (typeof AuditoriaSeguridadOrderByRelevanceFieldEnum)[keyof typeof AuditoriaSeguridadOrderByRelevanceFieldEnum]
+
+
+  export const AuditoriaSelloCabezaOrderByRelevanceFieldEnum: {
+    sello: 'sello'
+  };
+
+  export type AuditoriaSelloCabezaOrderByRelevanceFieldEnum = (typeof AuditoriaSelloCabezaOrderByRelevanceFieldEnum)[keyof typeof AuditoriaSelloCabezaOrderByRelevanceFieldEnum]
 
 
   export const ImportacionMasivaOrderByRelevanceFieldEnum: {
@@ -21004,6 +22060,9 @@ export namespace Prisma {
     severidad?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     plataforma?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     con_cambios?: BoolFilter<"AuditoriaSeguridad"> | boolean
+    secuencia?: IntNullableFilter<"AuditoriaSeguridad"> | number | null
+    sello_previo?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    sello?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
   }
 
   export type AuditoriaSeguridadOrderByWithRelationInput = {
@@ -21031,11 +22090,15 @@ export namespace Prisma {
     severidad?: SortOrderInput | SortOrder
     plataforma?: SortOrderInput | SortOrder
     con_cambios?: SortOrder
+    secuencia?: SortOrderInput | SortOrder
+    sello_previo?: SortOrderInput | SortOrder
+    sello?: SortOrderInput | SortOrder
     _relevance?: AuditoriaSeguridadOrderByRelevanceInput
   }
 
   export type AuditoriaSeguridadWhereUniqueInput = Prisma.AtLeast<{
     id_auditoria?: string
+    secuencia?: number
     AND?: AuditoriaSeguridadWhereInput | AuditoriaSeguridadWhereInput[]
     OR?: AuditoriaSeguridadWhereInput[]
     NOT?: AuditoriaSeguridadWhereInput | AuditoriaSeguridadWhereInput[]
@@ -21062,7 +22125,9 @@ export namespace Prisma {
     severidad?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     plataforma?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
     con_cambios?: BoolFilter<"AuditoriaSeguridad"> | boolean
-  }, "id_auditoria">
+    sello_previo?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+    sello?: StringNullableFilter<"AuditoriaSeguridad"> | string | null
+  }, "id_auditoria" | "secuencia">
 
   export type AuditoriaSeguridadOrderByWithAggregationInput = {
     id_auditoria?: SortOrder
@@ -21089,6 +22154,9 @@ export namespace Prisma {
     severidad?: SortOrderInput | SortOrder
     plataforma?: SortOrderInput | SortOrder
     con_cambios?: SortOrder
+    secuencia?: SortOrderInput | SortOrder
+    sello_previo?: SortOrderInput | SortOrder
+    sello?: SortOrderInput | SortOrder
     _count?: AuditoriaSeguridadCountOrderByAggregateInput
     _avg?: AuditoriaSeguridadAvgOrderByAggregateInput
     _max?: AuditoriaSeguridadMaxOrderByAggregateInput
@@ -21124,6 +22192,59 @@ export namespace Prisma {
     severidad?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
     plataforma?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
     con_cambios?: BoolWithAggregatesFilter<"AuditoriaSeguridad"> | boolean
+    secuencia?: IntNullableWithAggregatesFilter<"AuditoriaSeguridad"> | number | null
+    sello_previo?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
+    sello?: StringNullableWithAggregatesFilter<"AuditoriaSeguridad"> | string | null
+  }
+
+  export type AuditoriaSelloCabezaWhereInput = {
+    AND?: AuditoriaSelloCabezaWhereInput | AuditoriaSelloCabezaWhereInput[]
+    OR?: AuditoriaSelloCabezaWhereInput[]
+    NOT?: AuditoriaSelloCabezaWhereInput | AuditoriaSelloCabezaWhereInput[]
+    id?: IntFilter<"AuditoriaSelloCabeza"> | number
+    secuencia?: IntFilter<"AuditoriaSelloCabeza"> | number
+    sello?: StringFilter<"AuditoriaSelloCabeza"> | string
+    actualizado?: DateTimeFilter<"AuditoriaSelloCabeza"> | Date | string
+  }
+
+  export type AuditoriaSelloCabezaOrderByWithRelationInput = {
+    id?: SortOrder
+    secuencia?: SortOrder
+    sello?: SortOrder
+    actualizado?: SortOrder
+    _relevance?: AuditoriaSelloCabezaOrderByRelevanceInput
+  }
+
+  export type AuditoriaSelloCabezaWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: AuditoriaSelloCabezaWhereInput | AuditoriaSelloCabezaWhereInput[]
+    OR?: AuditoriaSelloCabezaWhereInput[]
+    NOT?: AuditoriaSelloCabezaWhereInput | AuditoriaSelloCabezaWhereInput[]
+    secuencia?: IntFilter<"AuditoriaSelloCabeza"> | number
+    sello?: StringFilter<"AuditoriaSelloCabeza"> | string
+    actualizado?: DateTimeFilter<"AuditoriaSelloCabeza"> | Date | string
+  }, "id">
+
+  export type AuditoriaSelloCabezaOrderByWithAggregationInput = {
+    id?: SortOrder
+    secuencia?: SortOrder
+    sello?: SortOrder
+    actualizado?: SortOrder
+    _count?: AuditoriaSelloCabezaCountOrderByAggregateInput
+    _avg?: AuditoriaSelloCabezaAvgOrderByAggregateInput
+    _max?: AuditoriaSelloCabezaMaxOrderByAggregateInput
+    _min?: AuditoriaSelloCabezaMinOrderByAggregateInput
+    _sum?: AuditoriaSelloCabezaSumOrderByAggregateInput
+  }
+
+  export type AuditoriaSelloCabezaScalarWhereWithAggregatesInput = {
+    AND?: AuditoriaSelloCabezaScalarWhereWithAggregatesInput | AuditoriaSelloCabezaScalarWhereWithAggregatesInput[]
+    OR?: AuditoriaSelloCabezaScalarWhereWithAggregatesInput[]
+    NOT?: AuditoriaSelloCabezaScalarWhereWithAggregatesInput | AuditoriaSelloCabezaScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"AuditoriaSelloCabeza"> | number
+    secuencia?: IntWithAggregatesFilter<"AuditoriaSelloCabeza"> | number
+    sello?: StringWithAggregatesFilter<"AuditoriaSelloCabeza"> | string
+    actualizado?: DateTimeWithAggregatesFilter<"AuditoriaSelloCabeza"> | Date | string
   }
 
   export type ImportacionMasivaWhereInput = {
@@ -23037,6 +24158,9 @@ export namespace Prisma {
     severidad?: string | null
     plataforma?: string | null
     con_cambios?: boolean
+    secuencia?: number | null
+    sello_previo?: string | null
+    sello?: string | null
   }
 
   export type AuditoriaSeguridadUncheckedCreateInput = {
@@ -23064,6 +24188,9 @@ export namespace Prisma {
     severidad?: string | null
     plataforma?: string | null
     con_cambios?: boolean
+    secuencia?: number | null
+    sello_previo?: string | null
+    sello?: string | null
   }
 
   export type AuditoriaSeguridadUpdateInput = {
@@ -23091,6 +24218,9 @@ export namespace Prisma {
     severidad?: NullableStringFieldUpdateOperationsInput | string | null
     plataforma?: NullableStringFieldUpdateOperationsInput | string | null
     con_cambios?: BoolFieldUpdateOperationsInput | boolean
+    secuencia?: NullableIntFieldUpdateOperationsInput | number | null
+    sello_previo?: NullableStringFieldUpdateOperationsInput | string | null
+    sello?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AuditoriaSeguridadUncheckedUpdateInput = {
@@ -23118,6 +24248,9 @@ export namespace Prisma {
     severidad?: NullableStringFieldUpdateOperationsInput | string | null
     plataforma?: NullableStringFieldUpdateOperationsInput | string | null
     con_cambios?: BoolFieldUpdateOperationsInput | boolean
+    secuencia?: NullableIntFieldUpdateOperationsInput | number | null
+    sello_previo?: NullableStringFieldUpdateOperationsInput | string | null
+    sello?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AuditoriaSeguridadCreateManyInput = {
@@ -23145,6 +24278,9 @@ export namespace Prisma {
     severidad?: string | null
     plataforma?: string | null
     con_cambios?: boolean
+    secuencia?: number | null
+    sello_previo?: string | null
+    sello?: string | null
   }
 
   export type AuditoriaSeguridadUpdateManyMutationInput = {
@@ -23172,6 +24308,9 @@ export namespace Prisma {
     severidad?: NullableStringFieldUpdateOperationsInput | string | null
     plataforma?: NullableStringFieldUpdateOperationsInput | string | null
     con_cambios?: BoolFieldUpdateOperationsInput | boolean
+    secuencia?: NullableIntFieldUpdateOperationsInput | number | null
+    sello_previo?: NullableStringFieldUpdateOperationsInput | string | null
+    sello?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AuditoriaSeguridadUncheckedUpdateManyInput = {
@@ -23199,6 +24338,58 @@ export namespace Prisma {
     severidad?: NullableStringFieldUpdateOperationsInput | string | null
     plataforma?: NullableStringFieldUpdateOperationsInput | string | null
     con_cambios?: BoolFieldUpdateOperationsInput | boolean
+    secuencia?: NullableIntFieldUpdateOperationsInput | number | null
+    sello_previo?: NullableStringFieldUpdateOperationsInput | string | null
+    sello?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type AuditoriaSelloCabezaCreateInput = {
+    id: number
+    secuencia: number
+    sello: string
+    actualizado?: Date | string
+  }
+
+  export type AuditoriaSelloCabezaUncheckedCreateInput = {
+    id: number
+    secuencia: number
+    sello: string
+    actualizado?: Date | string
+  }
+
+  export type AuditoriaSelloCabezaUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    secuencia?: IntFieldUpdateOperationsInput | number
+    sello?: StringFieldUpdateOperationsInput | string
+    actualizado?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuditoriaSelloCabezaUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    secuencia?: IntFieldUpdateOperationsInput | number
+    sello?: StringFieldUpdateOperationsInput | string
+    actualizado?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuditoriaSelloCabezaCreateManyInput = {
+    id: number
+    secuencia: number
+    sello: string
+    actualizado?: Date | string
+  }
+
+  export type AuditoriaSelloCabezaUpdateManyMutationInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    secuencia?: IntFieldUpdateOperationsInput | number
+    sello?: StringFieldUpdateOperationsInput | string
+    actualizado?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AuditoriaSelloCabezaUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    secuencia?: IntFieldUpdateOperationsInput | number
+    sello?: StringFieldUpdateOperationsInput | string
+    actualizado?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ImportacionMasivaCreateInput = {
@@ -24889,10 +26080,14 @@ export namespace Prisma {
     severidad?: SortOrder
     plataforma?: SortOrder
     con_cambios?: SortOrder
+    secuencia?: SortOrder
+    sello_previo?: SortOrder
+    sello?: SortOrder
   }
 
   export type AuditoriaSeguridadAvgOrderByAggregateInput = {
     estado_http?: SortOrder
+    secuencia?: SortOrder
   }
 
   export type AuditoriaSeguridadMaxOrderByAggregateInput = {
@@ -24918,6 +26113,9 @@ export namespace Prisma {
     severidad?: SortOrder
     plataforma?: SortOrder
     con_cambios?: SortOrder
+    secuencia?: SortOrder
+    sello_previo?: SortOrder
+    sello?: SortOrder
   }
 
   export type AuditoriaSeguridadMinOrderByAggregateInput = {
@@ -24943,10 +26141,14 @@ export namespace Prisma {
     severidad?: SortOrder
     plataforma?: SortOrder
     con_cambios?: SortOrder
+    secuencia?: SortOrder
+    sello_previo?: SortOrder
+    sello?: SortOrder
   }
 
   export type AuditoriaSeguridadSumOrderByAggregateInput = {
     estado_http?: SortOrder
+    secuencia?: SortOrder
   }
 
   export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -24955,6 +26157,43 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedBoolNullableFilter<$PrismaModel>
     _max?: NestedBoolNullableFilter<$PrismaModel>
+  }
+
+  export type AuditoriaSelloCabezaOrderByRelevanceInput = {
+    fields: AuditoriaSelloCabezaOrderByRelevanceFieldEnum | AuditoriaSelloCabezaOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type AuditoriaSelloCabezaCountOrderByAggregateInput = {
+    id?: SortOrder
+    secuencia?: SortOrder
+    sello?: SortOrder
+    actualizado?: SortOrder
+  }
+
+  export type AuditoriaSelloCabezaAvgOrderByAggregateInput = {
+    id?: SortOrder
+    secuencia?: SortOrder
+  }
+
+  export type AuditoriaSelloCabezaMaxOrderByAggregateInput = {
+    id?: SortOrder
+    secuencia?: SortOrder
+    sello?: SortOrder
+    actualizado?: SortOrder
+  }
+
+  export type AuditoriaSelloCabezaMinOrderByAggregateInput = {
+    id?: SortOrder
+    secuencia?: SortOrder
+    sello?: SortOrder
+    actualizado?: SortOrder
+  }
+
+  export type AuditoriaSelloCabezaSumOrderByAggregateInput = {
+    id?: SortOrder
+    secuencia?: SortOrder
   }
 
   export type ImportacionMasivaOrderByRelevanceInput = {

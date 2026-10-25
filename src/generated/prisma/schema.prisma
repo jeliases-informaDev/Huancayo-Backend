@@ -455,6 +455,12 @@ model AuditoriaSeguridad {
   plataforma  String? @db.VarChar(8) // WEB o MOVIL
   con_cambios Boolean @default(false) // el evento trae el valor anterior o el nuevo
 
+  // Sello de integridad (ver sistema/sello.core.js): número correlativo y huella SHA-256 del contenido encadenada con la huella de la anotación
+  // anterior. Null solo en anotaciones aún sin sellar (anteriores a la migración o guardadas en una falla momentánea): se sellan al arrancar.
+  secuencia    Int?    @unique
+  sello_previo String? @db.VarChar(64)
+  sello        String? @db.VarChar(64)
+
   @@index([fecha])
   @@index([actor_id, fecha])
   @@index([empresa_id, fecha])
@@ -463,6 +469,17 @@ model AuditoriaSeguridad {
   @@index([empresa_id, actor, fecha]) // actividad de una persona (también las que intentaron entrar y no tienen cuenta)
   @@index([empresa_id, entidad_id]) // historial de una cuenta o de un expediente
   @@map("auditoria_seguridad")
+}
+
+// Una sola fila (id 1): candado de la cadena del sello (SELECT … FOR UPDATE en la transacción que anota y sella) y espejo de su cabeza
+// (último número y sello). Es de la plataforma, no de una empresa.
+model AuditoriaSelloCabeza {
+  id          Int      @id
+  secuencia   Int
+  sello       String   @db.Char(64)
+  actualizado DateTime @default(now())
+
+  @@map("auditoria_sello_cabeza")
 }
 
 /// Importación masiva de expedientes por Excel (no hay integración en vivo con Caja Huancayo todavía)

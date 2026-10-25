@@ -381,7 +381,17 @@ exports.Prisma.AuditoriaSeguridadScalarFieldEnum = {
   categoria: 'categoria',
   severidad: 'severidad',
   plataforma: 'plataforma',
-  con_cambios: 'con_cambios'
+  con_cambios: 'con_cambios',
+  secuencia: 'secuencia',
+  sello_previo: 'sello_previo',
+  sello: 'sello'
+};
+
+exports.Prisma.AuditoriaSelloCabezaScalarFieldEnum = {
+  id: 'id',
+  secuencia: 'secuencia',
+  sello: 'sello',
+  actualizado: 'actualizado'
 };
 
 exports.Prisma.ImportacionMasivaScalarFieldEnum = {
@@ -602,7 +612,13 @@ exports.Prisma.AuditoriaSeguridadOrderByRelevanceFieldEnum = {
   accion: 'accion',
   categoria: 'categoria',
   severidad: 'severidad',
-  plataforma: 'plataforma'
+  plataforma: 'plataforma',
+  sello_previo: 'sello_previo',
+  sello: 'sello'
+};
+
+exports.Prisma.AuditoriaSelloCabezaOrderByRelevanceFieldEnum = {
+  sello: 'sello'
 };
 
 exports.Prisma.ImportacionMasivaOrderByRelevanceFieldEnum = {
@@ -652,6 +668,7 @@ exports.Prisma.ModelName = {
   VisitaAuditoria: 'VisitaAuditoria',
   Evidencia: 'Evidencia',
   AuditoriaSeguridad: 'AuditoriaSeguridad',
+  AuditoriaSelloCabeza: 'AuditoriaSelloCabeza',
   ImportacionMasiva: 'ImportacionMasiva',
   AceptacionTerminos: 'AceptacionTerminos'
 };
