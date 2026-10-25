@@ -1,5 +1,6 @@
 import { once } from 'node:events';
 import service from './seguridad.service.js';
+import { verificar as verificarSello } from './sello.service.js';
 import { logger } from '#core/config/logger.js';
 
 async function auditoria(req, res, next) {
@@ -8,6 +9,10 @@ async function auditoria(req, res, next) {
 
 async function metricas(req, res, next) {
   try { res.json({ data: await service.metricas(req.validated.query) }); } catch (error) { next(error); }
+}
+
+async function integridad(req, res, next) {
+  try { res.json({ data: await verificarSello({ ultimas: req.validated.query.ultimas }) }); } catch (error) { next(error); }
 }
 
 async function alertas(req, res, next) {
@@ -36,4 +41,4 @@ async function exportar(req, res, next) {
   }
 }
 
-export default { auditoria, metricas, alertas, exportar };
+export default { auditoria, metricas, alertas, exportar, integridad };

@@ -35,6 +35,7 @@ import { sinEmpresa } from '#core/tenant/contexto.js';
 import { iniciarGeocodificacion } from '#modules/geocodificacion/geocodificacion.worker.js';
 import { iniciarRetencionTracking } from '#modules/auditorias/tracking.retencion.js';
 import { iniciarRetencionAuditoria } from '#modules/sistema/seguridad.retencion.js';
+import { iniciarSelladoPendiente } from '#modules/sistema/sello.service.js';
 
 // ============================================================================
 // 3. CONFIGURACIÓN DE EXPRESS Y MIDDLEWARES GLOBALES
@@ -180,6 +181,7 @@ const server = app.listen(env.PORT, () => {
   sinEmpresa(() => importador.marcarInterrumpidas()).catch(() => {});
   iniciarRetencionTracking();
   iniciarRetencionAuditoria();
+  iniciarSelladoPendiente(); // sella las anotaciones del registro que hayan quedado sin sello (al arrancar y cada 15 minutos)
   iniciarGeocodificacion(); // apagado salvo GEOCODING_WORKER_ENABLED=true (enviar direcciones a un proveedor externo requiere autorización del banco)
   if (env.NODE_ENV === 'development') process.stdout.write(`http://localhost:${env.PORT}\n`);
   else logger.info({ port: env.PORT }, 'server_started');

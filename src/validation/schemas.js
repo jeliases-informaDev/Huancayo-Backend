@@ -252,6 +252,8 @@ export const exportarAuditoriaQuery = z.object({ ...filtrosAuditoria, desde: fec
   else if (dias > 366) ctx.addIssue({ code: 'custom', path: ['hasta'], message: 'El rango máximo para exportar es de un año' });
 });
 // `fresco=true` se salta la caché de 30 s (el botón «Actualizar» de la pantalla).
+// Cuántas anotaciones (las últimas) recalcula la verificación del sello; con 100 000 tarda unos segundos.
+export const integridadQuery = z.object({ ultimas: z.coerce.number().int().min(1).max(100000).optional() }).strict();
 export const metricasSeguridadQuery = z.object({ ventana: z.enum(['24h', '7d', '30d']).optional(), fresco: z.enum(['true', 'false']).optional() }).strict();
 export const alertasSeguridadQuery = z.object({ fresco: z.enum(['true', 'false']).optional() }).strict();
 
