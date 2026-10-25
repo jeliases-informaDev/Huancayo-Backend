@@ -3,7 +3,7 @@
 //   · mapbox: con clave (MAPBOX_ACCESS_TOKEN), rápido y con nivel de precisión por dirección; guardar coordenadas exige su modo permanente.
 // Al proveedor solo se le envía el texto de la dirección con distrito y provincia: nunca el nombre ni el documento del cliente.
 import { logger } from '#core/config/logger.js';
-import { coincideDistrito, evaluarResultado, limpiarDireccion, mapearFeatureMapbox, normalizarNumero } from './direcciones.js';
+import { busquedasParaDireccion, coincideDistrito, evaluarResultado, mapearFeatureMapbox, normalizarNumero } from './direcciones.js';
 
 const PAUSA_NOMINATIM_MS = 1200;
 const PAUSA_MAPBOX_MS = 100;
@@ -69,23 +69,17 @@ async function consultarMapbox({ consulta, permanente }) {
   return Array.isArray(data.features) ? data.features.map(mapearFeatureMapbox) : [];
 }
 
-function unirSinRepetir(partes) {
-  const vistos = new Set();
-  return partes.map((p) => String(p ?? '').trim()).filter((p) => { const k = p.toUpperCase(); if (!p || vistos.has(k)) return false; vistos.add(k); return true; }).join(', ');
-}
-
-async function buscarCandidatos({ proveedor, limpia, direccionNormalizada, distrito, provincia, departamento, permanente }) {
+// Prueba las búsquedas de la dirección en orden y se queda con las del primer intento que encuentre algo (ver busquedasParaDireccion).
+async function buscarCandidatos({ proveedor, busquedas, permanente }) {
   try {
-    if (proveedor === 'mapbox') return await consultarMapbox({ consulta: unirSinRepetir([limpia.texto, distrito, provincia, departamento]), permanente });
-    // La búsqueda estructurada (calle + número + distrito) encuentra muchas direcciones que la de texto libre no resuelve.
-    const ciudad = distrito || provincia || null;
-    let results = [];
-    if (limpia.calle && ciudad) {
-      results = await consultarNominatim({ street: [limpia.numero, limpia.calle].filter(Boolean).join(' '), city: ciudad });
-      if (!results.length) await sleep(pausaEntreConsultasMs('nominatim'));
+    if (proveedor === 'mapbox') return await consultarMapbox({ consulta: busquedas[0].texto, permanente });
+    for (let i = 0; i < busquedas.length; i += 1) {
+      const { texto, ...parametros } = busquedas[i];
+      const results = await consultarNominatim(parametros);
+      if (results.length) return results;
+      if (i < busquedas.length - 1) await sleep(pausaEntreConsultasMs('nominatim'));
     }
-    if (!results.length) results = await consultarNominatim({ q: unirSinRepetir([direccionNormalizada || limpia.texto, distrito, provincia, departamento]) });
-    return results;
+    return [];
   } catch (error) {
     if (error.status === undefined) error.detenerLote = true; // error de red, de espera o de configuración
     throw error;
@@ -94,9 +88,10 @@ async function buscarCandidatos({ proveedor, limpia, direccionNormalizada, distr
 
 // Devuelve { latitud, longitud, precision, confianza, distritoCoincide, direccionEncontrada } o null si no encontró nada utilizable.
 export async function geocodificarDireccion({ direccion, direccion_normalizada: direccionNormalizada, distrito, provincia, departamento }, { proveedor = proveedorActivo(), permanente = true } = {}) {
-  const limpia = limpiarDireccion(direccion);
+  const { limpia, busquedas } = busquedasParaDireccion({ direccion, direccion_normalizada: direccionNormalizada, distrito, provincia, departamento });
   const numeroSolicitado = limpia.numero ? normalizarNumero(limpia.numero) : null;
-  const results = await buscarCandidatos({ proveedor, limpia, direccionNormalizada, distrito, provincia, departamento, permanente });
+  if (!busquedas.length) return null; // una dirección de manzana y lote sin zona ni calle no se puede buscar
+  const results = await buscarCandidatos({ proveedor, busquedas, permanente });
   if (!results.length) return null;
 
   let item;

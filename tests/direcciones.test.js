@@ -62,3 +62,31 @@ test('confianza del punto: exacto con número y distrito = ALTA; calle = MEDIA; 
   assert.equal(evaluarResultado({ item: exacto, esManzanaLote: true, distritoEsperado: 'Huancayo' }).confianza, 'BAJA');
   assert.equal(coincideDistrito('Chilca', { suburb: 'Huancayo' }), false);
 });
+
+// ---------------------------------------------------------------- búsquedas para el mapa (manzana y lote)
+import { busquedasParaDireccion, zonaParaBuscar, nombreDeZona } from '../src/modules/geocodificacion/direcciones.js';
+
+test('la zona se escribe como la tienen los mapas y se le puede quitar el tipo', () => {
+  assert.equal(zonaParaBuscar('AA.HH. Pamplona Alta'), 'Asentamiento Humano Pamplona Alta');
+  assert.equal(zonaParaBuscar('Asociación Viv. Valle de Mantaro'), 'Asociación Vivienda Valle de Mantaro');
+  assert.equal(zonaParaBuscar('Cooperativa Pro Viv. Los Alamos'), 'Cooperativa Pro Vivienda Los Alamos');
+  assert.equal(nombreDeZona('Asentamiento Humano Pamplona Alta'), 'Pamplona Alta');
+  assert.equal(nombreDeZona('Urbanización Las Gardenias'), 'Las Gardenias');
+  assert.equal(nombreDeZona('Pueblo Joven 1ro de Mayo'), '1ro de Mayo');
+});
+
+test('con número de puerta se busca calle + número + distrito y, si no, el texto completo', () => {
+  const { busquedas, limpia } = busquedasParaDireccion({ direccion: 'AV. TUPAC AMARU 1500', distrito: 'COMAS', provincia: 'LIMA', departamento: 'LIMA' });
+  assert.equal(limpia.numero, '1500');
+  assert.deepEqual(busquedas.map((b) => b.street || b.q), ['1500 Avenida TUPAC AMARU', 'Avenida TUPAC AMARU 1500, COMAS, LIMA']);
+  assert.equal(busquedas[0].city, 'COMAS');
+});
+
+test('con manzana y lote no se busca la puerta: se busca la zona (con y sin su tipo) y luego la calle, siempre con el distrito', () => {
+  const { busquedas } = busquedasParaDireccion({ direccion: 'AA.HH. PAMPLONA ALTA MZ C LT 10', distrito: 'SAN JUAN DE MIRAFLORES', provincia: 'LIMA', departamento: 'LIMA' });
+  assert.deepEqual(busquedas.map((b) => b.q), ['Asentamiento Humano Pamplona Alta, SAN JUAN DE MIRAFLORES, LIMA', 'Pamplona Alta, SAN JUAN DE MIRAFLORES, LIMA']);
+  assert.ok(busquedas.every((b) => !b.street), 'nada estructurado: no hay número de puerta');
+  const conCalle = busquedasParaDireccion({ direccion: 'CALLE LOS CEDROS MZ B LT 3', distrito: 'CHILCA', provincia: 'HUANCAYO', departamento: 'JUNIN' }).busquedas;
+  assert.deepEqual(conCalle.map((b) => b.q), ['Calle Los Cedros, CHILCA, HUANCAYO, JUNIN']);
+  assert.deepEqual(busquedasParaDireccion({ direccion: 'MZ A LT 3', distrito: 'COMAS' }).busquedas, [], 'solo manzana y lote: no hay nada que buscar');
+});
