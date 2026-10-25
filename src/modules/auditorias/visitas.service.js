@@ -8,8 +8,13 @@ import { estadoDeMovimiento } from '#modules/usuarios/movimiento.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { logger } from '#core/config/logger.js';
 import { cierreAlReiniciar, textoZona, zonaDeJornada } from './jornada.core.js';
-import { conteosPorResultado, construirDonde, filaVisitaCsv, COLUMNAS_CSV } from './visitas.filtros.js';
+import { conteosPorResultado, construirDonde, fechaYHora, filaVisitaCsv, COLUMNAS_CSV } from './visitas.filtros.js';
 import { filaCsv } from '#modules/sistema/seguridad.filtros.js';
+import { once } from 'node:events';
+import ExcelJS from 'exceljs';
+import { publica as empresaPublica } from '#modules/empresas/empresas.service.js';
+import { empresaActual } from '#core/tenant/contexto.js';
+import { COLUMNAS, COLOR_GRUPO, COLOR_RESULTADO, ETIQUETA_RESULTADO, filaVisitaXlsx, descripcionDeFiltros, idx } from './visitas.excel.js';
 
 function serialize(value) { return JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'object' && item?.constructor?.name === 'Decimal' ? Number(item) : item)); }
 
@@ -279,6 +284,141 @@ async function exportarCsv(consulta, { escribir, cancelado = () => false, lote =
   return { filas };
 }
 
+// Reporte de visitas en Excel con formato (el que baja el panel): las mismas visitas filtradas que el CSV, por lotes con cursor y escritas al archivo a medida que
+// salen (sin tope de filas ni cargar todo en memoria). Hoja «Resumen» (filtros usados y visitas por resultado) y hoja «Visitas» con una fila por visita.
+// `stream` es donde se escribe el .xlsx (la respuesta HTTP); `cancelado()` avisa si el cliente cortó la descarga; `antesDeCerrar({ filas })` se llama justo antes de terminar el archivo.
+// Alto de la fila (en puntos) según cuántas líneas ocupa el texto que se ajusta dentro de su celda: Excel no lo calcula solo al abrir un archivo escrito por partes.
+function alturaDeFila(valores) {
+  let lineas = 1;
+  COLUMNAS.forEach((c, i) => {
+    if (!(c.ajustar || c.t === 'Alertas' || c.t === 'Dirección registrada' || c.t === 'Dirección visitada')) return;
+    const texto = String(valores[i] ?? '');
+    if (texto) lineas = Math.max(lineas, Math.ceil((texto.length * 1.1) / c.w));
+  });
+  return Math.min(180, Math.max(22, lineas * 13.5 + 8));
+}
+
+async function exportarXlsx(consulta, { stream, cancelado = () => false, antesDeCerrar = () => {}, lote = 500 }) {
+  const base = construirDonde(consulta);
+  const desfase = consulta.desfase || 0;
+  const [reglas, porResultado, auditor, empresa] = await Promise.all([
+    reglasEmpresa(),
+    prisma.visitaAuditoria.groupBy({ by: ['resultado'], where: base, _count: { _all: true } }),
+    consulta.id_usuario_auditor ? prisma.usuario.findFirst({ where: { id_usuario: consulta.id_usuario_auditor }, select: { username: true, nombres: true, apellidos: true } }) : null,
+    Promise.resolve(empresaPublica(empresaActual())).catch(() => null),
+  ]);
+  const radioM = reglas.geocerca_radio_m;
+  const conteos = conteosPorResultado(porResultado);
+  const borde = { bottom: { style: 'thin', color: { argb: 'FFE5E8F2' } } };
+  const relleno = (argb) => ({ type: 'pattern', pattern: 'solid', fgColor: { argb } });
+  const wb = new ExcelJS.stream.xlsx.WorkbookWriter({ stream, useStyles: true, useSharedStrings: false });
+  wb.creator = 'Auditoría de Visitas';
+  wb.created = new Date();
+
+  // ---- Resumen
+  const rs = wb.addWorksheet('Resumen', { views: [{ showGridLines: false }], pageSetup: { orientation: 'portrait', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0 } });
+  rs.getColumn(1).width = 30; rs.getColumn(2).width = 16; rs.getColumn(3).width = 12; rs.getColumn(4).width = 46;
+  const [hoyDia, hoyHora] = fechaYHora(new Date(), desfase);
+  // `unir` = [desde, hasta]: columnas que se juntan en una sola celda (para que un texto largo no se salga de la hoja).
+  const escribir = (valores, { font = {}, alto, unir } = {}) => {
+    const fila = rs.addRow(valores);
+    fila.font = { name: 'Calibri', size: 11, ...font };
+    if (unir) { rs.mergeCells(fila.number, unir[0], fila.number, unir[1]); fila.getCell(unir[0]).alignment = { vertical: 'top', wrapText: true }; }
+    if (alto) fila.height = alto;
+    fila.commit();
+  };
+  escribir(['Reporte de visitas'], { font: { size: 20, bold: true, color: { argb: 'FF2F3E9E' } }, alto: 32 });
+  escribir([`${empresa?.nombre || 'Auditoría de Visitas'} · generado el ${hoyDia} a las ${hoyHora}`], { font: { color: { argb: 'FF6B7194' } } });
+  escribir([]);
+  escribir(['Filtros aplicados'], { font: { bold: true, size: 13, color: { argb: 'FF2F3E9E' } } });
+  const nombreAuditor = auditor ? ([auditor.nombres, auditor.apellidos].filter(Boolean).join(' ') || auditor.username) : null;
+  for (const [k, v] of descripcionDeFiltros(consulta, { nombreAuditor })) escribir([k, v], { unir: [2, 4] });
+  escribir([]);
+  escribir(['Visitas por resultado'], { font: { bold: true, size: 13, color: { argb: 'FF2F3E9E' } } });
+  for (const r of ['CONFORME', 'OBSERVADO', 'NO_UBICADO', 'RECHAZADO']) {
+    const fila = rs.addRow([ETIQUETA_RESULTADO[r], conteos[r], conteos.total ? conteos[r] / conteos.total : 0]);
+    const c = COLOR_RESULTADO[r];
+    fila.getCell(1).fill = relleno(c.fondo); fila.getCell(1).font = { name: 'Calibri', bold: true, color: { argb: c.texto } };
+    fila.getCell(2).numFmt = '#,##0'; fila.getCell(2).alignment = { horizontal: 'left' };
+    fila.getCell(3).numFmt = '0%'; fila.getCell(3).alignment = { horizontal: 'left' };
+    fila.commit();
+  }
+  const total = rs.addRow(['Total', conteos.total]);
+  total.font = { name: 'Calibri', bold: true }; total.getCell(2).numFmt = '#,##0'; total.getCell(2).alignment = { horizontal: 'left' };
+  total.commit();
+  escribir([]);
+  escribir(['Cómo leer la hoja «Visitas»'], { font: { bold: true, size: 13, color: { argb: 'FF2F3E9E' } } });
+  for (const t of [
+    'Una fila por visita, de la más reciente a la más antigua. Las columnas están agrupadas por tema (franja de colores de arriba).',
+    'La columna «Alertas» dice en palabras por qué conviene mirar esa visita: GPS simulado, dispositivo no íntegro, fuera de la geocerca, sin fotografías o una respuesta del cliente que preocupa.',
+    `La geocerca de esta empresa es de ${radioM} m. Las celdas en rojo son lo que salió mal; en verde, los controles que salieron bien.`,
+    '«Latitud/Longitud del cliente» es el punto de referencia del domicilio; «De dónde salió el punto» dice si vino de la base, del mapa, de un supervisor o de la primera visita.',
+  ]) escribir([t], { font: { color: { argb: 'FF4B5170' } }, unir: [1, 4], alto: 32 });
+  await rs.commit();
+
+  // ---- Visitas
+  const ws = wb.addWorksheet('Visitas', {
+    views: [{ state: 'frozen', xSplit: 4, ySplit: 2, showGridLines: false }],
+    pageSetup: { orientation: 'landscape', paperSize: 9, fitToPage: true, fitToWidth: 1, fitToHeight: 0 },
+  });
+  COLUMNAS.forEach((c, i) => { ws.getColumn(i + 1).width = c.w; });
+  // Franja de grupos (fila 1) y títulos (fila 2).
+  const franja = ws.addRow(COLUMNAS.map((c, i) => (i === 0 || COLUMNAS[i - 1].g !== c.g ? c.g : null)));
+  const titulos = ws.addRow(COLUMNAS.map((c) => c.t));
+  franja.height = 22; titulos.height = 44;
+  COLUMNAS.forEach((c, i) => {
+    const celdaF = franja.getCell(i + 1); const celdaT = titulos.getCell(i + 1);
+    celdaF.fill = relleno(COLOR_GRUPO[c.g]); celdaF.font = { name: 'Calibri', bold: true, size: 11, color: { argb: 'FFFFFFFF' } };
+    celdaF.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
+    celdaT.fill = relleno('FFE8ECF9'); celdaT.font = { name: 'Calibri', bold: true, size: 10, color: { argb: 'FF2F3E9E' } };
+    celdaT.alignment = { vertical: 'middle', horizontal: c.c ? 'center' : 'left', wrapText: true };
+    celdaT.border = { bottom: { style: 'medium', color: { argb: 'FF2F3E9E' } } };
+  });
+  franja.commit(); titulos.commit();
+  const IDX_RESULTADO = idx('Resultado');
+  let cursor = null; let filas = 0;
+  for (;;) {
+    if (cancelado()) break;
+    const where = cursor ? { AND: [base, { OR: [{ fecha_hora_checkin: { lt: cursor.fecha } }, { fecha_hora_checkin: cursor.fecha, id_visita: { lt: cursor.id } }] }] } : base;
+    const pagina = await prisma.visitaAuditoria.findMany({
+      where, orderBy: ORDEN_LISTA, take: lote,
+      omit: { expediente_snapshot: true, firma_evidencia: true, conformidad_financiera: true },
+      include: { expediente: { select: { ...EXPEDIENTE_RESUMEN, latitud: true, longitud: true, ubicacion_origen: true } }, auditor: { select: AUDITOR_RESUMEN }, evidencias: { select: { id_evidencia: true } } },
+    });
+    if (!pagina.length) break;
+    for (const v of pagina) {
+      const { valores, malas, buenas } = filaVisitaXlsx(v, { desfase, radioM });
+      const fila = ws.addRow(valores);
+      fila.height = alturaDeFila(valores);
+      const zebra = filas % 2 === 1 ? relleno('FFF7F8FC') : null;
+      COLUMNAS.forEach((c, i) => {
+        const celda = fila.getCell(i + 1);
+        celda.font = { name: 'Calibri', size: 10, color: { argb: 'FF1F2340' } };
+        celda.alignment = { vertical: c.ajustar ? 'top' : 'middle', horizontal: c.c ? 'center' : 'left', wrapText: Boolean(c.ajustar || c.t === 'Alertas' || c.t === 'Dirección registrada' || c.t === 'Dirección visitada') };
+        celda.border = borde;
+        if (c.f) celda.numFmt = c.f;
+        if (zebra) celda.fill = zebra;
+        if (malas.has(i)) { celda.fill = relleno('FFFCEBED'); celda.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFA33C43' } }; }
+        else if (buenas.has(i)) celda.font = { name: 'Calibri', size: 10, color: { argb: 'FF267254' } };
+      });
+      const rc = COLOR_RESULTADO[v.resultado];
+      if (rc) { const c = fila.getCell(IDX_RESULTADO + 1); c.fill = relleno(rc.fondo); c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: rc.texto } }; }
+      fila.commit();
+      filas += 1;
+    }
+    // Si la conexión va lenta se espera a que se vacíe el búfer en vez de acumular el archivo en memoria.
+    if (stream.writableNeedDrain && !cancelado()) await once(stream, 'drain');
+    const ultima = pagina[pagina.length - 1];
+    cursor = { fecha: ultima.fecha_hora_checkin, id: ultima.id_visita };
+    if (pagina.length < lote) break;
+  }
+  ws.autoFilter = { from: { row: 2, column: 1 }, to: { row: 2, column: COLUMNAS.length } };
+  antesDeCerrar({ filas }); // al cerrar el archivo se termina la respuesta: lo que hay que anotar en el registro de seguridad se deja listo antes
+  await ws.commit();
+  await wb.commit();
+  return { filas };
+}
+
 async function obtener(id) {
   const visita = await prisma.visitaAuditoria.findUnique({
     where: { id_visita: id },
@@ -409,4 +549,4 @@ async function registrarJornada(usuarioId, accion, cuerpo = {}) {
 }
 
 export { snapshotExpediente };
-export default { presignEvidencia, recibirEvidencia, crearVisita, listar, exportarCsv, obtener, obtenerArchivoEvidencia, actualizarUbicacionEnVivo, registrarJornada };
+export default { presignEvidencia, recibirEvidencia, crearVisita, listar, exportarCsv, exportarXlsx, obtener, obtenerArchivoEvidencia, actualizarUbicacionEnVivo, registrarJornada };
