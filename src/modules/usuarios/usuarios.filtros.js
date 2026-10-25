@@ -16,13 +16,16 @@ export function filtroTexto(q, campos) {
   return palabras.map((palabra) => ({ OR: campos.map((campo) => ({ [campo]: { contains: palabra } })) }));
 }
 
-// Lista de usuarios de la empresa (pantalla Usuarios): por texto, rol y estado.
+// Estado de una cuenta «eliminada»: sigue en la base (con todo su historial), pero ya no se ve en el panel, no puede entrar y no se vuelve a activar desde él.
+export const ESTADO_ELIMINADO = 'ELIMINADO';
+
+// Lista de usuarios de la empresa (pantalla Usuarios): por texto, rol y estado. Las cuentas eliminadas nunca salen.
 export function filtroUsuarios({ q, rol, estado } = {}) {
   const texto = filtroTexto(q, ['username', 'nombres', 'apellidos', 'email']);
   return {
     // «ADMIN» es el nombre anterior del rol de administrador: se sigue encontrando.
     ...(rol ? { rol: rol === ROLES.ADMINISTRADOR ? { in: [ROLES.ADMINISTRADOR, 'ADMIN'] } : rol } : {}),
-    ...(estado ? { estado } : {}),
+    estado: estado || { not: ESTADO_ELIMINADO },
     ...(texto.length ? { AND: texto } : {}),
   };
 }
