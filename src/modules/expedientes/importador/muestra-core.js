@@ -2,7 +2,7 @@
 // completos y coherentes: sirven para la plantilla descargable del panel y para generar muestras de prueba sin datos personales.
 // Cada fila trae domicilio con coordenadas en la referencia, dos locales del negocio, las dos evaluaciones, cinco líneas de
 // ingresos y el endeudamiento del cliente (y del cónyuge cuando está casado).
-import { COLUMNAS_CORE } from './columnas-core.js';
+import { COLUMNAS_CORE, COLUMNAS_CONSUMO } from './columnas-core.js';
 
 const f2 = (n) => Number(n).toFixed(2);
 const dmy = (d) => `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
@@ -243,3 +243,33 @@ export function construirFilaSimple(i, opciones = {}) {
 
 // Fila como arreglo en el orden de las 262 columnas (para escribir el Excel).
 export const filaCoreComoArreglo = (fila) => COLUMNAS_CORE.map((c) => (fila[c] === undefined ? '' : fila[c]));
+
+// Fila de ejemplo de la base de Consumo (hoja CONSUMO, con las columnas de su ficha): parte de la fila del core y la vuelve la de un trabajador con ingresos
+// sustentados (empleador, no negocio), más las 16 columnas propias de Consumo. Datos inventados.
+const SUSTENTOS = ['BOLETAS DE PAGO', 'CONSTANCIA DE TRABAJO', 'RECIBOS POR HONORARIOS', 'DECLARACION JURADA DE INGRESOS'];
+const EMPLEADORES = ['MUNICIPALIDAD DISTRITAL', 'INSTITUCION EDUCATIVA PRIVADA', 'EMPRESA DE TRANSPORTES', 'CLINICA LOCAL', 'COMERCIAL MAYORISTA'];
+export function construirFilaConsumo(i, opciones = {}) {
+  const v = construirFilaCore(i, opciones);
+  const empleador = EMPLEADORES[i % EMPLEADORES.length];
+  Object.assign(v, {
+    Fuente: 'BASE CORE CONSUMO',
+    actividad: 'EMPLEADO DEPENDIENTE', cAspExpAct: `${1 + (i % 12)} AÑOS`,
+    NomEmp_1: `${empleador} ${v.DISTNEG_1}`, NomEmp_2: '-',
+    DirEmp_2: '-', DISTNEG_2: '-', RefEmp_2: '-', TelEmp_2: '-',
+    cDesCortaTipCre: 'CONSUMO NO REV', cdesprodu: 'CREDITO CONSUMO A CUOTA FIJA', destino: ['LIBRE DISPONIBILIDAD', 'COMPRA DE DEUDA', 'LIBRE DISPONIBILIDAD'][i % 3],
+    SustIngreso: SUSTENTOS[i % SUSTENTOS.length],
+  });
+  const sueldo = 1800 + ((i * 370) % 4200);
+  const ingresos = [
+    ['SUELDO DEPENDIENTE', 'TITULAR', sueldo, 'FIJO'],
+    ...(i % 2 === 0 ? [[v.nombreconyuge === 'SIN CONYUGE' ? 'ALQUILER DE CUARTO' : 'SUELDO CONYUGE', v.nombreconyuge === 'SIN CONYUGE' ? 'TITULAR' : 'CONYUGE', 900 + ((i * 130) % 1500), 'VARIABLE']] : []),
+    ...(i % 3 === 0 ? [['BONOS Y GRATIFICACIONES', 'TITULAR', 300 + ((i * 70) % 500), 'VARIABLE']] : []),
+  ];
+  for (let n = 1; n <= 3; n += 1) {
+    const [descripcion, relacion, monto, tipo] = ingresos[n - 1] || ['-', '-', '0.00', '-'];
+    Object.assign(v, { [`DESCRIPCIONCONSUMO${n}`]: descripcion, [`RELACION${n}`]: relacion, [`MONEDA${n}`]: descripcion === '-' ? '-' : 'SOLES', [`NMONINGDEU${n}`]: typeof monto === 'number' ? f2(monto) : monto, [`TIPOING${n}`]: tipo });
+  }
+  return v;
+}
+// Fila de Consumo como arreglo en el orden de sus columnas (para escribir el Excel).
+export const filaConsumoComoArreglo = (fila) => COLUMNAS_CONSUMO.map((c) => (fila[c] === undefined ? '' : fila[c]));

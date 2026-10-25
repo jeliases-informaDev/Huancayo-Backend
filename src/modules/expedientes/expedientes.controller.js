@@ -91,7 +91,7 @@ async function plantilla(req, res, next) {
     const permitidos = (await reglasEmpresa()).formatos_importacion || [];
     if (!permitidos.includes(formato)) return res.status(403).json({ error: 'Tu empresa no acepta este formato de importación', code: 'FORMATO_NO_PERMITIDO' });
     const archivo = await generarPlantilla(formato, { tipo });
-    const sufijo = formato === 'SIMPLE' && tipo ? `-${tipo === 'OTROS' ? 'mype' : 'consumo'}` : '';
+    const sufijo = tipo ? `-${tipo === 'OTROS' ? 'mype' : 'consumo'}` : '';
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="plantilla-expedientes-${formato.toLowerCase()}${sufijo}.xlsx"`);
     res.send(archivo);

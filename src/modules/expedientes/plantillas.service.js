@@ -1,8 +1,8 @@
 // Plantillas de Excel descargables desde el panel («Cargar expedientes»): una por formato que la empresa acepta, con los
 // encabezados exactos, filas de ejemplo con datos inventados y una hoja de instrucciones. Así nadie tiene que adivinar columnas.
 import ExcelJS from 'exceljs';
-import { COLUMNAS_CORE } from './importador/columnas-core.js';
-import { construirFilaCore, filaCoreComoArreglo } from './importador/muestra-core.js';
+import { COLUMNAS_CORE, COLUMNAS_CONSUMO } from './importador/columnas-core.js';
+import { construirFilaCore, filaCoreComoArreglo, construirFilaConsumo, filaConsumoComoArreglo } from './importador/muestra-core.js';
 
 export const FORMATOS = Object.freeze(['CORE_262', 'SIMPLE']);
 
@@ -31,11 +31,29 @@ function ajustarEncabezado(ws) {
   ws.views = [{ state: 'frozen', ySplit: 1 }];
 }
 
-// `tipo` (CONSUMO u OTROS) solo cambia el tipo de las filas de ejemplo de la plantilla SIMPLE: Modelo Consumo y Modelo MYPE.
+// `tipo` (CONSUMO u OTROS): en la plantilla CORE_262 elige la ficha completa (CONSUMO = la base de consumo con las columnas de su ficha, hoja CONSUMO; sin tipo u OTROS =
+// las 262 columnas de la base MYPE, hoja OTROS). En la SIMPLE solo cambia el tipo de las filas de ejemplo.
 export async function generarPlantilla(formato, { ejemplos = 3, tipo } = {}) {
   const wb = new ExcelJS.Workbook();
   wb.creator = 'Auditoria de Visitas';
-  if (formato === 'CORE_262') {
+  if (formato === 'CORE_262' && tipo === 'CONSUMO') {
+    const ws = wb.addWorksheet('CONSUMO');
+    ws.addRow(COLUMNAS_CONSUMO);
+    for (let i = 0; i < ejemplos; i += 1) ws.addRow(filaConsumoComoArreglo(construirFilaConsumo(i)));
+    ajustarEncabezado(ws);
+    COLUMNAS_CONSUMO.forEach((c, i) => { ws.getColumn(i + 1).width = Math.min(40, Math.max(12, c.length + 2)); });
+    hojaInstrucciones(wb, [
+      `Plantilla de CONSUMO completa (${COLUMNAS_CONSUMO.length} columnas): todo lo que lleva la ficha de entrevista de Consumo del banco.`,
+      `Son las columnas de la base del core que usa esa ficha (mismos nombres) y, al final, las 16 propias de Consumo: SustIngreso (documento con que sustenta sus ingresos) y hasta 3 ingresos del cliente (DESCRIPCIONCONSUMO, RELACION, MONEDA, NMONINGDEU, TIPOING).`,
+      'La hoja debe llamarse CONSUMO. Si tu base trae más columnas del core, no pasa nada: se leen todas.',
+      'Columnas obligatorias por fila: ccodctacre (N° de crédito), cnomcliente, DocIde y nombreAsesorActual. Las demás pueden quedar vacías.',
+      'Ubicación del domicilio: escribe las coordenadas dentro de cRefDomCli, por ejemplo "Ref: -11.933000,-77.054000 FRENTE AL PARQUE". Lo mismo en RefEmp_1 y RefEmp_2 para el lugar de trabajo.',
+      'Fechas en formato dd-mm-aaaa. Montos con punto decimal. Los 3 ingresos van en las columnas con sufijo 1, 2 y 3; deja vacío el que no exista.',
+      'Las 3 filas de ejemplo son datos inventados: bórralas antes de cargar tu base. Si el N° de crédito ya existe se actualiza; si ya fue auditado no se modifica.',
+      'Todo o nada: si alguna fila trae un error no se guarda ninguna (ni las válidas). El reporte dice la fila del archivo, el campo y qué corregir; corrige y vuelve a cargar.',
+      'Al cargar el archivo, el sistema primero lo revisa completo sin guardar nada y te muestra el reporte; después decides si importarlo.',
+    ]);
+  } else if (formato === 'CORE_262') {
     const ws = wb.addWorksheet('OTROS');
     ws.addRow(COLUMNAS_CORE);
     for (let i = 0; i < ejemplos; i += 1) ws.addRow(filaCoreComoArreglo(construirFilaCore(i)));

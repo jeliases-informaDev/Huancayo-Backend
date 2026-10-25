@@ -206,7 +206,9 @@ export function mapearFilaCore(fila, { hoja }) {
 
   const reevaluacion = periodo(v, 2);
   const anterior = periodo(v, 1);
-  if (!reevaluacion && !anterior) advertencias.push('SIN_EVALUACION');
+  // La evaluación de Consumo son sus ingresos (no el balance de un negocio): sin ellos es cuando se avisa. Si no, cada fila de Consumo saldría con un aviso falso.
+  const lineasConsumo = ingresosConsumo(v);
+  if (tipoCredito === 'CONSUMO' ? !lineasConsumo.length : (!reevaluacion && !anterior)) advertencias.push('SIN_EVALUACION');
 
   const monedaCodigo = moneda(v('Moneda'), v('cCodTipMon'));
   const celular = telefono(v('TELFCLIENTE'));
@@ -320,7 +322,6 @@ export function mapearFilaCore(fila, { hoja }) {
   }];
 
   const evaluacionFinanciera = { moneda: monedaCodigo, reevaluacion, anterior, ingresos: ingresos(v) };
-  const lineasConsumo = ingresosConsumo(v);
   if (lineasConsumo.length) evaluacionFinanciera.ingresos_consumo = lineasConsumo;
   const endeudamiento = {
     fecha_corte: fecha(v('FECHAOBTENCION')),
