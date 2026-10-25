@@ -215,7 +215,7 @@ async function exportarCsv(consulta, { escribir, cancelado = () => false, lote =
       const v = presentar(f, nombres);
       texto += filaCsv([
         v.fecha.toISOString(), v.actor, v.actor_nombre, v.rol, v.titulo, v.categoria_texto, v.severidad, v.resultado === 'ok' ? 'Correcto' : 'Rechazado', v.estado_http,
-        v.metodo, v.ruta, v.ip_address, v.plataforma, v.device_id, v.entidad, v.entidad_id, v.request_id, v.valor_anterior, v.valor_nuevo,
+        v.metodo, v.ruta, v.ip_address, v.plataforma, v.device_id, v.entidad, v.entidad_id, v.request_id, v.valor_anterior, v.valor_nuevo, v.secuencia, v.sello,
       ]);
     }
     await escribir(texto);

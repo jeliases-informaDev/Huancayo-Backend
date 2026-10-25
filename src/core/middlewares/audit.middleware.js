@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 import prisma from '#core/config/prisma.js';
 import { sinEmpresa } from '#core/tenant/contexto.js';
 import { clasificar, esLecturaAuditada } from '#modules/sistema/seguridad.catalogo.js';
+import { registrarSellado, programarSellado } from '#modules/sistema/sello.service.js';
 
 const ESCRIBE = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
@@ -69,7 +70,7 @@ export function auditMiddleware(req, res, next) {
     const diff = req.auditContext || {};
     const clase = clasificar({ metodo, ruta, estado: res.statusCode, anterior: diff.valor_anterior, nuevo: diff.valor_nuevo });
     const idEntidad = diff.entidad_id ? String(diff.entidad_id) : (clase.ref?.id != null ? String(clase.ref.id) : null);
-    sinEmpresa(() => prisma.auditoriaSeguridad.create({ data: {
+    const datos = {
       empresa_id: actor?.empresa_id || null,
       request_id: req.id, actor_id: actor?.id || null, actor: nombreActor,
       rol: actor?.rol || null, metodo, ruta: ruta.slice(0, 255),
@@ -82,7 +83,16 @@ export function auditMiddleware(req, res, next) {
       con_cambios: clase.categoria !== 'CONSULTA' && (diff.valor_anterior !== undefined || diff.valor_nuevo !== undefined),
       entidad: diff.entidad || clase.ref?.tipo || null, entidad_id: idEntidad ? idEntidad.slice(0, 64) : null,
       valor_anterior: diff.valor_anterior ?? undefined, valor_nuevo: diff.valor_nuevo ?? undefined,
-    } })).catch(error => logger.error({ err: error, requestId: req.id }, 'security_audit_persistence_failed'));
+    };
+    // Cada anotación se guarda sellada (cadena de huellas, ver sistema/sello.service.js). Si el sellado falla (p. ej. el candado tardó más de la
+    // cuenta), la anotación se guarda igual sin sello antes que perderla: el sellador periódico la sella después.
+    registrarSellado(datos)
+      .catch((error) => {
+        logger.error({ err: error, requestId: req.id }, 'security_audit_seal_failed');
+        programarSellado();
+        return sinEmpresa(() => prisma.auditoriaSeguridad.create({ data: datos }));
+      })
+      .catch(error => logger.error({ err: error, requestId: req.id }, 'security_audit_persistence_failed'));
   });
   next();
 }

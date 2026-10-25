@@ -80,5 +80,5 @@ export const filaCsv = (celdas) => `${celdas.map(celdaCsv).join(',')}\r\n`;
 
 export const COLUMNAS_CSV = Object.freeze([
   'Fecha (UTC)', 'Usuario', 'Nombre', 'Rol', 'Acción', 'Categoría', 'Gravedad', 'Resultado', 'Código HTTP', 'Método', 'Ruta', 'IP', 'Plataforma',
-  'Dispositivo', 'Entidad', 'Id de la entidad', 'Id de la petición', 'Valor anterior', 'Valor nuevo',
+  'Dispositivo', 'Entidad', 'Id de la entidad', 'Id de la petición', 'Valor anterior', 'Valor nuevo', 'N.°', 'Sello',
 ]);
