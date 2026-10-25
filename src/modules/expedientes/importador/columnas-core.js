@@ -36,3 +36,29 @@ export const COLUMNAS_CORE = [
   'cdestipcreConyu2', 'nsaldoConyu2', 'cnomifiConyu3', 'ccalempdesConyu3', 'cdestipcreConyu3', 'nsaldoConyu3', 'cnomifiConyu4', 'ccalempdesConyu4',
   'cdestipcreConyu4', 'nsaldoConyu4', 'cnomifiConyu5', 'ccalempdesConyu5', 'cdestipcreConyu5', 'nsaldoConyu5',
 ];
+
+// Ficha de Consumo: la base de consumo del banco trae el documento con que el cliente sustenta su ingreso y hasta 3 ingresos (descripción, relación, moneda,
+// monto y tipo). Son 16 columnas que la base MYPE de 262 no tiene; el importador ya las lee.
+export const COLUMNAS_CONSUMO_PROPIAS = [
+  'SustIngreso',
+  'DESCRIPCIONCONSUMO1', 'RELACION1', 'MONEDA1', 'NMONINGDEU1', 'TIPOING1',
+  'DESCRIPCIONCONSUMO2', 'RELACION2', 'MONEDA2', 'NMONINGDEU2', 'TIPOING2',
+  'DESCRIPCIONCONSUMO3', 'RELACION3', 'MONEDA3', 'NMONINGDEU3', 'TIPOING3',
+];
+
+// Columnas de la base de 262 que usa la ficha de Consumo del banco (los campos combinados de «PLANTILLA PARA CRÉDITOS CONSUMO»), más depDom, con el que se
+// fija el departamento del expediente. Las otras (balance, estado de resultados e ingresos del negocio) son de la evaluación MYPE y en Consumo no se piden.
+const CORE_EN_CONSUMO = [
+  'ccodctacre', 'cCodSolCre', 'dfecdescre', 'cnomcliente', 'Moneda', 'desembolsado', 'cDesCorta', 'CONDICIONDOMCLI', 'ProvDom', 'destino',
+  'cdesprodu', 'TelefijoDom', 'TELFCLIENTE', 'NomEmp_1', 'NomEmp_2', 'TelEmp_1', 'TelEmp_2', 'nombreAsesorActual', 'nombreAsesorOrigen', 'Oficina',
+  'nnumcuoapr', 'cDesCortaTipCre', 'DirEmp_1', 'DISTNEG_1', 'RefEmp_1', 'DirEmp_2', 'DISTNEG_2', 'RefEmp_2', 'cdirdomcli', 'DisDOM', 'depDom', 'dFecNacCli',
+  'CDESESTCIV', 'suministro', 'DocIde', 'cRefDomCli', 'cDesCortaEstado', 'cCodLinCre', 'Fuente', 'cAspExpAct', 'dFecUltPag', 'cargoPERAprob',
+  'NomAprobador', 'actividad', 'edad', 'SALDOCAPSoles', 'nombreconyuge', 'fiadores', 'representantes', 'cCuoDiaMasAtr', 'FECHAVENCIMIENTO',
+  'nmoncuota', 'CALIFICACIONSBS', 'NNROENTIDA', 'FECHAOBTENCION', 'cnomifi1', 'ccalempdes1', 'cdestipcre1', 'nsaldo1', 'cnomifi2', 'ccalempdes2',
+  'cdestipcre2', 'nsaldo2', 'cnomifi3', 'ccalempdes3', 'cdestipcre3', 'nsaldo3', 'cnomifi4', 'ccalempdes4', 'cdestipcre4', 'nsaldo4', 'cnomifi5',
+  'ccalempdes5', 'cdestipcre5', 'nsaldo5', 'cnomifiConyu1', 'ccalempdesConyu1', 'cdestipcreConyu1', 'nsaldoConyu1', 'cnomifiConyu2',
+  'ccalempdesConyu2', 'cdestipcreConyu2', 'nsaldoConyu2', 'cnomifiConyu3', 'ccalempdesConyu3', 'cdestipcreConyu3', 'nsaldoConyu3',
+];
+const enConsumo = new Set(CORE_EN_CONSUMO.map((c) => c.toLowerCase()));
+// Base de consumo completa: las columnas del core que usa su ficha, en el mismo orden que el core, y al final las 16 propias de Consumo.
+export const COLUMNAS_CONSUMO = [...COLUMNAS_CORE.filter((c) => enConsumo.has(c.toLowerCase())), ...COLUMNAS_CONSUMO_PROPIAS];
