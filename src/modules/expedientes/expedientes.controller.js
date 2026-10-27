@@ -1,3 +1,4 @@
+import { avisarPanel } from '#core/realtime.js';
 import crypto from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
@@ -20,7 +21,11 @@ async function obtener(req, res, next) {
   try { res.json({ data: await expedientesService.obtener(req.validated.params.id) }); } catch (error) { next(error); }
 }
 async function crear(req, res, next) {
-  try { res.status(201).json({ data: await expedientesService.crear(req.body) }); } catch (error) { next(error); }
+  try {
+    const data = await expedientesService.crear(req.body);
+    avisarPanel(req.user.empresa_id, 'expedientes_actualizados', { motivo: 'creado' });
+    res.status(201).json({ data });
+  } catch (error) { next(error); }
 }
 async function actualizar(req, res, next) {
   try {

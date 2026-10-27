@@ -69,7 +69,7 @@ export async function cargarVisitasDemo({ actorId }) {
         const creada = await tx.visitaAuditoria.create({
           data: {
             ...visita, id_asignacion: asignacion.id_asignacion, id_expediente: expediente.id_expediente, id_usuario_auditor: auditor.id_usuario,
-            expediente_snapshot: snapshotExpediente(expediente), firma_evidencia: ['CONFORME', 'OBSERVADO'].includes(caso.resultado) ? FIRMA_DEMO : null,
+            expediente_snapshot: snapshotExpediente(expediente), firma_evidencia: ['CONFORME', 'OBSERVADO'].includes(caso.resultado) ? FIRMA_DEMO : null, firma_auditor: FIRMA_DEMO,
           },
         });
         for (const f of fotos) {

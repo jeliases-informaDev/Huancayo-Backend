@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import ExcelJS from 'exceljs';
 import prisma from '#core/config/prisma.js';
 import { conEmpresa, empresaActual } from '#core/tenant/contexto.js';
+import { avisarPanel } from '#core/realtime.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { Prisma } from '../../../generated/prisma/index.js';
 import { esFormatoCore, FORMATO_CORE, mapearFilaCore } from './formato-core.js';
@@ -362,6 +363,7 @@ async function ejecutar(ctx, ruta) {
     await leerArchivo(ctx, ruta);
     if (!ctx.procesadas) { ctx.errores += 1; ctx.registrar(SIN_FILAS); }
     await guardarAvance(ctx, { estado: ctx.procesadas ? 'COMPLETADO' : 'ERROR', formato: ctx.formato, detalle_error: detalleDe(ctx), advertencias: ctx.advertencias, fecha_fin: new Date() });
+    if (!ctx.simular && ctx.procesadas) avisarPanel(ctx.empresaId, 'expedientes_actualizados', { motivo: 'importacion' }); // el Resumen cuenta los expedientes cargados
   } catch (error) {
     actual.registrar({ resultado: 'ERROR', campo: 'Archivo', problema: motivoDeLectura(error), corregir: 'Corrige el archivo y vuelve a validarlo.' });
     await guardarAvance(actual, { estado: 'ERROR', formato: actual.formato, detalle_error: detalleDe(actual), advertencias: actual.advertencias, fecha_fin: new Date() }).catch(() => {});

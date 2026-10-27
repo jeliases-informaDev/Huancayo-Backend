@@ -11,6 +11,7 @@ import { cierreAlReiniciar, textoZona, zonaDeJornada } from './jornada.core.js';
 import { conteosPorResultado, construirDonde, fechaYHora, filaVisitaCsv, COLUMNAS_CSV } from './visitas.filtros.js';
 import { filaCsv } from '#modules/sistema/seguridad.filtros.js';
 import { once } from 'node:events';
+import { validarFirmaAuditor } from './firma-auditor.js';
 import ExcelJS from 'exceljs';
 import { publica as empresaPublica } from '#modules/empresas/empresas.service.js';
 import { empresaActual } from '#core/tenant/contexto.js';
@@ -141,6 +142,7 @@ async function crearVisita(auditorId, payload) {
     throw Object.assign(new Error(`Este expediente es de crédito ${expediente.tipo_credito}: corresponde la ficha ${plantillaEsperada}, no ${payload.plantilla}.`), { statusCode: 422, code: 'TEMPLATE_MISMATCH' });
   }
   validarFichaBasica(payload);
+  validarFirmaAuditor(payload, env.FIRMA_AUDITOR_OBLIGATORIA === 'true');
   validarFichaMype(payload);
   const punto = puntoDeReferencia(expediente, payload.ubicacion_visitada || 'DOMICILIO', payload.indice_negocio ?? 0);
   if (!punto) {
@@ -197,6 +199,7 @@ async function crearVisita(auditorId, payload) {
         otros_clientes_domicilio: payload.otros_clientes_domicilio || undefined,
         otros_ingresos: payload.otros_ingresos || undefined,
         firma_evidencia: payload.firma_evidencia || null,
+        firma_auditor: payload.firma_auditor || null,
         plantilla: plantillaEsperada,
         expediente_snapshot: snapshotExpediente(expediente),
         estado_negocio: payload.estado_negocio || null,
@@ -249,7 +252,7 @@ async function listar(consulta = {}) {
     prisma.visitaAuditoria.findMany({
       where, orderBy: ORDEN_LISTA, skip: (page - 1) * limit, take: limit,
       // Listado liviano: sin los bloques JSON del expediente, el snapshot ni la firma; de las fotos solo se necesita saber cuántas hay.
-      omit: { expediente_snapshot: true, firma_evidencia: true, conformidad_financiera: true },
+      omit: { expediente_snapshot: true, firma_evidencia: true, firma_auditor: true, conformidad_financiera: true },
       include: { expediente: { select: EXPEDIENTE_RESUMEN }, auditor: { select: AUDITOR_RESUMEN }, evidencias: { select: { id_evidencia: true } } },
     }),
     prisma.visitaAuditoria.count({ where }),
@@ -271,7 +274,7 @@ async function exportarCsv(consulta, { escribir, cancelado = () => false, lote =
     const where = cursor ? { AND: [base, { OR: [{ fecha_hora_checkin: { lt: cursor.fecha } }, { fecha_hora_checkin: cursor.fecha, id_visita: { lt: cursor.id } }] }] } : base;
     const pagina = await prisma.visitaAuditoria.findMany({
       where, orderBy: ORDEN_LISTA, take: lote,
-      omit: { expediente_snapshot: true, firma_evidencia: true, conformidad_financiera: true },
+      omit: { expediente_snapshot: true, firma_evidencia: true, firma_auditor: true, conformidad_financiera: true },
       include: { expediente: { select: { ...EXPEDIENTE_RESUMEN, oficina: true } }, auditor: { select: AUDITOR_RESUMEN }, evidencias: { select: { id_evidencia: true } } },
     });
     if (!pagina.length) break;
@@ -382,7 +385,7 @@ async function exportarXlsx(consulta, { stream, cancelado = () => false, antesDe
     const where = cursor ? { AND: [base, { OR: [{ fecha_hora_checkin: { lt: cursor.fecha } }, { fecha_hora_checkin: cursor.fecha, id_visita: { lt: cursor.id } }] }] } : base;
     const pagina = await prisma.visitaAuditoria.findMany({
       where, orderBy: ORDEN_LISTA, take: lote,
-      omit: { expediente_snapshot: true, firma_evidencia: true, conformidad_financiera: true },
+      omit: { expediente_snapshot: true, firma_evidencia: true, firma_auditor: true, conformidad_financiera: true },
       include: { expediente: { select: { ...EXPEDIENTE_RESUMEN, latitud: true, longitud: true, ubicacion_origen: true } }, auditor: { select: AUDITOR_RESUMEN }, evidencias: { select: { id_evidencia: true } } },
     });
     if (!pagina.length) break;

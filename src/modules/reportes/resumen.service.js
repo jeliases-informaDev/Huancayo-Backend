@@ -3,6 +3,7 @@ import { Prisma } from '../../generated/prisma/index.js';
 import { empresaActual } from '#core/tenant/contexto.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { cubetasDe, agruparPorCubeta, aFecha, aIso } from './actividad.js';
+import { ventanas, armarSerie, armarRanking, resultadosDe } from './tablero.js';
 import { MAX_DISTRITOS, formaDistritos } from './distritos.js';
 import { textoZona } from '#modules/auditorias/jornada.core.js';
 
@@ -146,6 +147,13 @@ const SERIES = {
   observados: { tabla: Prisma.raw('visitas_auditoria'), fecha: Prisma.raw('fecha_hora_checkin'), filtro: Prisma.sql`AND resultado = 'OBSERVADO'` },
 };
 
+// Lo que se registró en cada día (del usuario) entre dos instantes: Map AAAA-MM-DD → n. Una sola consulta con GROUP BY por día. La usan el gráfico
+// (`actividad`) y el tablero, así los números de las tarjetas son los mismos que dibuja el gráfico.
+async function conteoPorDia(serie, empresaId, desfase, inicioUtc, finUtc) {
+  const filas = await prisma.$queryRaw(Prisma.sql`SELECT DATE_FORMAT(DATE_SUB(${serie.fecha}, INTERVAL ${desfase} MINUTE), '%Y-%m-%d') AS d, COUNT(*) AS n FROM ${serie.tabla} WHERE empresa_id = ${empresaId} ${serie.filtro} AND ${serie.fecha} >= ${inicioUtc} AND ${serie.fecha} < ${finUtc} GROUP BY d`);
+  return new Map(filas.map((f) => [f.d, Number(f.n)]));
+}
+
 // Lo que se registró por día, semana o mes en la serie elegida (expedientes cargados, asignaciones hechas, visitas, visitas observadas).
 // `hasta` y `desfase` (minutos que el navegador está detrás de UTC, 300 en Perú) hacen que los días sean los del usuario y no los de UTC.
 // Un solo GROUP BY por día sobre una ventana acotada (7 días, 8 semanas o 6 meses); las semanas y los meses se arman en memoria.
@@ -157,9 +165,58 @@ async function actividad({ metrica = 'asignaciones', periodo = 'diario', hasta, 
   const cubetas = cubetasDe(periodo, fin);
   const inicioUtc = new Date(aFecha(cubetas[0].inicio).getTime() + desfase * 60000);
   const finUtc = new Date(aFecha(fin).getTime() + 24 * 60 * 60 * 1000 + desfase * 60000);
-  const filas = await prisma.$queryRaw(Prisma.sql`SELECT DATE_FORMAT(DATE_SUB(${serie.fecha}, INTERVAL ${desfase} MINUTE), '%Y-%m-%d') AS d, COUNT(*) AS n FROM ${serie.tabla} WHERE empresa_id = ${empresaId} ${serie.filtro} AND ${serie.fecha} >= ${inicioUtc} AND ${serie.fecha} < ${finUtc} GROUP BY d`);
-  const puntos = agruparPorCubeta(cubetas, new Map(filas.map((f) => [f.d, Number(f.n)])));
+  const puntos = agruparPorCubeta(cubetas, await conteoPorDia(serie, empresaId, desfase, inicioUtc, finUtc));
   return { metrica, periodo, desde: cubetas[0].inicio, hasta: fin, total: puntos.reduce((s, p) => s + p.total, 0), puntos };
 }
 
-export default { obtenerResumen, actividad };
+const SELECCION_AUDITOR = { id_usuario: true, nombres: true, apellidos: true, username: true, departamento: true, zona_distrito: true, zona_provincia: true, zona_departamento: true, zona_en: true };
+const nombreDe = (a) => `${a.nombres || ''} ${a.apellidos || ''}`.trim() || a.username;
+const zonaDe = (a) => (a.zona_en && textoZona({ distrito: a.zona_distrito, provincia: a.zona_provincia, departamento: a.zona_departamento })) || a.departamento || null;
+
+// Todo lo que dibuja la parte de arriba del Resumen para UN mismo tramo: las cuatro series (con su total y el del tramo anterior), lo que hay hoy en
+// total, los resultados de las visitas del tramo y el ranking de auditores con sus categorías. Tarjetas, gráfico y ranking salen de aquí, por eso coinciden.
+// `periodo`: 7 días, 8 bloques de 7 días o 6 meses de calendario terminando en `hasta` (día del usuario); `desfase`: minutos que el usuario está detrás de UTC.
+async function tablero({ periodo = 'diario', hasta, desfase = 0 } = {}) {
+  const empresaId = empresaDeLaPeticion();
+  const fin = hasta || aIso(new Date(Date.now() - desfase * 60000));
+  const v = ventanas(periodo, fin);
+  const aUtc = (iso) => new Date(aFecha(iso).getTime() + desfase * 60000); // medianoche del día del usuario, expresada en UTC
+  const inicioPrevio = aUtc(v.desdeAnterior);
+  const inicioActual = aUtc(v.desde);
+  const finUtc = new Date(aUtc(fin).getTime() + 24 * 60 * 60 * 1000);
+  const metricas = Object.keys(SERIES);
+
+  const [porDia, conteosBd, previosBd, totales, activos] = await Promise.all([
+    Promise.all(metricas.map((m) => conteoPorDia(SERIES[m], empresaId, desfase, inicioPrevio, finUtc))),
+    prisma.visitaAuditoria.groupBy({ by: ['id_usuario_auditor', 'resultado', 'plantilla'], where: { fecha_hora_checkin: { gte: inicioActual, lt: finUtc } }, _count: { _all: true } }),
+    prisma.visitaAuditoria.groupBy({ by: ['id_usuario_auditor'], where: { fecha_hora_checkin: { gte: inicioPrevio, lt: inicioActual } }, _count: { _all: true } }),
+    Promise.all([
+      prisma.expediente.count(), prisma.asignacionAuditoria.count({ where: { estado: 'ACTIVA' } }),
+      prisma.visitaAuditoria.count(), prisma.visitaAuditoria.count({ where: { resultado: 'OBSERVADO' } }),
+    ]),
+    prisma.usuario.findMany({ where: { rol: 'AUDITOR', estado: 'ACTIVO' }, select: SELECCION_AUDITOR }),
+  ]);
+
+  // Quien visitó en el tramo y ya no es un auditor activo también aparece (con la marca de inactivo): sus visitas cuentan en el total.
+  const conocidos = new Set(activos.map((a) => a.id_usuario));
+  const faltan = [...new Set(conteosBd.map((c) => c.id_usuario_auditor))].filter((id) => !conocidos.has(id));
+  const otros = faltan.length ? await prisma.usuario.findMany({ where: { id_usuario: { in: faltan } }, select: SELECCION_AUDITOR }) : [];
+  const conteos = conteosBd.map((c) => ({ id: c.id_usuario_auditor, resultado: c.resultado, plantilla: c.plantilla, n: c._count._all }));
+
+  return {
+    periodo, desde: v.desde, hasta: fin, dias: v.dias,
+    anterior: { desde: v.desdeAnterior, hasta: v.hastaAnterior },
+    generado_en: new Date().toISOString(),
+    series: Object.fromEntries(metricas.map((m, i) => [m, armarSerie(v, porDia[i])])),
+    hoy: { expedientes: totales[0], asignaciones_activas: totales[1], visitas: totales[2], observados: totales[3] },
+    resultados: resultadosDe(conteos),
+    ranking: armarRanking({
+      conteos,
+      anteriores: new Map(previosBd.map((c) => [c.id_usuario_auditor, c._count._all])),
+      auditores: [...activos.map((a) => ({ a, activo: true })), ...otros.map((a) => ({ a, activo: false }))]
+        .map(({ a, activo }) => ({ id: a.id_usuario, nombre: nombreDe(a), usuario: a.username, zona: zonaDe(a), activo })),
+    }),
+  };
+}
+
+export default { obtenerResumen, actividad, tablero };

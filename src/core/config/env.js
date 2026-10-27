@@ -63,6 +63,9 @@ const schema = z.object({
   // Interruptor de «Disponibles / Tomar este caso»: con false el auditor ya no puede tomar casos por su cuenta y solo trabaja los que
   // le asigna un supervisor. Encendido por defecto; además, cada carga de Excel decide si sus casos son tomables (autoasignable).
   PERMITIR_AUTOASIGNACION: z.enum(['true', 'false']).default('true'),
+  // Firma del auditor de campo al cierre de su trabajo. false: solo se exige a las apps que la declaran (ficha_version 2 o mayor), así las apps
+  // anteriores siguen enviando visitas mientras se actualizan. true: se exige a todas (ponerlo cuando todos los celulares estén al día).
+  FIRMA_AUDITOR_OBLIGATORIA: z.enum(['true', 'false']).default('false'),
   // Tope de casos abiertos que un asesor puede tener cuando los toma por su cuenta («Disponibles»). 0 = sin tope. El administrador lo cambia
   // desde el panel (Asignaciones); este valor solo rige mientras nadie lo haya tocado. Un supervisor puede asignar más allá del tope.
   TOPE_CASOS_ACTIVOS: z.coerce.number().int().min(0).max(1000).default(30),

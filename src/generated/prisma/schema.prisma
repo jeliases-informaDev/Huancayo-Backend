@@ -371,7 +371,8 @@ model VisitaAuditoria {
   comentario_auditor       String? @db.Text
   otros_clientes_domicilio Json?
   otros_ingresos           Json?
-  firma_evidencia          String? @db.Text // firma PNG en data URL
+  firma_evidencia          String? @db.Text // firma PNG en data URL (la del cliente)
+  firma_auditor            String? @db.Text // firma PNG en data URL del auditor de campo, al cerrar su trabajo
 
   // Ficha por tipo de crédito. "plantilla" identifica con qué formulario se tomó la visita
   // (CONSUMO_V1 / MYPE_V1) y "expediente_snapshot" congela los datos de la base tal como los

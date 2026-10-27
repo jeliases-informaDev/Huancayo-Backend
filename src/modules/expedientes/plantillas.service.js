@@ -1,5 +1,6 @@
 // Plantillas de Excel descargables desde el panel («Cargar expedientes»): una por formato que la empresa acepta, con los
 // encabezados exactos, filas de ejemplo con datos inventados y una hoja de instrucciones. Así nadie tiene que adivinar columnas.
+import { PRODUCTO } from '#core/config/producto.js';
 import ExcelJS from 'exceljs';
 import { COLUMNAS_CORE, COLUMNAS_CONSUMO } from './importador/columnas-core.js';
 import { construirFilaCore, filaCoreComoArreglo, construirFilaConsumo, filaConsumoComoArreglo } from './importador/muestra-core.js';
@@ -35,7 +36,7 @@ function ajustarEncabezado(ws) {
 // las 262 columnas de la base MYPE, hoja OTROS). En la SIMPLE solo cambia el tipo de las filas de ejemplo.
 export async function generarPlantilla(formato, { ejemplos = 3, tipo } = {}) {
   const wb = new ExcelJS.Workbook();
-  wb.creator = 'Auditoria de Visitas';
+  wb.creator = PRODUCTO;
   if (formato === 'CORE_262' && tipo === 'CONSUMO') {
     const ws = wb.addWorksheet('CONSUMO');
     ws.addRow(COLUMNAS_CONSUMO);

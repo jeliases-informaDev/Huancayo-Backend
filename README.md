@@ -1,6 +1,8 @@
-# Caja Huancayo — Auditoría de Visitas (Backend)
+# GeoMatrix — auditoría de visitas en campo (Backend)
 
-API para el proyecto de auditoría de visitas en campo de Caja Huancayo. Proyecto
+El producto se llama siempre **GeoMatrix**; las pantallas lo muestran como «GeoMatrix · nombre de la empresa que lo contrata».
+
+API para el proyecto de auditoría de visitas en campo (nació para Caja Huancayo y hoy es una plantilla multiempresa). Proyecto
 nuevo e independiente de `Afacop-Backend`, construido reusando sus mismos
 patrones (Express + Prisma + JWT/MFA + auditoría de seguridad).
 
