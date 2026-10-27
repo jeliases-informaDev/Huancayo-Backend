@@ -343,21 +343,25 @@ function seccionComentariosFinales(comentario) {
   return [titulo('COMENTARIOS FINALES DEL AUDITOR'), tabla([ANCHO], [[celda(val(comentario, ' '), { w: ANCHO, valign: VerticalAlign.TOP })]])];
 }
 
-function seccionFirmas(visita, e) {
-  const firma = visita.firma_evidencia;
-  const celdaFirma = [];
+// Firma PNG (data URL) dentro de una celda; sin firma devuelve `vacio`, para firmar a mano al imprimir.
+function contenidoFirma(firma, vacio) {
   if (firma && firma.startsWith('data:image/png;base64,')) {
-    celdaFirma.push(new Paragraph({ keepNext: true, children: [new ImageRun({ data: Buffer.from(firma.split(',')[1], 'base64'), type: 'png', transformation: { width: 170, height: 80 } })] }));
-  } else {
-    celdaFirma.push(parrafo(' ', { keepNext: true }));
+    return [new Paragraph({ keepNext: true, children: [new ImageRun({ data: Buffer.from(firma.split(',')[1], 'base64'), type: 'png', transformation: { width: 170, height: 80 } })] })];
   }
+  return vacio;
+}
+
+// Firma del cliente y firma del auditor de campo (el verificador), con la que cierra su trabajo. Una visita que viene de una app anterior,
+// sin firma del auditor, deja ese recuadro en blanco para firmarlo y sellarlo a mano.
+function seccionFirmas(visita, e) {
   const a = [3300, 1800, 5106];
+  const auditor = `${visita.auditor?.nombres || ''} ${visita.auditor?.apellidos || ''}`.trim() || visita.auditor?.username || '';
   return [
     titulo('FIRMAS'),
     tabla(a, [
-      [celda('FIRMA DEL CLIENTE', { w: a[0], bold: true, fill: GRIS }), celda('', { w: a[1], fill: GRIS }), celda('FIRMA Y SELLO DEL VERIFICADOR', { w: a[2], bold: true, fill: GRIS })],
-      [celda(celdaFirma, { w: a[0] }), celda('', { w: a[1] }), celda(' \n \n ', { w: a[2] })],
-      [celda(`N.º DE DNI: ${val(visita.firmante_documento || e.numero_documento_cliente)}`, { w: a[0] }), celda('', { w: a[1] }), celda(' ', { w: a[2] })],
+      [celda('FIRMA DEL CLIENTE', { w: a[0], bold: true, fill: GRIS }), celda('', { w: a[1], fill: GRIS }), celda('FIRMA Y SELLO DEL AUDITOR DE CAMPO (VERIFICADOR)', { w: a[2], bold: true, fill: GRIS })],
+      [celda(contenidoFirma(visita.firma_evidencia, ' '), { w: a[0] }), celda('', { w: a[1] }), celda(contenidoFirma(visita.firma_auditor, ' \n \n '), { w: a[2] })],
+      [celda(`N.º DE DNI: ${val(visita.firmante_documento || e.numero_documento_cliente)}`, { w: a[0] }), celda('', { w: a[1] }), celda(auditor ? `Auditor de campo: ${auditor}` : ' ', { w: a[2] })],
     ]),
   ];
 }

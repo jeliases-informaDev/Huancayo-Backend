@@ -3,6 +3,7 @@
 import prisma from '#core/config/prisma.js';
 import { env } from '#core/config/env.js';
 import { empresaActual } from '#core/tenant/contexto.js';
+import { PRODUCTO } from '#core/config/producto.js';
 
 const TTL_MS = 10_000;
 const cache = new Map();
@@ -44,7 +45,8 @@ const REGLAS_PERMITIDAS = Object.freeze({ geocerca_radio_m: [10, 50000], precisi
 // Formatos de Excel que la empresa acepta al cargar expedientes: CORE_262 (base del sistema core de Caja Huancayo) y SIMPLE (plantilla
 // de demostración). Una empresa nueva trae ambos; cada formato nuevo se suma aquí y en el importador, sin tocar los demás.
 export const FORMATOS_IMPORTACION = Object.freeze(['CORE_262', 'SIMPLE']);
-const MARCA_PERMITIDA = Object.freeze(['nombre', 'producto', 'color', 'logo_url']);
+// El nombre del producto no se personaliza (siempre GeoMatrix): la marca de la empresa solo cambia su nombre, color y logo.
+const MARCA_PERMITIDA = Object.freeze(['nombre', 'color', 'logo_url']);
 
 function limpiarReglas(configuracion = {}) {
   const limpias = {};
@@ -75,7 +77,8 @@ function limpiarMarca(marca = {}) {
 
 const aPublica = (e) => ({
   id: e.id_empresa, nombre: e.nombre, nombre_corto: e.nombre_corto || e.nombre, slug: e.slug, estado: e.estado, prefijo: e.prefijo || null,
-  marca: { nombre: e.nombre_corto || e.nombre, producto: 'Auditoria de Visitas', ...(e.marca || {}) },
+  // `producto` va al final: aunque una marca guardada antes traiga otro nombre de producto, se muestra siempre GeoMatrix.
+  marca: { nombre: e.nombre_corto || e.nombre, ...(e.marca || {}), producto: PRODUCTO },
   reglas: { ...REGLAS_POR_DEFECTO(), ...limpiarReglas(e.configuracion || {}) },
 });
 

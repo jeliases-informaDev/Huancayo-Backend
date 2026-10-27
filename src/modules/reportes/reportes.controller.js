@@ -18,4 +18,8 @@ async function actividad(req, res, next) {
   try { res.json({ data: await resumenService.actividad(req.validated?.query || {}) }); } catch (error) { next(error); }
 }
 
-export default { wordVisita, resumen, actividad };
+async function tablero(req, res, next) {
+  try { res.json({ data: await resumenService.tablero(req.validated?.query || {}) }); } catch (error) { next(error); }
+}
+
+export default { wordVisita, resumen, actividad, tablero };

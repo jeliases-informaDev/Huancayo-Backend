@@ -165,6 +165,22 @@ describe('visitaCreateBody — payload completo de cierre de visita', () => {
   test('rechaza firma_evidencia que no sea un PNG en base64 con el prefijo data URI correcto', () => {
     assert.equal(visitaCreateBody.safeParse({ ...base, firma_evidencia: 'no-es-una-firma' }).success, false);
   });
+  test('acepta la firma del auditor de campo y la versión de la ficha que llenó la app', () => {
+    const r = visitaCreateBody.safeParse({ ...base, firma_auditor: firmaValida, ficha_version: 2 });
+    assert.equal(r.success, true, JSON.stringify(r.success ? null : r.error.issues));
+  });
+  test('las apps anteriores, que no envían firma_auditor ni ficha_version, siguen siendo válidas', () => {
+    const r = visitaCreateBody.safeParse(base);
+    assert.equal(r.success, true);
+    assert.equal(r.data.firma_auditor, undefined);
+    assert.equal(r.data.ficha_version, undefined);
+  });
+  test('rechaza firma_auditor que no sea un PNG en base64 y una ficha_version que no sea un entero positivo', () => {
+    assert.equal(visitaCreateBody.safeParse({ ...base, firma_auditor: 'no-es-una-firma' }).success, false);
+    assert.equal(visitaCreateBody.safeParse({ ...base, ficha_version: 0 }).success, false);
+    assert.equal(visitaCreateBody.safeParse({ ...base, ficha_version: '2' }).success, false);
+    assert.equal(visitaCreateBody.safeParse({ ...base, ficha_version: 2.5 }).success, false);
+  });
   test('rechaza una fecha de checkin con formato invalido', () => {
     assert.equal(visitaCreateBody.safeParse({ ...base, fecha_hora_checkin: '18/09/2026' }).success, false);
   });

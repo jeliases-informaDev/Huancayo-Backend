@@ -6,6 +6,7 @@ import { rateLimit } from 'express-rate-limit';
 import pinoHttp from 'pino-http';
 import jwt from 'jsonwebtoken';
 import { Server as SocketServer } from 'socket.io';
+import { registrarIo } from '#core/realtime.js';
 import { auditMiddleware } from '#core/middlewares/audit.middleware.js';
 // ============================================================================
 // 1. CORE (Configuraciones, Middlewares y Seguridad Transversal)
@@ -204,6 +205,7 @@ const io = new SocketServer(server, {
   pingTimeout: 20_000,
 });
 app.set('io', io);
+registrarIo(io);
 
 io.use(async (socket, next) => {
   try {

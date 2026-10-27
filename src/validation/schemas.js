@@ -302,6 +302,13 @@ export const actividadQuery = z.object({
   desfase: z.coerce.number().int().min(-840).max(840).optional(),
 }).strict();
 
+// Tablero del Resumen: las cuatro series, el ranking de auditores y los resultados de UN mismo tramo (7 días, 8 semanas o 6 meses), así coinciden.
+export const tableroQuery = z.object({
+  periodo: z.enum(['diario', 'semanal', 'mensual']).optional(),
+  hasta: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  desfase: z.coerce.number().int().min(-840).max(840).optional(),
+}).strict();
+
 export const trackingQuery = z.object({
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 }).strict();
@@ -350,6 +357,9 @@ export const visitaCreateBody = z.object({
   conformidad_financiera: conformidadFinancieraSchema.optional(),
   firmante_documento: z.string().trim().regex(/^[A-Za-z0-9]{6,20}$/).optional(),
   firma_evidencia: z.string().regex(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/).max(700000).optional(),
+  // Firma del auditor de campo al cerrar su trabajo, y versión de la ficha que llenó la app (2 = pide esa firma). Las apps anteriores no las envían.
+  firma_auditor: z.string().regex(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/).max(700000).optional(),
+  ficha_version: z.number().int().min(1).max(20).optional(),
   evidencia_principal_key: cleanString(255),
   evidencia_adicional_key: cleanString(255).optional(),
 }).strict();

@@ -44,7 +44,7 @@ async function consultarNominatim(params) {
   url.searchParams.set('addressdetails', '1');
   for (const [clave, valor] of Object.entries(params)) url.searchParams.set(clave, valor);
   const response = await fetch(url, {
-    headers: { Accept: 'application/json', 'Accept-Language': 'es', 'User-Agent': process.env.GEOCODING_USER_AGENT || 'CajaHuancayoAuditoria/1.0' },
+    headers: { Accept: 'application/json', 'Accept-Language': 'es', 'User-Agent': process.env.GEOCODING_USER_AGENT || 'GeoMatrix/1.0' },
     signal: AbortSignal.timeout(15000),
   });
   verificarRespuesta(response, 'Nominatim');

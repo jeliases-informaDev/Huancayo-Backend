@@ -1,3 +1,4 @@
+import { PRODUCTO } from '#core/config/producto.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { generateSecret, generateURI, verify } from 'otplib';
@@ -72,7 +73,7 @@ export async function verifyChallenge(challengeToken, code) {
 export async function setup(userId, username) {
   const secret = generateSecret();
   await prisma.usuario.update({ where: { id_usuario: userId }, data: { mfa_secreto: encryptSecret(secret), mfa_habilitado: false } });
-  return { secret, otpauthUri: generateURI({ issuer: 'Caja Huancayo Auditoria', label: username, secret }) };
+  return { secret, otpauthUri: generateURI({ issuer: PRODUCTO, label: username, secret }) };
 }
 
 export async function confirm(userId, code) {

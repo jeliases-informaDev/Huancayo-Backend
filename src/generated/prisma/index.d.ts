@@ -13414,6 +13414,7 @@ export namespace Prisma {
     comentario_negocio: string | null
     comentario_auditor: string | null
     firma_evidencia: string | null
+    firma_auditor: string | null
     plantilla: string | null
     estado_negocio: string | null
     propiedad_local: string | null
@@ -13447,6 +13448,7 @@ export namespace Prisma {
     comentario_negocio: string | null
     comentario_auditor: string | null
     firma_evidencia: string | null
+    firma_auditor: string | null
     plantilla: string | null
     estado_negocio: string | null
     propiedad_local: string | null
@@ -13483,6 +13485,7 @@ export namespace Prisma {
     otros_clientes_domicilio: number
     otros_ingresos: number
     firma_evidencia: number
+    firma_auditor: number
     plantilla: number
     expediente_snapshot: number
     estado_negocio: number
@@ -13540,6 +13543,7 @@ export namespace Prisma {
     comentario_negocio?: true
     comentario_auditor?: true
     firma_evidencia?: true
+    firma_auditor?: true
     plantilla?: true
     estado_negocio?: true
     propiedad_local?: true
@@ -13573,6 +13577,7 @@ export namespace Prisma {
     comentario_negocio?: true
     comentario_auditor?: true
     firma_evidencia?: true
+    firma_auditor?: true
     plantilla?: true
     estado_negocio?: true
     propiedad_local?: true
@@ -13609,6 +13614,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: true
     otros_ingresos?: true
     firma_evidencia?: true
+    firma_auditor?: true
     plantilla?: true
     expediente_snapshot?: true
     estado_negocio?: true
@@ -13734,6 +13740,7 @@ export namespace Prisma {
     otros_clientes_domicilio: JsonValue | null
     otros_ingresos: JsonValue | null
     firma_evidencia: string | null
+    firma_auditor: string | null
     plantilla: string | null
     expediente_snapshot: JsonValue | null
     estado_negocio: string | null
@@ -13791,6 +13798,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: boolean
     otros_ingresos?: boolean
     firma_evidencia?: boolean
+    firma_auditor?: boolean
     plantilla?: boolean
     expediente_snapshot?: boolean
     estado_negocio?: boolean
@@ -13835,6 +13843,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: boolean
     otros_ingresos?: boolean
     firma_evidencia?: boolean
+    firma_auditor?: boolean
     plantilla?: boolean
     expediente_snapshot?: boolean
     estado_negocio?: boolean
@@ -13847,7 +13856,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type VisitaAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_visita" | "empresa_id" | "client_sync_id" | "id_asignacion" | "id_expediente" | "id_usuario_auditor" | "fecha_hora_checkin" | "fecha_hora_checkout" | "latitud" | "longitud" | "precision_metros" | "distancia_domicilio_m" | "ubicacion_visitada" | "direccion_visitada" | "mock_location" | "device_integrity_ok" | "device_id" | "server_received_at" | "resultado" | "respuestas_cuestionario" | "comentario_negocio" | "comentario_auditor" | "otros_clientes_domicilio" | "otros_ingresos" | "firma_evidencia" | "plantilla" | "expediente_snapshot" | "estado_negocio" | "propiedad_local" | "otros_pasivos" | "conformidad_financiera" | "firmante_documento" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["visitaAuditoria"]>
+  export type VisitaAuditoriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_visita" | "empresa_id" | "client_sync_id" | "id_asignacion" | "id_expediente" | "id_usuario_auditor" | "fecha_hora_checkin" | "fecha_hora_checkout" | "latitud" | "longitud" | "precision_metros" | "distancia_domicilio_m" | "ubicacion_visitada" | "direccion_visitada" | "mock_location" | "device_integrity_ok" | "device_id" | "server_received_at" | "resultado" | "respuestas_cuestionario" | "comentario_negocio" | "comentario_auditor" | "otros_clientes_domicilio" | "otros_ingresos" | "firma_evidencia" | "firma_auditor" | "plantilla" | "expediente_snapshot" | "estado_negocio" | "propiedad_local" | "otros_pasivos" | "conformidad_financiera" | "firmante_documento" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["visitaAuditoria"]>
   export type VisitaAuditoriaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     expediente?: boolean | ExpedienteDefaultArgs<ExtArgs>
     auditor?: boolean | UsuarioDefaultArgs<ExtArgs>
@@ -13888,6 +13897,7 @@ export namespace Prisma {
       otros_clientes_domicilio: Prisma.JsonValue | null
       otros_ingresos: Prisma.JsonValue | null
       firma_evidencia: string | null
+      firma_auditor: string | null
       plantilla: string | null
       expediente_snapshot: Prisma.JsonValue | null
       estado_negocio: string | null
@@ -14295,6 +14305,7 @@ export namespace Prisma {
     readonly otros_clientes_domicilio: FieldRef<"VisitaAuditoria", 'Json'>
     readonly otros_ingresos: FieldRef<"VisitaAuditoria", 'Json'>
     readonly firma_evidencia: FieldRef<"VisitaAuditoria", 'String'>
+    readonly firma_auditor: FieldRef<"VisitaAuditoria", 'String'>
     readonly plantilla: FieldRef<"VisitaAuditoria", 'String'>
     readonly expediente_snapshot: FieldRef<"VisitaAuditoria", 'Json'>
     readonly estado_negocio: FieldRef<"VisitaAuditoria", 'String'>
@@ -20120,6 +20131,7 @@ export namespace Prisma {
     otros_clientes_domicilio: 'otros_clientes_domicilio',
     otros_ingresos: 'otros_ingresos',
     firma_evidencia: 'firma_evidencia',
+    firma_auditor: 'firma_auditor',
     plantilla: 'plantilla',
     expediente_snapshot: 'expediente_snapshot',
     estado_negocio: 'estado_negocio',
@@ -20432,6 +20444,7 @@ export namespace Prisma {
     comentario_negocio: 'comentario_negocio',
     comentario_auditor: 'comentario_auditor',
     firma_evidencia: 'firma_evidencia',
+    firma_auditor: 'firma_auditor',
     plantilla: 'plantilla',
     estado_negocio: 'estado_negocio',
     propiedad_local: 'propiedad_local',
@@ -21763,6 +21776,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: JsonNullableFilter<"VisitaAuditoria">
     otros_ingresos?: JsonNullableFilter<"VisitaAuditoria">
     firma_evidencia?: StringNullableFilter<"VisitaAuditoria"> | string | null
+    firma_auditor?: StringNullableFilter<"VisitaAuditoria"> | string | null
     plantilla?: StringNullableFilter<"VisitaAuditoria"> | string | null
     expediente_snapshot?: JsonNullableFilter<"VisitaAuditoria">
     estado_negocio?: StringNullableFilter<"VisitaAuditoria"> | string | null
@@ -21804,6 +21818,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: SortOrderInput | SortOrder
     otros_ingresos?: SortOrderInput | SortOrder
     firma_evidencia?: SortOrderInput | SortOrder
+    firma_auditor?: SortOrderInput | SortOrder
     plantilla?: SortOrderInput | SortOrder
     expediente_snapshot?: SortOrderInput | SortOrder
     estado_negocio?: SortOrderInput | SortOrder
@@ -21849,6 +21864,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: JsonNullableFilter<"VisitaAuditoria">
     otros_ingresos?: JsonNullableFilter<"VisitaAuditoria">
     firma_evidencia?: StringNullableFilter<"VisitaAuditoria"> | string | null
+    firma_auditor?: StringNullableFilter<"VisitaAuditoria"> | string | null
     plantilla?: StringNullableFilter<"VisitaAuditoria"> | string | null
     expediente_snapshot?: JsonNullableFilter<"VisitaAuditoria">
     estado_negocio?: StringNullableFilter<"VisitaAuditoria"> | string | null
@@ -21890,6 +21906,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: SortOrderInput | SortOrder
     otros_ingresos?: SortOrderInput | SortOrder
     firma_evidencia?: SortOrderInput | SortOrder
+    firma_auditor?: SortOrderInput | SortOrder
     plantilla?: SortOrderInput | SortOrder
     expediente_snapshot?: SortOrderInput | SortOrder
     estado_negocio?: SortOrderInput | SortOrder
@@ -21936,6 +21953,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: JsonNullableWithAggregatesFilter<"VisitaAuditoria">
     otros_ingresos?: JsonNullableWithAggregatesFilter<"VisitaAuditoria">
     firma_evidencia?: StringNullableWithAggregatesFilter<"VisitaAuditoria"> | string | null
+    firma_auditor?: StringNullableWithAggregatesFilter<"VisitaAuditoria"> | string | null
     plantilla?: StringNullableWithAggregatesFilter<"VisitaAuditoria"> | string | null
     expediente_snapshot?: JsonNullableWithAggregatesFilter<"VisitaAuditoria">
     estado_negocio?: StringNullableWithAggregatesFilter<"VisitaAuditoria"> | string | null
@@ -23801,6 +23819,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -23842,6 +23861,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -23878,6 +23898,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23919,6 +23940,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23958,6 +23980,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -23993,6 +24016,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -24031,6 +24055,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25879,6 +25904,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: SortOrder
     otros_ingresos?: SortOrder
     firma_evidencia?: SortOrder
+    firma_auditor?: SortOrder
     plantilla?: SortOrder
     expediente_snapshot?: SortOrder
     estado_negocio?: SortOrder
@@ -25924,6 +25950,7 @@ export namespace Prisma {
     comentario_negocio?: SortOrder
     comentario_auditor?: SortOrder
     firma_evidencia?: SortOrder
+    firma_auditor?: SortOrder
     plantilla?: SortOrder
     estado_negocio?: SortOrder
     propiedad_local?: SortOrder
@@ -25957,6 +25984,7 @@ export namespace Prisma {
     comentario_negocio?: SortOrder
     comentario_auditor?: SortOrder
     firma_evidencia?: SortOrder
+    firma_auditor?: SortOrder
     plantilla?: SortOrder
     estado_negocio?: SortOrder
     propiedad_local?: SortOrder
@@ -27514,6 +27542,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -27553,6 +27582,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -27819,6 +27849,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: JsonNullableFilter<"VisitaAuditoria">
     otros_ingresos?: JsonNullableFilter<"VisitaAuditoria">
     firma_evidencia?: StringNullableFilter<"VisitaAuditoria"> | string | null
+    firma_auditor?: StringNullableFilter<"VisitaAuditoria"> | string | null
     plantilla?: StringNullableFilter<"VisitaAuditoria"> | string | null
     expediente_snapshot?: JsonNullableFilter<"VisitaAuditoria">
     estado_negocio?: StringNullableFilter<"VisitaAuditoria"> | string | null
@@ -29088,6 +29119,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -29127,6 +29159,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -30415,6 +30448,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -30455,6 +30489,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -30506,6 +30541,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30546,6 +30582,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30806,6 +30843,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -30942,6 +30980,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30981,6 +31020,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31019,6 +31059,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31241,6 +31282,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: string | null
+    firma_auditor?: string | null
     plantilla?: string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: string | null
@@ -31342,6 +31384,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31381,6 +31424,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31419,6 +31463,7 @@ export namespace Prisma {
     otros_clientes_domicilio?: NullableJsonNullValueInput | InputJsonValue
     otros_ingresos?: NullableJsonNullValueInput | InputJsonValue
     firma_evidencia?: NullableStringFieldUpdateOperationsInput | string | null
+    firma_auditor?: NullableStringFieldUpdateOperationsInput | string | null
     plantilla?: NullableStringFieldUpdateOperationsInput | string | null
     expediente_snapshot?: NullableJsonNullValueInput | InputJsonValue
     estado_negocio?: NullableStringFieldUpdateOperationsInput | string | null

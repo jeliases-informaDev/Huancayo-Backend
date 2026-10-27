@@ -1,4 +1,4 @@
-# Auditoria de Visitas (plantilla "Authentication Work" de Sulotec) - API. Imagen para el servidor de Oracle (arm64); tambien sirve en x64.
+# GeoMatrix (antes Auditoria de Visitas; plantilla "Authentication Work" de Sulotec) - API. Imagen para el servidor de Oracle (arm64); tambien sirve en x64.
 # El arranque (npm start) aplica las migraciones de Prisma y crea la empresa inicial y su administrador si la base esta vacia.
 FROM node:24-slim
 
