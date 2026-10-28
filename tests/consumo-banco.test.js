@@ -222,11 +222,31 @@ describe('Consumo del banco — la ficha de Word', () => {
     respuestas_cuestionario: {}, estado_negocio: 'EN_FUNCIONAMIENTO', plantilla: 'CONSUMO_V1',
   };
 
-  test('imprime el N.º de expediente y la fuente, todos los créditos del historial y el saldo del crédito', async () => {
+  const generar = (e, extra = {}) => textoDe(renderizarFicha({ visita, e, plantilla: 'CONSUMO_V1', empresa: { nombre_corto: 'Caja Prueba' }, huella: 'abc', generadaEl: new Date('2026-10-28T20:00:00-05:00'), ...extra }));
+
+  test('imprime el N.º de expediente y la fuente con el código fijo del banco, todos los créditos del historial y el saldo del crédito', async () => {
     const e = mapear(construirFilaConsumoBanco(0, HOY)).expediente;
-    const texto = await textoDe(renderizarFicha({ visita, e, plantilla: 'CONSUMO_V1', empresa: { nombre_corto: 'Caja Prueba' }, huella: 'abc' }));
-    assert.match(texto, new RegExp(`N\\.º de expediente: ${e.datos_cliente.codigo_expediente_core} Fuente: NUEVO`));
+    assert.equal(e.datos_cliente.fuente, 'NUEVO', 'en los datos la fuente queda como llegó');
+    const texto = await generar(e);
+    assert.match(texto, new RegExp(`N\\.º de expediente: ${e.datos_cliente.codigo_expediente_core} Fuente: MPAUCC/NUEVO`));
     for (const credito of e.datos_credito.historial) assert.ok(texto.includes(credito.numero_credito), `falta el crédito ${credito.numero_credito} en el historial`);
     assert.match(texto, /Saldo capital: \d/, 'el saldo sale aunque la base solo traiga el saldo en soles');
+  });
+
+  test('el código fijo no se repite si la base ya lo trae, y sale solo cuando no hay fuente', async () => {
+    const e = mapear(construirFilaConsumoBanco(0, HOY)).expediente;
+    assert.match(await generar({ ...e, datos_cliente: { ...e.datos_cliente, fuente: 'MPAUCC/RECURRENTE' } }), /Fuente: MPAUCC\/RECURRENTE(?!.*MPAUCC\/MPAUCC)/);
+    assert.ok(!(await generar({ ...e, datos_cliente: { ...e.datos_cliente, fuente: 'MPAUCC/RECURRENTE' } })).includes('MPAUCC/MPAUCC'));
+    assert.match(await generar({ ...e, datos_cliente: { ...e.datos_cliente, fuente: null } }), /Fuente: MPAUCC(?!\/)/);
+  });
+
+  test('«Saldo de capital al» lleva el día en que se genera la ficha (hora de Lima) cuando la base no trae fecha de corte, y la de la base cuando sí', async () => {
+    const e = mapear(construirFilaConsumoBanco(0, HOY)).expediente;
+    assert.equal(e.endeudamiento.fecha_corte, null, 'la base de Consumo no trae fecha de corte');
+    assert.match(await generar(e), /SALDO DE CAPITAL AL 28-10-2026/);
+    // 22:00 del 28 en Lima ya es el 29 en UTC: el día que cuenta es el de Lima.
+    assert.match(await generar(e, { generadaEl: new Date('2026-10-29T03:00:00Z') }), /SALDO DE CAPITAL AL 28-10-2026/);
+    assert.match(await generar(e, { generadaEl: new Date('2026-11-02T14:00:00Z') }), /SALDO DE CAPITAL AL 02-11-2026/);
+    assert.match(await generar({ ...e, endeudamiento: { ...e.endeudamiento, fecha_corte: '2026-10-01' } }), /SALDO DE CAPITAL AL 01-10-2026/);
   });
 });
