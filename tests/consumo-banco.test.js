@@ -2,7 +2,7 @@ import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Packer } from 'docx';
 import JSZip from 'jszip';
-import { ALIAS_CONSUMO_BANCO, COLUMNAS_CONSUMO_BANCO, PREFIJO_FUENTE_CONSUMO } from '../src/modules/expedientes/importador/columnas-consumo.js';
+import { ALIAS_CONSUMO_BANCO, COLUMNAS_CONSUMO_BANCO } from '../src/modules/expedientes/importador/columnas-consumo.js';
 import { COLUMNAS_CONSUMO } from '../src/modules/expedientes/importador/columnas-core.js';
 import { esFormatoCore, mapearFilaCore } from '../src/modules/expedientes/importador/formato-core.js';
 import { construirFilaConsumo, construirFilaCore } from '../src/modules/expedientes/importador/muestra-core.js';
@@ -50,7 +50,7 @@ describe('Consumo del banco — las filas de ejemplo', () => {
       assert.equal(e.tipo_credito, 'CONSUMO');
       assert.ok(e.latitud && e.longitud, 'coordenadas desde la referencia');
       assert.ok(e.datos_negocio.negocios.length >= 1, 'el empleador llega a los datos del negocio');
-      assert.ok(e.datos_cliente.fuente.startsWith(`${PREFIJO_FUENTE_CONSUMO}/`), e.datos_cliente.fuente);
+      assert.ok(['NUEVO', 'RECURRENTE', 'VIG. CON ATRASO'].includes(e.datos_cliente.fuente), e.datos_cliente.fuente);
       assert.ok(e.evaluacion_financiera.ingresos_consumo.every((x) => x.descripcion && x.monto > 0 && x.fuente_ingreso), 'cada ingreso trae su fuente');
     }
   });
@@ -89,9 +89,9 @@ describe('Consumo del banco — cada dato llega a su lugar', () => {
     assert.deepEqual([e.oficina, e.provincia, e.distrito, e.direccion_domicilio, e.telefono_cliente], ['AG. OTRA', 'PROVINCIA PRUEBA', 'DISTRITO PRUEBA', 'JR. PRUEBA 123', '987654321']);
   });
 
-  test('datos del cliente: fuente con el prefijo del banco, tipo, expediente del core, vivienda y estado civil', () => {
+  test('datos del cliente: fuente tal como viene, tipo, expediente del core, vivienda y estado civil', () => {
     const c = e.datos_cliente;
-    assert.deepEqual([c.fuente, c.tipo_cliente, c.codigo_expediente_core, c.codigo_cliente], ['MPAUCC/VIG. CON ATRASO', 'RECURRENTE', '7770001', '5550001']);
+    assert.deepEqual([c.fuente, c.tipo_cliente, c.codigo_expediente_core, c.codigo_cliente], ['VIG. CON ATRASO', 'RECURRENTE', '7770001', '5550001']);
     assert.deepEqual([c.tipo_vivienda, c.estado_civil, c.edad], ['ALQUILADA', 'CASADO', 54]);
   });
 
@@ -169,10 +169,10 @@ describe('Consumo del banco — avisos de calidad del dato', () => {
     assert.equal(mapear({ ...base, cCuoDiaMasAtr: '-.-' }).expediente.datos_credito.dias_atraso, null);
   });
 
-  test('el prefijo de la fuente se agrega una sola vez', () => {
+  test('la fuente se guarda tal como viene en la base, sin agregarle nada', () => {
     const base = construirFilaConsumoBanco(0, HOY);
-    assert.equal(mapear({ ...base, cFuente: 'NUEVO' }).expediente.datos_cliente.fuente, 'MPAUCC/NUEVO');
-    assert.equal(mapear({ ...base, cFuente: 'MPAUCC/NUEVO' }).expediente.datos_cliente.fuente, 'MPAUCC/NUEVO');
+    assert.equal(mapear({ ...base, cFuente: 'NUEVO' }).expediente.datos_cliente.fuente, 'NUEVO');
+    assert.equal(mapear({ ...base, cFuente: 'OTRO CODIGO/NUEVO' }).expediente.datos_cliente.fuente, 'OTRO CODIGO/NUEVO');
   });
 });
 
@@ -222,11 +222,31 @@ describe('Consumo del banco — la ficha de Word', () => {
     respuestas_cuestionario: {}, estado_negocio: 'EN_FUNCIONAMIENTO', plantilla: 'CONSUMO_V1',
   };
 
-  test('imprime el N.º de expediente y la fuente como el banco, todos los créditos del historial y el saldo del crédito', async () => {
+  const generar = (e, extra = {}) => textoDe(renderizarFicha({ visita, e, plantilla: 'CONSUMO_V1', empresa: { nombre_corto: 'Caja Prueba' }, huella: 'abc', generadaEl: new Date('2026-10-28T20:00:00-05:00'), ...extra }));
+
+  test('imprime el N.º de expediente y la fuente con el código fijo del banco, todos los créditos del historial y el saldo del crédito', async () => {
     const e = mapear(construirFilaConsumoBanco(0, HOY)).expediente;
-    const texto = await textoDe(renderizarFicha({ visita, e, plantilla: 'CONSUMO_V1', empresa: { nombre_corto: 'Caja Prueba' }, huella: 'abc' }));
+    assert.equal(e.datos_cliente.fuente, 'NUEVO', 'en los datos la fuente queda como llegó');
+    const texto = await generar(e);
     assert.match(texto, new RegExp(`N\\.º de expediente: ${e.datos_cliente.codigo_expediente_core} Fuente: MPAUCC/NUEVO`));
     for (const credito of e.datos_credito.historial) assert.ok(texto.includes(credito.numero_credito), `falta el crédito ${credito.numero_credito} en el historial`);
     assert.match(texto, /Saldo capital: \d/, 'el saldo sale aunque la base solo traiga el saldo en soles');
+  });
+
+  test('el código fijo no se repite si la base ya lo trae, y sale solo cuando no hay fuente', async () => {
+    const e = mapear(construirFilaConsumoBanco(0, HOY)).expediente;
+    assert.match(await generar({ ...e, datos_cliente: { ...e.datos_cliente, fuente: 'MPAUCC/RECURRENTE' } }), /Fuente: MPAUCC\/RECURRENTE(?!.*MPAUCC\/MPAUCC)/);
+    assert.ok(!(await generar({ ...e, datos_cliente: { ...e.datos_cliente, fuente: 'MPAUCC/RECURRENTE' } })).includes('MPAUCC/MPAUCC'));
+    assert.match(await generar({ ...e, datos_cliente: { ...e.datos_cliente, fuente: null } }), /Fuente: MPAUCC(?!\/)/);
+  });
+
+  test('«Saldo de capital al» lleva el día en que se genera la ficha (hora de Lima) cuando la base no trae fecha de corte, y la de la base cuando sí', async () => {
+    const e = mapear(construirFilaConsumoBanco(0, HOY)).expediente;
+    assert.equal(e.endeudamiento.fecha_corte, null, 'la base de Consumo no trae fecha de corte');
+    assert.match(await generar(e), /SALDO DE CAPITAL AL 28-10-2026/);
+    // 22:00 del 28 en Lima ya es el 29 en UTC: el día que cuenta es el de Lima.
+    assert.match(await generar(e, { generadaEl: new Date('2026-10-29T03:00:00Z') }), /SALDO DE CAPITAL AL 28-10-2026/);
+    assert.match(await generar(e, { generadaEl: new Date('2026-11-02T14:00:00Z') }), /SALDO DE CAPITAL AL 02-11-2026/);
+    assert.match(await generar({ ...e, endeudamiento: { ...e.endeudamiento, fecha_corte: '2026-10-01' } }), /SALDO DE CAPITAL AL 01-10-2026/);
   });
 });

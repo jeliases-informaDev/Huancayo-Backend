@@ -46,9 +46,6 @@ export const COLUMNAS_CONSUMO_BANCO = [
   'nSalConyu5',
 ];
 
-// «Fuente» de la muestra: la ficha impresa del banco escribe «MPAUCC/<fuente>» (por ejemplo MPAUCC/NUEVO), con la columna cFuente después de la barra.
-export const PREFIJO_FUENTE_CONSUMO = 'MPAUCC';
-
 // El mapeo (formato-core.js) pide cada dato por su nombre en la base MYPE de 262 columnas. Cuando esta base lo llama distinto, aquí está el equivalente: nombre
 // del core → nombres de Consumo (todo en minúsculas). Así los dos formatos pasan por el mismo mapeo y una fila con los nombres anteriores sigue funcionando.
 const PARES = [

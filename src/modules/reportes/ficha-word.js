@@ -41,6 +41,16 @@ const telefonosDe = (e, c = {}) => [c.telefono_fijo, c.telefono_celular].filter(
 const deNegocios = (negocios, clave) => (negocios || []).map((x) => val(x?.[clave], '')).filter(Boolean).join(' / ');
 const casillasNegocio = (estado) => `En funcionamiento: ${casilla(estado === 'EN_FUNCIONAMIENTO')}    Inoperativo: ${casilla(estado === 'INOPERATIVO')}    De terceros: ${casilla(estado === 'DE_TERCEROS')}`;
 const monedaTexto = (ev) => (ev?.moneda === 'USD' ? 'DÓLARES' : 'SOLES');
+// La ficha impresa de Consumo antepone un código fijo a la fuente («MPAUCC/NUEVO»). No viene en la base: es parte del formato del banco, y por eso se pone solo al imprimir
+// (la fuente se guarda como llega en el archivo).
+const PREFIJO_FUENTE_CONSUMO = 'MPAUCC';
+const fuenteConsumo = (fuente) => {
+  if (vacio(fuente)) return PREFIJO_FUENTE_CONSUMO;
+  const f = String(fuente);
+  return f.toUpperCase().startsWith(`${PREFIJO_FUENTE_CONSUMO}/`) ? f : `${PREFIJO_FUENTE_CONSUMO}/${f}`;
+};
+// El día (AAAA-MM-DD) en hora de Lima. Cuando la base no trae fecha de corte, «Saldo de capital al …» lleva el día en que se genera la ficha.
+const hoyEnLima = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Lima' }).format(d);
 
 // ---------- bloques de bajo nivel ----------
 function parrafo(text, { bold = false, size = FS, align, before = 0, after = 0, italics = false, keepNext = false } = {}) {
@@ -143,9 +153,9 @@ function seccionClienteNegocioMype(e, visita) {
   ];
 }
 
-function seccionHistorialMype(e) {
+function seccionHistorialMype(e, hoy) {
   const filas = e.datos_credito?.historial || [];
-  const corte = e.endeudamiento?.fecha_corte;
+  const corte = e.endeudamiento?.fecha_corte || hoy;
   const a = [850, 700, 760, 760, 380, 850, 1350, 560, 760, 800, 760, 1100, 576];
   const cab = ['LÍNEA DE CRÉDITO', 'TIPO DE CRÉDITO', 'FECHA DE DESEMB.', 'MONTO DEL DESEMB.', 'MON.', 'SOLICITUD', 'N.º DE CRÉDITO', 'PLAZO Y FREC.', 'MONTO DE LA CUOTA', 'CONDICIÓN CONTABLE', corte ? `SALDO DE CAPITAL AL ${dmy(corte)}` : 'SALDO AL CORTE', 'ASESOR RESPONSABLE', 'CUOTA MÁS ATRASADA'];
   return [
@@ -406,8 +416,8 @@ function seccionClienteConsumo(e, visita) {
   return [
     titulo('DATOS DEL CLIENTE / DATOS LABORALES'),
     tablaPares([
-      // Como en la ficha impresa del banco: «N.º de expediente: … Fuente: MPAUCC/NUEVO» (el número de expediente solo sale si la base lo trae).
-      [`${c.codigo_expediente_core ? `N.º de expediente: ${c.codigo_expediente_core}      ` : ''}Fuente: ${val(c.fuente)}`],
+      // Como en la ficha impresa del banco: «N.º de expediente: … Fuente: MPAUCC/…» (el número de expediente solo sale si la base lo trae).
+      [`${c.codigo_expediente_core ? `N.º de expediente: ${c.codigo_expediente_core}      ` : ''}Fuente: ${fuenteConsumo(c.fuente)}`],
       [`Fecha de Nac.: ${dmy(c.fecha_nacimiento)}      Edad: ${val(c.edad)}`, `Actividad: ${val(n.actividad)}`],
       [`Nombres y apellidos: ${val(e.nombres_cliente)}`, casillasNegocio(visita.estado_negocio)],
       [`Estado civil: ${val(c.estado_civil)}      ${val(e.tipo_documento_cliente, 'DNI')}: ${val(e.numero_documento_cliente)}`, `Antigüedad: ${antiguedadDe(n)}`],
@@ -438,16 +448,17 @@ function seccionIngresosConsumo(ev) {
 // ---------- armado ----------
 /**
  * Arma el documento Word de la ficha.
- * @param {{ visita: object, e: object, plantilla: 'MYPE_V1'|'CONSUMO_V1', empresa?: object, importacion?: object|null, huella: string }} datos
- *   visita = la visita cerrada (con auditor); e = el expediente tal como lo vio el auditor (snapshot).
+ * @param {{ visita: object, e: object, plantilla: 'MYPE_V1'|'CONSUMO_V1', empresa?: object, importacion?: object|null, huella: string, generadaEl?: Date }} datos
+ *   visita = la visita cerrada (con auditor); e = el expediente tal como lo vio el auditor (snapshot); generadaEl = cuándo se genera el documento (hoy; solo se pasa en pruebas).
  */
-export function renderizarFicha({ visita, e, plantilla, empresa, importacion = null, huella }) {
+export function renderizarFicha({ visita, e, plantilla, empresa, importacion = null, huella, generadaEl = new Date() }) {
+  const hoy = hoyEnLima(generadaEl);
   const esMype = plantilla === 'MYPE_V1';
   const cuerpo = esMype
     ? [
         ...seccionEncabezado(e, visita, plantilla, empresa),
         ...seccionClienteNegocioMype(e, visita),
-        ...seccionHistorialMype(e),
+        ...seccionHistorialMype(e, hoy),
         ...seccionCreditoYParticipantes(e),
         ...seccionIngresosMype(e.evaluacion_financiera, visita.conformidad_financiera),
         ...seccionBalanceResultados(e.evaluacion_financiera, visita.conformidad_financiera),
@@ -463,7 +474,7 @@ export function renderizarFicha({ visita, e, plantilla, empresa, importacion = n
     : [
         ...seccionEncabezado(e, visita, plantilla, empresa),
         ...seccionClienteConsumo(e, visita),
-        ...seccionHistorialMype(e),
+        ...seccionHistorialMype(e, hoy),
         ...seccionCreditoYParticipantes(e),
         ...seccionIngresosConsumo(e.evaluacion_financiera),
         ...seccionEndeudamiento(e.endeudamiento),
