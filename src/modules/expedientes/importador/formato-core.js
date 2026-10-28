@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { antiguedadEnMeses, entero, fecha, normalizarClave, numero, tieneTextoDanado, texto } from './limpieza.js';
 import { extraerCoordenadas, sinCoordenadas } from './coordenadas.js';
 import { camposDeDireccion } from '../../geocodificacion/direcciones.js';
-import { ALIAS_CONSUMO_BANCO, PREFIJO_FUENTE_CONSUMO } from './columnas-consumo.js';
+import { ALIAS_CONSUMO_BANCO } from './columnas-consumo.js';
 
 // Base "FV_..._CRED_EMP" del sistema core de Caja Huancayo: una fila por crédito, 262 columnas
 // con nombres técnicos. Este módulo la convierte al modelo del sistema:
@@ -292,13 +292,8 @@ export function mapearFilaCore(fila, { hoja }) {
     })
     .filter((negocio) => negocio.direccion || negocio.referencia || negocio.telefono || negocio.latitud !== null);
 
-  // La ficha impresa de Consumo escribe «MPAUCC/<fuente>» (ver columnas-consumo.js): la columna cFuente trae solo lo de después de la barra.
-  const fuenteBase = texto(v('Fuente'));
-  const fuente = consumoBanco && tipoCredito === 'CONSUMO' && fuenteBase && !fuenteBase.toUpperCase().startsWith(`${PREFIJO_FUENTE_CONSUMO}/`)
-    ? `${PREFIJO_FUENTE_CONSUMO}/${fuenteBase}` : fuenteBase;
-
   const datosCliente = {
-    fuente,
+    fuente: texto(v('Fuente')),
     fecha_nacimiento: fecha(v('dFecNacCli')),
     edad: entero(v('edad')),
     estado_civil: texto(v('CDESESTCIV')),

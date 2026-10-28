@@ -406,7 +406,7 @@ function seccionClienteConsumo(e, visita) {
   return [
     titulo('DATOS DEL CLIENTE / DATOS LABORALES'),
     tablaPares([
-      // Como en la ficha impresa del banco: «N.º de expediente: … Fuente: MPAUCC/NUEVO» (el número de expediente solo sale si la base lo trae).
+      // Como en la ficha impresa del banco: «N.º de expediente: … Fuente: …» (el número de expediente solo sale si la base lo trae).
       [`${c.codigo_expediente_core ? `N.º de expediente: ${c.codigo_expediente_core}      ` : ''}Fuente: ${val(c.fuente)}`],
       [`Fecha de Nac.: ${dmy(c.fecha_nacimiento)}      Edad: ${val(c.edad)}`, `Actividad: ${val(n.actividad)}`],
       [`Nombres y apellidos: ${val(e.nombres_cliente)}`, casillasNegocio(visita.estado_negocio)],
