@@ -173,7 +173,7 @@ function seccionCreditoYParticipantes(e) {
       [`Fecha de vencimiento: ${dmy(cr.fecha_vencimiento)}      Estado: ${val(cr.estado)}`, `Monto de la cuota: ${n2(cr.monto_cuota)}`],
       [`Fecha últ. pago: ${dmy(cr.fecha_ultimo_pago)}`, `Destino: ${val(cr.destino)}`],
       [`Asesor responsable a la fecha: ${val(e.asesor_responsable)}`, `Calificación SBS: ${val(cr.calificacion_sbs)}      N.º de entidades: ${val(cr.numero_entidades)}`],
-      [`Código de cliente: ${val(e.datos_cliente?.codigo_cliente)}`, `Días de atraso: ${val(cr.dias_atraso)}      Saldo capital: ${n2(cr.saldo_capital)}`],
+      [`Código de cliente: ${val(e.datos_cliente?.codigo_cliente)}`, `Días de atraso: ${val(cr.dias_atraso)}      Saldo capital: ${n2(cr.saldo_capital ?? cr.saldo_capital_soles)}`],
     ]),
   ];
 }
@@ -406,7 +406,8 @@ function seccionClienteConsumo(e, visita) {
   return [
     titulo('DATOS DEL CLIENTE / DATOS LABORALES'),
     tablaPares([
-      [`Fuente: ${val(c.fuente)}`],
+      // Como en la ficha impresa del banco: «N.º de expediente: … Fuente: MPAUCC/NUEVO» (el número de expediente solo sale si la base lo trae).
+      [`${c.codigo_expediente_core ? `N.º de expediente: ${c.codigo_expediente_core}      ` : ''}Fuente: ${val(c.fuente)}`],
       [`Fecha de Nac.: ${dmy(c.fecha_nacimiento)}      Edad: ${val(c.edad)}`, `Actividad: ${val(n.actividad)}`],
       [`Nombres y apellidos: ${val(e.nombres_cliente)}`, casillasNegocio(visita.estado_negocio)],
       [`Estado civil: ${val(c.estado_civil)}      ${val(e.tipo_documento_cliente, 'DNI')}: ${val(e.numero_documento_cliente)}`, `Antigüedad: ${antiguedadDe(n)}`],

@@ -4,6 +4,7 @@ import ExcelJS from 'exceljs';
 import { generarPlantilla, COLUMNAS_SIMPLE } from '../src/modules/expedientes/plantillas.service.js';
 import fs from 'node:fs';
 import { COLUMNAS_CORE, COLUMNAS_CONSUMO, COLUMNAS_CONSUMO_PROPIAS } from '../src/modules/expedientes/importador/columnas-core.js';
+import { COLUMNAS_CONSUMO_BANCO } from '../src/modules/expedientes/importador/columnas-consumo.js';
 import { construirFilaCore, construirFilaConsumo } from '../src/modules/expedientes/importador/muestra-core.js';
 import { mapearFilaCore } from '../src/modules/expedientes/importador/formato-core.js';
 
@@ -68,7 +69,8 @@ test('la ficha MYPE del banco entera sale de las 262 columnas del core: ningún 
   assert.deepEqual(fichasBanco.OTROS.filter((c) => !core.has(c.toLowerCase())), []);
 });
 
-test('la ficha de Consumo del banco entera sale de la plantilla de Consumo: sus columnas del core más las 16 propias', () => {
+// Formato anterior de Consumo (columnas del core + 16 propias): ya no es la plantilla que se descarga, pero los archivos con esos nombres se siguen leyendo.
+test('formato anterior de Consumo: la ficha del banco entera sale de sus columnas del core más las 16 propias', () => {
   const consumo = minusculas(COLUMNAS_CONSUMO);
   assert.equal(fichasBanco.CONSUMO.length, 102);
   assert.deepEqual(fichasBanco.CONSUMO.filter((c) => !consumo.has(c.toLowerCase())), [], 'campos de la ficha sin columna en la plantilla');
@@ -78,12 +80,12 @@ test('la ficha de Consumo del banco entera sale de la plantilla de Consumo: sus 
   assert.ok(COLUMNAS_CONSUMO.length > COLUMNAS_SIMPLE.length * 5, 'la plantilla completa no es la mínima');
 });
 
-test('la plantilla CORE de Consumo trae la hoja CONSUMO con todas las columnas de su ficha, 3 ejemplos y las instrucciones; sin tipo u OTROS sigue siendo la MYPE', async () => {
+test('la plantilla CORE de Consumo trae la hoja CONSUMO con las 297 columnas de la base del banco, 3 ejemplos y las instrucciones; sin tipo u OTROS sigue siendo la MYPE', async () => {
   const wb = await leer(await generarPlantilla('CORE_262', { tipo: 'CONSUMO' }));
   const ws = wb.getWorksheet('CONSUMO');
   assert.ok(ws, 'hoja CONSUMO');
   assert.equal(wb.getWorksheet('OTROS'), undefined);
-  assert.deepEqual(encabezados(ws), COLUMNAS_CONSUMO);
+  assert.deepEqual(encabezados(ws), COLUMNAS_CONSUMO_BANCO);
   assert.equal(ws.rowCount, 4);
   assert.ok(wb.getWorksheet('Instrucciones'), 'hoja Instrucciones');
   for (const tipo of [undefined, 'OTROS']) {

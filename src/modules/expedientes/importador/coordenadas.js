@@ -2,6 +2,7 @@
 // coordenadas dentro de la referencia del domicilio (texto libre). Formatos vistos:
 //   "-12.345678,-76.543210"            (decimal con signo)
 //   "12.34567890S 76.54321098W"        (decimal con hemisferio)
+//   "-6.12345678 -78.12345678°NW"      (decimal con signo separado por un espacio, con la orientación al final: así viene en la base de Consumo)
 // También se aceptan grados/minutos/segundos. Todo se valida contra una caja que cubre el Perú
 // para descartar números que se parecen a coordenadas pero no lo son.
 
@@ -46,6 +47,13 @@ export function extraerCoordenadas(textoLibre) {
     const r = aceptar(Number(conSigno[1]), Number(conSigno[2]), 'DECIMAL');
     if (r) return r;
   }
+
+  // 4) Decimal con signo separado por un espacio: -6.123456 -78.123456°NW. Los dos con signo (en el Perú siempre son negativos): así no se confunde con dos números cualquiera.
+  const conEspacio = s.match(/(-\d{1,2}\.\d{3,})\s+(-\d{1,3}\.\d{3,})/);
+  if (conEspacio) {
+    const r = aceptar(Number(conEspacio[1]), Number(conEspacio[2]), 'DECIMAL_ESPACIO');
+    if (r) return r;
+  }
   return null;
 }
 
@@ -55,6 +63,7 @@ export function sinCoordenadas(textoLibre) {
   return textoLibre
     .replace(/(\d{1,2}\.\d{3,})\s*°?\s*[NS][\s,;]*(\d{1,3}\.\d{3,})\s*°?\s*[EWO]/gi, '')
     .replace(/(-?\d{1,2}\.\d{3,})\s*[,;]\s*(-?\d{1,3}\.\d{3,})/g, '')
+    .replace(/(-\d{1,2}\.\d{3,})\s+(-\d{1,3}\.\d{3,})(?:\s*°\s*[NSEWO]{1,2}\b)?/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }

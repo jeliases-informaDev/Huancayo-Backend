@@ -2,8 +2,10 @@
 // encabezados exactos, filas de ejemplo con datos inventados y una hoja de instrucciones. Así nadie tiene que adivinar columnas.
 import { PRODUCTO } from '#core/config/producto.js';
 import ExcelJS from 'exceljs';
-import { COLUMNAS_CORE, COLUMNAS_CONSUMO } from './importador/columnas-core.js';
-import { construirFilaCore, filaCoreComoArreglo, construirFilaConsumo, filaConsumoComoArreglo } from './importador/muestra-core.js';
+import { COLUMNAS_CORE } from './importador/columnas-core.js';
+import { COLUMNAS_CONSUMO_BANCO } from './importador/columnas-consumo.js';
+import { construirFilaCore, filaCoreComoArreglo } from './importador/muestra-core.js';
+import { construirFilaConsumoBanco, filaConsumoBancoComoArreglo } from './importador/muestra-consumo.js';
 
 export const FORMATOS = Object.freeze(['CORE_262', 'SIMPLE']);
 
@@ -32,24 +34,27 @@ function ajustarEncabezado(ws) {
   ws.views = [{ state: 'frozen', ySplit: 1 }];
 }
 
-// `tipo` (CONSUMO u OTROS): en la plantilla CORE_262 elige la ficha completa (CONSUMO = la base de consumo con las columnas de su ficha, hoja CONSUMO; sin tipo u OTROS =
+// `tipo` (CONSUMO u OTROS): en la plantilla CORE_262 elige la ficha completa (CONSUMO = la base de Consumo del banco, 297 columnas, hoja CONSUMO; sin tipo u OTROS =
 // las 262 columnas de la base MYPE, hoja OTROS). En la SIMPLE solo cambia el tipo de las filas de ejemplo.
 export async function generarPlantilla(formato, { ejemplos = 3, tipo } = {}) {
   const wb = new ExcelJS.Workbook();
   wb.creator = PRODUCTO;
   if (formato === 'CORE_262' && tipo === 'CONSUMO') {
     const ws = wb.addWorksheet('CONSUMO');
-    ws.addRow(COLUMNAS_CONSUMO);
-    for (let i = 0; i < ejemplos; i += 1) ws.addRow(filaConsumoComoArreglo(construirFilaConsumo(i)));
+    ws.addRow(COLUMNAS_CONSUMO_BANCO);
+    for (let i = 0; i < ejemplos; i += 1) ws.addRow(filaConsumoBancoComoArreglo(construirFilaConsumoBanco(i)));
     ajustarEncabezado(ws);
-    COLUMNAS_CONSUMO.forEach((c, i) => { ws.getColumn(i + 1).width = Math.min(40, Math.max(12, c.length + 2)); });
+    COLUMNAS_CONSUMO_BANCO.forEach((c, i) => { ws.getColumn(i + 1).width = Math.min(40, Math.max(12, c.length + 2)); });
     hojaInstrucciones(wb, [
-      `Plantilla de CONSUMO completa (${COLUMNAS_CONSUMO.length} columnas): todo lo que lleva la ficha de entrevista de Consumo del banco.`,
-      `Son las columnas de la base del core que usa esa ficha (mismos nombres) y, al final, las 16 propias de Consumo: SustIngreso (documento con que sustenta sus ingresos) y hasta 3 ingresos del cliente (DESCRIPCIONCONSUMO, RELACION, MONEDA, NMONINGDEU, TIPOING).`,
-      'La hoja debe llamarse CONSUMO. Si tu base trae más columnas del core, no pasa nada: se leen todas.',
-      'Columnas obligatorias por fila: ccodctacre (N° de crédito), cnomcliente, DocIde y nombreAsesorActual. Las demás pueden quedar vacías.',
-      'Ubicación del domicilio: escribe las coordenadas dentro de cRefDomCli, por ejemplo "Ref: -11.933000,-77.054000 FRENTE AL PARQUE". Lo mismo en RefEmp_1 y RefEmp_2 para el lugar de trabajo.',
-      'Fechas en formato dd-mm-aaaa. Montos con punto decimal. Los 3 ingresos van en las columnas con sufijo 1, 2 y 3; deja vacío el que no exista.',
+      `Plantilla de CONSUMO (${COLUMNAS_CONSUMO_BANCO.length} columnas): la base de Consumo tal como la entrega Caja Huancayo, con los mismos nombres de columna.`,
+      'Qué trae: el cliente y su domicilio, el empleador (cNomEmp1/cDirEmp1…), el crédito, el historial con hasta 4 créditos anteriores (cLinCre1… cCuoMasAtr4), hasta 3 ingresos (cDesConsum1… nMonIngDeu3), la calificación SBS y el endeudamiento del cliente (cNomIfi1…) y del cónyuge (cNomIfiConyu1…).',
+      'El balance, el estado de resultados y las líneas de ingreso del negocio (cActNoCor… nCanEstFin5) son de la evaluación MYPE: en Consumo van vacíos o en cero.',
+      'La hoja debe llamarse CONSUMO. Si tu base trae más columnas, no pasa nada: se leen todas y las que no se conocen se guardan tal cual.',
+      'Columnas obligatorias por fila: cCodCtaCre (N° de crédito), cNomCliente, cDocIde y cNomAseAct (o cNomAseOri). Las demás pueden quedar vacías.',
+      'Cada fila debe traer TODOS sus datos juntos: la evaluación (nNumEva1, dFecEva1), los ingresos y las deudas tienen que ser del mismo cliente que el crédito de esa fila. Si el archivo sale de varias consultas, únelas por cCodCtaCre antes de cargarlo. El sistema avisa cuando la fecha de evaluación es posterior al desembolso (señal de datos de otro cliente).',
+      'Ubicación del domicilio: escribe las coordenadas dentro de cRefDomCli, por ejemplo "Ref: -11.933000,-77.054000 FRENTE AL PARQUE" (también sirve "-11.933000 -77.054000"). Lo mismo en cRefEmp1 y cRefEmp2 para el lugar de trabajo.',
+      'Fechas en formato dd-mm-aaaa. Montos con punto decimal. Lo que no existe va como NULL, vacío o «-».',
+      'La plantilla anterior de Consumo (con los nombres del core: ccodctacre, cnomcliente, DocIde…) todavía se lee, pero conviene usar los nombres de esta.',
       'Las 3 filas de ejemplo son datos inventados: bórralas antes de cargar tu base. Si el N° de crédito ya existe se actualiza; si ya fue auditado no se modifica.',
       'Todo o nada: si alguna fila trae un error no se guarda ninguna (ni las válidas). El reporte dice la fila del archivo, el campo y qué corregir; corrige y vuelve a cargar.',
       'Al cargar el archivo, el sistema primero lo revisa completo sin guardar nada y te muestra el reporte; después decides si importarlo.',
