@@ -2,11 +2,14 @@ import crypto from 'node:crypto';
 import { antiguedadEnMeses, entero, fecha, normalizarClave, numero, tieneTextoDanado, texto } from './limpieza.js';
 import { extraerCoordenadas, sinCoordenadas } from './coordenadas.js';
 import { camposDeDireccion } from '../../geocodificacion/direcciones.js';
+import { ALIAS_CONSUMO_BANCO, PREFIJO_FUENTE_CONSUMO } from './columnas-consumo.js';
 
 // Base "FV_..._CRED_EMP" del sistema core de Caja Huancayo: una fila por crédito, 262 columnas
 // con nombres técnicos. Este módulo la convierte al modelo del sistema:
 //   · columnas propias del expediente (para filtrar y asignar),
 //   · cinco bloques JSON que alimentan la ficha (cliente, negocio, crédito, evaluación, deuda).
+// La base de Consumo (297 columnas, ver columnas-consumo.js) llama distinto a muchos datos: pasa por el mismo mapeo, que pide cada dato por su nombre del
+// core y, si no está, por el equivalente de Consumo (ALIAS_CONSUMO_BANCO). Solo trae de más el historial de créditos anteriores y la fuente de cada ingreso.
 //
 // Convención de la evaluación financiera en la base: cada valor viene en dos periodos.
 //   sufijo 2 = reevaluación (la más reciente)   sufijo 1 = evaluación anterior
@@ -17,7 +20,8 @@ const COLUMNAS_FIRMA = ['ccodctacre', 'cnomcliente', 'docide'];
 
 export function esFormatoCore(encabezados) {
   const claves = new Set(encabezados.map((h) => String(h).trim().toLowerCase()));
-  return COLUMNAS_FIRMA.every((c) => claves.has(c));
+  const tiene = (c) => claves.has(c) || (ALIAS_CONSUMO_BANCO[c] || []).some((a) => claves.has(a));
+  return COLUMNAS_FIRMA.every(tiene);
 }
 
 const BALANCE = [
@@ -56,11 +60,19 @@ const RESULTADOS = [
   ['porcentaje_capacidad', 'ntotporepg'],
 ];
 
-function periodo(v, n) {
+// `leerSiVacio`: en la base de Consumo las columnas de un periodo sin evaluación vienen en cero y no son «datos sin destino»: se leen aunque el periodo se descarte,
+// para que no terminen en campos_adicionales. En la base MYPE no se toca (lo que ya se importó no cambia).
+function periodo(v, n, { leerSiVacio = false } = {}) {
   const numeroEvaluacion = texto(v(`numeva${n}`));
   const fechaEvaluacion = fecha(v(`fechaeva${n}`));
   const sinEvaluacion = (!numeroEvaluacion || numeroEvaluacion === '0') && !fechaEvaluacion;
-  if (sinEvaluacion) return null;
+  if (sinEvaluacion) {
+    if (leerSiVacio) {
+      for (const [, col1, col2] of BALANCE) v(n === 1 ? col1 : col2);
+      for (const [, base] of RESULTADOS) v(`${base}${n}`);
+    }
+    return null;
+  }
   const balance = {};
   for (const [clave, col1, col2] of BALANCE) balance[clave] = numero(v(n === 1 ? col1 : col2));
   const resultados = {};
@@ -102,6 +114,9 @@ function ingresosConsumo(v) {
       monto: numero(v(`NMONINGDEU${n}`)),
       tipo_ingreso: texto(v(`TIPOING${n}`)),
     };
+    // La base de Consumo del banco agrega de dónde viene el ingreso (cFueIng); la anterior no lo trae y entonces la clave no se agrega (la huella no cambia).
+    const fuenteIngreso = texto(v(`FUENTEING${n}`));
+    if (fuenteIngreso) linea.fuente_ingreso = fuenteIngreso;
     if (linea.descripcion || linea.monto) lineas.push(linea);
   }
   return lineas;
@@ -118,6 +133,38 @@ function entidades(v, prefijo) {
     lista.push({ entidad, saldo, calificacion, tipo_credito: tipoCredito });
   }
   return lista;
+}
+
+// Créditos anteriores del cliente (hasta 4): solo los trae la base de Consumo del banco, con los mismos 13 datos por crédito que su historial impreso. Salen con las
+// claves del historial del crédito vigente (ver datosCredito.historial); en la base MYPE la lista queda vacía.
+function historialPrevio(v) {
+  const lista = [];
+  for (let n = 1; n <= 4; n += 1) {
+    const credito = {
+      linea: texto(v(`cLinCre${n}`)),
+      tipo: texto(v(`cTipCredit${n}`)),
+      fecha_desembolso: fecha(v(`dFecDesemb${n}`)),
+      monto: numero(v(`nMonDesemb${n}`)),
+      moneda: moneda(v(`cMoneda${n}`), null),
+      solicitud: texto(v(`cSolCre${n}`)),
+      numero_credito: texto(v(`cCodCtaCre${n}`)),
+      plazo_cuotas: entero(v(`nNumCuoApr${n}`)),
+      cuota: numero(v(`nMontCuota${n}`)),
+      condicion: texto(v(`cCondContab${n}`)),
+      saldo: numero(v(`nSalCap${n}`)),
+      asesor: texto(v(`cNomAsesor${n}`)),
+      cuota_mas_atrasada: texto(v(`cCuoMasAtr${n}`)),
+    };
+    // Los créditos que no existen vienen como NULL o en blanco: solo se guardan los que tienen número, solicitud o monto.
+    if (credito.numero_credito || credito.solicitud || credito.monto) lista.push(credito);
+  }
+  return lista;
+}
+
+// «006 - 73 día(s)»: cuota más atrasada y sus días. La base de Consumo no trae la columna de días de atraso; salen de este texto.
+function diasDeAtraso(cuotaMasAtrasada) {
+  const hit = String(cuotaMasAtrasada || '').match(/-\s*(\d+)\s*d/i);
+  return hit ? Number(hit[1]) : null;
 }
 
 function deducirTipoCredito(hoja, descripcionTipo) {
@@ -154,10 +201,21 @@ function telefono(...valores) {
   return null;
 }
 
-// Acceso a una fila sin distinguir mayúsculas en el nombre de la columna.
+// Acceso a una fila sin distinguir mayúsculas en el nombre de la columna. Si la fila no trae la columna con el nombre del core, se busca con el de la base de Consumo
+// (ALIAS_CONSUMO_BANCO) y se marca como usada la que se leyó. `v.existe(nombre)` dice si la fila trae esa columna, tal cual se llama.
 function accesoFila(fila, usadas) {
   const porClave = new Map(Object.entries(fila).map(([k, val]) => [k.trim().toLowerCase(), val]));
-  return (nombre) => { usadas.add(nombre.toLowerCase()); return porClave.get(nombre.toLowerCase()); };
+  const v = (nombre) => {
+    const clave = nombre.toLowerCase();
+    usadas.add(clave);
+    if (porClave.has(clave)) return porClave.get(clave);
+    for (const alias of Object.hasOwn(ALIAS_CONSUMO_BANCO, clave) ? ALIAS_CONSUMO_BANCO[clave] : []) {
+      if (porClave.has(alias)) { usadas.add(alias); return porClave.get(alias); }
+    }
+    return undefined;
+  };
+  v.existe = (nombre) => porClave.has(nombre.toLowerCase());
+  return v;
 }
 
 const huella = (objeto) => crypto.createHash('sha256').update(JSON.stringify(objeto)).digest('hex');
@@ -170,6 +228,7 @@ export function mapearFilaCore(fila, { hoja }) {
   const usadas = new Set();
   const v = accesoFila(fila, usadas);
   const advertencias = [];
+  const consumoBanco = v.existe('cDocIde'); // la fila viene de la base de Consumo del banco (297 columnas)
 
   const codigo = texto(v('ccodctacre'), 50);
   const nombre = texto(v('cnomcliente'), 200);
@@ -204,8 +263,8 @@ export function mapearFilaCore(fila, { hoja }) {
     advertencias.push('DISTRITO_IGUAL_A_AGENCIA');
   }
 
-  const reevaluacion = periodo(v, 2);
-  const anterior = periodo(v, 1);
+  const reevaluacion = periodo(v, 2, { leerSiVacio: consumoBanco });
+  const anterior = periodo(v, 1, { leerSiVacio: consumoBanco });
   // La evaluación de Consumo son sus ingresos (no el balance de un negocio): sin ellos es cuando se avisa. Si no, cada fila de Consumo saldría con un aviso falso.
   const lineasConsumo = ingresosConsumo(v);
   if (tipoCredito === 'CONSUMO' ? !lineasConsumo.length : (!reevaluacion && !anterior)) advertencias.push('SIN_EVALUACION');
@@ -233,8 +292,13 @@ export function mapearFilaCore(fila, { hoja }) {
     })
     .filter((negocio) => negocio.direccion || negocio.referencia || negocio.telefono || negocio.latitud !== null);
 
+  // La ficha impresa de Consumo escribe «MPAUCC/<fuente>» (ver columnas-consumo.js): la columna cFuente trae solo lo de después de la barra.
+  const fuenteBase = texto(v('Fuente'));
+  const fuente = consumoBanco && tipoCredito === 'CONSUMO' && fuenteBase && !fuenteBase.toUpperCase().startsWith(`${PREFIJO_FUENTE_CONSUMO}/`)
+    ? `${PREFIJO_FUENTE_CONSUMO}/${fuenteBase}` : fuenteBase;
+
   const datosCliente = {
-    fuente: texto(v('Fuente')),
+    fuente,
     fecha_nacimiento: fecha(v('dFecNacCli')),
     edad: entero(v('edad')),
     estado_civil: texto(v('CDESESTCIV')),
@@ -275,7 +339,7 @@ export function mapearFilaCore(fila, { hoja }) {
     monto_desembolsado_soles: numero(v('desembolsadoSoles')),
     saldo_capital: numero(v('saldocap')),
     saldo_capital_soles: numero(v('SALDOCAPSoles')),
-    dias_atraso: entero(v('diasatraso')),
+    dias_atraso: entero(v('diasatraso')) ?? diasDeAtraso(v('cCuoDiaMasAtr')),
     condicion_contable: texto(v('cDesCorta')),
     estado: texto(v('cDesCortaEstado')),
     destino: texto(v('destino')),
@@ -303,8 +367,7 @@ export function mapearFilaCore(fila, { hoja }) {
       estado_contable: texto(v('cestcrecon')), modalidad: texto(v('cCodModCre')), plazo: texto(v('cCodPlazo')), oficina: texto(v('cCodOficin')),
     },
   };
-  // La base trae solo el crédito vigente; el historial se modela como lista para poder
-  // sumar más créditos del cliente cuando el origen los entregue.
+  // La base MYPE trae solo el crédito vigente; la de Consumo trae además hasta 4 créditos anteriores del cliente (historialPrevio): primero va el vigente.
   datosCredito.historial = [{
     linea: datosCredito.linea_credito,
     tipo: datosCredito.tipo_credito_desc,
@@ -319,7 +382,11 @@ export function mapearFilaCore(fila, { hoja }) {
     saldo: datosCredito.saldo_capital_soles ?? datosCredito.saldo_capital,
     asesor: datosCredito.asesor_actual,
     cuota_mas_atrasada: datosCredito.cuota_mas_atrasada,
-  }];
+  }, ...historialPrevio(v)];
+
+  // Una evaluación posterior al desembolso no pudo sustentar este crédito: lo normal es que la evaluación, los ingresos y las deudas de la fila sean de OTRO cliente
+  // (por ejemplo, un archivo armado juntando consultas ordenadas distinto) y la ficha mostraría datos ajenos. Se avisa; solo se revisa en la base de Consumo del banco.
+  if (consumoBanco && anterior?.fecha && datosCredito.fecha_desembolso && anterior.fecha > datosCredito.fecha_desembolso) advertencias.push('EVALUACION_POSTERIOR_AL_DESEMBOLSO');
 
   const evaluacionFinanciera = { moneda: monedaCodigo, reevaluacion, anterior, ingresos: ingresos(v) };
   if (lineasConsumo.length) evaluacionFinanciera.ingresos_consumo = lineasConsumo;
@@ -357,7 +424,7 @@ export function mapearFilaCore(fila, { hoja }) {
 
   // Ninguna columna de la base queda sin destino: lo que el mapeo no consume (columnas nuevas o
   // sin uso conocido) se conserva tal cual en datos_credito.campos_adicionales.
-  usadas.add('nro'); usadas.add('ubidom');
+  usadas.add('nro'); usadas.add('ubidom'); usadas.add('cnum'); usadas.add('ctipfic'); // cNum: correlativo de la muestra; cTipFic: «CONSUMO», ya lo dice la hoja
   const adicionales = {};
   for (const [clave, valor] of Object.entries(fila)) {
     if (usadas.has(clave.trim().toLowerCase())) continue;
