@@ -1,7 +1,7 @@
 // Trabajador en segundo plano: toma lotes de direcciones pendientes y las ubica. Apagado por defecto (GEOCODING_WORKER_ENABLED=true para
 // encenderlo): enviar direcciones de clientes a un proveedor externo de mapas requiere que el banco lo autorice.
 import { logger } from '#core/config/logger.js';
-import { geocodificacionActiva, geocodificarPendientes } from './geocodificacion.service.js';
+import { borrarSugerenciasVencidas, geocodificacionActiva, geocodificarPendientes } from './geocodificacion.service.js';
 import { tamanoMaximoLote } from './proveedores.js';
 import { conEmpresa } from '#core/tenant/contexto.js';
 import { listarActivas } from '#modules/empresas/empresas.service.js';
@@ -13,6 +13,8 @@ const INTERVALO_MS = Math.max(Number(process.env.GEOCODING_INTERVAL_MS) || 30000
 let iniciado = false;
 let procesando = false;
 let temporizador = null;
+let ultimaLimpieza = 0;
+const LIMPIEZA_MS = 60 * 60 * 1000; // las sugerencias temporales vencidas se borran una vez por hora
 
 function programar(ms = INTERVALO_MS) {
   if (!iniciado) return;
@@ -28,8 +30,15 @@ async function ciclo() {
   try {
     // Una empresa por vez: la cola de direcciones de cada una se procesa dentro de su propio contexto.
     const r = { procesados: 0, detenido: false };
+    const limpiar = Date.now() - ultimaLimpieza > LIMPIEZA_MS;
+    if (limpiar) ultimaLimpieza = Date.now();
     for (const empresa of await listarActivas()) {
+      if (limpiar) {
+        const vencidas = await conEmpresa(empresa.id_empresa, () => borrarSugerenciasVencidas());
+        if (vencidas.domicilios || vencidas.negocios) logger.info({ empresa: empresa.id_empresa, ...vencidas }, 'geocodificacion_sugerencias_vencidas');
+      }
       const parcial = await conEmpresa(empresa.id_empresa, () => geocodificarPendientes({ limit: LOTE }));
+      if (parcial.tope) { logger.info({ proveedor: parcial.proveedor, motivo: parcial.detenido }, 'geocodificacion_tope_mensual'); r.detenido = true; break; }
       r.procesados += parcial.procesados || 0; r.detenido = r.detenido || Boolean(parcial.detenido);
       if (r.procesados >= LOTE) break;
     }

@@ -3,7 +3,13 @@
 //   · mapbox: con clave (MAPBOX_ACCESS_TOKEN), rápido y con nivel de precisión por dirección; guardar coordenadas exige su modo permanente.
 // Al proveedor solo se le envía el texto de la dirección con distrito y provincia: nunca el nombre ni el documento del cliente.
 import { logger } from '#core/config/logger.js';
-import { busquedasParaDireccion, coincideDistrito, evaluarResultado, mapearFeatureMapbox, normalizarNumero } from './direcciones.js';
+import { busquedasParaDireccion, coincideDistrito, evaluarResultado, mapearFeatureMapbox, mapearResultadoGoogle, normalizarNumero } from './direcciones.js';
+
+// Proveedores «temporales»: sus términos solo permiten guardar las coordenadas unos días (Google: 30) y prohíben armar con ellas una base propia
+// de ubicaciones. Por eso sus resultados quedan solo como SUGERENCIA (para llegar y para controlar la primera visita), vencen y se borran, y
+// nunca se vuelven la referencia de los 100 m: esa la pone el GPS del auditor en su primera visita.
+export const PROVEEDORES_TEMPORALES = Object.freeze(['google']);
+export const esProveedorTemporal = (proveedor) => PROVEEDORES_TEMPORALES.includes(String(proveedor || '').toLowerCase());
 
 const PAUSA_NOMINATIM_MS = 1200;
 const PAUSA_MAPBOX_MS = 100;
@@ -13,14 +19,15 @@ const esNominatimPublico = () => /nominatim\.openstreetmap\.org/i.test(baseUrl()
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function proveedorActivo() {
-  return String(process.env.GEOCODING_PROVIDER || 'nominatim').trim().toLowerCase() === 'mapbox' ? 'mapbox' : 'nominatim';
+  const p = String(process.env.GEOCODING_PROVIDER || 'nominatim').trim().toLowerCase();
+  return ['mapbox', 'google'].includes(p) ? p : 'nominatim';
 }
 
 export function pausaEntreConsultasMs(proveedor = proveedorActivo()) {
   const texto = process.env.GEOCODING_DELAY_MS;
   const configurada = texto === undefined || texto === '' ? NaN : Number(texto);
   if (Number.isFinite(configurada) && configurada >= 0) return proveedor === 'nominatim' && esNominatimPublico() ? Math.max(configurada, 1000) : configurada;
-  return proveedor === 'mapbox' ? PAUSA_MAPBOX_MS : PAUSA_NOMINATIM_MS;
+  return proveedor === 'nominatim' ? PAUSA_NOMINATIM_MS : PAUSA_MAPBOX_MS; // Mapbox y Google aceptan decenas de consultas por segundo
 }
 
 export function tamanoMaximoLote(proveedor = proveedorActivo()) {
@@ -69,9 +76,31 @@ async function consultarMapbox({ consulta, permanente }) {
   return Array.isArray(data.features) ? data.features.map(mapearFeatureMapbox) : [];
 }
 
+// Geocoding API de Google: una consulta por dirección, acotada a Perú. Solo se envía la dirección con distrito y provincia.
+async function consultarGoogle({ consulta }) {
+  const key = process.env.GOOGLE_MAPS_API_KEY;
+  if (!key) throw Object.assign(new Error('GOOGLE_MAPS_API_KEY no está configurado.'), { detenerLote: true });
+  const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
+  url.searchParams.set('address', consulta);
+  url.searchParams.set('components', 'country:PE');
+  url.searchParams.set('region', 'pe');
+  url.searchParams.set('language', 'es');
+  url.searchParams.set('key', key);
+  const response = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(15000) });
+  verificarRespuesta(response, 'Google');
+  const data = await response.json();
+  if (data.status === 'ZERO_RESULTS' || data.status === 'INVALID_REQUEST') return [];
+  if (data.status !== 'OK') {
+    // Clave inválida, cuota agotada o pedido rechazado: no es culpa de la dirección, el lote se detiene y las filas siguen pendientes.
+    throw Object.assign(new Error(`Google Geocoding respondió ${data.status}${data.error_message ? `: ${data.error_message}` : ''}`), { detenerLote: true });
+  }
+  return (data.results || []).map(mapearResultadoGoogle);
+}
+
 // Prueba las búsquedas de la dirección en orden y se queda con las del primer intento que encuentre algo (ver busquedasParaDireccion).
 async function buscarCandidatos({ proveedor, busquedas, permanente }) {
   try {
+    if (proveedor === 'google') return await consultarGoogle({ consulta: busquedas[0].texto });
     if (proveedor === 'mapbox') return await consultarMapbox({ consulta: busquedas[0].texto, permanente });
     for (let i = 0; i < busquedas.length; i += 1) {
       const { texto, ...parametros } = busquedas[i];

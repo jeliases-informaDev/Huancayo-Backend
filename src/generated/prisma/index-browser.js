@@ -269,6 +269,7 @@ exports.Prisma.ExpedienteScalarFieldEnum = {
   geo_direccion_encontrada: 'geo_direccion_encontrada',
   geo_fecha: 'geo_fecha',
   geo_negocios_estado: 'geo_negocios_estado',
+  geo_negocios_fecha: 'geo_negocios_fecha',
   ubicacion_origen: 'ubicacion_origen',
   autoasignable: 'autoasignable',
   id_importacion: 'id_importacion',
@@ -428,6 +429,14 @@ exports.Prisma.AceptacionTerminosScalarFieldEnum = {
   ip: 'ip',
   user_agent: 'user_agent',
   fecha: 'fecha'
+};
+
+exports.Prisma.GeocodificacionConsumoScalarFieldEnum = {
+  id: 'id',
+  proveedor: 'proveedor',
+  mes: 'mes',
+  consultas: 'consultas',
+  actualizado: 'actualizado'
 };
 
 exports.Prisma.SortOrder = {
@@ -646,6 +655,11 @@ exports.Prisma.AceptacionTerminosOrderByRelevanceFieldEnum = {
   ip: 'ip',
   user_agent: 'user_agent'
 };
+
+exports.Prisma.GeocodificacionConsumoOrderByRelevanceFieldEnum = {
+  proveedor: 'proveedor',
+  mes: 'mes'
+};
 exports.TipoCredito = exports.$Enums.TipoCredito = {
   CONSUMO: 'CONSUMO',
   OTROS: 'OTROS'
@@ -674,7 +688,8 @@ exports.Prisma.ModelName = {
   AuditoriaSeguridad: 'AuditoriaSeguridad',
   AuditoriaSelloCabeza: 'AuditoriaSelloCabeza',
   ImportacionMasiva: 'ImportacionMasiva',
-  AceptacionTerminos: 'AceptacionTerminos'
+  AceptacionTerminos: 'AceptacionTerminos',
+  GeocodificacionConsumo: 'GeocodificacionConsumo'
 };
 
 /**

@@ -252,6 +252,7 @@ model Expediente {
   geo_fecha     DateTime?
   // Cola del mapa para los negocios/empleadores (sus direcciones viven en datos_negocio): PENDIENTE = alguno sin coordenadas por buscar; LISTO = ya se buscaron.
   geo_negocios_estado String? @db.VarChar(15)
+  geo_negocios_fecha  DateTime? // cuándo se buscaron por última vez (las sugerencias de un proveedor temporal vencen)
 
   // --- Trazabilidad del dato ---
   // De dónde salió la ubicación del domicilio: REFERENCIA (coordenadas escritas en la referencia de la base), MANUAL (la fijó un
@@ -283,6 +284,7 @@ model Expediente {
   @@index([departamento])
   @@index([geo_estado])
   @@index([geo_negocios_estado])
+  @@index([geo_negocios_fecha])
   @@unique([empresa_id, codigo_expediente])
   @@index([empresa_id, estado])
   @@index([empresa_id, fecha_creacion]) // expedientes cargados por día del Resumen
@@ -534,4 +536,17 @@ model AceptacionTerminos {
   @@unique([usuario_id, version])
   @@index([empresa_id])
   @@map("aceptaciones_terminos")
+}
+
+// Consultas hechas al proveedor de mapas por mes: tope mensual para no pasar de la cuota gratuita ni recibir una factura sorpresa.
+// Es global, no por empresa: la clave del proveedor es una sola.
+model GeocodificacionConsumo {
+  id          Int      @id @default(autoincrement())
+  proveedor   String   @db.VarChar(12)
+  mes         String   @db.VarChar(7) // AAAA-MM
+  consultas   Int      @default(0)
+  actualizado DateTime @updatedAt
+
+  @@unique([proveedor, mes])
+  @@map("geocodificacion_consumo")
 }

@@ -99,6 +99,11 @@ export type ImportacionMasiva = $Result.DefaultSelection<Prisma.$ImportacionMasi
  * 
  */
 export type AceptacionTerminos = $Result.DefaultSelection<Prisma.$AceptacionTerminosPayload>
+/**
+ * Model GeocodificacionConsumo
+ * 
+ */
+export type GeocodificacionConsumo = $Result.DefaultSelection<Prisma.$GeocodificacionConsumoPayload>
 
 /**
  * Enums
@@ -411,6 +416,16 @@ export class PrismaClient<
     * ```
     */
   get aceptacionTerminos(): Prisma.AceptacionTerminosDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.geocodificacionConsumo`: Exposes CRUD operations for the **GeocodificacionConsumo** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more GeocodificacionConsumos
+    * const geocodificacionConsumos = await prisma.geocodificacionConsumo.findMany()
+    * ```
+    */
+  get geocodificacionConsumo(): Prisma.GeocodificacionConsumoDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -873,7 +888,8 @@ export namespace Prisma {
     AuditoriaSeguridad: 'AuditoriaSeguridad',
     AuditoriaSelloCabeza: 'AuditoriaSelloCabeza',
     ImportacionMasiva: 'ImportacionMasiva',
-    AceptacionTerminos: 'AceptacionTerminos'
+    AceptacionTerminos: 'AceptacionTerminos',
+    GeocodificacionConsumo: 'GeocodificacionConsumo'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -889,7 +905,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "empresa" | "usuario" | "jornadaCampo" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "auditoriaSelloCabeza" | "importacionMasiva" | "aceptacionTerminos"
+      modelProps: "empresa" | "usuario" | "jornadaCampo" | "trackingUbicacion" | "eventoCampo" | "configuracionSistema" | "dispositivoAutorizado" | "expediente" | "expedienteCambio" | "asignacionAuditoria" | "visitaAuditoria" | "evidencia" | "auditoriaSeguridad" | "auditoriaSelloCabeza" | "importacionMasiva" | "aceptacionTerminos" | "geocodificacionConsumo"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1949,6 +1965,72 @@ export namespace Prisma {
           }
         }
       }
+      GeocodificacionConsumo: {
+        payload: Prisma.$GeocodificacionConsumoPayload<ExtArgs>
+        fields: Prisma.GeocodificacionConsumoFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.GeocodificacionConsumoFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GeocodificacionConsumoPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.GeocodificacionConsumoFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GeocodificacionConsumoPayload>
+          }
+          findFirst: {
+            args: Prisma.GeocodificacionConsumoFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GeocodificacionConsumoPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.GeocodificacionConsumoFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GeocodificacionConsumoPayload>
+          }
+          findMany: {
+            args: Prisma.GeocodificacionConsumoFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GeocodificacionConsumoPayload>[]
+          }
+          create: {
+            args: Prisma.GeocodificacionConsumoCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GeocodificacionConsumoPayload>
+          }
+          createMany: {
+            args: Prisma.GeocodificacionConsumoCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.GeocodificacionConsumoDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GeocodificacionConsumoPayload>
+          }
+          update: {
+            args: Prisma.GeocodificacionConsumoUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GeocodificacionConsumoPayload>
+          }
+          deleteMany: {
+            args: Prisma.GeocodificacionConsumoDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.GeocodificacionConsumoUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.GeocodificacionConsumoUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GeocodificacionConsumoPayload>
+          }
+          aggregate: {
+            args: Prisma.GeocodificacionConsumoAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateGeocodificacionConsumo>
+          }
+          groupBy: {
+            args: Prisma.GeocodificacionConsumoGroupByArgs<ExtArgs>
+            result: $Utils.Optional<GeocodificacionConsumoGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.GeocodificacionConsumoCountArgs<ExtArgs>
+            result: $Utils.Optional<GeocodificacionConsumoCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2088,6 +2170,7 @@ export namespace Prisma {
     auditoriaSelloCabeza?: AuditoriaSelloCabezaOmit
     importacionMasiva?: ImportacionMasivaOmit
     aceptacionTerminos?: AceptacionTerminosOmit
+    geocodificacionConsumo?: GeocodificacionConsumoOmit
   }
 
   /* Types for Logging */
@@ -9874,6 +9957,7 @@ export namespace Prisma {
     geo_direccion_encontrada: string | null
     geo_fecha: Date | null
     geo_negocios_estado: string | null
+    geo_negocios_fecha: Date | null
     ubicacion_origen: string | null
     autoasignable: boolean | null
     id_importacion: string | null
@@ -9913,6 +9997,7 @@ export namespace Prisma {
     geo_direccion_encontrada: string | null
     geo_fecha: Date | null
     geo_negocios_estado: string | null
+    geo_negocios_fecha: Date | null
     ubicacion_origen: string | null
     autoasignable: boolean | null
     id_importacion: string | null
@@ -9958,6 +10043,7 @@ export namespace Prisma {
     geo_direccion_encontrada: number
     geo_fecha: number
     geo_negocios_estado: number
+    geo_negocios_fecha: number
     ubicacion_origen: number
     autoasignable: number
     id_importacion: number
@@ -10020,6 +10106,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: true
     geo_fecha?: true
     geo_negocios_estado?: true
+    geo_negocios_fecha?: true
     ubicacion_origen?: true
     autoasignable?: true
     id_importacion?: true
@@ -10059,6 +10146,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: true
     geo_fecha?: true
     geo_negocios_estado?: true
+    geo_negocios_fecha?: true
     ubicacion_origen?: true
     autoasignable?: true
     id_importacion?: true
@@ -10104,6 +10192,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: true
     geo_fecha?: true
     geo_negocios_estado?: true
+    geo_negocios_fecha?: true
     ubicacion_origen?: true
     autoasignable?: true
     id_importacion?: true
@@ -10237,6 +10326,7 @@ export namespace Prisma {
     geo_direccion_encontrada: string | null
     geo_fecha: Date | null
     geo_negocios_estado: string | null
+    geo_negocios_fecha: Date | null
     ubicacion_origen: string | null
     autoasignable: boolean
     id_importacion: string | null
@@ -10302,6 +10392,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: boolean
     geo_fecha?: boolean
     geo_negocios_estado?: boolean
+    geo_negocios_fecha?: boolean
     ubicacion_origen?: boolean
     autoasignable?: boolean
     id_importacion?: boolean
@@ -10355,6 +10446,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: boolean
     geo_fecha?: boolean
     geo_negocios_estado?: boolean
+    geo_negocios_fecha?: boolean
     ubicacion_origen?: boolean
     autoasignable?: boolean
     id_importacion?: boolean
@@ -10366,7 +10458,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "empresa_id" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "direccion_normalizada" | "direccion_componentes" | "geo_estado" | "geo_confianza" | "geo_precision" | "geo_proveedor" | "geo_latitud" | "geo_longitud" | "geo_direccion_encontrada" | "geo_fecha" | "geo_negocios_estado" | "ubicacion_origen" | "autoasignable" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
+  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "empresa_id" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "direccion_normalizada" | "direccion_componentes" | "geo_estado" | "geo_confianza" | "geo_precision" | "geo_proveedor" | "geo_latitud" | "geo_longitud" | "geo_direccion_encontrada" | "geo_fecha" | "geo_negocios_estado" | "geo_negocios_fecha" | "ubicacion_origen" | "autoasignable" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
   export type ExpedienteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Expediente$asignacionesArgs<ExtArgs>
     visitas?: boolean | Expediente$visitasArgs<ExtArgs>
@@ -10418,6 +10510,7 @@ export namespace Prisma {
       geo_direccion_encontrada: string | null
       geo_fecha: Date | null
       geo_negocios_estado: string | null
+      geo_negocios_fecha: Date | null
       ubicacion_origen: string | null
       autoasignable: boolean
       id_importacion: string | null
@@ -10834,6 +10927,7 @@ export namespace Prisma {
     readonly geo_direccion_encontrada: FieldRef<"Expediente", 'String'>
     readonly geo_fecha: FieldRef<"Expediente", 'DateTime'>
     readonly geo_negocios_estado: FieldRef<"Expediente", 'String'>
+    readonly geo_negocios_fecha: FieldRef<"Expediente", 'DateTime'>
     readonly ubicacion_origen: FieldRef<"Expediente", 'String'>
     readonly autoasignable: FieldRef<"Expediente", 'Boolean'>
     readonly id_importacion: FieldRef<"Expediente", 'String'>
@@ -19887,6 +19981,931 @@ export namespace Prisma {
 
 
   /**
+   * Model GeocodificacionConsumo
+   */
+
+  export type AggregateGeocodificacionConsumo = {
+    _count: GeocodificacionConsumoCountAggregateOutputType | null
+    _avg: GeocodificacionConsumoAvgAggregateOutputType | null
+    _sum: GeocodificacionConsumoSumAggregateOutputType | null
+    _min: GeocodificacionConsumoMinAggregateOutputType | null
+    _max: GeocodificacionConsumoMaxAggregateOutputType | null
+  }
+
+  export type GeocodificacionConsumoAvgAggregateOutputType = {
+    id: number | null
+    consultas: number | null
+  }
+
+  export type GeocodificacionConsumoSumAggregateOutputType = {
+    id: number | null
+    consultas: number | null
+  }
+
+  export type GeocodificacionConsumoMinAggregateOutputType = {
+    id: number | null
+    proveedor: string | null
+    mes: string | null
+    consultas: number | null
+    actualizado: Date | null
+  }
+
+  export type GeocodificacionConsumoMaxAggregateOutputType = {
+    id: number | null
+    proveedor: string | null
+    mes: string | null
+    consultas: number | null
+    actualizado: Date | null
+  }
+
+  export type GeocodificacionConsumoCountAggregateOutputType = {
+    id: number
+    proveedor: number
+    mes: number
+    consultas: number
+    actualizado: number
+    _all: number
+  }
+
+
+  export type GeocodificacionConsumoAvgAggregateInputType = {
+    id?: true
+    consultas?: true
+  }
+
+  export type GeocodificacionConsumoSumAggregateInputType = {
+    id?: true
+    consultas?: true
+  }
+
+  export type GeocodificacionConsumoMinAggregateInputType = {
+    id?: true
+    proveedor?: true
+    mes?: true
+    consultas?: true
+    actualizado?: true
+  }
+
+  export type GeocodificacionConsumoMaxAggregateInputType = {
+    id?: true
+    proveedor?: true
+    mes?: true
+    consultas?: true
+    actualizado?: true
+  }
+
+  export type GeocodificacionConsumoCountAggregateInputType = {
+    id?: true
+    proveedor?: true
+    mes?: true
+    consultas?: true
+    actualizado?: true
+    _all?: true
+  }
+
+  export type GeocodificacionConsumoAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GeocodificacionConsumo to aggregate.
+     */
+    where?: GeocodificacionConsumoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GeocodificacionConsumos to fetch.
+     */
+    orderBy?: GeocodificacionConsumoOrderByWithRelationInput | GeocodificacionConsumoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: GeocodificacionConsumoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GeocodificacionConsumos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GeocodificacionConsumos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned GeocodificacionConsumos
+    **/
+    _count?: true | GeocodificacionConsumoCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: GeocodificacionConsumoAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: GeocodificacionConsumoSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: GeocodificacionConsumoMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: GeocodificacionConsumoMaxAggregateInputType
+  }
+
+  export type GetGeocodificacionConsumoAggregateType<T extends GeocodificacionConsumoAggregateArgs> = {
+        [P in keyof T & keyof AggregateGeocodificacionConsumo]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateGeocodificacionConsumo[P]>
+      : GetScalarType<T[P], AggregateGeocodificacionConsumo[P]>
+  }
+
+
+
+
+  export type GeocodificacionConsumoGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GeocodificacionConsumoWhereInput
+    orderBy?: GeocodificacionConsumoOrderByWithAggregationInput | GeocodificacionConsumoOrderByWithAggregationInput[]
+    by: GeocodificacionConsumoScalarFieldEnum[] | GeocodificacionConsumoScalarFieldEnum
+    having?: GeocodificacionConsumoScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: GeocodificacionConsumoCountAggregateInputType | true
+    _avg?: GeocodificacionConsumoAvgAggregateInputType
+    _sum?: GeocodificacionConsumoSumAggregateInputType
+    _min?: GeocodificacionConsumoMinAggregateInputType
+    _max?: GeocodificacionConsumoMaxAggregateInputType
+  }
+
+  export type GeocodificacionConsumoGroupByOutputType = {
+    id: number
+    proveedor: string
+    mes: string
+    consultas: number
+    actualizado: Date
+    _count: GeocodificacionConsumoCountAggregateOutputType | null
+    _avg: GeocodificacionConsumoAvgAggregateOutputType | null
+    _sum: GeocodificacionConsumoSumAggregateOutputType | null
+    _min: GeocodificacionConsumoMinAggregateOutputType | null
+    _max: GeocodificacionConsumoMaxAggregateOutputType | null
+  }
+
+  type GetGeocodificacionConsumoGroupByPayload<T extends GeocodificacionConsumoGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<GeocodificacionConsumoGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof GeocodificacionConsumoGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], GeocodificacionConsumoGroupByOutputType[P]>
+            : GetScalarType<T[P], GeocodificacionConsumoGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type GeocodificacionConsumoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    proveedor?: boolean
+    mes?: boolean
+    consultas?: boolean
+    actualizado?: boolean
+  }, ExtArgs["result"]["geocodificacionConsumo"]>
+
+
+
+  export type GeocodificacionConsumoSelectScalar = {
+    id?: boolean
+    proveedor?: boolean
+    mes?: boolean
+    consultas?: boolean
+    actualizado?: boolean
+  }
+
+  export type GeocodificacionConsumoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "proveedor" | "mes" | "consultas" | "actualizado", ExtArgs["result"]["geocodificacionConsumo"]>
+
+  export type $GeocodificacionConsumoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "GeocodificacionConsumo"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      proveedor: string
+      mes: string
+      consultas: number
+      actualizado: Date
+    }, ExtArgs["result"]["geocodificacionConsumo"]>
+    composites: {}
+  }
+
+  type GeocodificacionConsumoGetPayload<S extends boolean | null | undefined | GeocodificacionConsumoDefaultArgs> = $Result.GetResult<Prisma.$GeocodificacionConsumoPayload, S>
+
+  type GeocodificacionConsumoCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<GeocodificacionConsumoFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: GeocodificacionConsumoCountAggregateInputType | true
+    }
+
+  export interface GeocodificacionConsumoDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['GeocodificacionConsumo'], meta: { name: 'GeocodificacionConsumo' } }
+    /**
+     * Find zero or one GeocodificacionConsumo that matches the filter.
+     * @param {GeocodificacionConsumoFindUniqueArgs} args - Arguments to find a GeocodificacionConsumo
+     * @example
+     * // Get one GeocodificacionConsumo
+     * const geocodificacionConsumo = await prisma.geocodificacionConsumo.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends GeocodificacionConsumoFindUniqueArgs>(args: SelectSubset<T, GeocodificacionConsumoFindUniqueArgs<ExtArgs>>): Prisma__GeocodificacionConsumoClient<$Result.GetResult<Prisma.$GeocodificacionConsumoPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one GeocodificacionConsumo that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {GeocodificacionConsumoFindUniqueOrThrowArgs} args - Arguments to find a GeocodificacionConsumo
+     * @example
+     * // Get one GeocodificacionConsumo
+     * const geocodificacionConsumo = await prisma.geocodificacionConsumo.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends GeocodificacionConsumoFindUniqueOrThrowArgs>(args: SelectSubset<T, GeocodificacionConsumoFindUniqueOrThrowArgs<ExtArgs>>): Prisma__GeocodificacionConsumoClient<$Result.GetResult<Prisma.$GeocodificacionConsumoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GeocodificacionConsumo that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GeocodificacionConsumoFindFirstArgs} args - Arguments to find a GeocodificacionConsumo
+     * @example
+     * // Get one GeocodificacionConsumo
+     * const geocodificacionConsumo = await prisma.geocodificacionConsumo.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends GeocodificacionConsumoFindFirstArgs>(args?: SelectSubset<T, GeocodificacionConsumoFindFirstArgs<ExtArgs>>): Prisma__GeocodificacionConsumoClient<$Result.GetResult<Prisma.$GeocodificacionConsumoPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GeocodificacionConsumo that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GeocodificacionConsumoFindFirstOrThrowArgs} args - Arguments to find a GeocodificacionConsumo
+     * @example
+     * // Get one GeocodificacionConsumo
+     * const geocodificacionConsumo = await prisma.geocodificacionConsumo.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends GeocodificacionConsumoFindFirstOrThrowArgs>(args?: SelectSubset<T, GeocodificacionConsumoFindFirstOrThrowArgs<ExtArgs>>): Prisma__GeocodificacionConsumoClient<$Result.GetResult<Prisma.$GeocodificacionConsumoPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more GeocodificacionConsumos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GeocodificacionConsumoFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all GeocodificacionConsumos
+     * const geocodificacionConsumos = await prisma.geocodificacionConsumo.findMany()
+     * 
+     * // Get first 10 GeocodificacionConsumos
+     * const geocodificacionConsumos = await prisma.geocodificacionConsumo.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const geocodificacionConsumoWithIdOnly = await prisma.geocodificacionConsumo.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends GeocodificacionConsumoFindManyArgs>(args?: SelectSubset<T, GeocodificacionConsumoFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GeocodificacionConsumoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a GeocodificacionConsumo.
+     * @param {GeocodificacionConsumoCreateArgs} args - Arguments to create a GeocodificacionConsumo.
+     * @example
+     * // Create one GeocodificacionConsumo
+     * const GeocodificacionConsumo = await prisma.geocodificacionConsumo.create({
+     *   data: {
+     *     // ... data to create a GeocodificacionConsumo
+     *   }
+     * })
+     * 
+     */
+    create<T extends GeocodificacionConsumoCreateArgs>(args: SelectSubset<T, GeocodificacionConsumoCreateArgs<ExtArgs>>): Prisma__GeocodificacionConsumoClient<$Result.GetResult<Prisma.$GeocodificacionConsumoPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many GeocodificacionConsumos.
+     * @param {GeocodificacionConsumoCreateManyArgs} args - Arguments to create many GeocodificacionConsumos.
+     * @example
+     * // Create many GeocodificacionConsumos
+     * const geocodificacionConsumo = await prisma.geocodificacionConsumo.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends GeocodificacionConsumoCreateManyArgs>(args?: SelectSubset<T, GeocodificacionConsumoCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a GeocodificacionConsumo.
+     * @param {GeocodificacionConsumoDeleteArgs} args - Arguments to delete one GeocodificacionConsumo.
+     * @example
+     * // Delete one GeocodificacionConsumo
+     * const GeocodificacionConsumo = await prisma.geocodificacionConsumo.delete({
+     *   where: {
+     *     // ... filter to delete one GeocodificacionConsumo
+     *   }
+     * })
+     * 
+     */
+    delete<T extends GeocodificacionConsumoDeleteArgs>(args: SelectSubset<T, GeocodificacionConsumoDeleteArgs<ExtArgs>>): Prisma__GeocodificacionConsumoClient<$Result.GetResult<Prisma.$GeocodificacionConsumoPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one GeocodificacionConsumo.
+     * @param {GeocodificacionConsumoUpdateArgs} args - Arguments to update one GeocodificacionConsumo.
+     * @example
+     * // Update one GeocodificacionConsumo
+     * const geocodificacionConsumo = await prisma.geocodificacionConsumo.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends GeocodificacionConsumoUpdateArgs>(args: SelectSubset<T, GeocodificacionConsumoUpdateArgs<ExtArgs>>): Prisma__GeocodificacionConsumoClient<$Result.GetResult<Prisma.$GeocodificacionConsumoPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more GeocodificacionConsumos.
+     * @param {GeocodificacionConsumoDeleteManyArgs} args - Arguments to filter GeocodificacionConsumos to delete.
+     * @example
+     * // Delete a few GeocodificacionConsumos
+     * const { count } = await prisma.geocodificacionConsumo.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends GeocodificacionConsumoDeleteManyArgs>(args?: SelectSubset<T, GeocodificacionConsumoDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GeocodificacionConsumos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GeocodificacionConsumoUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many GeocodificacionConsumos
+     * const geocodificacionConsumo = await prisma.geocodificacionConsumo.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends GeocodificacionConsumoUpdateManyArgs>(args: SelectSubset<T, GeocodificacionConsumoUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one GeocodificacionConsumo.
+     * @param {GeocodificacionConsumoUpsertArgs} args - Arguments to update or create a GeocodificacionConsumo.
+     * @example
+     * // Update or create a GeocodificacionConsumo
+     * const geocodificacionConsumo = await prisma.geocodificacionConsumo.upsert({
+     *   create: {
+     *     // ... data to create a GeocodificacionConsumo
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the GeocodificacionConsumo we want to update
+     *   }
+     * })
+     */
+    upsert<T extends GeocodificacionConsumoUpsertArgs>(args: SelectSubset<T, GeocodificacionConsumoUpsertArgs<ExtArgs>>): Prisma__GeocodificacionConsumoClient<$Result.GetResult<Prisma.$GeocodificacionConsumoPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of GeocodificacionConsumos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GeocodificacionConsumoCountArgs} args - Arguments to filter GeocodificacionConsumos to count.
+     * @example
+     * // Count the number of GeocodificacionConsumos
+     * const count = await prisma.geocodificacionConsumo.count({
+     *   where: {
+     *     // ... the filter for the GeocodificacionConsumos we want to count
+     *   }
+     * })
+    **/
+    count<T extends GeocodificacionConsumoCountArgs>(
+      args?: Subset<T, GeocodificacionConsumoCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], GeocodificacionConsumoCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a GeocodificacionConsumo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GeocodificacionConsumoAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends GeocodificacionConsumoAggregateArgs>(args: Subset<T, GeocodificacionConsumoAggregateArgs>): Prisma.PrismaPromise<GetGeocodificacionConsumoAggregateType<T>>
+
+    /**
+     * Group by GeocodificacionConsumo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GeocodificacionConsumoGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends GeocodificacionConsumoGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: GeocodificacionConsumoGroupByArgs['orderBy'] }
+        : { orderBy?: GeocodificacionConsumoGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, GeocodificacionConsumoGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetGeocodificacionConsumoGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the GeocodificacionConsumo model
+   */
+  readonly fields: GeocodificacionConsumoFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for GeocodificacionConsumo.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__GeocodificacionConsumoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the GeocodificacionConsumo model
+   */
+  interface GeocodificacionConsumoFieldRefs {
+    readonly id: FieldRef<"GeocodificacionConsumo", 'Int'>
+    readonly proveedor: FieldRef<"GeocodificacionConsumo", 'String'>
+    readonly mes: FieldRef<"GeocodificacionConsumo", 'String'>
+    readonly consultas: FieldRef<"GeocodificacionConsumo", 'Int'>
+    readonly actualizado: FieldRef<"GeocodificacionConsumo", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * GeocodificacionConsumo findUnique
+   */
+  export type GeocodificacionConsumoFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+    /**
+     * Filter, which GeocodificacionConsumo to fetch.
+     */
+    where: GeocodificacionConsumoWhereUniqueInput
+  }
+
+  /**
+   * GeocodificacionConsumo findUniqueOrThrow
+   */
+  export type GeocodificacionConsumoFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+    /**
+     * Filter, which GeocodificacionConsumo to fetch.
+     */
+    where: GeocodificacionConsumoWhereUniqueInput
+  }
+
+  /**
+   * GeocodificacionConsumo findFirst
+   */
+  export type GeocodificacionConsumoFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+    /**
+     * Filter, which GeocodificacionConsumo to fetch.
+     */
+    where?: GeocodificacionConsumoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GeocodificacionConsumos to fetch.
+     */
+    orderBy?: GeocodificacionConsumoOrderByWithRelationInput | GeocodificacionConsumoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GeocodificacionConsumos.
+     */
+    cursor?: GeocodificacionConsumoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GeocodificacionConsumos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GeocodificacionConsumos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GeocodificacionConsumos.
+     */
+    distinct?: GeocodificacionConsumoScalarFieldEnum | GeocodificacionConsumoScalarFieldEnum[]
+  }
+
+  /**
+   * GeocodificacionConsumo findFirstOrThrow
+   */
+  export type GeocodificacionConsumoFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+    /**
+     * Filter, which GeocodificacionConsumo to fetch.
+     */
+    where?: GeocodificacionConsumoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GeocodificacionConsumos to fetch.
+     */
+    orderBy?: GeocodificacionConsumoOrderByWithRelationInput | GeocodificacionConsumoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GeocodificacionConsumos.
+     */
+    cursor?: GeocodificacionConsumoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GeocodificacionConsumos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GeocodificacionConsumos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GeocodificacionConsumos.
+     */
+    distinct?: GeocodificacionConsumoScalarFieldEnum | GeocodificacionConsumoScalarFieldEnum[]
+  }
+
+  /**
+   * GeocodificacionConsumo findMany
+   */
+  export type GeocodificacionConsumoFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+    /**
+     * Filter, which GeocodificacionConsumos to fetch.
+     */
+    where?: GeocodificacionConsumoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GeocodificacionConsumos to fetch.
+     */
+    orderBy?: GeocodificacionConsumoOrderByWithRelationInput | GeocodificacionConsumoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing GeocodificacionConsumos.
+     */
+    cursor?: GeocodificacionConsumoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GeocodificacionConsumos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GeocodificacionConsumos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GeocodificacionConsumos.
+     */
+    distinct?: GeocodificacionConsumoScalarFieldEnum | GeocodificacionConsumoScalarFieldEnum[]
+  }
+
+  /**
+   * GeocodificacionConsumo create
+   */
+  export type GeocodificacionConsumoCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+    /**
+     * The data needed to create a GeocodificacionConsumo.
+     */
+    data: XOR<GeocodificacionConsumoCreateInput, GeocodificacionConsumoUncheckedCreateInput>
+  }
+
+  /**
+   * GeocodificacionConsumo createMany
+   */
+  export type GeocodificacionConsumoCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many GeocodificacionConsumos.
+     */
+    data: GeocodificacionConsumoCreateManyInput | GeocodificacionConsumoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * GeocodificacionConsumo update
+   */
+  export type GeocodificacionConsumoUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+    /**
+     * The data needed to update a GeocodificacionConsumo.
+     */
+    data: XOR<GeocodificacionConsumoUpdateInput, GeocodificacionConsumoUncheckedUpdateInput>
+    /**
+     * Choose, which GeocodificacionConsumo to update.
+     */
+    where: GeocodificacionConsumoWhereUniqueInput
+  }
+
+  /**
+   * GeocodificacionConsumo updateMany
+   */
+  export type GeocodificacionConsumoUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update GeocodificacionConsumos.
+     */
+    data: XOR<GeocodificacionConsumoUpdateManyMutationInput, GeocodificacionConsumoUncheckedUpdateManyInput>
+    /**
+     * Filter which GeocodificacionConsumos to update
+     */
+    where?: GeocodificacionConsumoWhereInput
+    /**
+     * Limit how many GeocodificacionConsumos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * GeocodificacionConsumo upsert
+   */
+  export type GeocodificacionConsumoUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+    /**
+     * The filter to search for the GeocodificacionConsumo to update in case it exists.
+     */
+    where: GeocodificacionConsumoWhereUniqueInput
+    /**
+     * In case the GeocodificacionConsumo found by the `where` argument doesn't exist, create a new GeocodificacionConsumo with this data.
+     */
+    create: XOR<GeocodificacionConsumoCreateInput, GeocodificacionConsumoUncheckedCreateInput>
+    /**
+     * In case the GeocodificacionConsumo was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<GeocodificacionConsumoUpdateInput, GeocodificacionConsumoUncheckedUpdateInput>
+  }
+
+  /**
+   * GeocodificacionConsumo delete
+   */
+  export type GeocodificacionConsumoDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+    /**
+     * Filter which GeocodificacionConsumo to delete.
+     */
+    where: GeocodificacionConsumoWhereUniqueInput
+  }
+
+  /**
+   * GeocodificacionConsumo deleteMany
+   */
+  export type GeocodificacionConsumoDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GeocodificacionConsumos to delete
+     */
+    where?: GeocodificacionConsumoWhereInput
+    /**
+     * Limit how many GeocodificacionConsumos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * GeocodificacionConsumo without action
+   */
+  export type GeocodificacionConsumoDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GeocodificacionConsumo
+     */
+    select?: GeocodificacionConsumoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GeocodificacionConsumo
+     */
+    omit?: GeocodificacionConsumoOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -20070,6 +21089,7 @@ export namespace Prisma {
     geo_direccion_encontrada: 'geo_direccion_encontrada',
     geo_fecha: 'geo_fecha',
     geo_negocios_estado: 'geo_negocios_estado',
+    geo_negocios_fecha: 'geo_negocios_fecha',
     ubicacion_origen: 'ubicacion_origen',
     autoasignable: 'autoasignable',
     id_importacion: 'id_importacion',
@@ -20256,6 +21276,17 @@ export namespace Prisma {
   };
 
   export type AceptacionTerminosScalarFieldEnum = (typeof AceptacionTerminosScalarFieldEnum)[keyof typeof AceptacionTerminosScalarFieldEnum]
+
+
+  export const GeocodificacionConsumoScalarFieldEnum: {
+    id: 'id',
+    proveedor: 'proveedor',
+    mes: 'mes',
+    consultas: 'consultas',
+    actualizado: 'actualizado'
+  };
+
+  export type GeocodificacionConsumoScalarFieldEnum = (typeof GeocodificacionConsumoScalarFieldEnum)[keyof typeof GeocodificacionConsumoScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -20539,6 +21570,14 @@ export namespace Prisma {
   };
 
   export type AceptacionTerminosOrderByRelevanceFieldEnum = (typeof AceptacionTerminosOrderByRelevanceFieldEnum)[keyof typeof AceptacionTerminosOrderByRelevanceFieldEnum]
+
+
+  export const GeocodificacionConsumoOrderByRelevanceFieldEnum: {
+    proveedor: 'proveedor',
+    mes: 'mes'
+  };
+
+  export type GeocodificacionConsumoOrderByRelevanceFieldEnum = (typeof GeocodificacionConsumoOrderByRelevanceFieldEnum)[keyof typeof GeocodificacionConsumoOrderByRelevanceFieldEnum]
 
 
   /**
@@ -21371,6 +22410,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: StringNullableFilter<"Expediente"> | string | null
     geo_fecha?: DateTimeNullableFilter<"Expediente"> | Date | string | null
     geo_negocios_estado?: StringNullableFilter<"Expediente"> | string | null
+    geo_negocios_fecha?: DateTimeNullableFilter<"Expediente"> | Date | string | null
     ubicacion_origen?: StringNullableFilter<"Expediente"> | string | null
     autoasignable?: BoolFilter<"Expediente"> | boolean
     id_importacion?: StringNullableFilter<"Expediente"> | string | null
@@ -21421,6 +22461,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: SortOrderInput | SortOrder
     geo_fecha?: SortOrderInput | SortOrder
     geo_negocios_estado?: SortOrderInput | SortOrder
+    geo_negocios_fecha?: SortOrderInput | SortOrder
     ubicacion_origen?: SortOrderInput | SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
@@ -21476,6 +22517,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: StringNullableFilter<"Expediente"> | string | null
     geo_fecha?: DateTimeNullableFilter<"Expediente"> | Date | string | null
     geo_negocios_estado?: StringNullableFilter<"Expediente"> | string | null
+    geo_negocios_fecha?: DateTimeNullableFilter<"Expediente"> | Date | string | null
     ubicacion_origen?: StringNullableFilter<"Expediente"> | string | null
     autoasignable?: BoolFilter<"Expediente"> | boolean
     id_importacion?: StringNullableFilter<"Expediente"> | string | null
@@ -21526,6 +22568,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: SortOrderInput | SortOrder
     geo_fecha?: SortOrderInput | SortOrder
     geo_negocios_estado?: SortOrderInput | SortOrder
+    geo_negocios_fecha?: SortOrderInput | SortOrder
     ubicacion_origen?: SortOrderInput | SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
@@ -21580,6 +22623,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     geo_fecha?: DateTimeNullableWithAggregatesFilter<"Expediente"> | Date | string | null
     geo_negocios_estado?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
+    geo_negocios_fecha?: DateTimeNullableWithAggregatesFilter<"Expediente"> | Date | string | null
     ubicacion_origen?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     autoasignable?: BoolWithAggregatesFilter<"Expediente"> | boolean
     id_importacion?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
@@ -22485,6 +23529,62 @@ export namespace Prisma {
     fecha?: DateTimeWithAggregatesFilter<"AceptacionTerminos"> | Date | string
   }
 
+  export type GeocodificacionConsumoWhereInput = {
+    AND?: GeocodificacionConsumoWhereInput | GeocodificacionConsumoWhereInput[]
+    OR?: GeocodificacionConsumoWhereInput[]
+    NOT?: GeocodificacionConsumoWhereInput | GeocodificacionConsumoWhereInput[]
+    id?: IntFilter<"GeocodificacionConsumo"> | number
+    proveedor?: StringFilter<"GeocodificacionConsumo"> | string
+    mes?: StringFilter<"GeocodificacionConsumo"> | string
+    consultas?: IntFilter<"GeocodificacionConsumo"> | number
+    actualizado?: DateTimeFilter<"GeocodificacionConsumo"> | Date | string
+  }
+
+  export type GeocodificacionConsumoOrderByWithRelationInput = {
+    id?: SortOrder
+    proveedor?: SortOrder
+    mes?: SortOrder
+    consultas?: SortOrder
+    actualizado?: SortOrder
+    _relevance?: GeocodificacionConsumoOrderByRelevanceInput
+  }
+
+  export type GeocodificacionConsumoWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    proveedor_mes?: GeocodificacionConsumoProveedorMesCompoundUniqueInput
+    AND?: GeocodificacionConsumoWhereInput | GeocodificacionConsumoWhereInput[]
+    OR?: GeocodificacionConsumoWhereInput[]
+    NOT?: GeocodificacionConsumoWhereInput | GeocodificacionConsumoWhereInput[]
+    proveedor?: StringFilter<"GeocodificacionConsumo"> | string
+    mes?: StringFilter<"GeocodificacionConsumo"> | string
+    consultas?: IntFilter<"GeocodificacionConsumo"> | number
+    actualizado?: DateTimeFilter<"GeocodificacionConsumo"> | Date | string
+  }, "id" | "proveedor_mes">
+
+  export type GeocodificacionConsumoOrderByWithAggregationInput = {
+    id?: SortOrder
+    proveedor?: SortOrder
+    mes?: SortOrder
+    consultas?: SortOrder
+    actualizado?: SortOrder
+    _count?: GeocodificacionConsumoCountOrderByAggregateInput
+    _avg?: GeocodificacionConsumoAvgOrderByAggregateInput
+    _max?: GeocodificacionConsumoMaxOrderByAggregateInput
+    _min?: GeocodificacionConsumoMinOrderByAggregateInput
+    _sum?: GeocodificacionConsumoSumOrderByAggregateInput
+  }
+
+  export type GeocodificacionConsumoScalarWhereWithAggregatesInput = {
+    AND?: GeocodificacionConsumoScalarWhereWithAggregatesInput | GeocodificacionConsumoScalarWhereWithAggregatesInput[]
+    OR?: GeocodificacionConsumoScalarWhereWithAggregatesInput[]
+    NOT?: GeocodificacionConsumoScalarWhereWithAggregatesInput | GeocodificacionConsumoScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"GeocodificacionConsumo"> | number
+    proveedor?: StringWithAggregatesFilter<"GeocodificacionConsumo"> | string
+    mes?: StringWithAggregatesFilter<"GeocodificacionConsumo"> | string
+    consultas?: IntWithAggregatesFilter<"GeocodificacionConsumo"> | number
+    actualizado?: DateTimeWithAggregatesFilter<"GeocodificacionConsumo"> | Date | string
+  }
+
   export type EmpresaCreateInput = {
     id_empresa?: string
     nombre: string
@@ -23337,6 +24437,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -23387,6 +24488,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -23436,6 +24538,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23486,6 +24589,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23536,6 +24640,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -23581,6 +24686,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23627,6 +24733,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -24679,6 +25786,59 @@ export namespace Prisma {
     fecha?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type GeocodificacionConsumoCreateInput = {
+    proveedor: string
+    mes: string
+    consultas?: number
+    actualizado?: Date | string
+  }
+
+  export type GeocodificacionConsumoUncheckedCreateInput = {
+    id?: number
+    proveedor: string
+    mes: string
+    consultas?: number
+    actualizado?: Date | string
+  }
+
+  export type GeocodificacionConsumoUpdateInput = {
+    proveedor?: StringFieldUpdateOperationsInput | string
+    mes?: StringFieldUpdateOperationsInput | string
+    consultas?: IntFieldUpdateOperationsInput | number
+    actualizado?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GeocodificacionConsumoUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    proveedor?: StringFieldUpdateOperationsInput | string
+    mes?: StringFieldUpdateOperationsInput | string
+    consultas?: IntFieldUpdateOperationsInput | number
+    actualizado?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GeocodificacionConsumoCreateManyInput = {
+    id?: number
+    proveedor: string
+    mes: string
+    consultas?: number
+    actualizado?: Date | string
+  }
+
+  export type GeocodificacionConsumoUpdateManyMutationInput = {
+    proveedor?: StringFieldUpdateOperationsInput | string
+    mes?: StringFieldUpdateOperationsInput | string
+    consultas?: IntFieldUpdateOperationsInput | number
+    actualizado?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GeocodificacionConsumoUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    proveedor?: StringFieldUpdateOperationsInput | string
+    mes?: StringFieldUpdateOperationsInput | string
+    consultas?: IntFieldUpdateOperationsInput | number
+    actualizado?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -25601,6 +26761,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: SortOrder
     geo_fecha?: SortOrder
     geo_negocios_estado?: SortOrder
+    geo_negocios_fecha?: SortOrder
     ubicacion_origen?: SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrder
@@ -25651,6 +26812,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: SortOrder
     geo_fecha?: SortOrder
     geo_negocios_estado?: SortOrder
+    geo_negocios_fecha?: SortOrder
     ubicacion_origen?: SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrder
@@ -25690,6 +26852,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: SortOrder
     geo_fecha?: SortOrder
     geo_negocios_estado?: SortOrder
+    geo_negocios_fecha?: SortOrder
     ubicacion_origen?: SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrder
@@ -26383,6 +27546,51 @@ export namespace Prisma {
     ip?: SortOrder
     user_agent?: SortOrder
     fecha?: SortOrder
+  }
+
+  export type GeocodificacionConsumoOrderByRelevanceInput = {
+    fields: GeocodificacionConsumoOrderByRelevanceFieldEnum | GeocodificacionConsumoOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type GeocodificacionConsumoProveedorMesCompoundUniqueInput = {
+    proveedor: string
+    mes: string
+  }
+
+  export type GeocodificacionConsumoCountOrderByAggregateInput = {
+    id?: SortOrder
+    proveedor?: SortOrder
+    mes?: SortOrder
+    consultas?: SortOrder
+    actualizado?: SortOrder
+  }
+
+  export type GeocodificacionConsumoAvgOrderByAggregateInput = {
+    id?: SortOrder
+    consultas?: SortOrder
+  }
+
+  export type GeocodificacionConsumoMaxOrderByAggregateInput = {
+    id?: SortOrder
+    proveedor?: SortOrder
+    mes?: SortOrder
+    consultas?: SortOrder
+    actualizado?: SortOrder
+  }
+
+  export type GeocodificacionConsumoMinOrderByAggregateInput = {
+    id?: SortOrder
+    proveedor?: SortOrder
+    mes?: SortOrder
+    consultas?: SortOrder
+    actualizado?: SortOrder
+  }
+
+  export type GeocodificacionConsumoSumOrderByAggregateInput = {
+    id?: SortOrder
+    consultas?: SortOrder
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -28598,6 +29806,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -28647,6 +29856,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -28818,6 +30028,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28867,6 +30078,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29391,6 +30603,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -29440,6 +30653,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -29504,6 +30718,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29553,6 +30768,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29601,6 +30817,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -29650,6 +30867,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -29815,6 +31033,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29864,6 +31083,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30019,6 +31239,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -30068,6 +31289,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
     geo_negocios_estado?: string | null
+    geo_negocios_fecha?: Date | string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -30267,6 +31489,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30316,6 +31539,7 @@ export namespace Prisma {
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
+    geo_negocios_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
