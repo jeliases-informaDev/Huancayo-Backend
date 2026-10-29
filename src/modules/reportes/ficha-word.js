@@ -41,13 +41,13 @@ const telefonosDe = (e, c = {}) => [c.telefono_fijo, c.telefono_celular].filter(
 const deNegocios = (negocios, clave) => (negocios || []).map((x) => val(x?.[clave], '')).filter(Boolean).join(' / ');
 const casillasNegocio = (estado) => `En funcionamiento: ${casilla(estado === 'EN_FUNCIONAMIENTO')}    Inoperativo: ${casilla(estado === 'INOPERATIVO')}    De terceros: ${casilla(estado === 'DE_TERCEROS')}`;
 const monedaTexto = (ev) => (ev?.moneda === 'USD' ? 'DÓLARES' : 'SOLES');
-// La ficha impresa de Consumo antepone un código fijo a la fuente («MPAUCC/NUEVO»). No viene en la base: es parte del formato del banco, y por eso se pone solo al imprimir
-// (la fuente se guarda como llega en el archivo).
-const PREFIJO_FUENTE_CONSUMO = 'MPAUCC';
-const fuenteConsumo = (fuente) => {
-  if (vacio(fuente)) return PREFIJO_FUENTE_CONSUMO;
-  const f = String(fuente);
-  return f.toUpperCase().startsWith(`${PREFIJO_FUENTE_CONSUMO}/`) ? f : `${PREFIJO_FUENTE_CONSUMO}/${f}`;
+// En la ficha impresa del banco, «Fuente» es «usuario que generó la ficha / fuente de la revisión del crédito» (por ejemplo «MPAUCC/NUEVO», donde MPAUCC
+// era el usuario del banco). En GeoMatrix la ficha la hace el auditor de campo: va su usuario. Si la base ya trae «usuario/fuente», se respeta tal cual.
+const fuenteConsumo = (fuente, usuario) => {
+  const f = vacio(fuente) ? '' : String(fuente).trim();
+  const u = vacio(usuario) ? '' : String(usuario).trim().toUpperCase();
+  if (f.includes('/')) return f;
+  return [u, f].filter(Boolean).join('/');
 };
 // El día (AAAA-MM-DD) en hora de Lima. Cuando la base no trae fecha de corte, «Saldo de capital al …» lleva el día en que se genera la ficha.
 const hoyEnLima = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Lima' }).format(d);
@@ -422,7 +422,7 @@ function seccionClienteConsumo(e, visita) {
     titulo('DATOS DEL CLIENTE / DATOS LABORALES'),
     tablaPares([
       // Como en la ficha impresa del banco: «N.º de expediente: … Fuente: MPAUCC/…» (el número de expediente solo sale si la base lo trae).
-      [`${c.codigo_expediente_core ? `N.º de expediente: ${c.codigo_expediente_core}      ` : ''}Fuente: ${fuenteConsumo(c.fuente)}`],
+      [`${c.codigo_expediente_core ? `N.º de expediente: ${c.codigo_expediente_core}      ` : ''}Fuente: ${fuenteConsumo(c.fuente, visita?.auditor?.username)}`],
       [`Fecha de Nac.: ${dmy(c.fecha_nacimiento)}      Edad: ${val(c.edad)}`, `Actividad: ${val(n.actividad)}`],
       [`Nombres y apellidos: ${val(e.nombres_cliente)}`, casillasNegocio(visita.estado_negocio)],
       [`Estado civil: ${val(c.estado_civil)}      ${val(e.tipo_documento_cliente, 'DNI')}: ${val(e.numero_documento_cliente)}`, `Antigüedad: ${antiguedadDe(n)}`],
