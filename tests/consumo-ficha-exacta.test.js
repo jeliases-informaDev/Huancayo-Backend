@@ -69,7 +69,7 @@ function comprobar(fila, tablas) {
     ['Asesor solicitud', t('cNomAseOri')], ['Cónyuge', t('cNomConyug')], ['Nivel aprobador', `${t('NomAprobador')} - ${t('cCarPerApr')}`], ['Aval', t('cFiadores')],
     ['Producto', t('cDesProdu')], ['Rep. legal', t('cRepresent')], ['Fecha de vencimiento', t('dFecVenci')], ['Estado', t('cDesCorEst')],
     ['Monto de la cuota', t('nMonCuota')], ['Fecha últ. pago', t('dFecUltPag')], ['Destino', t('cDestin')], ['Asesor responsable a la fecha', t('cNomAseAct')],
-    ['Calificación SBS', t('cCalSbs')], ['N.º de entidades', t('nNroEnt')], ['N.º de expediente', t('cCodExpCli')], ['Fuente', `MPAUCC/${t('cFuente')}`],
+    ['Calificación SBS', t('cCalSbs')], ['N.º de entidades', t('nNroEnt')], ['N.º de expediente', t('cCodExpCli')], ['Fuente', `ANA/${t('cFuente')}`],
     ['AGENCIA/OF. ESP.', t('cOficin')],
   ];
   for (const [etiqueta, valor] of PARES) {
