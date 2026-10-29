@@ -304,4 +304,33 @@ export function mapearFeatureMapbox(feature) {
 
 // Un punto aproximado sirve para ver la zona pero NO es una referencia para medir los 100 m; solo uno ALTO y que cae en el distrito
 // declarado se usa como referencia. Lo que cae fuera del distrito declarado se marca para revisar.
+// Traduce un resultado de la Geocoding API de Google al formato interno, para aplicarle los mismos criterios de precisión y confianza.
+//   location_type: ROOFTOP (la puerta) · RANGE_INTERPOLATED (número estimado sobre la calle) · GEOMETRIC_CENTER (centro de una calle o zona) · APPROXIMATE.
+//   En Perú, Google entrega el distrito como «locality» (a veces administrative_area_level_3), la provincia como nivel 2 y la región como nivel 1.
+export function mapearResultadoGoogle(result) {
+  const componente = (tipo) => (result?.address_components || []).find((c) => (c.types || []).includes(tipo));
+  const nombre = (tipo) => componente(tipo)?.long_name ?? null;
+  const tipos = result?.types || [];
+  const locationType = result?.geometry?.location_type;
+  const numero = nombre('street_number');
+  let addresstype;
+  if (locationType === 'ROOFTOP' && numero) addresstype = 'building';
+  else if (numero) addresstype = 'place'; // número estimado: aproximado, no la puerta
+  else if (tipos.includes('route') || (locationType === 'GEOMETRIC_CENTER' && componente('route'))) addresstype = 'road';
+  else if (tipos.some((t) => ['sublocality', 'sublocality_level_1', 'sublocality_level_2', 'neighborhood'].includes(t))) addresstype = 'suburb';
+  else if (tipos.some((t) => ['locality', 'administrative_area_level_3', 'administrative_area_level_2', 'administrative_area_level_1', 'country'].includes(t))) addresstype = 'city';
+  else addresstype = 'place';
+  return {
+    lat: String(result?.geometry?.location?.lat), lon: String(result?.geometry?.location?.lng),
+    display_name: result?.formatted_address || null,
+    addresstype, type: addresstype,
+    address: {
+      house_number: numero, road: nombre('route'),
+      suburb: nombre('sublocality_level_1') || nombre('sublocality') || nombre('neighborhood'),
+      city_district: nombre('administrative_area_level_3') || nombre('locality'),
+      city: nombre('locality') || nombre('administrative_area_level_2'),
+    },
+  };
+}
+
 export const estadoSegunResultado = ({ distritoCoincide }) => (distritoCoincide === false ? 'REVISAR' : 'LOCALIZADO');
