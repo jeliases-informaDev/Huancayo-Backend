@@ -9873,6 +9873,7 @@ export namespace Prisma {
     geo_longitud: Decimal | null
     geo_direccion_encontrada: string | null
     geo_fecha: Date | null
+    geo_negocios_estado: string | null
     ubicacion_origen: string | null
     autoasignable: boolean | null
     id_importacion: string | null
@@ -9911,6 +9912,7 @@ export namespace Prisma {
     geo_longitud: Decimal | null
     geo_direccion_encontrada: string | null
     geo_fecha: Date | null
+    geo_negocios_estado: string | null
     ubicacion_origen: string | null
     autoasignable: boolean | null
     id_importacion: string | null
@@ -9955,6 +9957,7 @@ export namespace Prisma {
     geo_longitud: number
     geo_direccion_encontrada: number
     geo_fecha: number
+    geo_negocios_estado: number
     ubicacion_origen: number
     autoasignable: number
     id_importacion: number
@@ -10016,6 +10019,7 @@ export namespace Prisma {
     geo_longitud?: true
     geo_direccion_encontrada?: true
     geo_fecha?: true
+    geo_negocios_estado?: true
     ubicacion_origen?: true
     autoasignable?: true
     id_importacion?: true
@@ -10054,6 +10058,7 @@ export namespace Prisma {
     geo_longitud?: true
     geo_direccion_encontrada?: true
     geo_fecha?: true
+    geo_negocios_estado?: true
     ubicacion_origen?: true
     autoasignable?: true
     id_importacion?: true
@@ -10098,6 +10103,7 @@ export namespace Prisma {
     geo_longitud?: true
     geo_direccion_encontrada?: true
     geo_fecha?: true
+    geo_negocios_estado?: true
     ubicacion_origen?: true
     autoasignable?: true
     id_importacion?: true
@@ -10230,6 +10236,7 @@ export namespace Prisma {
     geo_longitud: Decimal | null
     geo_direccion_encontrada: string | null
     geo_fecha: Date | null
+    geo_negocios_estado: string | null
     ubicacion_origen: string | null
     autoasignable: boolean
     id_importacion: string | null
@@ -10294,6 +10301,7 @@ export namespace Prisma {
     geo_longitud?: boolean
     geo_direccion_encontrada?: boolean
     geo_fecha?: boolean
+    geo_negocios_estado?: boolean
     ubicacion_origen?: boolean
     autoasignable?: boolean
     id_importacion?: boolean
@@ -10346,6 +10354,7 @@ export namespace Prisma {
     geo_longitud?: boolean
     geo_direccion_encontrada?: boolean
     geo_fecha?: boolean
+    geo_negocios_estado?: boolean
     ubicacion_origen?: boolean
     autoasignable?: boolean
     id_importacion?: boolean
@@ -10357,7 +10366,7 @@ export namespace Prisma {
     fecha_actualizar?: boolean
   }
 
-  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "empresa_id" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "direccion_normalizada" | "direccion_componentes" | "geo_estado" | "geo_confianza" | "geo_precision" | "geo_proveedor" | "geo_latitud" | "geo_longitud" | "geo_direccion_encontrada" | "geo_fecha" | "ubicacion_origen" | "autoasignable" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
+  export type ExpedienteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_expediente" | "empresa_id" | "codigo_expediente" | "tipo_credito" | "oficina" | "tipo_documento_cliente" | "numero_documento_cliente" | "nombres_cliente" | "telefono_cliente" | "direccion_domicilio" | "distrito" | "provincia" | "departamento" | "latitud" | "longitud" | "asesor_responsable" | "monto_desembolso" | "moneda" | "datos_cliente" | "datos_negocio" | "datos_credito" | "evaluacion_financiera" | "endeudamiento" | "direccion_normalizada" | "direccion_componentes" | "geo_estado" | "geo_confianza" | "geo_precision" | "geo_proveedor" | "geo_latitud" | "geo_longitud" | "geo_direccion_encontrada" | "geo_fecha" | "geo_negocios_estado" | "ubicacion_origen" | "autoasignable" | "id_importacion" | "fila_origen" | "hash_origen" | "advertencias_origen" | "estado" | "fecha_creacion" | "fecha_actualizar", ExtArgs["result"]["expediente"]>
   export type ExpedienteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     asignaciones?: boolean | Expediente$asignacionesArgs<ExtArgs>
     visitas?: boolean | Expediente$visitasArgs<ExtArgs>
@@ -10408,6 +10417,7 @@ export namespace Prisma {
       geo_longitud: Prisma.Decimal | null
       geo_direccion_encontrada: string | null
       geo_fecha: Date | null
+      geo_negocios_estado: string | null
       ubicacion_origen: string | null
       autoasignable: boolean
       id_importacion: string | null
@@ -10823,6 +10833,7 @@ export namespace Prisma {
     readonly geo_longitud: FieldRef<"Expediente", 'Decimal'>
     readonly geo_direccion_encontrada: FieldRef<"Expediente", 'String'>
     readonly geo_fecha: FieldRef<"Expediente", 'DateTime'>
+    readonly geo_negocios_estado: FieldRef<"Expediente", 'String'>
     readonly ubicacion_origen: FieldRef<"Expediente", 'String'>
     readonly autoasignable: FieldRef<"Expediente", 'Boolean'>
     readonly id_importacion: FieldRef<"Expediente", 'String'>
@@ -20058,6 +20069,7 @@ export namespace Prisma {
     geo_longitud: 'geo_longitud',
     geo_direccion_encontrada: 'geo_direccion_encontrada',
     geo_fecha: 'geo_fecha',
+    geo_negocios_estado: 'geo_negocios_estado',
     ubicacion_origen: 'ubicacion_origen',
     autoasignable: 'autoasignable',
     id_importacion: 'id_importacion',
@@ -20399,6 +20411,7 @@ export namespace Prisma {
     geo_precision: 'geo_precision',
     geo_proveedor: 'geo_proveedor',
     geo_direccion_encontrada: 'geo_direccion_encontrada',
+    geo_negocios_estado: 'geo_negocios_estado',
     ubicacion_origen: 'ubicacion_origen',
     id_importacion: 'id_importacion',
     hash_origen: 'hash_origen',
@@ -21357,6 +21370,7 @@ export namespace Prisma {
     geo_longitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: StringNullableFilter<"Expediente"> | string | null
     geo_fecha?: DateTimeNullableFilter<"Expediente"> | Date | string | null
+    geo_negocios_estado?: StringNullableFilter<"Expediente"> | string | null
     ubicacion_origen?: StringNullableFilter<"Expediente"> | string | null
     autoasignable?: BoolFilter<"Expediente"> | boolean
     id_importacion?: StringNullableFilter<"Expediente"> | string | null
@@ -21406,6 +21420,7 @@ export namespace Prisma {
     geo_longitud?: SortOrderInput | SortOrder
     geo_direccion_encontrada?: SortOrderInput | SortOrder
     geo_fecha?: SortOrderInput | SortOrder
+    geo_negocios_estado?: SortOrderInput | SortOrder
     ubicacion_origen?: SortOrderInput | SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
@@ -21460,6 +21475,7 @@ export namespace Prisma {
     geo_longitud?: DecimalNullableFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: StringNullableFilter<"Expediente"> | string | null
     geo_fecha?: DateTimeNullableFilter<"Expediente"> | Date | string | null
+    geo_negocios_estado?: StringNullableFilter<"Expediente"> | string | null
     ubicacion_origen?: StringNullableFilter<"Expediente"> | string | null
     autoasignable?: BoolFilter<"Expediente"> | boolean
     id_importacion?: StringNullableFilter<"Expediente"> | string | null
@@ -21509,6 +21525,7 @@ export namespace Prisma {
     geo_longitud?: SortOrderInput | SortOrder
     geo_direccion_encontrada?: SortOrderInput | SortOrder
     geo_fecha?: SortOrderInput | SortOrder
+    geo_negocios_estado?: SortOrderInput | SortOrder
     ubicacion_origen?: SortOrderInput | SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrderInput | SortOrder
@@ -21562,6 +21579,7 @@ export namespace Prisma {
     geo_longitud?: DecimalNullableWithAggregatesFilter<"Expediente"> | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     geo_fecha?: DateTimeNullableWithAggregatesFilter<"Expediente"> | Date | string | null
+    geo_negocios_estado?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     ubicacion_origen?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
     autoasignable?: BoolWithAggregatesFilter<"Expediente"> | boolean
     id_importacion?: StringNullableWithAggregatesFilter<"Expediente"> | string | null
@@ -23318,6 +23336,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -23367,6 +23386,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -23415,6 +23435,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23464,6 +23485,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23513,6 +23535,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -23557,6 +23580,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23602,6 +23626,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25575,6 +25600,7 @@ export namespace Prisma {
     geo_longitud?: SortOrder
     geo_direccion_encontrada?: SortOrder
     geo_fecha?: SortOrder
+    geo_negocios_estado?: SortOrder
     ubicacion_origen?: SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrder
@@ -25624,6 +25650,7 @@ export namespace Prisma {
     geo_longitud?: SortOrder
     geo_direccion_encontrada?: SortOrder
     geo_fecha?: SortOrder
+    geo_negocios_estado?: SortOrder
     ubicacion_origen?: SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrder
@@ -25662,6 +25689,7 @@ export namespace Prisma {
     geo_longitud?: SortOrder
     geo_direccion_encontrada?: SortOrder
     geo_fecha?: SortOrder
+    geo_negocios_estado?: SortOrder
     ubicacion_origen?: SortOrder
     autoasignable?: SortOrder
     id_importacion?: SortOrder
@@ -28569,6 +28597,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -28617,6 +28646,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -28787,6 +28817,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28835,6 +28866,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29358,6 +29390,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -29406,6 +29439,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -29469,6 +29503,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29517,6 +29552,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29564,6 +29600,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -29612,6 +29649,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -29776,6 +29814,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29824,6 +29863,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29978,6 +30018,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -30026,6 +30067,7 @@ export namespace Prisma {
     geo_longitud?: Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: string | null
     geo_fecha?: Date | string | null
+    geo_negocios_estado?: string | null
     ubicacion_origen?: string | null
     autoasignable?: boolean
     id_importacion?: string | null
@@ -30224,6 +30266,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30272,6 +30315,7 @@ export namespace Prisma {
     geo_longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     geo_direccion_encontrada?: NullableStringFieldUpdateOperationsInput | string | null
     geo_fecha?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    geo_negocios_estado?: NullableStringFieldUpdateOperationsInput | string | null
     ubicacion_origen?: NullableStringFieldUpdateOperationsInput | string | null
     autoasignable?: BoolFieldUpdateOperationsInput | boolean
     id_importacion?: NullableStringFieldUpdateOperationsInput | string | null

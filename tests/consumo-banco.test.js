@@ -96,7 +96,9 @@ describe('Consumo del banco — cada dato llega a su lugar', () => {
   });
 
   test('empleador: nombre, dirección, distrito y teléfono van a la lista de negocios; la actividad y el sustento de ingreso, a los datos laborales', () => {
-    assert.deepEqual(e.datos_negocio.negocios[0], { direccion: 'AV. TRABAJO 456', distrito: 'DISTRITO TRABAJO', departamento: null, referencia: e.datos_negocio.negocios[0].referencia, contacto: 'EMPLEADOR UNO SAC', telefono: '012345678', latitud: e.datos_negocio.negocios[0].latitud, longitud: e.datos_negocio.negocios[0].longitud, ubicacion_origen: e.datos_negocio.negocios[0].ubicacion_origen });
+    // El negocio trae además su dirección descompuesta (direccion_normalizada, componentes): aquí se comparan los datos que vienen del banco.
+    const { direccion_normalizada: _dn, componentes: _comp, ...negocioUno } = e.datos_negocio.negocios[0];
+    assert.deepEqual(negocioUno, { direccion: 'AV. TRABAJO 456', distrito: 'DISTRITO TRABAJO', departamento: null, referencia: e.datos_negocio.negocios[0].referencia, contacto: 'EMPLEADOR UNO SAC', telefono: '012345678', latitud: e.datos_negocio.negocios[0].latitud, longitud: e.datos_negocio.negocios[0].longitud, ubicacion_origen: e.datos_negocio.negocios[0].ubicacion_origen });
     assert.deepEqual([e.datos_negocio.actividad, e.datos_negocio.sustento_ingreso, e.datos_negocio.antiguedad_meses], ['ACTIVIDAD PRUEBA', 'BOLETAS DE PAGO', 36]);
   });
 

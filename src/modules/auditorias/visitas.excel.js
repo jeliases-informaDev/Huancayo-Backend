@@ -9,7 +9,7 @@ export const COLOR_RESULTADO = {
   CONFORME: { fondo: 'FFE7F4ED', texto: 'FF267254' }, OBSERVADO: { fondo: 'FFFFF1D8', texto: 'FF8A5917' },
   NO_UBICADO: { fondo: 'FFE8ECF9', texto: 'FF3B4A8A' }, RECHAZADO: { fondo: 'FFFCEBED', texto: 'FFA33C43' },
 };
-const ORIGEN_UBICACION = { REFERENCIA: 'Coordenadas de la base', MANUAL: 'Fijada en el panel', PRIMERA_VISITA: 'Primera visita', GEOCODIFICADA: 'Ubicada por el mapa' };
+const ORIGEN_UBICACION = { REFERENCIA: 'Coordenadas de la base', MANUAL: 'Fijada en el panel', PRIMERA_VISITA: 'Primera visita', GEOCODIFICADA: 'Ubicada por el mapa', MANZANA_VECINA: 'Por manzana vecina (visitas anteriores)' };
 const ESTADO_NEGOCIO = { EN_FUNCIONAMIENTO: 'En funcionamiento', INOPERATIVO: 'Inoperativo', DE_TERCEROS: 'De terceros' };
 const PROPIEDAD_LOCAL = { PROPIO: 'Propio', ALQUILADO: 'Alquilado', FAMILIAR: 'Familiar', OTRO: 'Otro' };
 

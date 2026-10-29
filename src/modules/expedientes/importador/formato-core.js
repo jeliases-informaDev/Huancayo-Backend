@@ -3,6 +3,7 @@ import { antiguedadEnMeses, entero, fecha, normalizarClave, numero, tieneTextoDa
 import { extraerCoordenadas, sinCoordenadas } from './coordenadas.js';
 import { camposDeDireccion } from '../../geocodificacion/direcciones.js';
 import { ALIAS_CONSUMO_BANCO } from './columnas-consumo.js';
+import { conDireccionesDescompuestas, estadoGeoNegocios } from '../ubicaciones.js';
 
 // Base "FV_..._CRED_EMP" del sistema core de Caja Huancayo: una fila por crédito, 262 columnas
 // con nombres técnicos. Este módulo la convierte al modelo del sistema:
@@ -445,5 +446,28 @@ export function mapearFilaCore(fila, { hoja }) {
   const huellaFila = huella(expediente);
   const direccionNormalizada = camposDeDireccion({ direccion: expediente.direccion_domicilio, distrito: expediente.distrito, provincia: expediente.provincia, tieneCoordenadas: expediente.latitud != null });
   advertencias.push(...direccionNormalizada.advertencias);
-  return { expediente: { ...expediente, ...direccionNormalizada.campos }, advertencias, camposDanados: dañados.slice(0, 8), huella: huellaFila, columnasUsadas: usadas };
+  // Las direcciones de los negocios/empleadores también se descomponen (zona, manzana, lote) y entran a la cola del mapa si no traen coordenadas.
+  const negociosDescompuestos = conDireccionesDescompuestas(expediente.datos_negocio, { distrito: expediente.distrito, provincia: expediente.provincia });
+  return {
+    expediente: { ...expediente, ...direccionNormalizada.campos, datos_negocio: negociosDescompuestos, geo_negocios_estado: estadoGeoNegocios(negociosDescompuestos) },
+    advertencias, camposDanados: dañados.slice(0, 8), huella: huellaFila, columnasUsadas: usadas,
+  };
+}
+
+// Archivo armado juntando consultas ordenadas distinto (pasó con la muestra de Consumo del banco): la evaluación, los ingresos y las deudas de cada
+// fila son del cliente de la fila SIGUIENTE. Se nota porque la fecha de evaluación de la fila i coincide con el desembolso de la fila i+1 y no con el
+// suyo. Con 2 o más coincidencias que sean al menos la mitad de las filas comparables, el archivo se considera corrido.
+export function contarFilasDesplazadas(expedientes) {
+  const fechaEva = (e) => e?.evaluacion_financiera?.anterior?.fecha || e?.evaluacion_financiera?.reevaluacion?.fecha || null;
+  const desembolso = (e) => e?.datos_credito?.fecha_desembolso || null;
+  let desplazadas = 0;
+  let comparables = 0;
+  for (let i = 0; i < expedientes.length - 1; i += 1) {
+    const eva = fechaEva(expedientes[i]);
+    const siguiente = desembolso(expedientes[i + 1]);
+    if (!eva || !siguiente) continue;
+    comparables += 1;
+    if (eva === siguiente && eva !== desembolso(expedientes[i])) desplazadas += 1;
+  }
+  return { desplazadas, comparables, sospechoso: desplazadas >= 2 && desplazadas * 2 >= comparables };
 }

@@ -5,6 +5,8 @@ import prisma from '#core/config/prisma.js';
 import { logger } from '#core/config/logger.js';
 import { estadoSegunResultado, SIN_SUGERENCIA as BORRAR_SUGERENCIA } from './direcciones.js';
 import { geocodificarDireccion, pausaEntreConsultasMs, proveedorActivo, sleep, tamanoMaximoLote } from './proveedores.js';
+import { propagarUbicacionAVecinos } from './vecinos.js';
+import { negociosDe } from '#modules/expedientes/ubicaciones.js';
 
 const LOTE_POR_DEFECTO = 5;
 export const geocodificacionActiva = () => String(process.env.GEOCODING_WORKER_ENABLED ?? 'false').toLowerCase() === 'true';
@@ -58,22 +60,58 @@ async function procesar(e, proveedor) {
   return { tipo: estado === 'REVISAR' ? 'revisar' : result.confianza === 'ALTA' ? 'localizado' : 'aproximado', consulto: true };
 }
 
-const SELECT_COLA = { id_expediente: true, codigo_expediente: true, direccion_domicilio: true, distrito: true, provincia: true, departamento: true, direccion_normalizada: true };
+// Los negocios/empleadores (en MYPE se visita el negocio) se ubican igual que el domicilio; el resultado queda dentro de cada negocio (negocio.geo)
+// y solo un punto exacto (confianza ALTA) pasa a ser su referencia, marcado GEOCODIFICADA.
+async function procesarNegocios(e, proveedor) {
+  const negocios = negociosDe(e);
+  const ahora = new Date().toISOString();
+  const fijados = {};
+  let consulto = false;
+  const nuevos = [];
+  for (const [i, n] of negocios.entries()) {
+    if (!n?.direccion || n.latitud != null || n.geo) { nuevos.push(n); continue; }
+    if (consulto) await sleep(pausaEntreConsultasMs(proveedor));
+    const result = await geocodificarDireccion({ direccion: n.direccion, direccion_normalizada: n.direccion_normalizada, distrito: n.distrito || e.distrito, provincia: e.provincia, departamento: n.departamento || e.departamento }, { proveedor });
+    consulto = true;
+    if (!result) { nuevos.push({ ...n, geo: { estado: 'NO_ENCONTRADO', proveedor, fecha: ahora } }); continue; }
+    const estado = estadoSegunResultado(result);
+    const geo = { estado, confianza: result.confianza, precision: result.precision, proveedor, latitud: result.latitud, longitud: result.longitud, direccion_encontrada: result.direccionEncontrada, fecha: ahora };
+    if (estado === 'LOCALIZADO' && result.confianza === 'ALTA' && aplicarAlta()) {
+      nuevos.push({ ...n, geo, latitud: result.latitud, longitud: result.longitud, ubicacion_origen: 'GEOCODIFICADA' });
+      fijados[`negocio_${i + 1}_latitud`] = { antes: null, despues: result.latitud };
+      fijados[`negocio_${i + 1}_longitud`] = { antes: null, despues: result.longitud };
+    } else {
+      nuevos.push({ ...n, geo });
+    }
+  }
+  await prisma.expediente.update({ where: { id_expediente: e.id_expediente }, data: { datos_negocio: { ...(e.datos_negocio || {}), negocios: nuevos }, geo_negocios_estado: 'LISTO' } });
+  if (Object.keys(fijados).length) await prisma.expedienteCambio.create({ data: { id_expediente: e.id_expediente, tipo: 'UBICACION', cambios: { ...fijados, proveedor } } });
+  return { consulto };
+}
+
+const SELECT_COLA = { id_expediente: true, codigo_expediente: true, direccion_domicilio: true, distrito: true, provincia: true, departamento: true, direccion_normalizada: true, latitud: true, geo_estado: true, geo_negocios_estado: true, datos_negocio: true };
 
 export async function geocodificarPendientes({ limit = LOTE_POR_DEFECTO } = {}) {
   const proveedor = proveedorActivo();
   const tope = Math.min(Math.max(Number(limit) || LOTE_POR_DEFECTO, 1), tamanoMaximoLote(proveedor));
   const cola = await prisma.expediente.findMany({
-    where: { geo_estado: 'PENDIENTE', direccion_normalizada: { not: null }, latitud: null },
+    // El domicilio en cola, o algún negocio/empleador todavía sin ubicar.
+    where: { OR: [{ geo_estado: 'PENDIENTE', direccion_normalizada: { not: null }, latitud: null }, { geo_negocios_estado: 'PENDIENTE' }] },
     select: SELECT_COLA, orderBy: { id_expediente: 'asc' }, take: tope,
   });
-  const cuenta = { localizado: 0, aproximado: 0, revisar: 0, no_encontrado: 0, reutilizado: 0, error: 0 };
+  const cuenta = { localizado: 0, aproximado: 0, revisar: 0, no_encontrado: 0, reutilizado: 0, negocios: 0, error: 0 };
   let detenido = null;
   for (const e of cola) {
     let consulto = false;
     try {
-      const r = await procesar(e, proveedor);
-      cuenta[r.tipo] += 1; consulto = r.consulto;
+      if (e.geo_estado === 'PENDIENTE' && e.latitud == null && e.direccion_normalizada) {
+        const r = await procesar(e, proveedor);
+        cuenta[r.tipo] += 1; consulto = r.consulto;
+      }
+      if (e.geo_negocios_estado === 'PENDIENTE') {
+        const rn = await procesarNegocios(e, proveedor);
+        cuenta.negocios += 1; consulto = consulto || rn.consulto;
+      }
     } catch (error) {
       if (error.detenerLote) { detenido = error.message; logger.warn({ err: error, proveedor }, 'geocodificacion_lote_detenido'); break; }
       cuenta.error += 1; consulto = true;
@@ -92,6 +130,8 @@ export async function geocodificarUno(id) {
   if (!e.direccion_normalizada) throw Object.assign(new Error('El expediente no tiene dirección para buscar.'), { statusCode: 422, code: 'SIN_DIRECCION' });
   if (!geocodificacionActiva()) throw Object.assign(new Error('La búsqueda de direcciones en un proveedor de mapas está desactivada en este servidor.'), { statusCode: 409, code: 'GEOCODING_DISABLED' });
   const r = await procesar(e, proveedorActivo());
+  // De paso, los negocios/empleadores que falten (pueden seguir en cola aunque el domicilio ya esté ubicado).
+  if (e.geo_negocios_estado === 'PENDIENTE') await procesarNegocios(e, proveedorActivo());
   return r.tipo;
 }
 
@@ -105,6 +145,8 @@ export async function aceptarSugerencia(id, actorId) {
   await prisma.expedienteCambio.create({
     data: { id_expediente: id, actor_id: actorId || null, tipo: 'UBICACION', cambios: { latitud: { antes: e.latitud == null ? null : Number(e.latitud), despues: latitud }, longitud: { antes: e.longitud == null ? null : Number(e.longitud), despues: longitud }, ubicacion_origen: { antes: e.ubicacion_origen, despues: 'MANUAL' }, sugerencia_aceptada: true } },
   });
+  // Una ubicación aceptada por una persona vale como verificada: ubica a los vecinos de su manzana y de su zona.
+  await propagarUbicacionAVecinos(id, { actorId });
   return { antes: e, despues: actualizado };
 }
 
@@ -116,8 +158,10 @@ export async function resumenGeocodificacion() {
   const n = (estado, confianza) => filas.filter((f) => f.geo_estado === estado && (confianza === undefined || f.geo_confianza === confianza)).reduce((a, f) => a + f._count._all, 0);
   const sinDireccion = await prisma.expediente.count({ where: { direccion_normalizada: null } });
   const geocodificadasAlta = await prisma.expediente.count({ where: { ubicacion_origen: 'GEOCODIFICADA' } });
+  const porVecinos = await prisma.expediente.count({ where: { ubicacion_origen: 'MANZANA_VECINA' } });
+  const negociosPendientes = await prisma.expediente.count({ where: { geo_negocios_estado: 'PENDIENTE' } });
   return {
-    total, con_ubicacion_de_la_base_o_persona: conBase, geocodificadas_como_referencia: geocodificadasAlta,
+    total, con_ubicacion_de_la_base_o_persona: conBase, geocodificadas_como_referencia: geocodificadasAlta, por_manzana_vecina: porVecinos, negocios_pendientes: negociosPendientes,
     pendientes: n('PENDIENTE'), aproximadas: n('LOCALIZADO') - n('LOCALIZADO', 'ALTA'), precisas: n('LOCALIZADO', 'ALTA'), por_revisar: n('REVISAR'),
     no_encontradas: n('NO_ENCONTRADO'), con_error: n('ERROR'), verificadas: n('VERIFICADO'), sin_direccion: sinDireccion,
     activa: geocodificacionActiva(), proveedor: proveedorActivo(),

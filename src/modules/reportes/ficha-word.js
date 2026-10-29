@@ -300,25 +300,30 @@ function seccionComentarioNegocio(comentario) {
   ];
 }
 
-// Las mismas preguntas en las dos fichas del banco (la de Consumo también pregunta si el titular administra el negocio).
-function seccionCuestionario(r) {
+// Las preguntas de las dos fichas del banco. En Consumo, la del cónyuge admite «NO APLICA» y no hay bloque de microseguros (así viene su ficha).
+const siNoNa = (v, noAplica) => `${siNo(v)}   NO APLICA (${noAplica === true ? 'X' : '  '})`;
+function seccionCuestionario(r, plantilla = 'MYPE_V1') {
   const respuestas = r || {};
+  const consumo = plantilla === 'CONSUMO_V1';
   const mitad = ANCHO / 2;
   const q = (texto, clave) => `${texto}: ${siNo(respuestas[clave])}`;
+  const conyuge = consumo
+    ? `¿Cónyuge tiene conocimiento del préstamo?: ${siNoNa(respuestas.conyuge_conoce_prestamo, respuestas.conyuge_no_aplica)}`
+    : q('¿Cónyuge tiene conocimiento del préstamo?', 'conyuge_conoce_prestamo');
   const filas = [
-    [`¿Dónde realiza sus pagos?: ${val(respuestas.donde_realiza_pagos, '')}`, q('¿Cónyuge tiene conocimiento del préstamo?', 'conyuge_conoce_prestamo')],
+    [`¿Dónde realiza sus pagos?: ${val(respuestas.donde_realiza_pagos, '')}`, conyuge],
     [q('¿Alguna vez entregó dinero al asesor por alguna razón?', 'entrego_dinero_asesor'), q('¿Tiene Ud. créditos paralelos?', 'creditos_paralelos')],
     [q('¿Ud. ha pagado alguna comisión adicional por el desembolso de su crédito?', 'pago_comision_adicional'), q('¿Ud. ha recibido el total del monto solicitado?', 'recibio_monto_total')],
     [q('¿Comparte el dinero del crédito con otra persona?', 'comparte_dinero_credito'), q('¿Titular administra el negocio?', 'titular_administra_negocio')],
   ];
+  const microseguros = consumo ? [] : [
+    [celda('MICROSEGUROS:', { w: ANCHO, span: 2, bold: true, fill: GRIS })],
+    [celda(q('¿Ud. tiene microseguro?', 'tiene_microseguro'), { w: mitad }), celda(q('¿Ud. recibió toda la información necesaria antes de comprar el microseguro?', 'recibio_info_microseguro'), { w: mitad })],
+    [celda(q('¿Está conforme con el microseguro comprado?', 'conforme_microseguro'), { w: mitad }), celda(`Comentario: ${val(respuestas.comentario_microseguro, '')}`, { w: mitad })],
+  ];
   return [
     titulo('CUESTIONARIO AL CLIENTE'),
-    tabla([mitad, mitad], [
-      ...filas.map(([izq, der]) => [celda(izq, { w: mitad }), celda(der, { w: mitad })]),
-      [celda('MICROSEGUROS:', { w: ANCHO, span: 2, bold: true, fill: GRIS })],
-      [celda(q('¿Ud. tiene microseguro?', 'tiene_microseguro'), { w: mitad }), celda(q('¿Ud. recibió toda la información necesaria antes de comprar el microseguro?', 'recibio_info_microseguro'), { w: mitad })],
-      [celda(q('¿Está conforme con el microseguro comprado?', 'conforme_microseguro'), { w: mitad }), celda(`Comentario: ${val(respuestas.comentario_microseguro, '')}`, { w: mitad })],
-    ]),
+    tabla([mitad, mitad], [...filas.map(([izq, der]) => [celda(izq, { w: mitad }), celda(der, { w: mitad })]), ...microseguros]),
   ];
 }
 
@@ -464,7 +469,7 @@ export function renderizarFicha({ visita, e, plantilla, empresa, importacion = n
         ...seccionBalanceResultados(e.evaluacion_financiera, visita.conformidad_financiera),
         ...seccionEndeudamiento(e.endeudamiento),
         ...seccionComentarioNegocio(visita.comentario_negocio),
-        ...seccionCuestionario(visita.respuestas_cuestionario),
+        ...seccionCuestionario(visita.respuestas_cuestionario, plantilla),
         ...seccionOtrosClientes(visita.otros_clientes_domicilio),
         ...seccionOtrosPasivosEIngresos(visita.otros_pasivos, visita.otros_ingresos),
         ...seccionComentariosFinales(visita.comentario_auditor),
@@ -479,7 +484,7 @@ export function renderizarFicha({ visita, e, plantilla, empresa, importacion = n
         ...seccionIngresosConsumo(e.evaluacion_financiera),
         ...seccionEndeudamiento(e.endeudamiento),
         ...seccionComentarioNegocio(visita.comentario_negocio),
-        ...seccionCuestionario(visita.respuestas_cuestionario),
+        ...seccionCuestionario(visita.respuestas_cuestionario, plantilla),
         ...seccionOtrosClientes(visita.otros_clientes_domicilio),
         ...seccionOtrosPasivosEIngresos(visita.otros_pasivos, visita.otros_ingresos),
         ...seccionComentariosFinales(visita.comentario_auditor),

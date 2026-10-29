@@ -39,9 +39,10 @@ export function usuarioConPrefijo(prefijo, username) {
 export const REGLAS_POR_DEFECTO = () => ({
   geocerca_radio_m: env.GEOFENCE_RADIO_METROS,
   precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS,
+  zona_radio_m: 1000, // primera visita sin referencia: cuánto puede alejarse de la zona ya conocida (sugerencia del mapa o visitas vecinas)
   formatos_importacion: [...FORMATOS_IMPORTACION],
 });
-const REGLAS_PERMITIDAS = Object.freeze({ geocerca_radio_m: [10, 50000], precision_maxima_m: [5, 5000] });
+const REGLAS_PERMITIDAS = Object.freeze({ geocerca_radio_m: [10, 50000], precision_maxima_m: [5, 5000], zona_radio_m: [100, 20000] });
 // Formatos de Excel que la empresa acepta al cargar expedientes: CORE_262 (base del sistema core de Caja Huancayo) y SIMPLE (plantilla
 // de demostración). Una empresa nueva trae ambos; cada formato nuevo se suma aquí y en el importador, sin tocar los demás.
 export const FORMATOS_IMPORTACION = Object.freeze(['CORE_262', 'SIMPLE']);

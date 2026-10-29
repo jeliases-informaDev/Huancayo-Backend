@@ -6,9 +6,10 @@ import { conEmpresa, empresaActual } from '#core/tenant/contexto.js';
 import { avisarPanel } from '#core/realtime.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { Prisma } from '../../../generated/prisma/index.js';
-import { esFormatoCore, FORMATO_CORE, mapearFilaCore } from './formato-core.js';
+import { contarFilasDesplazadas, esFormatoCore, FORMATO_CORE, mapearFilaCore } from './formato-core.js';
 import { validarFilaSimple } from './formato-simple.js';
-import { conservarUbicacionesNegocio } from '../ubicaciones.js';
+import { conservarUbicacionesNegocio, estadoGeoNegocios } from '../ubicaciones.js';
+import { ubicarNuevosPorVecinos } from '../../geocodificacion/vecinos.js';
 import { SIN_SUGERENCIA } from '../../geocodificacion/direcciones.js';
 
 // Importación de expedientes por Excel, pensada para cargas reales (miles de filas).
@@ -174,6 +175,9 @@ async function crearNuevos(nuevos, ctx) {
   });
   ctx.insertadas += creadas.length;
   creadas.forEach(registrarAvisos);
+  // Lo ya verificado en la misma manzana o zona ubica a los recién cargados (dato propio: no se consulta a nadie).
+  const sinUbicar = creadas.filter((n) => n.data.latitud == null).map((n) => idPorCodigo.get(n.data.codigo_expediente)).filter(Boolean);
+  await ubicarNuevosPorVecinos(sinUbicar, { actorId: ctx.actorId });
 }
 
 // Qué hacer con la ubicación de un expediente que ya existe cuando el archivo trae otra versión. Ubicación fijada por una persona (panel o primera visita):
@@ -200,7 +204,10 @@ async function actualizarExistente({ existente, datos, expediente, huella, base,
   if (existente.hash_origen === huella) { ctx.sinCambios += 1; return; }
   aplicarReglasDeUbicacion(existente, datos, expediente);
   // Lo mismo con la ubicación de los negocios (MYPE) que fijó una persona.
-  if (datos.datos_negocio) datos.datos_negocio = conservarUbicacionesNegocio(existente.datos_negocio, datos.datos_negocio);
+  if (datos.datos_negocio) {
+    datos.datos_negocio = conservarUbicacionesNegocio(existente.datos_negocio, datos.datos_negocio);
+    datos.geo_negocios_estado = estadoGeoNegocios(datos.datos_negocio); // lo que ya se ubicó o buscó no vuelve a la cola
+  }
   const cambios = calcularCambios(existente, datos);
   if (!ctx.simular) {
     await prisma.expediente.update({ where: { id_expediente: existente.id_expediente }, data: datos });
@@ -215,6 +222,16 @@ async function actualizarExistente({ existente, datos, expediente, huella, base,
 // ---------- lote formato core ----------
 async function procesarLoteCore({ hoja, filas, numeros }, ctx) {
   const mapeadas = filas.map((fila, i) => ({ numeroFila: numeros[i], resultado: mapearFilaCore(fila, { hoja }) }));
+  // Un archivo con las filas corridas cargaría la evaluación, los ingresos y las deudas de OTRO cliente en cada ficha: se rechaza entero.
+  const corrido = contarFilasDesplazadas(mapeadas.map((m) => m.resultado.expediente).filter(Boolean));
+  if (corrido.sospechoso) {
+    ctx.filaConError({ hoja, fila: null, codigo: null }, [{
+      campo: 'Archivo',
+      problema: `Las filas vienen corridas: en ${corrido.desplazadas} de ${corrido.comparables} filas la fecha de evaluación es la del desembolso de la fila siguiente (la evaluación, los ingresos y las deudas serían de otro cliente).`,
+      corregir: 'Vuelve a exportar la base con todos los datos de cada crédito en su misma fila (unidos por el N° de crédito) y carga el archivo otra vez.',
+    }]);
+    return;
+  }
   const existentes = await precargarExistentes(mapeadas.map((m) => m.resultado.expediente?.codigo_expediente).filter(Boolean));
   const nuevos = [];
 

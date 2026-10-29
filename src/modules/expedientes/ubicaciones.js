@@ -3,6 +3,8 @@
 // si todavía no se conocen). La ubicación de un negocio vive dentro del propio bloque datos_negocio:
 //   { direccion, distrito, referencia, ..., latitud, longitud, ubicacion_origen }
 
+import { descomponerDireccion } from '../geocodificacion/direcciones.js';
+
 const comoNumero = (valor) => {
   if (valor === null || valor === undefined || valor === '') return null;
   const n = Number(valor);
@@ -47,10 +49,33 @@ export function conservarUbicacionesNegocio(datosActuales, datosNuevos) {
   const clave = (s) => String(s || '').trim().toLowerCase();
   const negocios = nuevos.map((n, i) => {
     const a = antiguos[i];
-    if (a && ['MANUAL', 'PRIMERA_VISITA'].includes(a.ubicacion_origen) && comoNumero(a.latitud) !== null && clave(a.direccion) === clave(n.direccion)) {
-      return { ...n, latitud: a.latitud, longitud: a.longitud, ubicacion_origen: a.ubicacion_origen };
+    const mismaDireccion = Boolean(a) && clave(a.direccion) === clave(n.direccion);
+    if (mismaDireccion && ['MANUAL', 'PRIMERA_VISITA', 'GEOCODIFICADA'].includes(a.ubicacion_origen) && comoNumero(a.latitud) !== null) {
+      return { ...n, latitud: a.latitud, longitud: a.longitud, ubicacion_origen: a.ubicacion_origen, ...(a.geo ? { geo: a.geo } : {}) };
     }
+    // Lo que el mapa averiguó de esa dirección (la sugerencia) también se conserva mientras la dirección no cambie.
+    if (mismaDireccion && a.geo && comoNumero(n.latitud) === null) return { ...n, geo: a.geo };
     return n;
   });
   return { ...datosNuevos, negocios };
+}
+
+// Cada negocio o empleador con su dirección descompuesta (zona, manzana, lote, vía…), igual que el domicilio: así se puede buscar en el mapa
+// y reconocer vecinos. Se agrega después de calcular la huella de la fila para no alterar la huella de lo ya importado.
+export function conDireccionesDescompuestas(datosNegocio, { distrito, provincia } = {}) {
+  if (!datosNegocio || !Array.isArray(datosNegocio.negocios)) return datosNegocio;
+  const negocios = datosNegocio.negocios.map((n) => {
+    if (!n?.direccion) return n;
+    const d = descomponerDireccion(n.direccion, { distrito: n.distrito || distrito, provincia });
+    return { ...n, direccion_normalizada: d.normalizada, componentes: d.componentes ? { ...d.componentes, calidad: d.calidad } : null };
+  });
+  return { ...datosNegocio, negocios };
+}
+
+// Estado de la cola del mapa para los negocios: PENDIENTE si alguno con dirección sigue sin coordenadas y sin sugerencia; LISTO si ya no hay
+// nada que buscar; null si el expediente no tiene negocios.
+export function estadoGeoNegocios(datosNegocio) {
+  const negocios = negociosDe({ datos_negocio: datosNegocio });
+  if (!negocios.length) return null;
+  return negocios.some((n) => n.direccion && comoNumero(n.latitud) === null && !n.geo) ? 'PENDIENTE' : 'LISTO';
 }

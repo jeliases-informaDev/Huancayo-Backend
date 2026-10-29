@@ -2,7 +2,8 @@ import prisma from '#core/config/prisma.js';
 import storageService from '#modules/sistema/storage.service.js';
 import { env } from '#core/config/env.js';
 import { haversineMeters } from '#core/security/geofence.js';
-import { puntoDeReferencia, conUbicacionNegocio } from '#modules/expedientes/ubicaciones.js';
+import { negociosDe, puntoDeReferencia, conUbicacionNegocio } from '#modules/expedientes/ubicaciones.js';
+import { propagarUbicacionAVecinos } from '#modules/geocodificacion/vecinos.js';
 import { registrarEventosDeCampo, invalidarPuntos } from './eventos-campo.js';
 import { estadoDeMovimiento } from '#modules/usuarios/movimiento.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
@@ -101,12 +102,28 @@ function validarFichaMype(payload) {
 
 // La distancia se mide contra el punto que el auditor declaró visitar: el domicilio de la persona o,
 // en MYPE, uno de los negocios. Sin ese dato (apps anteriores) se usa el domicilio, como siempre.
-function evaluarSenales({ punto, payload, serverNow, reglas }) {
+const ZONA_RADIO_POR_DEFECTO_M = 1000;
+
+// Sin referencia todavía, la ubicación aproximada que ya se conoce (sugerencia del mapa o de las visitas vecinas de la zona) sirve para
+// comprobar que el auditor está al menos en la zona: una primera visita hecha desde otro lugar no fija la referencia ni pasa como conforme.
+function zonaDe(expediente, punto) {
+  if (!expediente || punto.latitud != null) return null;
+  const g = punto.destino === 'NEGOCIO' ? negociosDe(expediente)[punto.indice]?.geo : { latitud: expediente.geo_latitud, longitud: expediente.geo_longitud };
+  if (g?.latitud == null || g?.longitud == null) return null;
+  const latitud = Number(g.latitud);
+  const longitud = Number(g.longitud);
+  return Number.isFinite(latitud) && Number.isFinite(longitud) ? { latitud, longitud } : null;
+}
+
+function evaluarSenales({ punto, zona = null, payload, serverNow, reglas }) {
   const alertas = [];
   let distancia = null;
   if (punto.latitud != null && punto.longitud != null) {
     distancia = haversineMeters(punto.latitud, punto.longitud, payload.latitud, payload.longitud);
     if (distancia > reglas.geocerca_radio_m) alertas.push('GEOCERCA_EXCEDIDA');
+  } else if (zona) {
+    const distanciaZona = haversineMeters(zona.latitud, zona.longitud, payload.latitud, payload.longitud);
+    if (distanciaZona > (reglas.zona_radio_m ?? ZONA_RADIO_POR_DEFECTO_M)) alertas.push('FUERA_DE_ZONA');
   }
   if (payload.precision_metros != null && payload.precision_metros > reglas.precision_maxima_m) {
     alertas.push('PRECISION_INSUFICIENTE');
@@ -150,7 +167,7 @@ async function crearVisita(auditorId, payload) {
   }
 
   const serverNow = new Date();
-  const { alertas, distancia } = evaluarSenales({ reglas: await reglasEmpresa(), punto, payload, serverNow });
+  const { alertas, distancia } = evaluarSenales({ reglas: await reglasEmpresa(), punto, zona: zonaDe(expediente, punto), payload, serverNow });
   // Señales "blandas" (geocerca, precisión, reloj adelantado): no se bloquean, porque
   // pueden tener explicaciones legítimas, pero se obliga a declararlas — el auditor no
   // puede marcar la visita como CONFORME sin dejar constancia del motivo.
@@ -235,6 +252,10 @@ async function crearVisita(auditorId, payload) {
     await tx.asignacionAuditoria.update({ where: { id_asignacion: asignacion.id_asignacion }, data: { estado: 'FINALIZADA', fecha_fin: serverNow } });
     return created;
   });
+  // Si esta visita fijó la referencia del domicilio, los vecinos de su manzana reciben la misma ubicación y los de su zona una sugerencia.
+  if (punto.destino !== 'NEGOCIO' && punto.latitud == null && !alertas.length && ['CONFORME', 'OBSERVADO'].includes(payload.resultado)) {
+    await propagarUbicacionAVecinos(payload.id_expediente, { actorId: auditorId });
+  }
   invalidarPuntos(); // la asignación pasó a FINALIZADA: los avisos de llegada/salida deben releerla ya
   return { ...serialize(visita), _alertas: alertas };
 }
@@ -551,5 +572,5 @@ async function registrarJornada(usuarioId, accion, cuerpo = {}) {
   };
 }
 
-export { snapshotExpediente };
+export { snapshotExpediente, evaluarSenales, zonaDe };
 export default { presignEvidencia, recibirEvidencia, crearVisita, listar, exportarCsv, exportarXlsx, obtener, obtenerArchivoEvidencia, actualizarUbicacionEnVivo, registrarJornada };

@@ -183,6 +183,7 @@ export const asignacionBulkBody = z.object({
 export const cuestionarioSchema = z.object({
   donde_realiza_pagos: optionalString(200),
   conyuge_conoce_prestamo: z.boolean().optional(),
+  conyuge_no_aplica: z.boolean().optional(), // Consumo: la ficha del banco ofrece «NO APLICA»
   // Obligatorias solo si el auditor llegó al cliente (CONFORME/OBSERVADO): lo valida el servicio.
   entrego_dinero_asesor: z.boolean().optional(),
   creditos_paralelos: z.boolean().optional(),
