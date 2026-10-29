@@ -250,6 +250,8 @@ model Expediente {
   geo_longitud  Decimal? @db.Decimal(11, 8)
   geo_direccion_encontrada String? @db.VarChar(400)
   geo_fecha     DateTime?
+  // Cola del mapa para los negocios/empleadores (sus direcciones viven en datos_negocio): PENDIENTE = alguno sin coordenadas por buscar; LISTO = ya se buscaron.
+  geo_negocios_estado String? @db.VarChar(15)
 
   // --- Trazabilidad del dato ---
   // De dónde salió la ubicación del domicilio: REFERENCIA (coordenadas escritas en la referencia de la base), MANUAL (la fijó un
@@ -280,6 +282,7 @@ model Expediente {
   @@index([distrito])
   @@index([departamento])
   @@index([geo_estado])
+  @@index([geo_negocios_estado])
   @@unique([empresa_id, codigo_expediente])
   @@index([empresa_id, estado])
   @@index([empresa_id, fecha_creacion]) // expedientes cargados por día del Resumen

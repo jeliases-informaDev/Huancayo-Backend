@@ -81,8 +81,8 @@ const TIPOS_VIA = [
   ['Pasaje', /^PJE\b\.?\s*/i],
 ];
 // Zonas de vivienda que suelen escribirse después de la calle: se separan para no confundir al buscador.
-const ZONA = /\b(URB(?:ANIZACI[OÓ]N)?|AA\.?\s?HH\.?|A\.?\s?H\.?|ASOC(?:IACI[OÓ]N)?|COOP(?:ERATIVA)?|PP\.?\s?JJ\.?|P\.?\s?J\.?|RES(?:IDENCIAL)?|CONJ(?:UNTO)?(?:\s+HABITACIONAL)?|C\.?\s?H\.?|COND(?:OMINIO)?|SECTOR|BARRIO|CASER[IÍ]O|CENTRO POBLADO|C\.?\s?P\.?)\b\.?\s+([^,;]+?)(?=\s*(?:,|;|$|\bMZ\b|\bLT\b|\bMANZANA\b|\bLOTE\b))/i;
-const NOMBRES_ZONA = { URB: 'Urbanización', URBANIZACION: 'Urbanización', ASOC: 'Asociación', ASOCIACION: 'Asociación', COOP: 'Cooperativa', COOPERATIVA: 'Cooperativa', RES: 'Residencial', RESIDENCIAL: 'Residencial', SECTOR: 'Sector', BARRIO: 'Barrio', COND: 'Condominio', CONDOMINIO: 'Condominio', CASERIO: 'Caserío', 'CASERÍO': 'Caserío' };
+const ZONA = /\b(URB(?:ANIZACI[OÓ]N)?|AA\.?\s?HH\.?|A\.?\s?H\.?|ASOC(?:IACI[OÓ]N)?|COOP(?:ERATIVA)?|PP\.?\s?JJ\.?|P\.?\s?J\.?|RES(?:IDENCIAL)?|CONJ(?:UNTO)?(?:\s+HABITACIONAL)?|C\.?\s?H\.?|COND(?:OMINIO)?|ASENT(?:AMIENTO)?\.?\s+HUMANO|ANEXO|SECTOR|BARRIO|CASER[IÍ]O|CENTRO POBLADO|C\.?\s?P\.?)\b\.?\s+([^,;]+?)(?=\s*(?:,|;|$|\bMZ\b|\bLT\b|\bMANZANA\b|\bLOTE\b))/i;
+const NOMBRES_ZONA = { URB: 'Urbanización', URBANIZACION: 'Urbanización', ASOC: 'Asociación', ASOCIACION: 'Asociación', COOP: 'Cooperativa', COOPERATIVA: 'Cooperativa', RES: 'Residencial', RESIDENCIAL: 'Residencial', SECTOR: 'Sector', BARRIO: 'Barrio', COND: 'Condominio', CONDOMINIO: 'Condominio', CASERIO: 'Caserío', 'CASERÍO': 'Caserío', ANEXO: 'Anexo', ASENTHUMANO: 'AA.HH.', ASENTAMIENTOHUMANO: 'AA.HH.' };
 
 const capitalizar = (t) => String(t || '').toLowerCase().replace(/(^|\s)(\p{L})/gu, (m, a, b) => a + b.toUpperCase()).replace(/\b(De|Del|La|Las|Los|El|Y)\b/g, (m) => m.toLowerCase()).replace(/^\p{Ll}/u, (c) => c.toUpperCase());
 
@@ -169,6 +169,19 @@ export function nombreDeZona(zona) {
   return String(zona || '')
     .replace(/^(?:Asentamiento Humano|Asociaci[oó]n(?:\s+de)?(?:\s+Pro)?(?:\s+Vivienda)?|Cooperativa(?:\s+de)?(?:\s+Pro)?(?:\s+Vivienda)?|Urbanizaci[oó]n|Pueblo Joven|Residencial|Conjunto Habitacional|Centro Poblado|Barrio|Sector|Caser[ií]o|Condominio)\s+/i, '')
     .replace(/\s+/g, ' ').trim();
+}
+
+// Claves para reconocer vecinos aunque la dirección esté escrita distinto: la zona ya normalizada por el analizador («AA.HH. Santa Rosa»,
+// «Asociación de Vivienda …») con su distrito, y la manzana sin signos ni ceros a la izquierda. Nulas si falta la zona, el distrito o la manzana.
+export function claveZona(componentes, distrito) {
+  const zona = normalizarTexto(zonaParaBuscar(componentes?.urbanizacion));
+  const dis = normalizarTexto(distrito);
+  return zona && dis ? `${dis}|${zona}` : null;
+}
+export function claveManzana(componentes, distrito) {
+  const zona = claveZona(componentes, distrito);
+  const mz = String(componentes?.manzana ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^0+(?=\d)/, '');
+  return zona && mz ? `${zona}|MZ ${mz}` : null;
 }
 
 const unirSinRepetir = (partes) => {

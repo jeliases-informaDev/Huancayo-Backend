@@ -110,7 +110,7 @@ async function config(_req, res, next) {
   try {
     // Reglas y marca de la empresa del usuario (las del producto si no tiene propias).
     const empresa = await empresaPublica();
-    res.json({ data: { ...(empresa?.reglas || { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS }), autoasignacion: await autoasignacionPermitida(), empresa: empresa ? { id: empresa.id, nombre: empresa.nombre, marca: empresa.marca } : null } });
+    res.json({ data: { ...(empresa?.reglas || { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS, zona_radio_m: 1000 }), autoasignacion: await autoasignacionPermitida(), empresa: empresa ? { id: empresa.id, nombre: empresa.nombre, marca: empresa.marca } : null } });
   } catch (error) { next(error); }
 }
 

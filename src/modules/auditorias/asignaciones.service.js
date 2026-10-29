@@ -12,6 +12,7 @@ const expedienteSelect = {
   id_expediente: true, codigo_expediente: true, tipo_credito: true, oficina: true,
   numero_documento_cliente: true, nombres_cliente: true, direccion_domicilio: true,
   distrito: true, provincia: true, departamento: true, latitud: true, longitud: true, direccion_normalizada: true,
+  ubicacion_origen: true, geo_latitud: true, geo_longitud: true, geo_precision: true, geo_confianza: true, geo_estado: true, // ubicación aproximada para llegar mientras no haya referencia
   asesor_responsable: true, monto_desembolso: true, moneda: true, estado: true,
 };
 
