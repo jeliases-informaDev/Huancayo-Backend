@@ -6,6 +6,7 @@ import { negociosDe, puntoDeReferencia, conUbicacionNegocio } from '#modules/exp
 import { propagarUbicacionAVecinos } from '#modules/geocodificacion/vecinos.js';
 import { registrarEventosDeCampo, invalidarPuntos } from './eventos-campo.js';
 import { estadoDeMovimiento } from '#modules/usuarios/movimiento.js';
+import { decidirPunto } from '#modules/usuarios/recorrido.js';
 import { reglas as reglasEmpresa } from '#modules/empresas/empresas.service.js';
 import { logger } from '#core/config/logger.js';
 import { cierreAlReiniciar, textoZona, zonaDeJornada } from './jornada.core.js';
@@ -479,29 +480,43 @@ async function obtenerArchivoEvidencia(idEvidencia) {
   return { bytes: await storageService.readEvidence(evidencia.object_key), tipo: evidencia.tipo };
 }
 
-// Últimos puntos reales (no simulados) de cada auditor en la última hora, para calcular cómo se mueve. Se leen de la base UNA vez (al
-// primer punto tras arrancar el servidor) y desde ahí se mantienen en memoria: antes cada posición volvía a leer hasta 59 filas.
+// Últimos puntos buenos de cada auditor en la última hora, para calcular cómo se mueve. Se leen de la base UNA vez (al primer punto tras arrancar
+// el servidor) y desde ahí se mantienen en memoria: antes cada posición volvía a leer hasta 59 filas.
 const MOV_VENTANA_MS = 60 * 60 * 1000;
 const MOV_MAX_PUNTOS = 59;
 const MOV_MAX_AUDITORES = 5000;
+// Sin un punto bueno hace más de esto, una posición imprecisa pasa a ser la posición en vivo (con su radio de error): mejor «por aquí, ±600 m» que «sin señal».
+const IMPRECISA_MANDA_TRAS_MS = 2 * 60 * 1000;
 const memoriaMov = new Map(); // id del auditor → [{ latitud, longitud, fecha: Date }] (del más antiguo al más reciente)
+const memoriaSalto = new Map(); // id del auditor → último punto apartado por salto (ver recorrido.js)
 async function puntosPrevios(usuarioId, ahora) {
   let lista = memoriaMov.get(usuarioId);
   if (!lista) {
     const filas = await prisma.trackingUbicacion.findMany({
       where: { id_usuario: usuarioId, simulada: false, registrado_en: { gte: new Date(ahora.getTime() - MOV_VENTANA_MS) } },
-      orderBy: { registrado_en: 'desc' }, take: MOV_MAX_PUNTOS, select: { latitud: true, longitud: true, registrado_en: true },
+      orderBy: { registrado_en: 'desc' }, take: MOV_MAX_PUNTOS, select: { latitud: true, longitud: true, registrado_en: true, capturado_en: true },
     });
-    lista = filas.reverse().map((p) => ({ latitud: Number(p.latitud), longitud: Number(p.longitud), fecha: p.registrado_en }));
+    lista = filas.map((p) => ({ latitud: Number(p.latitud), longitud: Number(p.longitud), fecha: p.capturado_en || p.registrado_en })).sort((a, b) => a.fecha - b.fecha);
   }
   const corte = ahora.getTime() - MOV_VENTANA_MS;
   return lista.filter((p) => p.fecha.getTime() >= corte).slice(-MOV_MAX_PUNTOS);
 }
-function recordarPunto(usuarioId, previos, punto) {
-  if (memoriaMov.size >= MOV_MAX_AUDITORES) memoriaMov.clear();
-  memoriaMov.set(usuarioId, punto ? [...previos, punto].slice(-MOV_MAX_PUNTOS) : previos);
+function recordarPuntos(usuarioId, previos, nuevos) {
+  if (memoriaMov.size >= MOV_MAX_AUDITORES) { memoriaMov.clear(); memoriaSalto.clear(); }
+  memoriaMov.set(usuarioId, [...previos, ...nuevos].sort((a, b) => a.fecha - b.fecha).slice(-MOV_MAX_PUNTOS));
+}
+// Hora en que el celular tomó la posición. Si no la manda (apps anteriores) o su reloj está mal (más de 2 min en el futuro o más de un día atrás),
+// vale la hora de llegada al servidor.
+function horaDelCelular(texto, ahora) {
+  const t = texto ? Date.parse(texto) : NaN;
+  if (!Number.isFinite(t) || t > ahora.getTime() + 2 * 60 * 1000 || t < ahora.getTime() - 24 * 60 * 60 * 1000) return null;
+  return new Date(t);
 }
 
+// Cada posición del celular se clasifica antes de guardarla (ver recorrido.js): BUENA entra al recorrido y es la posición en vivo; SIMULADA se guarda
+// marcada y se avisa; IMPRECISA (peor que la regla de la empresa) no entra al recorrido y solo manda en vivo si hace rato no llega una buena; SALTO
+// (una posición imposible respecto de la anterior) no entra ni manda, pero el estado de movimiento lo delata. Así el recorrido del día ya no tiene
+// las rectas largas que dejaban las posiciones por antena o wifi.
 async function actualizarUbicacionEnVivo(usuarioId, payload) {
   const latitud = Number(payload.latitud); const longitud = Number(payload.longitud);
   if (!Number.isFinite(latitud) || !Number.isFinite(longitud) || Math.abs(latitud) > 90 || Math.abs(longitud) > 180) {
@@ -512,23 +527,48 @@ async function actualizarUbicacionEnVivo(usuarioId, payload) {
   const bateria = payload.bateria != null ? Math.round(Number(payload.bateria)) : null;
   const cargando = payload.cargando === true;
   const ahora = new Date();
-  // Cómo se mueve (a pie, vehículo, detenido…): se calcula aquí, con los últimos puntos de ESTE auditor, y se guarda en su registro;
-  // así la lista en vivo del supervisor no tiene que releer los puntos de todos los auditores en cada refresco.
+  const capturado = horaDelCelular(payload.fecha, ahora);
+  const reglas = await reglasEmpresa();
+  const punto = { latitud, longitud, precision, fecha: capturado || ahora, capturado, registrado: ahora };
   const previos = await puntosPrevios(usuarioId, ahora);
-  const actual = simulada ? null : { latitud, longitud, fecha: ahora };
-  const serie = [...previos, ...(actual ? [actual] : [])];
+  const ultimoBueno = previos[previos.length - 1] || null;
+  let calidad = simulada ? 'SIMULADA' : precision != null && precision > reglas.precision_maxima_m ? 'IMPRECISA' : 'BUENA';
+  let entran = [];
+  if (calidad === 'BUENA') {
+    const decision = decidirPunto(ultimoBueno, memoriaSalto.get(usuarioId) || null, punto);
+    entran = decision.entran;
+    if (decision.pendiente) memoriaSalto.set(usuarioId, decision.pendiente); else memoriaSalto.delete(usuarioId);
+    if (!entran.length) calidad = 'SALTO';
+  }
+  // Cómo se mueve (a pie, vehículo, detenido…): se calcula aquí, con los puntos buenos de ESTE auditor, y se guarda en su registro; así la lista en
+  // vivo del supervisor no tiene que releer los puntos de todos los auditores en cada refresco. Un salto entra al cálculo solo para que se vea como tal.
+  const serie = calidad === 'BUENA' ? [...previos, ...entran] : calidad === 'SALTO' ? [...previos, punto] : previos;
   const mov = estadoDeMovimiento(serie, ahora.getTime());
-  const [usuario] = await prisma.$transaction([
-    prisma.usuario.update({ where: { id_usuario: usuarioId }, data: { latitud, longitud, ubicacion_en: ahora, ubicacion_precision: precision, ubicacion_simulada: simulada, bateria_porcentaje: bateria, bateria_cargando: cargando, mov_estado: mov.estado, mov_desde: mov.desde ? new Date(mov.desde) : null, mov_velocidad: mov.velocidad_kmh, mov_modo: mov.modo }, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true } }),
-    // Se conserva cada punto (no solo el último) para poder reconstruir la ruta recorrida
-    // en el mapa de supervisión, tal como pide el flujo (Fase 2/Fase 6).
-    prisma.trackingUbicacion.create({ data: { id_usuario: usuarioId, latitud, longitud, precision_metros: precision, simulada, registrado_en: ahora } }),
+  const posicionManda = calidad === 'BUENA' || calidad === 'SIMULADA'
+    || (calidad === 'IMPRECISA' && (!ultimoBueno || ahora.getTime() - ultimoBueno.fecha.getTime() > IMPRECISA_MANDA_TRAS_MS));
+  const datos = {
+    ubicacion_en: ahora, bateria_porcentaje: bateria, bateria_cargando: cargando,
+    mov_estado: mov.estado, mov_desde: mov.desde ? new Date(mov.desde) : null, mov_velocidad: mov.velocidad_kmh, mov_modo: mov.modo,
+    ...(posicionManda ? { latitud, longitud, ubicacion_precision: precision, ubicacion_simulada: simulada } : {}),
+  };
+  // Se conserva cada punto bueno (no solo el último) para reconstruir la ruta recorrida en el mapa de supervisión; el simulado queda marcado, como prueba.
+  const guardar = calidad === 'SIMULADA' ? [punto] : entran;
+  const [fila] = await prisma.$transaction([
+    prisma.usuario.update({ where: { id_usuario: usuarioId }, data: datos, select: { id_usuario: true, username: true, nombres: true, apellidos: true, latitud: true, longitud: true, ubicacion_precision: true, ubicacion_simulada: true } }),
+    ...guardar.map((p) => prisma.trackingUbicacion.create({ data: { id_usuario: usuarioId, latitud: p.latitud, longitud: p.longitud, precision_metros: p.precision, simulada, registrado_en: p.registrado, capturado_en: p.capturado } })),
   ]);
-  recordarPunto(usuarioId, previos, actual);
-  // Avisos de llegada/salida: un fallo aquí nunca debe impedir que la posición quede registrada.
+  if (calidad === 'BUENA') recordarPuntos(usuarioId, previos, entran.map((p) => ({ latitud: p.latitud, longitud: p.longitud, fecha: p.fecha })));
+  // Avisos de llegada/salida: un fallo aquí nunca debe impedir que la posición quede registrada. Un salto no prueba que alguien llegó ni que se fue.
   let eventos = [];
-  try { eventos = await registrarEventosDeCampo(usuarioId, { latitud, longitud, precision, simulada }); } catch (error) { logger.warn({ err: error.message }, 'eventos_campo_fallo'); }
-  return serialize({ ...usuario, precision, simulada, bateria, cargando, actualizado_en: ahora, fecha: ahora, eventos });
+  if (calidad !== 'SALTO') {
+    try { eventos = await registrarEventosDeCampo(usuarioId, { latitud, longitud, precision, simulada }); } catch (error) { logger.warn({ err: error.message }, 'eventos_campo_fallo'); }
+  }
+  // Lo que ve el panel en vivo es la posición que quedó en el registro (la buena, aunque el punto de ahora no haya mandado) con su propia precisión.
+  const { ubicacion_precision: precisionEnVivo, ubicacion_simulada: simuladaEnVivo, ...usuario } = fila;
+  return serialize({
+    ...usuario, precision: precisionEnVivo == null ? null : Number(precisionEnVivo), simulada: Boolean(simuladaEnVivo), bateria, cargando, calidad,
+    actualizado_en: ahora, fecha: ahora, eventos,
+  });
 }
 
 // Jornada de campo: INICIAR / TERMINAR. Cada inicio queda en el historial (`jornadas_campo`) con la posición del celular en ese momento y la zona (distrito,

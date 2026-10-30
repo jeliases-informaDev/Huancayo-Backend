@@ -6,7 +6,9 @@ import { empresaActual, sinEmpresa } from '#core/tenant/contexto.js';
 import { env, mfaExemptUsernames } from '#core/config/env.js';
 import asignacionesService from '#modules/auditorias/asignaciones.service.js';
 import { codificarCursorJornada, decodificarCursorJornada, duracionMin, textoZona } from '#modules/auditorias/jornada.core.js';
-import { publica as empresaPublica, usuarioConPrefijo } from '#modules/empresas/empresas.service.js';
+import { publica as empresaPublica, reglas as reglasEmpresa, usuarioConPrefijo } from '#modules/empresas/empresas.service.js';
+import { limpiarRecorrido, numerarTramos, simplificarRecorrido } from './recorrido.js';
+import { ajustarRecorrido, rutasDisponibles } from '#modules/rutas/rutas.service.js';
 import { infoPaginas } from '#modules/auditorias/asignaciones.paginacion.js';
 import { paginaDeUsuarios, filtroUsuarios, filtroAuditores, juntarZonas, ESTADO_ELIMINADO } from './usuarios.filtros.js';
 
@@ -242,22 +244,53 @@ async function ubicacionesActivas() {
   }));
 }
 
-// Ruta recorrida por un usuario en un día dado (por defecto, hoy) — reconstruye la
-// visita a partir de los puntos guardados en tracking_ubicacion.
+// Ruta recorrida por un usuario en un día dado (por defecto, hoy), ya limpia (ver recorrido.js): sin puntos simulados, imprecisos ni saltos, ordenada
+// por la hora real del celular y numerada por tramos (uno nuevo tras más de 5 min sin señal). Los puntos que llegaron tarde (hasta 2 h) se cuentan
+// en el día en que se tomaron. `descartados` dice cuántos quedaron fuera y por qué; `recibidos`, cuántos llegaron en total.
 async function trackingDeUsuario(id, fecha) {
   const inicio = fecha ? new Date(`${fecha}T00:00:00`) : new Date(new Date().toDateString());
   const fin = new Date(inicio.getTime() + 24 * 60 * 60 * 1000);
-  const puntos = await prisma.trackingUbicacion.findMany({
-    where: { id_usuario: id, registrado_en: { gte: inicio, lt: fin } },
+  const margen = 2 * 60 * 60 * 1000;
+  const filas = await prisma.trackingUbicacion.findMany({
+    where: { id_usuario: id, registrado_en: { gte: new Date(inicio.getTime() - margen), lt: new Date(fin.getTime() + margen) } },
     orderBy: { registrado_en: 'asc' },
-    select: { latitud: true, longitud: true, precision_metros: true, simulada: true, registrado_en: true },
+    select: { latitud: true, longitud: true, precision_metros: true, simulada: true, registrado_en: true, capturado_en: true },
   });
-  return puntos.map(p => ({
-    latitud: Number(p.latitud), longitud: Number(p.longitud),
-    precision: p.precision_metros != null ? Number(p.precision_metros) : null,
-    simulada: p.simulada,
-    fecha: p.registrado_en,
-  }));
+  const crudos = filas
+    .map((p) => ({ latitud: Number(p.latitud), longitud: Number(p.longitud), precision: p.precision_metros != null ? Number(p.precision_metros) : null, simulada: p.simulada, fecha: p.capturado_en || p.registrado_en }))
+    .filter((p) => p.fecha >= inicio && p.fecha < fin);
+  const { puntos, descartados } = limpiarRecorrido(crudos, { precisionMaxima: (await reglasEmpresa()).precision_maxima_m });
+  return {
+    puntos: numerarTramos(puntos).map((p) => ({ latitud: p.latitud, longitud: p.longitud, precision: p.precision, fecha: p.fecha, tramo: p.tramo })),
+    descartados, recibidos: crudos.length,
+  };
+}
+
+// El mismo recorrido ajustado a las calles con el motor de rutas: una línea por tramo (o varias, si el motor partió el tramo). Si el motor no está o
+// no encontró calles cerca, la línea son los puntos tal cual (`ajustado: false`). Se guarda en memoria un rato: el de hoy cambia (1 min); el de días
+// anteriores, no (6 h).
+const cacheTrazado = new Map();
+async function trazadoDeUsuario(id, fecha) {
+  const hoy = new Date().toLocaleDateString('en-CA');
+  const dia = fecha || hoy;
+  const clave = `${empresaActual() || ''}|${id}|${dia}`;
+  const ahora = Date.now();
+  const guardado = cacheTrazado.get(clave);
+  if (guardado && guardado.expira > ahora) return guardado.valor;
+  const { puntos } = await trackingDeUsuario(id, fecha);
+  const porTramo = new Map();
+  for (const p of puntos) { if (!porTramo.has(p.tramo)) porTramo.set(p.tramo, []); porTramo.get(p.tramo).push(p); }
+  const lineas = [];
+  for (const [tramo, lista] of porTramo) {
+    const pocos = simplificarRecorrido(lista);
+    const ajustadas = pocos.length >= 2 ? await ajustarRecorrido(pocos) : null;
+    if (ajustadas && ajustadas.length) for (const a of ajustadas) lineas.push({ tramo, ajustado: true, coordenadas: a.coordenadas });
+    else lineas.push({ tramo, ajustado: false, coordenadas: pocos.map((p) => [p.latitud, p.longitud]) });
+  }
+  const valor = { disponible: rutasDisponibles(), lineas };
+  if (cacheTrazado.size >= 500) cacheTrazado.clear();
+  cacheTrazado.set(clave, { expira: ahora + (dia === hoy ? 60_000 : 6 * 60 * 60_000), valor });
+  return valor;
 }
 
 // Historial de jornadas de un usuario, de la más reciente a la más antigua, por páginas con cursor (nunca se carga todo el historial). Cada fila trae cuándo
@@ -288,4 +321,4 @@ async function jornadasDe(id, { limit = 30, cursor } = {}) {
   };
 }
 
-export default { listar, listarAuditores, zonasDeAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, trackingDeUsuario, jornadasDe };
+export default { listar, listarAuditores, zonasDeAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, trackingDeUsuario, trazadoDeUsuario, jornadasDe };

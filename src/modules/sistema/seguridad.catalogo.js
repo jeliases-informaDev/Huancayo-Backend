@@ -126,6 +126,7 @@ const REGLAS = [
   regla('GET', `/api/visitas/${ID}`, (c) => def('CONSULTA', 'CONSULTA_VISITA', 'INFO', `Consultó la visita n.º ${c.m[1]}`, { tipo: 'VisitaAuditoria', id: c.m[1] })),
   regla('GET', `/api/reportes/visita/${ID}/word`, (c) => def('CONSULTA', 'CONSULTA_FICHA_WORD', 'AVISO', `Descargó la ficha en Word de la visita n.º ${c.m[1]}`, { tipo: 'VisitaAuditoria', id: c.m[1] })),
   regla('GET', `/api/usuarios/${UUID}/tracking`, (c) => def('CONSULTA', 'CONSULTA_RECORRIDO', 'INFO', `Consultó el recorrido de ${usuario(c)}`, { tipo: 'Usuario', id: c.m[1] })),
+  regla('GET', `/api/usuarios/${UUID}/tracking/trazado`, (c) => def('CONSULTA', 'CONSULTA_RECORRIDO', 'INFO', `Consultó el recorrido de ${usuario(c)}`, { tipo: 'Usuario', id: c.m[1] })),
   regla('GET', '/api/seguridad/exportar', () => def('CONSULTA', 'SEGURIDAD_EXPORTAR', 'AVISO', 'Exportó el registro de auditoría')),
   regla('GET', '/api/seguridad/integridad', () => def('CONSULTA', 'SEGURIDAD_VERIFICAR_SELLO', 'INFO', 'Verificó el sello de integridad del registro de auditoría')),
   regla('GET', '/api/visitas/exportar', (c) => def('CONSULTA', 'VISITAS_EXPORTAR', 'AVISO', c.estado === 400 ? 'Intentó exportar la lista de visitas (se rechazó con filtros no válidos)' : `Exportó la lista de visitas${c.nuevo?.filas != null ? ` (${num(c.nuevo.filas)} ${Number(c.nuevo.filas) === 1 ? 'fila' : 'filas'})` : ''}`)),
