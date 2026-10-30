@@ -130,6 +130,7 @@ const REGLAS = [
   regla('GET', '/api/seguridad/exportar', () => def('CONSULTA', 'SEGURIDAD_EXPORTAR', 'AVISO', 'Exportó el registro de auditoría')),
   regla('GET', '/api/seguridad/integridad', () => def('CONSULTA', 'SEGURIDAD_VERIFICAR_SELLO', 'INFO', 'Verificó el sello de integridad del registro de auditoría')),
   regla('GET', '/api/visitas/exportar', (c) => def('CONSULTA', 'VISITAS_EXPORTAR', 'AVISO', c.estado === 400 ? 'Intentó exportar la lista de visitas (se rechazó con filtros no válidos)' : `Exportó la lista de visitas${c.nuevo?.filas != null ? ` (${num(c.nuevo.filas)} ${Number(c.nuevo.filas) === 1 ? 'fila' : 'filas'})` : ''}`)),
+  regla('GET', '/api/reportes/efectividad/excel', (c) => def('CONSULTA', 'EFECTIVIDAD_EXPORTAR', 'AVISO', `Descargó el reporte de efectividad de auditores${c.nuevo?.desde ? ` (del ${c.nuevo.desde} al ${c.nuevo.hasta})` : ''}`)),
 ];
 
 const sinRuta = (metodo, ruta) => def('OTRO', 'OTRO', 'INFO', `${metodo} ${ruta}`);
