@@ -204,7 +204,12 @@ export const ubicacionBody = z.object({
   simulada: z.boolean().optional(), // la app avisa si el GPS es simulado (Fake GPS); apps anteriores no lo envían
   bateria: z.coerce.number().int().min(0).max(100).optional(), // % de batería del celular; apps anteriores no lo envían
   cargando: z.boolean().optional(),
+  fecha: z.iso.datetime({ offset: true }).optional(), // hora en que el celular tomó la posición (ISO 8601); apps anteriores no la envían
 }).strict();
+
+// Ruta por calles entre paradas (la app y el panel): solo coordenadas, en el orden en que se visitan.
+const parada = z.object({ latitud: z.coerce.number().min(-90).max(90), longitud: z.coerce.number().min(-180).max(180) }).strict();
+export const rutaTrazarBody = z.object({ paradas: z.array(parada).min(2).max(60) }).strict();
 
 // Al iniciar la jornada la app manda la posición del celular en ese momento y, si el celular puede averiguarlo, el distrito, la provincia y el departamento:
 // esa es la zona de trabajo. Todo es opcional (las apps anteriores solo mandan la acción).

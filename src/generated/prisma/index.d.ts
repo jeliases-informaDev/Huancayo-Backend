@@ -6021,6 +6021,7 @@ export namespace Prisma {
     precision_metros: Decimal | null
     simulada: boolean | null
     registrado_en: Date | null
+    capturado_en: Date | null
   }
 
   export type TrackingUbicacionMaxAggregateOutputType = {
@@ -6032,6 +6033,7 @@ export namespace Prisma {
     precision_metros: Decimal | null
     simulada: boolean | null
     registrado_en: Date | null
+    capturado_en: Date | null
   }
 
   export type TrackingUbicacionCountAggregateOutputType = {
@@ -6043,6 +6045,7 @@ export namespace Prisma {
     precision_metros: number
     simulada: number
     registrado_en: number
+    capturado_en: number
     _all: number
   }
 
@@ -6070,6 +6073,7 @@ export namespace Prisma {
     precision_metros?: true
     simulada?: true
     registrado_en?: true
+    capturado_en?: true
   }
 
   export type TrackingUbicacionMaxAggregateInputType = {
@@ -6081,6 +6085,7 @@ export namespace Prisma {
     precision_metros?: true
     simulada?: true
     registrado_en?: true
+    capturado_en?: true
   }
 
   export type TrackingUbicacionCountAggregateInputType = {
@@ -6092,6 +6097,7 @@ export namespace Prisma {
     precision_metros?: true
     simulada?: true
     registrado_en?: true
+    capturado_en?: true
     _all?: true
   }
 
@@ -6190,6 +6196,7 @@ export namespace Prisma {
     precision_metros: Decimal | null
     simulada: boolean
     registrado_en: Date
+    capturado_en: Date | null
     _count: TrackingUbicacionCountAggregateOutputType | null
     _avg: TrackingUbicacionAvgAggregateOutputType | null
     _sum: TrackingUbicacionSumAggregateOutputType | null
@@ -6220,6 +6227,7 @@ export namespace Prisma {
     precision_metros?: boolean
     simulada?: boolean
     registrado_en?: boolean
+    capturado_en?: boolean
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["trackingUbicacion"]>
 
@@ -6234,9 +6242,10 @@ export namespace Prisma {
     precision_metros?: boolean
     simulada?: boolean
     registrado_en?: boolean
+    capturado_en?: boolean
   }
 
-  export type TrackingUbicacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_tracking" | "empresa_id" | "id_usuario" | "latitud" | "longitud" | "precision_metros" | "simulada" | "registrado_en", ExtArgs["result"]["trackingUbicacion"]>
+  export type TrackingUbicacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id_tracking" | "empresa_id" | "id_usuario" | "latitud" | "longitud" | "precision_metros" | "simulada" | "registrado_en" | "capturado_en", ExtArgs["result"]["trackingUbicacion"]>
   export type TrackingUbicacionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }
@@ -6255,6 +6264,7 @@ export namespace Prisma {
       precision_metros: Prisma.Decimal | null
       simulada: boolean
       registrado_en: Date
+      capturado_en: Date | null
     }, ExtArgs["result"]["trackingUbicacion"]>
     composites: {}
   }
@@ -6633,6 +6643,7 @@ export namespace Prisma {
     readonly precision_metros: FieldRef<"TrackingUbicacion", 'Decimal'>
     readonly simulada: FieldRef<"TrackingUbicacion", 'Boolean'>
     readonly registrado_en: FieldRef<"TrackingUbicacion", 'DateTime'>
+    readonly capturado_en: FieldRef<"TrackingUbicacion", 'DateTime'>
   }
     
 
@@ -21007,7 +21018,8 @@ export namespace Prisma {
     longitud: 'longitud',
     precision_metros: 'precision_metros',
     simulada: 'simulada',
-    registrado_en: 'registrado_en'
+    registrado_en: 'registrado_en',
+    capturado_en: 'capturado_en'
   };
 
   export type TrackingUbicacionScalarFieldEnum = (typeof TrackingUbicacionScalarFieldEnum)[keyof typeof TrackingUbicacionScalarFieldEnum]
@@ -22099,6 +22111,7 @@ export namespace Prisma {
     precision_metros?: DecimalNullableFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFilter<"TrackingUbicacion"> | boolean
     registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
+    capturado_en?: DateTimeNullableFilter<"TrackingUbicacion"> | Date | string | null
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
   }
 
@@ -22111,6 +22124,7 @@ export namespace Prisma {
     precision_metros?: SortOrderInput | SortOrder
     simulada?: SortOrder
     registrado_en?: SortOrder
+    capturado_en?: SortOrderInput | SortOrder
     usuario?: UsuarioOrderByWithRelationInput
     _relevance?: TrackingUbicacionOrderByRelevanceInput
   }
@@ -22127,6 +22141,7 @@ export namespace Prisma {
     precision_metros?: DecimalNullableFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFilter<"TrackingUbicacion"> | boolean
     registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
+    capturado_en?: DateTimeNullableFilter<"TrackingUbicacion"> | Date | string | null
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
   }, "id_tracking">
 
@@ -22139,6 +22154,7 @@ export namespace Prisma {
     precision_metros?: SortOrderInput | SortOrder
     simulada?: SortOrder
     registrado_en?: SortOrder
+    capturado_en?: SortOrderInput | SortOrder
     _count?: TrackingUbicacionCountOrderByAggregateInput
     _avg?: TrackingUbicacionAvgOrderByAggregateInput
     _max?: TrackingUbicacionMaxOrderByAggregateInput
@@ -22158,6 +22174,7 @@ export namespace Prisma {
     precision_metros?: DecimalNullableWithAggregatesFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolWithAggregatesFilter<"TrackingUbicacion"> | boolean
     registrado_en?: DateTimeWithAggregatesFilter<"TrackingUbicacion"> | Date | string
+    capturado_en?: DateTimeNullableWithAggregatesFilter<"TrackingUbicacion"> | Date | string | null
   }
 
   export type EventoCampoWhereInput = {
@@ -24114,6 +24131,7 @@ export namespace Prisma {
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     simulada?: boolean
     registrado_en?: Date | string
+    capturado_en?: Date | string | null
     usuario: UsuarioCreateNestedOneWithoutTrackingsInput
   }
 
@@ -24126,6 +24144,7 @@ export namespace Prisma {
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     simulada?: boolean
     registrado_en?: Date | string
+    capturado_en?: Date | string | null
   }
 
   export type TrackingUbicacionUpdateInput = {
@@ -24136,6 +24155,7 @@ export namespace Prisma {
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    capturado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     usuario?: UsuarioUpdateOneRequiredWithoutTrackingsNestedInput
   }
 
@@ -24148,6 +24168,7 @@ export namespace Prisma {
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    capturado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type TrackingUbicacionCreateManyInput = {
@@ -24159,6 +24180,7 @@ export namespace Prisma {
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     simulada?: boolean
     registrado_en?: Date | string
+    capturado_en?: Date | string | null
   }
 
   export type TrackingUbicacionUpdateManyMutationInput = {
@@ -24169,6 +24191,7 @@ export namespace Prisma {
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    capturado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type TrackingUbicacionUncheckedUpdateManyInput = {
@@ -24180,6 +24203,7 @@ export namespace Prisma {
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    capturado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type EventoCampoCreateInput = {
@@ -26476,6 +26500,7 @@ export namespace Prisma {
     precision_metros?: SortOrder
     simulada?: SortOrder
     registrado_en?: SortOrder
+    capturado_en?: SortOrder
   }
 
   export type TrackingUbicacionAvgOrderByAggregateInput = {
@@ -26494,6 +26519,7 @@ export namespace Prisma {
     precision_metros?: SortOrder
     simulada?: SortOrder
     registrado_en?: SortOrder
+    capturado_en?: SortOrder
   }
 
   export type TrackingUbicacionMinOrderByAggregateInput = {
@@ -26505,6 +26531,7 @@ export namespace Prisma {
     precision_metros?: SortOrder
     simulada?: SortOrder
     registrado_en?: SortOrder
+    capturado_en?: SortOrder
   }
 
   export type TrackingUbicacionSumOrderByAggregateInput = {
@@ -28880,6 +28907,7 @@ export namespace Prisma {
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     simulada?: boolean
     registrado_en?: Date | string
+    capturado_en?: Date | string | null
   }
 
   export type TrackingUbicacionUncheckedCreateWithoutUsuarioInput = {
@@ -28890,6 +28918,7 @@ export namespace Prisma {
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     simulada?: boolean
     registrado_en?: Date | string
+    capturado_en?: Date | string | null
   }
 
   export type TrackingUbicacionCreateOrConnectWithoutUsuarioInput = {
@@ -29156,6 +29185,7 @@ export namespace Prisma {
     precision_metros?: DecimalNullableFilter<"TrackingUbicacion"> | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFilter<"TrackingUbicacion"> | boolean
     registrado_en?: DateTimeFilter<"TrackingUbicacion"> | Date | string
+    capturado_en?: DateTimeNullableFilter<"TrackingUbicacion"> | Date | string | null
   }
 
   export type EventoCampoUpsertWithWhereUniqueWithoutUsuarioInput = {
@@ -32142,6 +32172,7 @@ export namespace Prisma {
     precision_metros?: Decimal | DecimalJsLike | number | string | null
     simulada?: boolean
     registrado_en?: Date | string
+    capturado_en?: Date | string | null
   }
 
   export type EventoCampoCreateManyUsuarioInput = {
@@ -32378,6 +32409,7 @@ export namespace Prisma {
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    capturado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type TrackingUbicacionUncheckedUpdateWithoutUsuarioInput = {
@@ -32388,6 +32420,7 @@ export namespace Prisma {
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    capturado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type TrackingUbicacionUncheckedUpdateManyWithoutUsuarioInput = {
@@ -32398,6 +32431,7 @@ export namespace Prisma {
     precision_metros?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     simulada?: BoolFieldUpdateOperationsInput | boolean
     registrado_en?: DateTimeFieldUpdateOperationsInput | Date | string
+    capturado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type EventoCampoUpdateWithoutUsuarioInput = {

@@ -97,6 +97,9 @@ const schema = z.object({
   // Anti-fraude: radio máximo (metros) entre el domicilio del expediente y el punto de la visita.
   GEOFENCE_RADIO_METROS: z.coerce.number().int().min(10).max(50000).default(100),
   GEOFENCE_PRECISION_MAXIMA_METROS: z.coerce.number().int().min(5).max(5000).default(100),
+  // Motor de rutas por calles (OSRM propio con los mapas de Perú; ver apps/auditoria en Sulotec-infra), p. ej. http://auditoria-osrm:5000.
+  // Vacío = sin motor: la ruta sugerida y el recorrido se dibujan con rectas, como antes.
+  OSRM_URL: z.string().trim().optional(),
 });
 
 const result = schema.safeParse(process.env);
@@ -116,6 +119,9 @@ if (result.data.EVIDENCIAS_BACKEND === 's3') {
 }
 if (result.data.NODE_ENV === 'production' && result.data.ENFORCE_DEVICE_BINDING === 'false') {
   throw new Error('Configuración de entorno inválida: ENFORCE_DEVICE_BINDING no puede desactivarse en producción');
+}
+if (result.data.OSRM_URL && !/^https?:\/\/\S+$/.test(result.data.OSRM_URL)) {
+  throw new Error('Configuración de entorno inválida: OSRM_URL debe ser una dirección http(s) o quedar vacía');
 }
 
 export const env = Object.freeze(result.data);

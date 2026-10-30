@@ -199,7 +199,8 @@ exports.Prisma.TrackingUbicacionScalarFieldEnum = {
   longitud: 'longitud',
   precision_metros: 'precision_metros',
   simulada: 'simulada',
-  registrado_en: 'registrado_en'
+  registrado_en: 'registrado_en',
+  capturado_en: 'capturado_en'
 };
 
 exports.Prisma.EventoCampoScalarFieldEnum = {

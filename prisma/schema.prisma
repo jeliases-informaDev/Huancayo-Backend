@@ -139,7 +139,8 @@ model TrackingUbicacion {
   longitud         Decimal  @db.Decimal(11, 8)
   precision_metros Decimal? @db.Decimal(8, 2)
   simulada         Boolean  @default(false) // el celular avisó que la posición venía de un GPS simulado
-  registrado_en    DateTime @default(now())
+  registrado_en    DateTime @default(now()) // cuándo llegó al servidor
+  capturado_en     DateTime? // cuándo tomó la posición el celular (la app la manda desde 0.4.0); el recorrido se ordena por esta hora
 
   usuario Usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Restrict, onUpdate: Cascade)
 

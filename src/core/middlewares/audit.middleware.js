@@ -37,7 +37,8 @@ export function auditMiddleware(req, res, next) {
   const startedAt = Date.now();
   // La posición en vivo del celular llega cada ~10 s por auditor: guardarla también aquí llenaba la tabla de auditoría (millones de filas
   // por día con cientos de auditores) sin aportar nada, porque cada punto ya queda en tracking_ubicacion. Solo se audita si falla.
-  const esPosicion = metodo === 'PATCH' && ruta === '/api/visitas/ubicacion';
+  // Lo mismo con las rutas por calles que pide la app con cada cambio de posición: solo viajan coordenadas y no cambian nada.
+  const esPosicion = (metodo === 'PATCH' && ruta === '/api/visitas/ubicacion') || (metodo === 'POST' && ruta === '/api/rutas/trazar');
   res.on('finish', () => {
     if (esPosicion && res.statusCode < 400) return;
     if (lee) {

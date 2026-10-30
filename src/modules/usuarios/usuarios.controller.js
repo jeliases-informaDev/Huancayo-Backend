@@ -52,8 +52,15 @@ async function resetDevice(req, res, next) {
 async function ubicacionesActivas(_req, res, next) {
   try { res.json({ data: await usuariosService.ubicacionesActivas(), ahora: new Date().toISOString() }); } catch (error) { next(error); }
 }
+// El recorrido del día ya limpio (`data`), con cuántos puntos se descartaron y por qué; y el mismo recorrido ajustado a las calles.
 async function tracking(req, res, next) {
-  try { res.json({ data: await usuariosService.trackingDeUsuario(req.validated.params.id, req.validated.query.fecha) }); } catch (error) { next(error); }
+  try {
+    const r = await usuariosService.trackingDeUsuario(req.validated.params.id, req.validated.query.fecha);
+    res.json({ data: r.puntos, descartados: r.descartados, recibidos: r.recibidos });
+  } catch (error) { next(error); }
+}
+async function trazado(req, res, next) {
+  try { res.json({ data: await usuariosService.trazadoDeUsuario(req.validated.params.id, req.validated.query.fecha) }); } catch (error) { next(error); }
 }
 async function jornadas(req, res, next) {
   try { res.json(await usuariosService.jornadasDe(req.validated.params.id, req.validated.query)); } catch (error) { next(error); }
@@ -61,4 +68,4 @@ async function jornadas(req, res, next) {
 async function eventos(req, res, next) {
   try { res.json({ data: await listarEventos(req.validated.query.fecha) }); } catch (error) { next(error); }
 }
-export default { listar, listarAuditores, zonasDeAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking, eventos, jornadas };
+export default { listar, listarAuditores, zonasDeAuditores, crear, actualizar, eliminar, resetMfa, resetDevice, ubicacionesActivas, tracking, trazado, eventos, jornadas };
