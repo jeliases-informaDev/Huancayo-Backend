@@ -310,6 +310,12 @@ export const tableroQuery = z.object({
   desfase: z.coerce.number().int().min(-840).max(840).optional(),
 }).strict();
 
+// Reporte de efectividad de auditores: un periodo cerrado (días del usuario) de hasta un año; `desfase` son los minutos que el navegador está detrás de UTC.
+const DIA = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+export const efectividadQuery = z.object({ desde: DIA, hasta: DIA, desfase: z.coerce.number().int().min(-840).max(840).optional() }).strict()
+  .refine((q) => q.desde <= q.hasta, { message: 'desde debe ser anterior o igual a hasta' })
+  .refine((q) => (Date.parse(`${q.hasta}T00:00:00Z`) - Date.parse(`${q.desde}T00:00:00Z`)) / 86400000 < 366, { message: 'el periodo no puede pasar de un año' });
+
 export const trackingQuery = z.object({
   fecha: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 }).strict();
