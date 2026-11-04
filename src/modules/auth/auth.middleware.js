@@ -4,6 +4,7 @@ import { env } from '#core/config/env.js';
 import { normalizeRole, FIELD_ROLES, ROLES } from '#core/security/roles.js';
 import { conEmpresa, sinEmpresa } from '#core/tenant/contexto.js';
 import { empresaActivaPorId } from '#modules/empresas/empresas.service.js';
+import { licenciaMiddleware } from '#modules/licencias/licencia.middleware.js';
 
 export async function authMiddleware(req, res, next) {
   try {
@@ -62,7 +63,8 @@ export async function authMiddleware(req, res, next) {
       return res.status(403).json({ error: 'La empresa de la cuenta está suspendida', code: 'EMPRESA_SUSPENDIDA', requestId: req.id });
     }
     req.user = { id: usuario.id_usuario, username: usuario.username, rol: role, empresa_id: empresaId };
-    conEmpresa(empresaId, () => next());
+    // Único punto por el que pasa toda ruta autenticada, ya con empresa y rol: aquí se cuelga el guard de licencia (D1), dentro del contexto de empresa.
+    conEmpresa(empresaId, () => licenciaMiddleware(req, res, next));
   } catch (error) {
     next(error);
   }

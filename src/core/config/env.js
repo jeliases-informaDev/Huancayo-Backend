@@ -100,6 +100,12 @@ const schema = z.object({
   // Motor de rutas por calles (OSRM propio con los mapas de Perú; ver apps/auditoria en Sulotec-infra), p. ej. http://auditoria-osrm:5000.
   // Vacío = sin motor: la ruta sugerida y el recorrido se dibujan con rectas, como antes.
   OSRM_URL: z.string().trim().optional(),
+  // Licencias de Sulotec (servicio común Licencias-Backend; dentro de la VM, http://licencias:3200). GeoMatrix se licencia solo por usuarios y no
+  // decide reglas: pregunta y muestra lo que el servicio responde (ver src/modules/licencias). LICENCIAS_TOKEN tiene la forma geomatrix.<secreto>.
+  // Token VACÍO = licencias apagadas: todo sigue como hoy, nada se bloquea ni se exige cupo. Si Sulotec no responde se sigue con la última conocida.
+  LICENCIAS_URL: z.string().trim().optional(),
+  LICENCIAS_TOKEN: z.string().trim().optional(),
+  LICENCIAS_PRODUCTO: z.string().trim().default('geomatrix'),
 });
 
 const result = schema.safeParse(process.env);
@@ -122,6 +128,13 @@ if (result.data.NODE_ENV === 'production' && result.data.ENFORCE_DEVICE_BINDING 
 }
 if (result.data.OSRM_URL && !/^https?:\/\/\S+$/.test(result.data.OSRM_URL)) {
   throw new Error('Configuración de entorno inválida: OSRM_URL debe ser una dirección http(s) o quedar vacía');
+}
+if (result.data.LICENCIAS_URL && !/^https?:\/\/\S+$/.test(result.data.LICENCIAS_URL)) {
+  throw new Error('Configuración de entorno inválida: LICENCIAS_URL debe ser una dirección http(s), p. ej. http://licencias:3200, o quedar vacía');
+}
+// Un token sin dirección es un descuido de configuración (las licencias quedarían apagadas sin que nadie lo note): se avisa al arrancar.
+if (result.data.LICENCIAS_TOKEN && !result.data.LICENCIAS_URL) {
+  throw new Error('Configuración de entorno inválida: LICENCIAS_TOKEN necesita LICENCIAS_URL (la dirección del servicio de licencias de Sulotec); para apagar las licencias deja LICENCIAS_TOKEN vacío');
 }
 
 export const env = Object.freeze(result.data);

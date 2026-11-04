@@ -1,4 +1,5 @@
 import empresasService from './empresas.service.js';
+import { licenciaPublica } from '#modules/licencias/licencias.service.js';
 
 // Solo el administrador universal de Sulotec ve y administra el catálogo de empresas.
 async function listar(_req, res, next) {
@@ -18,12 +19,12 @@ async function actualizar(req, res, next) {
     res.json({ data });
   } catch (error) { next(error); }
 }
-// La propia empresa del usuario (nombre, marca y reglas). Nunca devuelve nada de otras empresas.
+// La propia empresa del usuario (nombre, marca y reglas) con su licencia de GeoMatrix (D9). Nunca devuelve nada de otras empresas.
 async function actual(req, res, next) {
   try {
     const data = await empresasService.publica(req.user.empresa_id);
     if (!data) return res.status(400).json({ error: 'Elige la empresa con la que vas a trabajar (cabecera x-empresa-id).', code: 'EMPRESA_REQUERIDA', requestId: req.id });
-    res.json({ data });
+    res.json({ data: { ...data, licencia: await licenciaPublica(req.user.empresa_id) } });
   } catch (error) { next(error); }
 }
 

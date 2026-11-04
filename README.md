@@ -78,6 +78,33 @@ muestra (asignaciones), revisar cada visita con sus fotos y firma, descargar
 la ficha en Word, gestionar usuarios (reset MFA / liberar dispositivo) y ver
 el log de auditoría. `npm run dev` (puerto 5173).
 
+## Licencias de Sulotec
+
+GeoMatrix se licencia **solo por usuarios** y no decide reglas: pregunta al servicio común de licencias de Sulotec
+(`Licencias-Backend`) y muestra lo que responde. Variables: `LICENCIAS_URL` (en la VM `http://licencias:3200`),
+`LICENCIAS_TOKEN` (`geomatrix.<secreto>`; **vacío = licencias apagadas**: todo sigue como hoy) y `LICENCIAS_PRODUCTO`
+(`geomatrix`). Código en `src/modules/licencias/`.
+
+- La licencia de cada empresa se guarda 5 minutos en memoria. Si Sulotec no responde se sigue con la última conocida y, si nunca
+  se conoció, se trata como activa: una caída de Sulotec nunca bloquea a un cliente. Un 401 es un token mal configurado (ERROR en el log).
+- Nunca se bloquean: las lecturas, el administrador universal, `/api/auth`, `/api/terminos`, `/api/empresas`, `/api/licencia`,
+  la posición del celular, trazar rutas, terminar la jornada y apagar el modo pruebas.
+- `SOLO_LECTURA` (vencida): 403 `LICENCIA_SOLO_LECTURA` en las escrituras de trabajo. Sí se puede editar, desactivar, eliminar y
+  reiniciar MFA o celular de usuarios y cerrar autoasignación y tope de casos; no crear ni reactivar usuarios.
+- `SUSPENDIDA` / `CANCELADA`: 403 `LICENCIA_SUSPENDIDA` / `LICENCIA_CANCELADA` en toda escritura salvo desactivar o eliminar usuarios.
+- `SIN_LICENCIA` (404 de Sulotec) o licencia desconocida: no se bloquea nada ni se exige cupo (WARN en el log).
+- Cupo: antes de crear un usuario ACTIVO o reactivar uno se consulta en vivo; sin cupo → 409 `LICENCIA_SIN_CUPO` con `activos`,
+  `usuarios_max` y `enlace` (`https://sulotec.com/mi-licencia`, o `https://sulotec.com/licencias` si quien crea es el universal).
+  Después de crear, activar, desactivar o eliminar, y una vez al arrancar, se reporta a Sulotec el total de usuarios activos.
+- `GET /api/licencia` (cualquier sesión; `?refrescar=1` vuelve a preguntar) devuelve `{ estado, plan, usuarios_max, usuarios_activos,
+  puede_crear_usuarios, vencimiento, dias_para_vencer, mensaje, enlace }` o `null` si está apagado. El mismo objeto viaja como
+  `licencia` en `/api/auth/me`, `/api/empresas/actual` (dentro de `data`), `/api/visitas/config` (dentro de `data`) y en la raíz de
+  `/api/asignaciones/mias` y `/api/asignaciones/mias/version` (la app los pide cada 20 s; sale de la caché, no agrega tráfico a Sulotec).
+- Un 403 del guard queda en el registro de seguridad como `LICENCIA_BLOQUEO` (AVISO), aparte de `ACCESO_DENEGADO`. El trabajador de
+  geocodificación salta las empresas cuya licencia conocida no sea `ACTIVA` ni `SIN_LICENCIA` (no escribe expedientes ni gasta proveedor).
+- Probar en local: levantar `Licencias-Backend` en `http://localhost:3200`, crear la licencia de prueba con su
+  `scripts/licencia-prueba.js` (con el `id_empresa` de GeoMatrix) y poner `LICENCIAS_URL=http://localhost:3200` y el token de prueba en `.env`.
+
 ## Pendiente / fuera de alcance de esta fase
 
 Ver la sección "Fuera de alcance" del plan original. En resumen: sin integración

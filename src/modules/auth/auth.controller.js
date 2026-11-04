@@ -1,6 +1,7 @@
 import authService from "./auth.service.js";
 import { sinEmpresa } from '#core/tenant/contexto.js';
 import { publica as empresaPublica } from '#modules/empresas/empresas.service.js';
+import { licenciaPublica } from '#modules/licencias/licencias.service.js';
 import * as mfaService from "./mfa.service.js";
 import { configuracion as configuracionSso } from "./sso.service.js";
 
@@ -128,6 +129,8 @@ async function me(req, res) {
     return res.status(200).json({
       user: { ...resultado.user, empresa_id: req.user.empresa_id || null },
       empresa,
+      // La licencia de GeoMatrix de esa empresa (D9): null sin empresa, con las licencias apagadas o si nunca se pudo leer. Nunca lanza.
+      licencia: await licenciaPublica(req.user.empresa_id),
     });
   } catch (error) {
     console.error("Error en authController.me:", error);

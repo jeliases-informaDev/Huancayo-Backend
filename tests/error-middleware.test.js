@@ -82,6 +82,18 @@ describe('errorHandler', () => {
     assert.deepEqual(res.body.details, [{ field: 'username', message: 'Requerido' }]);
   });
 
+  test('un 409 LICENCIA_SIN_CUPO lleva a la pantalla los activos, el máximo y el enlace a Sulotec; un 500 nunca filtra esos campos', () => {
+    const res = fakeRes();
+    const error = Object.assign(new Error('Tu plan llegó al máximo de usuarios activos (10 de 10).'), { statusCode: 409, code: 'LICENCIA_SIN_CUPO', activos: 10, usuarios_max: 10, enlace: 'https://sulotec.com/mi-licencia' });
+    errorHandler(error, fakeReq(), res, () => {});
+    assert.equal(res.statusCode, 409);
+    assert.deepEqual(res.body, { error: 'Tu plan llegó al máximo de usuarios activos (10 de 10).', code: 'LICENCIA_SIN_CUPO', requestId: 'req-test-id', enlace: 'https://sulotec.com/mi-licencia', activos: 10, usuarios_max: 10 });
+    const res500 = fakeRes();
+    errorHandler(Object.assign(new Error('roto'), { enlace: 'https://interno', activos: 3 }), fakeReq(), res500, () => {});
+    assert.equal(res500.statusCode, 500);
+    assert.equal(res500.body.enlace, undefined); assert.equal(res500.body.activos, undefined);
+  });
+
   test('notFoundHandler responde 404 con codigo NOT_FOUND', () => {
     const res = fakeRes();
     notFoundHandler(fakeReq(), res);

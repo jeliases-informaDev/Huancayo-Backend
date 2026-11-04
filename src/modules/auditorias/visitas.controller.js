@@ -4,6 +4,7 @@ import { logger } from '#core/config/logger.js';
 import { env } from '#core/config/env.js';
 import { autoasignacionPermitida } from '#modules/sistema/configuracion.service.js';
 import { publica as empresaPublica } from '#modules/empresas/empresas.service.js';
+import { licenciaPublica } from '#modules/licencias/licencias.service.js';
 
 function notifyRoles(req, event, data) {
   const io = req.app.get('io');
@@ -106,11 +107,11 @@ async function jornada(req, res, next) {
   } catch (error) { next(error); }
 }
 
-async function config(_req, res, next) {
+async function config(req, res, next) {
   try {
-    // Reglas y marca de la empresa del usuario (las del producto si no tiene propias).
+    // Reglas y marca de la empresa del usuario (las del producto si no tiene propias), más su licencia de GeoMatrix (D9; null si está apagado).
     const empresa = await empresaPublica();
-    res.json({ data: { ...(empresa?.reglas || { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS, zona_radio_m: 1000 }), autoasignacion: await autoasignacionPermitida(), empresa: empresa ? { id: empresa.id, nombre: empresa.nombre, marca: empresa.marca } : null } });
+    res.json({ data: { ...(empresa?.reglas || { geocerca_radio_m: env.GEOFENCE_RADIO_METROS, precision_maxima_m: env.GEOFENCE_PRECISION_MAXIMA_METROS, zona_radio_m: 1000 }), autoasignacion: await autoasignacionPermitida(), empresa: empresa ? { id: empresa.id, nombre: empresa.nombre, marca: empresa.marca } : null, licencia: await licenciaPublica(req.user.empresa_id) } });
   } catch (error) { next(error); }
 }
 

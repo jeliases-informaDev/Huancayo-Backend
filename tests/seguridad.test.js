@@ -29,6 +29,17 @@ test('un 403 es un intento sin permiso (aviso) y un 401 fuera del login es una s
   assert.equal(clasificar({ metodo: 'POST', ruta: '/api/asignaciones', estado: 409 }).accion, 'ASIGNACION_CREAR');
 });
 
+test('un 403 del guard de licencia se anota aparte de los intentos sin permiso, con el estado de la licencia en el texto', () => {
+  const vencida = clasificar({ metodo: 'POST', ruta: '/api/visitas', estado: 403, licencia: { code: 'LICENCIA_SOLO_LECTURA', estado: 'SOLO_LECTURA' } });
+  assert.deepEqual([vencida.categoria, vencida.accion, vencida.severidad], ['ACCESO', 'LICENCIA_BLOQUEO', 'AVISO']);
+  assert.equal(vencida.titulo, 'Intentó registrar un cambio con la licencia vencida (solo lectura): Envió una visita');
+  assert.equal(clasificar({ metodo: 'POST', ruta: '/api/expedientes', estado: 403, licencia: { code: 'LICENCIA_CANCELADA', estado: 'CANCELADA' } }).titulo, 'Intentó registrar un cambio con la licencia cancelada: Creó un expediente');
+  assert.match(clasificar({ metodo: 'POST', ruta: '/api/visitas', estado: 403, licencia: { code: 'LICENCIA_X', estado: 'RARA' } }).titulo, /en estado RARA/);
+  // sin la marca del guard, un 403 sigue siendo un intento sin permiso; y la marca no cambia nada si la petición salió bien
+  assert.equal(clasificar({ metodo: 'POST', ruta: '/api/visitas', estado: 403 }).accion, 'ACCESO_DENEGADO');
+  assert.equal(clasificar({ metodo: 'POST', ruta: '/api/visitas', estado: 201, licencia: { code: 'LICENCIA_SOLO_LECTURA', estado: 'SOLO_LECTURA' } }).accion, 'VISITA_ENVIAR');
+});
+
 test('los cambios a una cuenta se distinguen por lo que cambió (rol > contraseña > estado > verificación > datos)', () => {
   const ruta = `/api/usuarios/${U}`;
   const base = { username: 'rosa', rol: 'AUDITOR', estado: 'ACTIVO', mfa_requerido: false, mfa_exento: false };

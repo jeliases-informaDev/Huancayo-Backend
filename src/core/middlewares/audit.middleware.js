@@ -69,7 +69,8 @@ export function auditMiddleware(req, res, next) {
     // cambia una entidad de negocio (ver #core/security/auditContext.js). No todas
     // las escrituras lo usan — solo las instrumentadas explícitamente.
     const diff = req.auditContext || {};
-    const clase = clasificar({ metodo, ruta, estado: res.statusCode, anterior: diff.valor_anterior, nuevo: diff.valor_nuevo });
+    // req.licenciaBloqueo lo deja el guard de licencia cuando el 403 fue suyo, para que no se confunda con un 403 de permisos.
+    const clase = clasificar({ metodo, ruta, estado: res.statusCode, anterior: diff.valor_anterior, nuevo: diff.valor_nuevo, licencia: req.licenciaBloqueo || null });
     const idEntidad = diff.entidad_id ? String(diff.entidad_id) : (clase.ref?.id != null ? String(clase.ref.id) : null);
     const datos = {
       empresa_id: actor?.empresa_id || null,

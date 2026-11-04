@@ -1,5 +1,6 @@
 import asignacionesService from './asignaciones.service.js';
 import { fijarAutoasignacion as fijarAjuste, fijarTopeCasos } from '#modules/sistema/configuracion.service.js';
+import { licenciaPublica } from '#modules/licencias/licencias.service.js';
 
 function notifyRoles(req, event, data) {
   const io = req.app.get('io');
@@ -23,8 +24,10 @@ async function crearMasivo(req, res, next) {
     res.status(201).json({ data });
   } catch (error) { next(error); }
 }
+// La app pide /mias y /mias/version cada 20 s: la licencia de la empresa viaja en la raíz de la respuesta (D9) y sale de la caché de 5 minutos,
+// así el aviso de vencimiento llega al celular sin otra petición ni más tráfico hacia Sulotec.
 async function misAsignaciones(req, res, next) {
-  try { res.json(await asignacionesService.misAsignaciones(req.user.id, req.validated?.query || {})); } catch (error) { next(error); }
+  try { res.json({ ...(await asignacionesService.misAsignaciones(req.user.id, req.validated?.query || {})), licencia: await licenciaPublica(req.user.empresa_id) }); } catch (error) { next(error); }
 }
 async function disponibles(req, res, next) {
   try { res.json(await asignacionesService.disponiblesParaAuditor(req.user.id, req.validated?.query || {})); } catch (error) { next(error); }
@@ -40,7 +43,7 @@ async function listar(req, res, next) {
   try { res.json(await asignacionesService.listar(req.validated.query)); } catch (error) { next(error); }
 }
 async function versionMia(req, res, next) {
-  try { res.json({ data: { version: await asignacionesService.versionMuestra(req.user.id) } }); } catch (error) { next(error); }
+  try { res.json({ data: { version: await asignacionesService.versionMuestra(req.user.id) }, licencia: await licenciaPublica(req.user.empresa_id) }); } catch (error) { next(error); }
 }
 async function carga(_req, res, next) {
   try { res.json({ data: await asignacionesService.cargaPorAuditor() }); } catch (error) { next(error); }
