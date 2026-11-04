@@ -24,6 +24,8 @@ export function errorHandler(error, req, res, _next) {
     code: error.code || (operational ? 'REQUEST_ERROR' : 'INTERNAL_ERROR'),
     requestId: req.id,
   };
+  // Algunos errores operacionales traen datos para la pantalla (p. ej. 409 LICENCIA_SIN_CUPO: activos, usuarios_max y el enlace a Sulotec): viajan tal cual.
+  if (operational) for (const k of ['enlace', 'activos', 'usuarios_max']) if (error[k] !== undefined) payload[k] = error[k];
   if (error instanceof ZodError) {
     payload.error = 'Los datos enviados no son válidos';
     payload.details = error.issues.map(({ path, message }) => ({ field: path.join('.'), message }));

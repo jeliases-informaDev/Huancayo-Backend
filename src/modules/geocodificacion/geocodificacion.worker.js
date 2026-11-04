@@ -5,6 +5,7 @@ import { borrarSugerenciasVencidas, geocodificacionActiva, geocodificarPendiente
 import { tamanoMaximoLote } from './proveedores.js';
 import { conEmpresa } from '#core/tenant/contexto.js';
 import { listarActivas } from '#modules/empresas/empresas.service.js';
+import { estadoConocido } from '#modules/licencias/licencias.service.js';
 
 const LOTE = Math.min(Math.max(Number(process.env.GEOCODING_BATCH_SIZE) || 5, 1), tamanoMaximoLote());
 const CONTINUAR_MS = 2000; // si el lote salió completo hay más en cola: se sigue casi de inmediato
@@ -15,6 +16,8 @@ let procesando = false;
 let temporizador = null;
 let ultimaLimpieza = 0;
 const LIMPIEZA_MS = 60 * 60 * 1000; // las sugerencias temporales vencidas se borran una vez por hora
+// Estados de la licencia de Sulotec con los que se sigue geocodificando; null = todavía no se conoce (ante la duda, se trabaja).
+const LICENCIA_PERMITE = new Set([null, 'ACTIVA', 'SIN_LICENCIA']);
 
 function programar(ms = INTERVALO_MS) {
   if (!iniciado) return;
@@ -37,6 +40,9 @@ async function ciclo() {
         const vencidas = await conEmpresa(empresa.id_empresa, () => borrarSugerenciasVencidas());
         if (vencidas.domicilios || vencidas.negocios) logger.info({ empresa: empresa.id_empresa, ...vencidas }, 'geocodificacion_sugerencias_vencidas');
       }
+      // Con la licencia vencida, suspendida o cancelada no se escriben expedientes ni se gasta proveedor externo por esa empresa. Solo se mira la
+      // caché (estadoConocido no hace red): el estado lo refresca el tráfico normal de la empresa.
+      if (!LICENCIA_PERMITE.has(estadoConocido(empresa.id_empresa))) continue;
       const parcial = await conEmpresa(empresa.id_empresa, () => geocodificarPendientes({ limit: LOTE }));
       if (parcial.tope) { logger.info({ proveedor: parcial.proveedor, motivo: parcial.detenido }, 'geocodificacion_tope_mensual'); r.detenido = true; break; }
       r.procesados += parcial.procesados || 0; r.detenido = r.detenido || Boolean(parcial.detenido);

@@ -136,8 +136,9 @@ const REGLAS = [
 const sinRuta = (metodo, ruta) => def('OTRO', 'OTRO', 'INFO', `${metodo} ${ruta}`);
 
 // Clasifica un evento. `estado` es el código HTTP; `anterior` y `nuevo` son los valores guardados del cambio (si los hay); `objetivo` es el nombre ya
-// resuelto de quien recibió la acción (por ejemplo «@juan»). Devuelve { categoria, accion, severidad, titulo, ref? }.
-export function clasificar({ metodo, ruta, estado = 200, anterior = null, nuevo = null, objetivo = null }) {
+// resuelto de quien recibió la acción (por ejemplo «@juan»); `licencia` es lo que deja el guard de licencia en la petición ({ code, estado }) cuando
+// fue él quien respondió el 403. Devuelve { categoria, accion, severidad, titulo, ref? }.
+export function clasificar({ metodo, ruta, estado = 200, anterior = null, nuevo = null, objetivo = null, licencia = null }) {
   const limpia = String(ruta || '').split('?')[0];
   const m = String(metodo || '').toUpperCase();
   for (const r of REGLAS) {
@@ -145,15 +146,21 @@ export function clasificar({ metodo, ruta, estado = 200, anterior = null, nuevo 
     const ok = r.patron.exec(limpia);
     if (!ok) continue;
     const base = r.def({ m: ok, estado, anterior, nuevo, objetivo, ruta: limpia });
-    return endurecer(base, { estado, metodo: m, ruta: limpia });
+    return endurecer(base, { estado, metodo: m, ruta: limpia, licencia });
   }
-  return endurecer(sinRuta(m, limpia), { estado, metodo: m, ruta: limpia });
+  return endurecer(sinRuta(m, limpia), { estado, metodo: m, ruta: limpia, licencia });
 }
 
+// Cómo se nombra el estado de la licencia en el texto del evento.
+const LICENCIA = { SOLO_LECTURA: 'vencida (solo lectura)', SUSPENDIDA: 'suspendida', CANCELADA: 'cancelada' };
+const licenciaEn = (l) => LICENCIA[l?.estado] || `en estado ${l?.estado || 'desconocido'}`;
+
 // Lo que el servidor rechaza por permisos o por sesión también es una señal: un 403 es alguien probando algo que no le toca (AVISO); un 401 fuera del
-// login es una sesión vencida o un token inválido (lo normal, INFO). En el login ya lo resuelve su propia regla.
-function endurecer(base, { estado, metodo, ruta }) {
+// login es una sesión vencida o un token inválido (lo normal, INFO). En el login ya lo resuelve su propia regla. Un 403 del guard de licencia no es
+// un intento sin permiso sino trabajo frenado por la licencia de la empresa: se anota aparte para que el administrador lo distinga.
+function endurecer(base, { estado, metodo, ruta, licencia }) {
   if (base.accion.startsWith('ACCESO_')) return base;
+  if (estado === 403 && licencia) return def('ACCESO', 'LICENCIA_BLOQUEO', 'AVISO', `Intentó registrar un cambio con la licencia ${licenciaEn(licencia)}: ${base.titulo}`);
   if (estado === 403) return def('ACCESO', 'ACCESO_DENEGADO', 'AVISO', `Intentó algo sin permiso: ${base.titulo}`);
   if (estado === 401) return def('ACCESO', 'SESION_INVALIDA', 'INFO', `Sesión vencida o no válida (${metodo} ${ruta})`);
   return base;

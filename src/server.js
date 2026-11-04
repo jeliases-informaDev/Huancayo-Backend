@@ -33,11 +33,13 @@ import empresasRoutes from '#modules/empresas/empresas.routes.js';
 import terminosRoutes from '#modules/terminos/terminos.routes.js';
 import limpiezaRoutes from '#modules/limpieza/limpieza.routes.js';
 import rutasRoutes from '#modules/rutas/rutas.routes.js';
+import licenciasRoutes from '#modules/licencias/licencias.routes.js';
 import { sinEmpresa } from '#core/tenant/contexto.js';
 import { iniciarGeocodificacion } from '#modules/geocodificacion/geocodificacion.worker.js';
 import { iniciarRetencionTracking } from '#modules/auditorias/tracking.retencion.js';
 import { iniciarRetencionAuditoria } from '#modules/sistema/seguridad.retencion.js';
 import { iniciarSelladoPendiente } from '#modules/sistema/sello.service.js';
+import { alinearActivosAlArrancar } from '#modules/licencias/licencias.service.js';
 
 // ============================================================================
 // 3. CONFIGURACIÓN DE EXPRESS Y MIDDLEWARES GLOBALES
@@ -171,6 +173,7 @@ app.use('/api/empresas', empresasRoutes);
 app.use('/api/terminos', terminosRoutes);
 app.use('/api/limpieza', limpiezaRoutes);
 app.use('/api/rutas', rutasRoutes);
+app.use('/api/licencia', licenciasRoutes);
 
 // Manejo de errores
 app.use(notFoundHandler);
@@ -186,6 +189,8 @@ const server = app.listen(env.PORT, () => {
   iniciarRetencionAuditoria();
   iniciarSelladoPendiente(); // sella las anotaciones del registro que hayan quedado sin sello (al arrancar y cada 15 minutos)
   iniciarGeocodificacion(); // apagado salvo GEOCODING_WORKER_ENABLED=true (enviar direcciones a un proveedor externo requiere autorización del banco)
+  // Licencias: alinear con Sulotec el conteo de usuarios activos una vez al arrancar; 30 s para no competir con las migraciones y el bootstrap.
+  setTimeout(() => alinearActivosAlArrancar().catch(() => {}), 30_000).unref();
   if (env.NODE_ENV === 'development') process.stdout.write(`http://localhost:${env.PORT}\n`);
   else logger.info({ port: env.PORT }, 'server_started');
 });

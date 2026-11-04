@@ -7,7 +7,7 @@ export const logger = pino({
   redact: {
     paths: [
       'req.headers.authorization', 'req.headers.cookie', 'headers.authorization',
-      'password', '*.password', 'token', '*.token', 'JWT_SECRET', 'DATABASE_URL'
+      'password', '*.password', 'token', '*.token', 'JWT_SECRET', 'DATABASE_URL', 'LICENCIAS_TOKEN'
     ],
     censor: '[REDACTED]',
   },

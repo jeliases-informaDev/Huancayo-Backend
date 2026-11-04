@@ -18,10 +18,11 @@ function soloUniversalDaUniversal(req, res) {
   }
   return true;
 }
+// El rol de quien actúa viaja al servicio solo para el enlace del 409 sin cupo de licencia: al universal se le manda a ampliar la licencia, no a renovarla.
 async function crear(req, res, next) {
   try {
     if (!soloUniversalDaUniversal(req, res)) return;
-    const { _auditDiff, ...data } = await usuariosService.crear(req.body);
+    const { _auditDiff, ...data } = await usuariosService.crear(req.body, { actorRol: req.user.rol });
     req.auditContext = _auditDiff;
     res.status(201).json({ data });
   } catch (error) { next(error); }
@@ -29,7 +30,7 @@ async function crear(req, res, next) {
 async function actualizar(req, res, next) {
   try {
     if (!soloUniversalDaUniversal(req, res)) return;
-    const { _auditDiff, ...data } = await usuariosService.actualizar(req.params.id, req.body, req.user.id);
+    const { _auditDiff, ...data } = await usuariosService.actualizar(req.params.id, req.body, req.user.id, { actorRol: req.user.rol });
     req.auditContext = _auditDiff;
     res.json({ data });
   } catch (error) { next(error); }

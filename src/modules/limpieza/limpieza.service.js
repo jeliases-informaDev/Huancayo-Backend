@@ -2,10 +2,11 @@ import bcrypt from 'bcryptjs';
 import prisma from '#core/config/prisma.js';
 import { env } from '#core/config/env.js';
 import { logger } from '#core/config/logger.js';
-import { sinEmpresa } from '#core/tenant/contexto.js';
+import { empresaActual, sinEmpresa } from '#core/tenant/contexto.js';
 import storage from '#modules/sistema/storage.service.js';
 import { modoPruebasActivo, fijarModoPruebas } from '#modules/sistema/configuracion.service.js';
 import { invalidarPuntos } from '#modules/auditorias/eventos-campo.js';
+import { reportarLuego } from '#modules/licencias/licencias.service.js';
 import { ceros, confirmaLimpieza, confirmaUsuario, crearPresupuesto, esSinPermiso, estadoDespuesDeBorrar, motivoQueImpideBorrar } from './limpieza.core.js';
 
 // Modo pruebas: borrar un empleado con todo lo suyo y limpiar los datos cargados para volver a probar desde cero. Es lo único del sistema que
@@ -166,13 +167,17 @@ export async function borrarUsuario({ id, actorId, confirmar }) {
   const bloqueo = await bloqueoDeBorrado(usuario, actorId);
   if (bloqueo) throw falla(409, bloqueo.code, bloqueo.mensaje);
   if (!confirmaUsuario(confirmar, usuario.username)) throw falla(400, 'CONFIRMACION_INCORRECTA', `Para confirmar escribe el usuario exacto: ${usuario.username}`);
-  if (usuario.estado === 'ACTIVO') await prisma.usuario.update({ where: { id_usuario: id }, data: { estado: 'INACTIVO', token_version: { increment: 1 } } });
+  if (usuario.estado === 'ACTIVO') {
+    await prisma.usuario.update({ where: { id_usuario: id }, data: { estado: 'INACTIVO', token_version: { increment: 1 } } });
+    reportarLuego(empresaActual()); // la licencia de Sulotec cuenta los usuarios activos de la empresa: uno menos
+  }
 
   const presupuesto = crearPresupuesto(env.LIMPIEZA_PRESUPUESTO_MS);
   const lote = env.LIMPIEZA_LOTE;
   const borrado = ceros(CLAVES_USUARIO);
   const estado = { archivosSinBorrar: 0, clavesSinBorrar: [] };
   const terminado = await borrarRastroYUsuario({ id, presupuesto, lote, borrado, estado });
+  if (terminado) reportarLuego(empresaActual()); // al cerrar el borrado se vuelve a reportar, por si el aviso anterior se perdió
   invalidarPuntos();
   return resultado({ terminado, borrado, estado, auditoria: { entidad: 'Usuario', entidad_id: id, valor_anterior: resumenUsuario(usuario) }, hecho: { eliminado: terminado } });
 }
@@ -215,6 +220,7 @@ export async function borrarEmpleados({ actorId, confirmar, clave }) {
   if (!confirmaLimpieza(confirmar)) throw falla(400, 'CONFIRMACION_INCORRECTA', 'Para confirmar escribe BORRAR.');
   await verificarClave(actorId, clave);
   await prisma.usuario.updateMany({ where: { rol: { in: ROLES_EMPLEADO }, estado: 'ACTIVO' }, data: { estado: 'INACTIVO', token_version: { increment: 1 } } });
+  reportarLuego(empresaActual()); // los empleados dejaron de contar como activos para la licencia de Sulotec
 
   const presupuesto = crearPresupuesto(env.LIMPIEZA_PRESUPUESTO_MS);
   const lote = env.LIMPIEZA_LOTE;
@@ -231,6 +237,7 @@ export async function borrarEmpleados({ actorId, confirmar, clave }) {
     }
     if (!alguno) break; // sin tiempo, o ninguno se pudo terminar: se devuelve lo que falta
   }
+  if (terminado) reportarLuego(empresaActual()); // al cerrar el borrado se vuelve a reportar, por si el aviso anterior se perdió
   invalidarPuntos();
   return resultado({ terminado, borrado, estado, auditoria: { entidad: 'Limpieza', entidad_id: 'empleados', valor_anterior: null }, hecho: { roles: ROLES_EMPLEADO } });
 }

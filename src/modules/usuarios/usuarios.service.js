@@ -11,6 +11,7 @@ import { limpiarRecorrido, numerarTramos, simplificarRecorrido } from './recorri
 import { ajustarRecorrido, rutasDisponibles } from '#modules/rutas/rutas.service.js';
 import { infoPaginas } from '#modules/auditorias/asignaciones.paginacion.js';
 import { paginaDeUsuarios, filtroUsuarios, filtroAuditores, juntarZonas, ESTADO_ELIMINADO } from './usuarios.filtros.js';
+import { reportarLuego, verificarCupo } from '#modules/licencias/licencias.service.js';
 
 // Dentro de una empresa el nombre de usuario lleva su abreviatura fija (arq.jorge); el universal de Sulotec no tiene empresa ni prefijo.
 async function usernameDeEmpresa(empresaId, username) {
@@ -107,7 +108,8 @@ async function zonasDeAuditores() {
   return juntarZonas(conJornada.map((f) => [f.zona_departamento, f._count._all]), sinJornada.map((f) => [f.departamento, f._count._all]));
 }
 
-async function crear(datos) {
+// `actorRol` (rol de quien crea) solo decide el enlace del 409 sin cupo: al universal de Sulotec se le manda a ampliar la licencia, no a renovarla.
+async function crear(datos, { actorRol } = {}) {
   assertRole(datos.rol);
   // El administrador universal de Sulotec no pertenece a ninguna empresa: se crea fuera del contexto y con empresa nula.
   const universal = normalizeRole(datos.rol) === ROLES.UNIVERSAL;
@@ -116,6 +118,8 @@ async function crear(datos) {
   // Una cuenta eliminada no se borra: su nombre de usuario queda reservado para que el historial siga apuntando a una sola persona.
   const reservado = await sinEmpresa(() => prisma.usuario.findFirst({ where: { username, estado: ESTADO_ELIMINADO }, select: { id_usuario: true } }));
   if (reservado) throw Object.assign(new Error('Ese nombre de usuario perteneció a una cuenta eliminada y queda reservado para conservar su historial. Elige otro.'), { statusCode: 409, code: 'USERNAME_RESERVADO' });
+  // Cupo del plan (D6): se exige a todos, incluido el universal, cuando el usuario nace ACTIVO en una empresa; crear otro universal o un INACTIVO no ocupa cupo.
+  if (!universal && (datos.estado || 'ACTIVO') === 'ACTIVO') await verificarCupo(empresaActual(), { universal: actorRol === ROLES.UNIVERSAL });
   const usuario = await crearFila({
       username, password_hash: await bcrypt.hash(datos.password, 12),
       nombres: datos.nombres?.trim() || null,
@@ -127,10 +131,11 @@ async function crear(datos) {
       mfa_requerido: datos.mfa_habilitado === true,
       mfa_exento: datos.mfa_habilitado !== true,
   });
+  if (!universal && usuario.estado === 'ACTIVO') reportarLuego(empresaActual()); // Sulotec cuenta los activos de la empresa: uno más, sin demorar la respuesta
   return { ...mapUsuario(usuario), _auditDiff: { entidad: 'Usuario', entidad_id: usuario.id_usuario, valor_anterior: null, valor_nuevo: auditSnapshot(usuario) } };
 }
 
-async function actualizar(id, datos, actorId) {
+async function actualizar(id, datos, actorId, { actorRol } = {}) {
   if (id === actorId && datos.estado === 'INACTIVO') {
     const error = new Error('No puede desactivar su propia cuenta activa'); error.statusCode = 409; throw error;
   }
@@ -170,7 +175,10 @@ async function actualizar(id, datos, actorId) {
       data.mfa_ultimo_uso = null;
     }
   }
+  // Reactivar ocupa cupo (D6): se pregunta en vivo antes de tocar la base. Desactivar nunca se bloquea por la licencia.
+  if (datos.estado === 'ACTIVO' && actual.estado !== 'ACTIVO') await verificarCupo(actual.empresa_id || empresaActual(), { universal: actorRol === ROLES.UNIVERSAL });
   const usuario = await prisma.usuario.update({ where: { id_usuario: id }, data });
+  if (datos.estado && datos.estado !== actual.estado) reportarLuego(actual.empresa_id || empresaActual()); // cambió el total de activos de la empresa
   // Si se desactiva a un auditor de campo, sus clientes en curso no deben quedar
   // "asignados" a alguien que ya no puede iniciar sesión ni visitarlos: se liberan
   // para que el Auditor de Oficina los reasigne a otra persona.
@@ -195,6 +203,7 @@ async function eliminar(id, actorId) {
     const error = new Error('Usuario no encontrado'); error.statusCode = 404; throw error;
   }
   const usuario = await prisma.usuario.update({ where: { id_usuario: id }, data: { estado: ESTADO_ELIMINADO, token_version: { increment: 1 } } });
+  if (actual.estado === 'ACTIVO') reportarLuego(actual.empresa_id || empresaActual()); // un activo menos para el cupo de la licencia
   await prisma.dispositivoAutorizado.updateMany({ where: { id_usuario: id, activo: true }, data: { activo: false } });
   await asignacionesService.cancelarTodasDeAuditor(id, actorId); // sus casos en curso vuelven a «Disponibles»
   return { _auditDiff: { entidad: 'Usuario', entidad_id: id, valor_anterior: auditSnapshot(actual), valor_nuevo: auditSnapshot(usuario) } };
